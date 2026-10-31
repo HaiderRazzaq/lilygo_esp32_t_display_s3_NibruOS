@@ -2,7 +2,11 @@
 
 **First deliverable:** a small, extensible Arduino/PlatformIO firmware shell for the owner's **LILYGO T-Display-S3 Touch Glass**, with a Home Launcher and three apps: **System Info**, **Touch Test**, and **Wi-Fi Scanner**.
 
-> **Status:** Source files are complete and the host-side C++ smoke tests pass. **Not compiled against actual PlatformIO Arduino dependencies here and not flashed or verified on physical hardware.** You must run PlatformIO Build and then test on the device. See `docs/BUILD_AND_TEST.md`.
+> **Status (2026-11-01):** Real PlatformIO target build PASS; current host rerun BLOCKED by missing desktop C++ compiler. Earlier host PASS reports are preserved. Patched firmware has not been physically verified in this session. Runtime says v0.1; legacy documentation calls the Wi-Fi patch v0.1.1-source-patch. See [current state](docs/CURRENT_STATE.md), [test matrix](docs/TEST_MATRIX.md), and [build/device procedures](docs/BUILD_AND_TEST.md).
+
+Engineering memory starts at [AGENTS.md](AGENTS.md) and the [documentation index](docs/README.md).
+Current features, issues, hardware plans, history and test evidence have separate
+records; [engineering workflow](docs/ENGINEERING_WORKFLOW.md) explains updates.
 
 ## Setup / تشغيل سريع
 
@@ -18,7 +22,7 @@
 |---|---|---|
 | System Info | ESP32 model / CPU, flash, PSRAM, free heap, uptime | No radio required |
 | Touch Test | Live mapped and raw coordinates; CST816S gesture reporting | No radio required |
-| Wi-Fi Scanner | Nonblocking 2.4 GHz network discovery; name, channel, RSSI, security | Acquires radio on entry, turns Wi-Fi off on exit; scan timeout 16 s |
+| Wi-Fi Scanner | Nonblocking 2.4 GHz network discovery; name, channel, RSSI, security | Acquires radio on entry, turns Wi-Fi off on exit; 650 ms warmup + 11 s scan deadline per attempt, at most 2 attempts |
 
 **No Wi-Fi password or account secret is embedded in this firmware.** This is a read-only scan of networks. No packet injection, capture, portal, or HID automation in v0.1.
 
@@ -89,4 +93,4 @@ docs/                          ← architecture, build, adding new apps, accepta
 
 If your earlier scanner showed **Scan timed out**, this package includes an updated asynchronous Wi-Fi state machine, one automatic retry, explicit low-level scan cancellation, and additional serial diagnostics. Hardware verification is still required. See [Wi-Fi debugging](docs/WIFI_DIAGNOSTICS.md).
 
-**Start every AI IDE session with [`AGENTS.md`](AGENTS.md), then [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md) and [`docs/HARDWARE_PINOUT.md`](docs/HARDWARE_PINOUT.md).** Full onboarding and prompts: [`docs/AI_IDE_QUICKSTART.md`](docs/AI_IDE_QUICKSTART.md). Change log: [`docs/CHANGELOG.md`](docs/CHANGELOG.md).
+**Start every AI IDE session with [`AGENTS.md`](AGENTS.md), then [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md), [`docs/CURRENT_STATE.md`](docs/CURRENT_STATE.md) and [`docs/HARDWARE_PINOUT.md`](docs/HARDWARE_PINOUT.md).** Full onboarding and prompts: [`docs/AI_IDE_QUICKSTART.md`](docs/AI_IDE_QUICKSTART.md). Canonical changelog: [`CHANGELOG.md`](CHANGELOG.md); [original package history](docs/CHANGELOG.md) is preserved.

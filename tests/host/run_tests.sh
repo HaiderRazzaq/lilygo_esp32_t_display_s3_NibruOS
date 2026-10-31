@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/../.."
+# Keep engineering records consistent alongside the existing validation path.
+"${PYTHON:-python}" tools/check_docs.py
 mkdir -p .testbuild
 c++ -std=c++17 -Wall -Wextra -Werror -Itests/host/stubs -Iinclude -Isrc \
   src/core/*.cpp src/hardware/*.cpp src/services/*.cpp src/apps/*.cpp \

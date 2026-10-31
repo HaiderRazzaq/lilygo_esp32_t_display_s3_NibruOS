@@ -11,6 +11,20 @@
 5. When an app needs hardware, supply the sensor/module model and its exact intended 3.3V pins. Have the agent check wiring, pull-ups, voltage levels, current and reserved pins **before coding**.
 6. Keep the `AGENTS.md` and both device/source docs inside version control for future IDE sessions. Commit after each tested milestone.
 
+## Required session handoff and maintenance
+
+Read [CURRENT_STATE](CURRENT_STATE.md), the relevant [feature](FEATURE_REGISTRY.md)
+and [issue](KNOWN_ISSUES.md) records, and [ENGINEERING_WORKFLOW](ENGINEERING_WORKFLOW.md)
+alongside the existing source/context/pinout reading list. Before implementation,
+identify FEAT/BUG IDs and a verification plan. Afterwards update current records,
+append engineering/test history, keep hardware outcomes separate from builds,
+and run `python tools/check_docs.py`. Record blockers and pending physical
+procedures; follow the AGENTS Definition of Done. Commit only with authorization.
+
+Current build evidence is no longer the original ZIP's NOT RUN result: the
+2026-11-01 target build passed. Physical verification of the Wi-Fi patch remains
+pending, and runtime v0.1 differs from the legacy v0.1.1-source-patch label.
+
 ## Copy-paste first prompt (English)
 
 > You are the firmware architect for **NibruOS**, a modular ESP32-S3 project targeting the **LILYGO T-Display-S3 Touch Glass** with a 320x170 ST7789V screen and CST816S touch. Before making changes, inspect the ENTIRE repository and read `AGENTS.md`, `docs/PROJECT_CONTEXT.md`, `docs/HARDWARE_PINOUT.md`, `docs/WIFI_DIAGNOSTICS.md`, `docs/ARCHITECTURE.md`, `docs/ADDING_AN_APP.md`, and `platformio.ini`. Use the actual source as the source of truth. Preserve all user-verified TFT/touch/button pin settings and the 320x170 coordinate mapping. Explain the architecture, dependencies, app lifecycle, resource ownership, known Wi-Fi timeout incident, hardware GPIO reservations, and build/test workflow. Then wait for my specific feature request. For any change, investigate the affected flow, avoid blocking the UI, keep one common hardware/service owner, update host tests and documentation, run PlatformIO Build when possible, and report any untested assumptions. Never claim hardware success without my physical-board test. Do not change the pinout or flash layout without a documented reason.

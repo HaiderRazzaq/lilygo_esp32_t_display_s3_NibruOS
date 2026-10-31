@@ -19,7 +19,7 @@ The Git repository URL for CST816S is not pinned to a verified commit in v0.1; f
 pio run -e lilygo-t-display-s3
 ```
 
-If `pio` is not in `PATH`, use the PlatformIO extension's built-in Project Tasks → General → Build, or open a PlatformIO Core CLI terminal.
+If `pio` is not in `PATH`, use the PlatformIO extension's built-in Project Tasks → General → Build, or open a PlatformIO Core CLI terminal. A common Windows fallback is `& "$env:USERPROFILE\.platformio\penv\Scripts\pio.exe" run -e lilygo-t-display-s3`; verify that executable exists first. Latest observed versions/results are in [DEPENDENCIES](DEPENDENCIES.md) and [CURRENT_STATE](CURRENT_STATE.md).
 
 ## Upload (flashing replaces the existing program)
 
@@ -62,7 +62,7 @@ If upload fails: unplug/replug; close Serial Monitor; try another data cable; ho
 - [ ] `RESCAN` touch triggers a fresh async scan after the prior one completes/fails (taps while scanning do not queue rescans); interface responds to GPIO14 while scanning.
 - [ ] Scrolling via swipe up/down shows additional records when >3 networks; at most 12 stored.
 - [ ] Exit Wi-Fi and return to System Info without needing to restart; Wi-Fi radio is switched off on exit.
-- [ ] No infinite wait if no networks or scan error; timeout after approximately 16 seconds.
+- [ ] No infinite wait: 650ms warmup and 11-second scan deadline per attempt, at most two scan attempts (about 23.3 seconds plus driver/UI overhead if both time out). Earlier 16-second timeout is historical. Immediate initialization failure may stop sooner.
 
 **Regression**
 - [ ] Run 20 successive Home ↔ Wi-Fi ↔ Home cycles; verify no freezes/reset loops.
@@ -94,6 +94,10 @@ Requirements: `g++` or `clang++` and Bash (Linux / WSL / Git Bash + compiler). M
 
 ## Build verification status for the delivered ZIP
 
+This section preserves the **original ZIP creation environment's** results.
+Fresh 2026-11-01 target-build evidence supersedes it for current build status;
+see [VERIFICATION_REPORT](VERIFICATION_REPORT.md) and [TEST_MATRIX](TEST_MATRIX.md).
+
 - Desktop **C++ host mock build and runtime assertions**: PASS.
 - `src/main.cpp` compiled against desktop mock headers: PASS.
 - PlatformIO firmware build against ESP32 SDK and external libraries: **NOT RUN** (PlatformIO dependencies/tools unavailable in the creation runtime).
@@ -101,3 +105,30 @@ Requirements: `g++` or `clang++` and Bash (Linux / WSL / Git Bash + compiler). M
 
 ## v0.1.1 Wi-Fi timeout patch and diagnostics
 If scanning shows `Scan timed out`, use `docs/WIFI_DIAGNOSTICS.md`. Scanner now warms up STA asynchronously (650ms), polls completion before its deadline, stops hardware scans explicitly on abort and retries once. Logs are at **115200**. The isolated diagnostic program in `tools/wifi_scan_diagnostic/` is a **separate PlatformIO project**; uploading it temporarily overwrites NibruOS until the main project is reflashed. Do not use erase-flash on devices storing important data. This updated code was host-tested but **has not been physically validated**.
+
+## Required engineering records and current checks
+
+Before completing a change run:
+
+```powershell
+python tools/check_docs.py
+python -m unittest discover -s tests/docs -v
+```
+
+Run host smoke tests for firmware behavior changes and target build when tools
+are available. The host script also checks docs; a missing compiler is BLOCKED,
+not firmware FAIL. Record real outcomes/types in [VERIFICATION_REPORT](VERIFICATION_REPORT.md),
+update [TEST_MATRIX](TEST_MATRIX.md), and append [DEVELOPMENT_LOG](DEVELOPMENT_LOG.md).
+
+Physical tests must record flashed version/commit and image hash, connected
+modules, GPIO, power source, procedure, expected/actual observations and sanitized
+serial evidence. Pending procedures HWT-0003 through HWT-0006 are in
+[HARDWARE_TEST_LOG](HARDWARE_TEST_LOG.md); append actual results without rewriting
+older failures. A target build does not establish physical PASS.
+
+If Windows cleanup reports locked artifacts even with exit0, inspect the output.
+For a fresh build without deleting locked files, set `$env:PLATFORMIO_BUILD_DIR`
+to an unused ignored folder such as `.testbuild/pio-build-new` before the build;
+remove that environment override afterward with `Remove-Item Env:PLATFORMIO_BUILD_DIR`.
+Do not stop unknown processes or force-delete files. The actual observed case and
+successful alternate-directory build are VER-0004 and VER-0001.

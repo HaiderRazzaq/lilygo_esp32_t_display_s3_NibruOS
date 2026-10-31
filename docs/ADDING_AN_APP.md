@@ -23,6 +23,16 @@ sensor, physical buttons, and the upper-left Back action.
    peripherals that can conflict with another app. Only release a resource you own.
 8. Add tests in `tests/host/test_main.cpp` and run the desktop smoke tests;
    afterwards run a **real PlatformIO Build** and the device acceptance tests.
+9. Register a stable FEAT ID in [FEATURE_REGISTRY](FEATURE_REGISTRY.md), add
+   applicable issue IDs and [matrix](TEST_MATRIX.md) coverage. Update current
+   state, inventory/pinout/dependencies if affected; append a development record
+   and user-facing changelog entry. Run `python tools/check_docs.py` and record
+   incomplete physical verification. See [workflow](ENGINEERING_WORKFLOW.md).
+
+To remove/deprecate an app, keep its feature ID with date/reason and history;
+remove unused registration/instances/dependencies deliberately, verify Home and
+remaining apps, and record Removed/Deprecated changes. Never silently erase its
+history or describe a planned app as implemented.
 
 ## Header example (not registered by default)
 

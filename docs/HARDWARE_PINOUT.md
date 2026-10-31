@@ -100,6 +100,59 @@ The numbered contact order is **specific to the image as seen from the back**. R
 ## Battery / power safety
 This board can be powered over USB-C or appropriate battery/power input only per the PCB power circuit specification. Never connect a raw Li-ion cell directly to 3V3 or 5V; use a correct protected cell and compatible charger/connector after checking board pinout and polarity. The diagram does **not** prove a battery charger configuration for every hardware revision. Confirm schematic and connector pins before wiring any battery. Measure external accessory current consumption; ESP32-S3 Wi-Fi spikes can reset weak supplies.
 
+## Allocation status and traceability (2026-11-01)
+
+All ESP32 signals below use **3.3V logic**. HIGH/LOW control outputs and active
+LOW/pull-up inputs are specified above; power rails are not GPIOs. Historical
+owner sketch verification (HWT-0001) applies to display/touch setup only, not
+every GPIO's electrical measurement or current firmware operation.
+
+| GPIO | Component / signal | Protocol / electrical use | Allocation | Verification / sharing | Source/configuration |
+|---|---|---|---|---|---|
+| 5 | LCD reset | Digital output | RESERVED | Owner display baseline; never share | platformio.ini TFT_RST |
+| 6 | LCD CS | Parallel control output | RESERVED | Owner display baseline; never share | platformio.ini TFT_CS |
+| 7 | LCD DC | Parallel control output | RESERVED | Owner display baseline; never share | platformio.ini TFT_DC |
+| 8 | LCD WR | Parallel write output | RESERVED | Owner display baseline; never share | platformio.ini TFT_WR |
+| 9 | LCD RD | Parallel read control | RESERVED | Owner display baseline; never share | platformio.ini TFT_RD |
+| 39 | LCD D0 | Parallel data | RESERVED | Owner display baseline; never share | platformio.ini TFT_D0 |
+| 40 | LCD D1 | Parallel data | RESERVED | Owner display baseline; never share | platformio.ini TFT_D1 |
+| 41 | LCD D2 | Parallel data | RESERVED | Owner display baseline; never share | platformio.ini TFT_D2 |
+| 42 | LCD D3 | Parallel data | RESERVED | Owner display baseline; never share | platformio.ini TFT_D3 |
+| 45 | LCD D4 | Parallel data; strap-sensitive | RESERVED | Never share/change boot loading | platformio.ini TFT_D4 |
+| 46 | LCD D5 | Parallel data; strap-sensitive | RESERVED | Never share/change boot loading | platformio.ini TFT_D5 |
+| 47 | LCD D6 | Parallel data | RESERVED | Owner display baseline; never share | platformio.ini TFT_D6 |
+| 48 | LCD D7 | Parallel data | RESERVED | Owner display baseline; never share | platformio.ini TFT_D7 |
+| 15 | Board/display power | Digital output HIGH | RESERVED | Owner baseline; no external reuse | BoardConfig kDisplayPower; DisplayManager |
+| 38 | Backlight | Digital output HIGH | RESERVED | Owner baseline; no external reuse | BoardConfig kDisplayBacklight; DisplayManager |
+| 18 | CST816S SDA | I2C data; compatible 3.3V pull-ups | RESERVED / shared bus only | Owner baseline; check address/pull-up load before extension | BoardConfig kTouchSda; TouchManager |
+| 17 | CST816S SCL | I2C clock; compatible 3.3V pull-ups | RESERVED / shared bus only | Owner baseline; do not swap with SDA | BoardConfig kTouchScl; TouchManager |
+| 21 | CST816S reset | Digital output, LOW10ms/HIGH wait50ms | RESERVED | Owner baseline; no sharing | BoardConfig kTouchReset; TouchManager |
+| 16 | CST816S interrupt | INPUT_PULLUP / FALLING | RESERVED | Owner baseline; no sharing | BoardConfig kTouchInterrupt; TouchManager |
+| 0 | BOOT | Active LOW INPUT_PULLUP; boot strap | RESERVED | Physical current-image test pending | BoardConfig kButtonBoot; ButtonManager |
+| 14 | User Back | Active LOW INPUT_PULLUP | RESERVED | Physical current-image test pending | BoardConfig kButtonUser; ButtonManager |
+| 4 | Battery divider | ADC input; calibration required | BOARD RESERVED / unused by firmware | Voltage/USB caveat; no sensor reuse | Board diagram/PDF; no battery driver |
+| 19, 20 | USB D-, D+ | Native USB differential | RESERVED | Current CDC/device test pending; no sensor reuse | platformio.ini USB flags; board wiring |
+| 43, 44 | UART TX, RX / small connector | UART/3.3V digital | BOARD SHARED / conditional | Verify connector/revision and UART use first | Owner diagram, local schematic; no extra app allocation |
+| 1, 2 | Expansion candidates | GPIO/ADC1 | UNALLOCATED | Not physically tested for external peripherals | Owner exposed-pad map; no firmware definitions |
+| 3 | Expansion candidate | GPIO; boot strap | CONDITIONAL | Boot loading restriction; not physically tested | Owner diagram; no firmware definition |
+| 10 | Proposed external SD CS | SPI output | PROPOSED / UNVERIFIED | No wiring/driver evidence; do not allocate twice | FEAT-0007; no source definition |
+| 11 | Proposed external SD MOSI | SPI output | PROPOSED / UNVERIFIED | Optional shield conflict; no wiring/driver evidence | FEAT-0007; no source definition |
+| 12 | Proposed external SD SCK | SPI clock output | PROPOSED / UNVERIFIED | Optional shield conflict; no wiring/driver evidence | FEAT-0007; no source definition |
+| 13 | Proposed external SD MISO | SPI input | PROPOSED / UNVERIFIED | Optional shield conflict; no wiring/driver evidence | FEAT-0007; no source definition |
+
+GPIO10–13 remain expansion candidates, with a documented **proposal**, not an
+installed allocation. Proposed SD supply: compatible **3.3V** and GND; module
+model/current/level shifting/SPI speed must be checked first. Do not confuse
+these SPI signals with the separate optional SD shield CMD/CLK/D0 map above.
+
+Pin definitions: [BoardConfig](../include/BoardConfig.h),
+[TFT setup](../platformio.ini), [drivers](../src/hardware/TouchManager.cpp).
+Installation evidence: [inventory](HARDWARE_INVENTORY.md); test evidence:
+[hardware log](HARDWARE_TEST_LOG.md). Any wiring change must update these records,
+feature registry, matrix and engineering log; major bus/pin choices need an ADR.
+The local [schematic PDF](T_Display_S3.pdf), added by commit ccbd0e6, has a
+2024-04-29 sheet date; matching this owner's PCB revision is **NOT VERIFIED**.
+
 ## Sources / caveats
 - User's provided `pinout-1086.png` (embedded above) + owner-tested original sketch (hardware settings).
 - Manufacturer: https://github.com/Xinyuan-LilyGO/T-Display-S3

@@ -1,0 +1,19 @@
+2026-11-01 Asia/Baghdad; command observations from this session.
+Host test attempted through installed Git Bash:
+  bash tests/host/run_tests.sh
+Observed output:
+  tests/host/run_tests.sh: line 5: c++: command not found
+Exit: 127 (compiler unavailable; host assertions never ran).
+
+Build-directory cleanup attempted:
+  pio run -e lilygo-t-display-s3 -t clean
+Observed output excerpts (absolute user path omitted):
+  [WinError 32] The process cannot access the file because it is being used by another process
+  bootloader.bin; firmware.bin; partitions.bin
+  [WinError 145] The directory is not empty
+  Done cleaning
+  Please manually remove the file ... .pio/build/lilygo-t-display-s3
+  [SUCCESS] Took 0.91 seconds
+Exit: 0, but incomplete cleanup. No force deletion or process termination.
+Follow-up: build with PLATFORMIO_BUILD_DIR=.testbuild/pio-build succeeded;
+see 2026-11-01-target-build.txt. Locking process UNKNOWN.

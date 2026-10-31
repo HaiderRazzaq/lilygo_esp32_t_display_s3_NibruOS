@@ -1,5 +1,9 @@
 # Changes
 
+> Historical package changelog preserved as received. New user-facing changes
+> belong in [root CHANGELOG](../CHANGELOG.md). Later evidence and version caveats:
+> [CURRENT_STATE](CURRENT_STATE.md). Original entries below have not been rewritten.
+
 ## v0.1.1-source-patch (2026-10-26)
 - Fixed Wi-Fi scanner lifecycle: asynchronous station warmup, completion polling precedence, explicit underlying scan cancellation, one radio restart/retry, more informative scan statuses.
 - Kept user-verified TFT_eSPI and CST816S wiring and original display/touch init unchanged.

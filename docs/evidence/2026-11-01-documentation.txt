@@ -1,0 +1,38 @@
+2026-11-01 Asia/Baghdad; documentation validation observations.
+
+Initial intentional RED run (before checker implementation):
+  python -m unittest discover -s tests/docs -v
+  ModuleNotFoundError: No module named 'check_docs'
+  Ran 1 test; FAILED (errors=1).
+
+First integration run after checker implementation:
+  python tools/check_docs.py
+  FAIL (3 errors): evidence file for documentation results and VER-0003
+  record were not yet present.
+  python -m unittest discover -s tests/docs -v
+  Ran 14 tests; FAILED (failures=2).
+  One test assumed single-line JSON for the evidence array, but records use
+  multiline JSON. The other test correctly rejected the incomplete repository.
+
+Correction: mutation helper edits parsed JSON evidence fields, independent of
+formatting. Added the missing real verification record and this evidence file.
+Later results are appended below; earlier failures remain intact.
+
+2026-11-01T00:19:18+03:00 — after fixture/record correction:
+  python tools/check_docs.py
+  Documentation checks: PASS
+  python -m unittest discover -s tests/docs -v
+  Ran 14 tests; OK (14 passed).
+  git diff --check: exit0, no whitespace errors.
+  Historical verification report and legacy changelog preservation check: PASS.
+  Content comparison of all 27 tracked firmware/config/diagnostic files to HEAD: PASS (unchanged).
+  Integrated host-script rerun: docs PASS, then line7 c++ not found (exit127).
+  Full-rebuild firmware.bin SHA256: aeb0d3765b725788005c337009bf221547663eb2b5240f775e69906ae3ca1b26
+  No upload, erase, Git commit, version bump or dependency change performed.
+
+2026-11-01T00:21:32+03:00 — independent final review and corrections:
+  Source-rename mutation initially FAIL: DEV-0001 missing historical source file.
+  Misplaced-HWT mutation initially FAIL: invalid record move was accepted.
+  After historical-path and log-location fixes: Documentation checks PASS; 16 tests OK.
+  Both review findings addressed; BUG-0006 VERIFIED RESOLVED at DOCUMENTATION layer.
+  No physical verification inferred. Final record: VER-0005.
