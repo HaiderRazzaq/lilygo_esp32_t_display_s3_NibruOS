@@ -13,4 +13,5 @@ public:
   void render(AppContext& ctx) override;
 private:
   uint32_t lastUpdateMs_ = 0;
+  bool fullRedraw_ = true;
 };

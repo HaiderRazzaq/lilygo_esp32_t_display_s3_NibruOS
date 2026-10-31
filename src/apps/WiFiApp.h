@@ -27,6 +27,7 @@ private:
   WiFiScannerApp scannerApp_;
   uint8_t savedOffset_ = 0;
   ConnectState lastConnState_ = ConnectState::Disconnected;
+  bool menuFullRedraw_ = true;
 
   void renderMenu(AppContext& ctx);
   void renderSaved(AppContext& ctx);

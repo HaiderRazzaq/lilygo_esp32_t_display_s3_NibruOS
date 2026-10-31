@@ -13,5 +13,6 @@ public:
   void render(AppContext& ctx) override;
 private:
   bool touched_ = false;
+  bool fullRedraw_ = true;
   TouchEvent last_{};
 };

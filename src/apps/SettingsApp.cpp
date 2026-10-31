@@ -57,7 +57,6 @@ void SettingsApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     if (ev.y >= 40 && ev.y <= 88 && ev.x >= 10 && ev.x <= 310) {
       subView_ = SettingsSubView::SystemInfo;
       systemInfo_.onEnter(ctx);
-      systemInfo_.render(ctx);
       return;
     }
 
@@ -65,7 +64,6 @@ void SettingsApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     if (ev.y >= 92 && ev.y <= 142 && ev.x >= 10 && ev.x <= 310) {
       subView_ = SettingsSubView::TouchTest;
       touchTest_.onEnter(ctx);
-      touchTest_.render(ctx);
       return;
     }
   } else if (subView_ == SettingsSubView::SystemInfo) {

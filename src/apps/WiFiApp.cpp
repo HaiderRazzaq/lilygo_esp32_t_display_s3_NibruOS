@@ -8,6 +8,7 @@ void WiFiApp::onEnter(AppContext& ctx) {
   (void)ctx;
   subView_ = WiFiSubView::Menu;
   lastConnState_ = ctx.wifi.connectState();
+  menuFullRedraw_ = true;
   invalidate();
 }
 
@@ -16,6 +17,7 @@ void WiFiApp::onExit(AppContext& ctx) {
     scannerApp_.onExit(ctx);
   }
   subView_ = WiFiSubView::Menu;
+  menuFullRedraw_ = true;
 }
 
 void WiFiApp::onTick(AppContext& ctx, uint32_t nowMs) {
@@ -37,11 +39,13 @@ bool WiFiApp::onBack(AppContext& ctx) {
     }
     scannerApp_.onExit(ctx);
     subView_ = WiFiSubView::Menu;
+    menuFullRedraw_ = true;
     invalidate();
     return true;
   }
   if (subView_ == WiFiSubView::Saved) {
     subView_ = WiFiSubView::Menu;
+    menuFullRedraw_ = true;
     invalidate();
     return true;
   }
@@ -76,7 +80,6 @@ void WiFiApp::handleMenuTouch(AppContext& ctx, const TouchEvent& ev) {
   if (ev.y >= 52 && ev.y <= 96 && ev.x >= 10 && ev.x <= 310) {
     subView_ = WiFiSubView::Scanner;
     scannerApp_.onEnter(ctx);
-    scannerApp_.render(ctx);
     return;
   }
 
@@ -119,7 +122,6 @@ void WiFiApp::handleSavedTouch(AppContext& ctx, const TouchEvent& ev) {
           ctx.wifi.connectSaved(idx, millis());
           subView_ = WiFiSubView::Scanner;
           scannerApp_.onEnter(ctx);
-          invalidate();
           return;
         }
         if (ev.x >= 222 && ev.x <= 308) {
@@ -145,9 +147,37 @@ void WiFiApp::render(AppContext& ctx) {
 void WiFiApp::renderMenu(AppContext& ctx) {
   DisplayManager& screen = ctx.display;
   TFT_eSPI& t = screen.gfx();
-  screen.clear();
-  screen.header("Wi-Fi", true);
 
+  if (menuFullRedraw_) {
+    screen.clear();
+    screen.header("Wi-Fi", true);
+
+    // Card 0: Scan Networks (Y: 54, H: 42)
+    t.fillRoundRect(10, 54, 300, 42, 6, Colors::Panel);
+    t.drawRoundRect(10, 54, 300, 42, 6, Colors::Border);
+    t.fillRoundRect(18, 60, 42, 30, 4, Colors::Cyan);
+    screen.label(22, 70, "SCAN", Colors::Bg, 1, Colors::Cyan);
+    screen.label(68, 60, "Scan Networks", Colors::White, 2, Colors::Panel);
+    screen.label(69, 79, "Search & connect 2.4GHz", Colors::Muted, 1, Colors::Panel);
+    screen.label(292, 67, ">", Colors::Cyan, 2, Colors::Panel);
+
+    // Card 1: Saved Networks (Y: 100, H: 42)
+    t.fillRoundRect(10, 100, 300, 42, 6, Colors::Panel);
+    t.drawRoundRect(10, 100, 300, 42, 6, Colors::Border);
+    t.fillRoundRect(18, 106, 42, 30, 4, Colors::Green);
+    screen.label(20, 116, "SAVED", Colors::Bg, 1, Colors::Green);
+    screen.label(68, 106, "Saved Networks", Colors::White, 2, Colors::Panel);
+    char sub[32];
+    snprintf(sub, sizeof(sub), "%u network(s) remembered", ctx.wifi.savedCount());
+    screen.label(69, 125, sub, Colors::Muted, 1, Colors::Panel);
+    screen.label(292, 113, ">", Colors::Green, 2, Colors::Panel);
+
+    screen.footer("GPIO14 = Home  |  Tap card to open");
+    menuFullRedraw_ = false;
+  }
+
+  // Differential live status bar update at Y: 36..50
+  t.fillRect(10, 36, 300, 16, Colors::Bg);
   const bool isConn = (ctx.wifi.connectState() == ConnectState::Connected);
   const bool isConnecting = (ctx.wifi.connectState() == ConnectState::Connecting);
   t.fillCircle(16, 43, 4, isConn ? Colors::Green : (isConnecting ? Colors::Amber : Colors::Muted));
@@ -163,28 +193,6 @@ void WiFiApp::renderMenu(AppContext& ctx) {
   } else {
     screen.label(26, 39, "Disconnected", Colors::Muted, 1, Colors::Bg);
   }
-
-  // Card 0: Scan Networks (Y: 54, H: 42)
-  t.fillRoundRect(10, 54, 300, 42, 6, Colors::Panel);
-  t.drawRoundRect(10, 54, 300, 42, 6, Colors::Border);
-  t.fillRoundRect(18, 60, 42, 30, 4, Colors::Cyan);
-  screen.label(22, 70, "SCAN", Colors::Bg, 1, Colors::Cyan);
-  screen.label(68, 60, "Scan Networks", Colors::White, 2, Colors::Panel);
-  screen.label(69, 79, "Search & connect 2.4GHz", Colors::Muted, 1, Colors::Panel);
-  screen.label(292, 67, ">", Colors::Cyan, 2, Colors::Panel);
-
-  // Card 1: Saved Networks (Y: 100, H: 42)
-  t.fillRoundRect(10, 100, 300, 42, 6, Colors::Panel);
-  t.drawRoundRect(10, 100, 300, 42, 6, Colors::Border);
-  t.fillRoundRect(18, 106, 42, 30, 4, Colors::Green);
-  screen.label(20, 116, "SAVED", Colors::Bg, 1, Colors::Green);
-  screen.label(68, 106, "Saved Networks", Colors::White, 2, Colors::Panel);
-  char sub[32];
-  snprintf(sub, sizeof(sub), "%u network(s) remembered", ctx.wifi.savedCount());
-  screen.label(69, 125, sub, Colors::Muted, 1, Colors::Panel);
-  screen.label(292, 113, ">", Colors::Green, 2, Colors::Panel);
-
-  screen.footer("GPIO14 = Home  |  Tap card to open");
 }
 
 void WiFiApp::renderSaved(AppContext& ctx) {
@@ -239,4 +247,3 @@ void WiFiApp::renderSaved(AppContext& ctx) {
 
   screen.footer("Tap Connect / Forget  |  GPIO14 = Back");
 }
-

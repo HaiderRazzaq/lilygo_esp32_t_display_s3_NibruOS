@@ -15,20 +15,40 @@ static const char* gestureName(TouchGesture g) {
     default: return "Unknown";
   }
 }
-void TouchTestApp::onEnter(AppContext&) { touched_ = false; invalidate(); }
-void TouchTestApp::onExit(AppContext&) {}
+
+void TouchTestApp::onEnter(AppContext&) {
+  touched_ = false;
+  fullRedraw_ = true;
+  invalidate();
+}
+
+void TouchTestApp::onExit(AppContext&) {
+  fullRedraw_ = true;
+}
+
 void TouchTestApp::onTick(AppContext&, uint32_t) {}
+
 void TouchTestApp::onTouch(AppContext&, const TouchEvent& ev) {
   last_ = ev;
   touched_ = true;
   invalidate();
 }
+
 void TouchTestApp::render(AppContext& ctx) {
   DisplayManager& screen = ctx.display;
   TFT_eSPI& t = screen.gfx();
-  screen.clear();
-  screen.header(title(), true);
-  t.drawRoundRect(7, 37, 306, 110, 5, Colors::Border);
+
+  if (fullRedraw_) {
+    screen.clear();
+    screen.header(title(), true);
+    t.drawRoundRect(7, 37, 306, 110, 5, Colors::Border);
+    screen.footer("Test rotation 1 + CST816S gestures");
+    fullRedraw_ = false;
+  }
+
+  // Clear only the inside of the test box without touching header or footer
+  t.fillRect(9, 39, 302, 106, Colors::Bg);
+
   if (!touched_) {
     screen.label(28, 67, "Tap or swipe anywhere in the box", Colors::Cyan);
     screen.label(28, 88, "Back: top-left / GPIO14", Colors::Muted);
@@ -39,13 +59,11 @@ void TouchTestApp::render(AppContext& ctx) {
     snprintf(line, sizeof(line), "Raw X:%d Y:%d", last_.rawX, last_.rawY);
     screen.label(17, 60, line, Colors::Muted);
     screen.label(17, 78, gestureName(last_.gesture), Colors::Green, 2);
-    // Place the marker at the mapped touch position. Clip near shell header
-    // and footer only; never force all upper-screen touches to the bottom.
+
     int x = last_.x < 17 ? 17 : (last_.x > 302 ? 302 : last_.x);
     int y = last_.y < 48 ? 48 : (last_.y > 135 ? 135 : last_.y);
     t.drawCircle(x, y, 5, Colors::Cyan);
     t.drawFastHLine(x - 9, y, 19, Colors::Cyan);
     t.drawFastVLine(x, y - 9, 19, Colors::Cyan);
   }
-  screen.footer("Test rotation 1 + CST816S gestures");
 }
