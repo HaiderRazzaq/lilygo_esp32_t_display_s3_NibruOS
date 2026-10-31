@@ -4,6 +4,8 @@
 class TouchTestApp final : public App {
 public:
   const char* title() const override { return "Touch Test"; }
+  const char* shortTitle() const override { return "TAP"; }
+  const char* subtitle() const override { return "Input"; }
   void onEnter(AppContext& ctx) override;
   void onExit(AppContext& ctx) override;
   void onTick(AppContext& ctx, uint32_t nowMs) override;

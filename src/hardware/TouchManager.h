@@ -10,4 +10,5 @@ public:
 private:
   CST816S touch_;
   uint32_t lastTouchTime_ = 0;
+  bool touchDown_ = false;
 };

@@ -4,6 +4,8 @@
 class SystemInfoApp final : public App {
 public:
   const char* title() const override { return "System Info"; }
+  const char* shortTitle() const override { return "SYS"; }
+  const char* subtitle() const override { return "Status"; }
   void onEnter(AppContext& ctx) override;
   void onExit(AppContext& ctx) override;
   void onTick(AppContext& ctx, uint32_t nowMs) override;

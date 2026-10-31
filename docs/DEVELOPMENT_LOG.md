@@ -235,3 +235,109 @@ Corrections must be appended with the original ID reference.
   "review": "One Important and one Minor validator finding addressed with RED-to-GREEN regressions; no deferred findings."
 }
 ```
+
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0006",
+  "date": "2026-11-01T00:36:00+03:00",
+  "event_date": "2026-11-01T00:36:00+03:00",
+  "related": [
+    "FEAT-0004",
+    "FEAT-0009"
+  ],
+  "action": "ADD / EXPAND",
+  "files": [
+    "src/apps/WiFiScannerApp.cpp",
+    "src/apps/WiFiScannerApp.h",
+    "src/services/WiFiService.cpp",
+    "src/services/WiFiService.h",
+    "include/BoardConfig.h",
+    "tests/host/stubs/WiFi.h",
+    "tests/host/test_main.cpp",
+    "docs/FEATURE_REGISTRY.md",
+    "docs/CURRENT_STATE.md",
+    "docs/CHANGELOG.md",
+    "docs/VERIFICATION_REPORT.md"
+  ],
+  "description": "Implemented AP selection, on-screen touch virtual keyboard with visible plaintext password, non-blocking Wi-Fi connection state machine with timeout, and connection status view.",
+  "reason": "User requested the ability to select a scanned network and connect to it with password visible while typing.",
+  "expected": "User can tap any scanned network; open networks connect directly, secured networks open full-screen virtual keyboard with visible password; non-blocking connection with status and disconnect.",
+  "actual": "PlatformIO build passed (RAM 45976 / 327680 bytes, Flash 741117 / 6553600 bytes); firmware uploaded successfully to ESP32-S3 on COM3.",
+  "verification": "VER-0006",
+  "risks": "Touch precision on dense virtual keyboard requires user testing on CST816S glass.",
+  "commit": "UNCOMMITTED working tree based on ccbd0e625837196ce547f16788022be6465786cb",
+  "follow_up": "Validate physical touch accuracy, network join, and credential handling on hardware."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0007",
+  "date": "2026-11-01T01:15:00+03:00",
+  "event_date": "2026-11-01T01:15:00+03:00",
+  "related": [
+    "FEAT-0004",
+    "FEAT-0009"
+  ],
+  "action": "ENHANCE / HARDEN",
+  "files": [
+    "src/apps/WiFiScannerApp.cpp",
+    "src/apps/WiFiScannerApp.h",
+    "src/services/WiFiService.cpp",
+    "src/services/WiFiService.h",
+    "include/BoardConfig.h",
+    "tests/host/stubs/WiFi.h"
+  ],
+  "description": "Hardened Wi-Fi station association: enabled open auth threshold (WPA/WPA2/WPA3 Personal), all-channel active scan, auto-reconnect, and registered WiFi.onEvent to capture low-level disconnect reasons (e.g. 202 AUTH_FAIL, 14 4WAY_TIMEOUT, 201 NO_AP_FOUND) with live elapsed seconds, status, and on-screen diagnostics.",
+  "reason": "User reported connection failed on physical device despite typing the correct password.",
+  "expected": "Station associates with WPA/WPA2/WPA3 networks without being rejected by default WPA2-only threshold, and displays live status and precise disconnect codes if rejected by the AP.",
+  "actual": "PlatformIO build passed (RAM 46048 / 327680 bytes, Flash 745937 / 6553600 bytes); firmware uploaded successfully to ESP32-S3 on COM3.",
+  "verification": "VER-0006",
+  "risks": "Networks requiring WPA-Enterprise (802.1X/EAP) or 5GHz-only APs remain unsupported by ESP32-S3 2.4GHz hardware.",
+  "commit": "UNCOMMITTED working tree based on ccbd0e625837196ce547f16788022be6465786cb",
+  "follow_up": "Observe physical screen and serial log during AP association attempt."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0008",
+  "date": "2026-11-01T02:00:00+03:00",
+  "event_date": "2026-11-01T02:00:00+03:00",
+  "related": [
+    "FEAT-0001",
+    "FEAT-0004",
+    "FEAT-0009",
+    "FEAT-0011"
+  ],
+  "action": "ADD / REFACTOR",
+  "files": [
+    "src/apps/WiFiApp.cpp",
+    "src/apps/WiFiApp.h",
+    "src/apps/WiFiScannerApp.cpp",
+    "src/apps/WiFiScannerApp.h",
+    "src/core/AppManager.cpp",
+    "src/services/WiFiService.cpp",
+    "src/services/WiFiService.h",
+    "src/main.cpp",
+    "tests/host/stubs/Preferences.h",
+    "tests/host/test_main.cpp",
+    "docs/FEATURE_REGISTRY.md",
+    "docs/CURRENT_STATE.md",
+    "docs/CHANGELOG.md",
+    "docs/VERIFICATION_REPORT.md"
+  ],
+  "description": "Implemented persistent NVS saved networks in Preferences, boot-time auto-connect with fallback, top-level WiFiApp container hosting Scan Networks and Saved Networks with hierarchical back navigation, and fixed home card text overflow with dynamic font sizing and centering.",
+  "reason": "User reported text overflowing app cards, Wi-Fi credentials not persisting across reboots, and requested a dedicated Wi-Fi hub with saved networks management.",
+  "expected": "No card text overflows; Wi-Fi credentials saved in NVS; automatic connection to known networks on boot; top-level Wi-Fi and Settings cards on home screen.",
+  "actual": "PlatformIO build passed (RAM 46672 / 327680 bytes, Flash 757533 / 6553600 bytes). All doc checks pass.",
+  "verification": "VER-0007",
+  "risks": "Multiple saved networks with identical SSID in range will connect to strongest BSSID.",
+  "commit": "UNCOMMITTED working tree based on ccbd0e625837196ce547f16788022be6465786cb",
+  "follow_up": "Upload firmware to device on COM3 and verify on-device auto-connect and UI layout."
+}
+```

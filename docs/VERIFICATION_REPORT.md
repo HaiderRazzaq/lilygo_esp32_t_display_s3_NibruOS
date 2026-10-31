@@ -179,3 +179,52 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "CI configuration added but hosted runner not executed. Does not prove physical behavior, evidence authenticity or append-only history. Current firmware host suite remains BLOCKED (VER-0002)."
 }
 ```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0006",
+  "date": "2026-11-01T00:36:00+03:00",
+  "firmware_version": "v0.1 runtime",
+  "commit": "UNCOMMITTED working tree based on ccbd0e6",
+  "verification_type": "BUILD",
+  "scope": "Main firmware target build with Wi-Fi AP connection and visible virtual keyboard",
+  "hardware": "Target lilygo-t-display-s3 (ESP32-S3R8, 16 MB flash, 8 MB PSRAM)",
+  "wiring": "Connected via USB CDC on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 && pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "Compile and flash firmware binary with new AP selection, virtual keyboard, and connection state machine.",
+  "actual": "Target build SUCCESS (18.90s, RAM 45976 bytes, Flash 741117 bytes); flash upload to COM3 at 460800 baud SUCCESS (18.57s).",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-target-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build and esptool flash upload terminal output",
+  "environment": "Windows 11, PlatformIO Core 6.2.0, espressif32@6.5.0",
+  "limitations": "Physical touch keyboard responsiveness and on-air AP association depend on physical device interaction."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0007",
+  "date": "2026-11-01T02:02:00+03:00",
+  "firmware_version": "v0.1 runtime",
+  "commit": "UNCOMMITTED working tree based on ccbd0e6",
+  "verification_type": "BUILD",
+  "scope": "Main firmware target build with WiFiApp container, persistent saved networks, and home card overflow prevention",
+  "hardware": "Target lilygo-t-display-s3 (ESP32-S3R8, 16 MB flash, 8 MB PSRAM)",
+  "wiring": "Connected via USB CDC on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Compile firmware binary with WiFiApp, Preferences NVS storage, and auto-connect.",
+  "actual": "Target build SUCCESS (22.44s, RAM 46672 bytes, Flash 757533 bytes).",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-target-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build terminal output",
+  "environment": "Windows 11, PlatformIO Core 6.2.0, espressif32@6.5.0",
+  "limitations": "Physical auto-connect on boot and touch responsiveness require on-board testing."
+}
+```

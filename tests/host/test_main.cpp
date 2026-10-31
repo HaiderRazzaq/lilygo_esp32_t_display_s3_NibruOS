@@ -9,6 +9,8 @@
 #include "apps/SystemInfoApp.h"
 #include "apps/TouchTestApp.h"
 #include "apps/WiFiScannerApp.h"
+#include "apps/WiFiApp.h"
+#include "apps/SettingsApp.h"
 #include <Arduino.h>
 #include <WiFi.h>
 #include <cassert>
@@ -210,5 +212,74 @@ int main() {
   assert(!mgr.isHome() && mgr.selectedIndex()==3);
   mgr.goHome();
   assert(mgr.isHome());
-  puts("PASS: host navigation/resource/async scan/timeout smoke tests");
+
+  // Wi-Fi Connection state machine tests
+  assert(wifi.connect("TestNet", "MyPass1234", fakeMs));
+  assert(wifi.connectState() == ConnectState::Connecting);
+  assert(std::strcmp(wifi.targetSSID(), "TestNet") == 0);
+  WiFi.statusValue = WL_CONNECTED;
+  wifi.tick(fakeMs + 50);
+  assert(wifi.connectState() == ConnectState::Connected);
+  assert(std::strcmp(wifi.connectedSSID(), "TestNet") == 0);
+  char ipBuf[24]{};
+  wifi.getLocalIP(ipBuf, sizeof(ipBuf));
+  assert(std::strcmp(ipBuf, "192.168.1.100") == 0);
+  wifi.disconnect();
+  assert(wifi.connectState() == ConnectState::Disconnected);
+
+  // Connection timeout test with underflow guard
+  assert(wifi.connect("TimeoutNet", "SecretPass", fakeMs));
+  WiFi.statusValue = WL_IDLE_STATUS;
+  // Verify stale tick timestamp does not trigger underflow timeout
+  wifi.tick(fakeMs - 5);
+  assert(wifi.connectState() == ConnectState::Connecting);
+  wifi.tick(fakeMs + Board::kConnectTimeoutMs + 10);
+  assert(wifi.connectState() == ConnectState::ConnectFailed);
+  assert(std::strcmp(wifi.connectError(), "Connection timed out") == 0);
+  wifi.shutdown();
+
+  // SettingsApp sub-navigation test
+  SettingsApp settings;
+  settings.onEnter(context);
+  // Tap System Info card in Settings menu
+  settings.onTouch(context, TouchEvent{100, 60, 0, 0, TouchGesture::Tap});
+  // Back returns to Settings Menu
+  assert(settings.onBack(context) == true);
+  // At menu, Back returns false so AppManager shell can return Home
+  assert(settings.onBack(context) == false);
+  settings.onExit(context);
+
+  // WiFiApp sub-navigation test
+  WiFiApp wifiApp;
+  wifiApp.onEnter(context);
+  // Tap Scan Networks card in WiFi menu
+  wifiApp.onTouch(context, TouchEvent{100, 70, 0, 0, TouchGesture::Tap});
+  // Back returns to WiFi Menu
+  assert(wifiApp.onBack(context) == true);
+  // Tap Saved Networks card in WiFi menu
+  wifiApp.onTouch(context, TouchEvent{100, 120, 0, 0, TouchGesture::Tap});
+  // Back returns to WiFi Menu
+  assert(wifiApp.onBack(context) == true);
+  // At menu, Back returns false so shell returns Home
+  assert(wifiApp.onBack(context) == false);
+  wifiApp.onExit(context);
+
+  // Saved networks persistence and management tests
+  assert(wifi.savedCount() == 0);
+  assert(wifi.saveNetwork("HomeNet", "Password123"));
+  assert(wifi.savedCount() == 1);
+  assert(std::strcmp(wifi.savedNetwork(0)->ssid, "HomeNet") == 0);
+  assert(std::strcmp(wifi.getSavedPassword("HomeNet"), "Password123") == 0);
+  assert(wifi.saveNetwork("OfficeNet", "CorpSecret"));
+  assert(wifi.savedCount() == 2);
+  // MRU: OfficeNet is at index 0, HomeNet is at index 1
+  assert(std::strcmp(wifi.savedNetwork(0)->ssid, "OfficeNet") == 0);
+  assert(std::strcmp(wifi.savedNetwork(1)->ssid, "HomeNet") == 0);
+  assert(wifi.forgetNetwork(static_cast<uint8_t>(0)));
+  assert(wifi.savedCount() == 1);
+  assert(std::strcmp(wifi.savedNetwork(0)->ssid, "HomeNet") == 0);
+  assert(wifi.forgetNetwork("HomeNet"));
+  assert(wifi.savedCount() == 0);
+
+  puts("PASS: host navigation/resource/async scan/timeout/connect smoke tests");
 }

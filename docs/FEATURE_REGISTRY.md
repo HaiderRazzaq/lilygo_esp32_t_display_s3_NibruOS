@@ -71,8 +71,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "issues": [],
   "history": [
     "DEV-0001"
-  ],
-  "registration": "systemInfo"
+  ]
 }
 ```
 
@@ -103,8 +102,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "issues": [],
   "history": [
     "DEV-0001"
-  ],
-  "registration": "touchTest"
+  ]
 }
 ```
 
@@ -140,8 +138,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ],
   "history": [
     "DEV-0001"
-  ],
-  "registration": "wifiScanner"
+  ]
 }
 ```
 
@@ -279,5 +276,107 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "DEV-0004",
     "DEV-0005"
   ]
+}
+```
+
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0009",
+  "name": "Wi-Fi AP Connection and On-Screen Keyboard",
+  "purpose": "Select scanned AP, enter visible password via on-screen touch keyboard, and connect/disconnect non-blocking",
+  "module": "src/apps/WiFiScannerApp + src/services/WiFiService",
+  "files": [
+    "src/apps/WiFiScannerApp.cpp",
+    "src/apps/WiFiScannerApp.h",
+    "src/services/WiFiService.cpp",
+    "src/services/WiFiService.h"
+  ],
+  "dependencies": [
+    "FEAT-0004",
+    "ResourceManager"
+  ],
+  "hardware": "Integrated 2.4GHz radio and CST816S capacitive touch",
+  "gpio": "Uses existing reserved pins; no additional GPIO",
+  "lifecycle": "Selection opens plaintext visible touch keyboard; non-blocking connection with 15s timeout; disconnect on onExit or user action",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0006",
+    "host": "VER-0006",
+    "hardware": "NOT VERIFIED"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0006"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0010",
+  "name": "Settings App",
+  "purpose": "Main settings menu organizing System Info and Touch Test diagnostics with hierarchical Back navigation",
+  "module": "src/apps/SettingsApp",
+  "files": [
+    "src/apps/SettingsApp.cpp",
+    "src/apps/SettingsApp.h"
+  ],
+  "dependencies": [
+    "FEAT-0001",
+    "FEAT-0002",
+    "FEAT-0003"
+  ],
+  "hardware": "Display, CST816S capacitive touch",
+  "gpio": "GPIO14 Back, BOOT 0",
+  "lifecycle": "Submenu container view delegates to sub-apps with hierarchical onBack navigation before exiting to Home",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0006",
+    "host": "VER-0006",
+    "hardware": "NOT VERIFIED"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0007"
+  ],
+  "registration": "settingsApp"
+}
+```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0011",
+  "name": "Wi-Fi Hub and Saved Networks",
+  "purpose": "Top-level Wi-Fi hub containing scanner and saved networks management with persistent NVS credentials and auto-connect on boot",
+  "module": "src/apps/WiFiApp",
+  "files": [
+    "src/apps/WiFiApp.cpp",
+    "src/apps/WiFiApp.h",
+    "src/services/WiFiService.cpp",
+    "src/services/WiFiService.h"
+  ],
+  "dependencies": [
+    "FEAT-0001",
+    "FEAT-0004",
+    "FEAT-0009"
+  ],
+  "hardware": "Integrated 2.4GHz radio and CST816S capacitive touch",
+  "gpio": "Uses existing reserved pins; no additional GPIO",
+  "lifecycle": "Hub container view delegates to Scan Networks and Saved Networks; auto-connects to known AP on boot; non-volatile NVS storage",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0007",
+    "host": "VER-0007",
+    "hardware": "NOT VERIFIED"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0008"
+  ],
+  "registration": "wifiApp"
 }
 ```

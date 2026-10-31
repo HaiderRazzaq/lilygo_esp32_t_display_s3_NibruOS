@@ -21,30 +21,48 @@ void TouchManager::begin() {
 bool TouchManager::poll(TouchEvent& ev) {
   if (!touch_.available()) return false;
   const uint32_t now = millis();
+
+  // If CST816S reports points == 0 or event == 1 (Up), finger was lifted
+  if (touch_.data.points == 0 || touch_.data.event == 1) {
+    touchDown_ = false;
+    return false;
+  }
+
+  // Minimum debounce gap between any accepted touch reports
   if (now - lastTouchTime_ < Board::kTouchDebounceMs) return false;
+
+  TouchGesture gesture = TouchGesture::Unknown;
+  switch (touch_.data.gestureID) {
+    case SWIPE_UP: gesture = TouchGesture::SwipeLeft; break;
+    case SWIPE_DOWN: gesture = TouchGesture::SwipeRight; break;
+    case SWIPE_LEFT: gesture = TouchGesture::SwipeDown; break;
+    case SWIPE_RIGHT: gesture = TouchGesture::SwipeUp; break;
+    case DOUBLE_CLICK: gesture = TouchGesture::DoubleTap; break;
+    case LONG_PRESS: gesture = TouchGesture::LongPress; break;
+    case SINGLE_CLICK:
+      gesture = TouchGesture::Tap;
+      break;
+    case NONE:
+      // When CST816S reports NONE during touch contact:
+      // Only fire Tap once when the touch first begins; suppress continuous hold repeats!
+      if (touchDown_) {
+        return false;
+      }
+      gesture = TouchGesture::Tap;
+      break;
+    default: break;
+  }
+
+  if (gesture == TouchGesture::Unknown) return false;
+
+  touchDown_ = true;
   lastTouchTime_ = now;
 
   ev.rawX = touch_.data.x;
   ev.rawY = touch_.data.y;
-  // Exact tested mapping for display rotation 1 / 320x170 landscape.
   ev.x = constrain(static_cast<int>(ev.rawY), 0, Board::kScreenWidth - 1);
   ev.y = constrain(Board::kScreenHeight - 1 - static_cast<int>(ev.rawX),
                    0, Board::kScreenHeight - 1);
-
-  // CST816S gesture IDs use the panel's native portrait axes.
-  // The landscape coordinate transform is (x, y) = (rawY, 169 - rawX).
-  // Apply the SAME rotation to directional swipe gestures so the home
-  // launcher and network list move in the direction seen by the user.
-  switch (touch_.data.gestureID) {
-    case SWIPE_UP: ev.gesture = TouchGesture::SwipeLeft; break;
-    case SWIPE_DOWN: ev.gesture = TouchGesture::SwipeRight; break;
-    case SWIPE_LEFT: ev.gesture = TouchGesture::SwipeDown; break;
-    case SWIPE_RIGHT: ev.gesture = TouchGesture::SwipeUp; break;
-    case DOUBLE_CLICK: ev.gesture = TouchGesture::DoubleTap; break;
-    case LONG_PRESS: ev.gesture = TouchGesture::LongPress; break;
-    case NONE:
-    case SINGLE_CLICK: ev.gesture = TouchGesture::Tap; break;
-    default: ev.gesture = TouchGesture::Unknown; break;
-  }
+  ev.gesture = gesture;
   return true;
 }

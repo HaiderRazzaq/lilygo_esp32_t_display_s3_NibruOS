@@ -6,9 +6,8 @@
 #include "hardware/TouchManager.h"
 #include "hardware/ButtonManager.h"
 #include "services/WiFiService.h"
-#include "apps/SystemInfoApp.h"
-#include "apps/TouchTestApp.h"
-#include "apps/WiFiScannerApp.h"
+#include "apps/WiFiApp.h"
+#include "apps/SettingsApp.h"
 
 namespace {
 DisplayManager display;
@@ -18,9 +17,8 @@ ResourceManager resources;
 WiFiService wifi;
 AppContext context{display, resources, wifi};
 AppManager launcher(context);
-SystemInfoApp systemInfo;
-TouchTestApp touchTest;
-WiFiScannerApp wifiScanner;
+WiFiApp wifiApp;
+SettingsApp settingsApp;
 }
 
 void setup() {
@@ -29,17 +27,20 @@ void setup() {
   display.begin();
   touch.begin();
   buttons.begin();
-  launcher.registerApp(systemInfo);
-  launcher.registerApp(touchTest);
-  launcher.registerApp(wifiScanner);
+  wifi.begin(millis());
+  launcher.registerApp(wifiApp);
+  launcher.registerApp(settingsApp);
   launcher.begin();
 }
+
 void loop() {
-  const uint32_t now = millis();
+  uint32_t now = millis();
   TouchEvent ev{};
   if (touch.poll(ev)) launcher.handleTouch(ev);
   const ButtonAction action = buttons.poll(now);
   if (action != ButtonAction::None) launcher.handleButton(action);
+  now = millis();
+  wifi.tick(now);
   launcher.tick(now);
   delay(12);
 }
