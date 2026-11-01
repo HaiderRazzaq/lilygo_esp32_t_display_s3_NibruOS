@@ -14,6 +14,10 @@ public:
   void handleButton(ButtonAction action);
   bool open(uint8_t index);
   void goHome();
+  void invalidate() {
+    if (active_) active_->invalidate();
+    else homeDirty_ = true;
+  }
   bool isHome() const { return active_ == nullptr; }
   uint8_t selectedIndex() const { return selected_; }
   uint8_t appCount() const { return count_; }

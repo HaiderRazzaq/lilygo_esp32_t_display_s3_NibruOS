@@ -2,6 +2,10 @@
 #include <stdint.h>
 
 namespace Board {
+// Firmware runtime versioning
+constexpr const char* kVersion = "v0.3";
+constexpr const char* kSystemTitle = "NibruOS v0.3";
+
 // WORKING baseline supplied by the owner; confirmed on their Touch Glass board.
 constexpr int kTouchSda = 18;
 constexpr int kTouchScl = 17;

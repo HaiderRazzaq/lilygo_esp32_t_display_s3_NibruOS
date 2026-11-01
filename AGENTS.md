@@ -66,5 +66,27 @@
   record the blocker and provide reproducible next tests. Never claim verified
   resolution, compilation, flashing or reception without actual evidence.
 
+## Mandatory Memory Profiling & Resource Budget Policy
+
+**CRITICAL: Every code change with possible runtime, memory, storage, timing, peripheral, or power impact MUST undergo resource impact analysis. This is a permanent project-wide engineering policy for ALL future modifications.**
+
+Every future AI agent must:
+1. **Inspect resource budgets** in [RESOURCE_BUDGET.md](docs/RESOURCE_BUDGET.md) and current metrics in [performance/BASELINE.md](docs/performance/BASELINE.md) before making relevant changes.
+2. **Measure or establish a baseline** when tools and device access are available.
+3. **Evaluate impact** on Flash, Internal SRAM, PSRAM, FreeRTOS stacks, UI responsiveness, peripherals, and power.
+4. **Follow the required profiling scenarios** in [MEMORY_PROFILING.md](docs/MEMORY_PROFILING.md):
+   - Scenario A: Startup
+   - Scenario B: Application Entry
+   - Scenario C: Application Exit
+   - Scenario D: Repeated Lifecycle Testing (20 cycles minimum)
+   - Scenario E: Combined Workloads
+5. **Enforce Resource Budget Controls**:
+   - Firmware image MUST fit within the active application partition (`app0` = 6,553,600 bytes [6.25 MB]).
+   - Maintain internal SRAM headroom (>= 150 KB free heap).
+   - Flag provisional review triggers: Flash growth > 5%, free heap drop > 10%, largest allocatable block drop > 10%, or repeatable latency degradation.
+6. **Produce a Resource Impact Report** for every resource-impacting change following the standard format in [RESOURCE_BUDGET.md](docs/RESOURCE_BUDGET.md).
+7. **Clean up shared resources** on `onExit()`: cancel active jobs, release buffers, unregister callbacks, and release `ResourceManager` locks.
+8. **Never claim hardware validation without physical evidence**: clearly distinguish compile-time results, host mocks, and physical measurements.
+
 ## Source of truth
 Actual source code > explanatory documents if they diverge; user-verified hardware wiring > contradictory image labels. External validation sources: https://github.com/Xinyuan-LilyGO/T-Display-S3 , https://wiki.lilygo.cc/products/t-display-series/t-display-s3/ , https://docs.espressif.com/projects/arduino-esp32/en/latest/api/wifi.html .

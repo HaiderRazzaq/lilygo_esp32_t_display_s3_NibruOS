@@ -32,8 +32,8 @@ public:
   virtual void render(AppContext& ctx) = 0;
 
   bool consumeDirty() { const bool d = dirty_; dirty_ = false; return d; }
-protected:
   void invalidate() { dirty_ = true; }
+
 private:
   bool dirty_ = true;
 };

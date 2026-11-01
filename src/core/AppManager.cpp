@@ -1,5 +1,6 @@
 #include "core/AppManager.h"
 #include "hardware/DisplayManager.h"
+#include "BoardConfig.h"
 #include <Arduino.h>
 #include <cstdio>
 
@@ -102,7 +103,7 @@ void AppManager::drawHome() {
   DisplayManager& screen = ctx_.display;
   TFT_eSPI& t = screen.gfx();
   screen.clear();
-  screen.header("NibruOS v0.1", false);
+  screen.header(Board::kSystemTitle, false);
   const uint16_t accents[] = {Colors::Cyan, Colors::Green, Colors::Amber};
   const uint8_t page = selected_ / 3;
   const uint8_t pages = static_cast<uint8_t>((count_ + 2) / 3);

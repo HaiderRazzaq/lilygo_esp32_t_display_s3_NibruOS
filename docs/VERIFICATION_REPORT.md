@@ -228,3 +228,75 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Physical auto-connect on boot and touch responsiveness require on-board testing."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0008",
+  "date": "2026-11-01T02:15:00+03:00",
+  "firmware_version": "v0.2 runtime",
+  "commit": "UNCOMMITTED working tree based on ccbd0e6",
+  "verification_type": "BUILD",
+  "scope": "Main firmware target build with runtime v0.2 bump and flicker-free differential rendering",
+  "hardware": "Target lilygo-t-display-s3 (ESP32-S3R8, 16 MB flash, 8 MB PSRAM)",
+  "wiring": "Connected via USB CDC on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 && pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "Compile and flash firmware binary with v0.2 versioning and differential rendering.",
+  "actual": "Target build SUCCESS (7.91s, RAM 46688 bytes, Flash 757717 bytes); flash upload to COM3 at 460800 baud SUCCESS (19.42s).",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-target-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build and flash terminal output",
+  "environment": "Windows 11, PlatformIO Core 6.2.0, espressif32@6.5.0",
+  "limitations": "Physical verification depends on user inspection of display stability."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0009",
+  "date": "2026-11-01T02:40:00+03:00",
+  "firmware_version": "v0.3 runtime",
+  "commit": "UNCOMMITTED working tree based on ccbd0e6",
+  "verification_type": "BUILD",
+  "scope": "Main firmware target build with FEAT-0012: LEDC PWM brightness control, inactivity sleep with touch/button wake, and PIN code lock screen",
+  "hardware": "Target lilygo-t-display-s3 (ESP32-S3R8, 16 MB flash, 8 MB PSRAM)",
+  "wiring": "Connected via USB CDC on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Compile firmware binary with DisplayManager PWM/sleep, SecurityService PIN lock, SettingsApp controls, and v0.3 versioning.",
+  "actual": "Target build SUCCESS (12.66s, RAM 46816 / 327680 bytes [14.3%], Flash 770661 / 6553600 bytes [11.8%]).",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-target-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build terminal output",
+  "environment": "Windows 11, PlatformIO Core 6.2.0, espressif32@6.5.0",
+  "limitations": "Physical touch wakeup and PWM brightness dimming observation require on-device validation."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0010",
+  "date": "2026-11-01T03:00:00+03:00",
+  "firmware_version": "v0.3 runtime",
+  "commit": "UNCOMMITTED working tree based on ccbd0e6",
+  "verification_type": "BUILD",
+  "scope": "Main firmware target build and flash with FEAT-0013: Essential Settings v0.1, AW9364 pulse dimming on GPIO38, SettingsService, and MemoryProfiler",
+  "hardware": "Target lilygo-t-display-s3 (ESP32-S3R8, 16 MB flash, 8 MB PSRAM)",
+  "wiring": "Connected via USB CDC on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 && pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "Compile and flash firmware binary with AW9364 pulse dimming, SettingsService, MemoryProfiler, and Essential Settings v0.1.",
+  "actual": "Target build SUCCESS (16.62s, RAM 46752 / 327680 bytes [14.3%], Flash 766705 / 6553600 bytes [11.7%]); flash upload to COM3 SUCCESS (17.58s); verified boot log over COM3.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-target-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build and flash terminal output + serial boot log",
+  "environment": "Windows 11, PlatformIO Core 6.2.0, espressif32@6.5.0",
+  "limitations": "Physical observation of display dimming steps (25%, 50%, 75%, 100%) and touch responsiveness on the glass."
+}
+```

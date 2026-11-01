@@ -7,6 +7,14 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 ## Unreleased
 
 ### Added
+- Essential Settings v0.1 (`FEAT-0013`) with 6 modular subviews: Display & Screen, Theme Accent, Memory Monitor, Wi-Fi Diagnostics, Device Controls (Reboot & Reset), and Touch Test.
+- Centralized `SettingsService` for typed, validated, and persistent user configuration in NVS namespace `nibru_settings`.
+- Lightweight, zero-allocation `MemoryProfiler` utility capturing real ESP-IDF heap and PSRAM runtime metrics without fictional estimates.
+- Permanent project-wide Memory Profiling & Resource Budget Policy in `AGENTS.md`, `docs/RESOURCE_BUDGET.md`, `docs/MEMORY_PROFILING.md`, and `docs/performance/BASELINE.md`.
+- Display brightness control (`FEAT-0012`, `FEAT-0013`) with AW9364 hardware pulse dimming (25%, 50%, 75%, 100%) and NVS persistence.
+- Inactivity sleep mode (`FEAT-0012`) with configurable timeouts (15s, 30s, 1m, 2m, Never), instant wake-up on touch or button press, and manual test button.
+- 4-digit PIN security lock screen (`FEAT-0012`) with capacitive touch numpad, NVS storage, and lock enforcement on boot and sleep wake-up.
+- Interactive PIN management in Settings allowing passcode changes and enabling/disabling security lock.
 - Wi-Fi Hub App (`FEAT-0011`) hosting Scan Networks and Saved Networks in a unified menu with hierarchical Back navigation.
 - Persistent saved networks via NVS `Preferences` (`nibru_wifi` namespace) supporting up to 5 remembered access points with MRU ordering.
 - Boot-time background auto-connect with fallback across saved networks, maintaining connection across app switches.
@@ -24,6 +32,8 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 - Documentation regression checks and CI integration with the existing host suite.
 
 ### Changed
+- Bumped firmware version to NibruOS v0.3 across boot banner, Home launcher, BoardConfig, and System Info.
+- Switched `SystemInfoApp` and `TouchTestApp` to targeted differential redraws to eliminate periodic screen flicker.
 - Root launcher now registers `wifiApp` and `settingsApp`, presenting two clean primary hubs on the Home screen.
 - `WiFiScannerApp` now operates within `WiFiApp` without severing active background Wi-Fi connections on exit.
 - `AppManager` home card rendering dynamically centers text and adapts font size (2 to 1) to prevent card text overflow.
@@ -31,6 +41,8 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
   and a Definition of Done. Updated current guidance to match Wi-Fi timing.
 
 ### Fixed
+- Resolved hardware backlight brightness control failure on physical LilyGO T-Display-S3 by implementing the AW9364 single-wire pulse-dimming protocol on GPIO 38, replacing incompatible high-frequency LEDC PWM.
+- Fixed initialization sequence ordering so `tft_.init()` does not overwrite backlight pin configuration.
 - Eliminated text overflow on Home screen cards where long titles (e.g. "Wi-Fi Scanner") spilled into adjacent cards.
 - Resolved integer underflow timing race condition where `nowMs < connectStartedAt_` triggered an immediate `kConnectTimeoutMs` failure (reporting 4,294,967 s timeout).
 - Eliminated whole-screen flickering during virtual keyboard keystrokes and scan refreshing using differential redraws.

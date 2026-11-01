@@ -341,3 +341,133 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Upload firmware to device on COM3 and verify on-device auto-connect and UI layout."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0009",
+  "date": "2026-11-01T02:15:00+03:00",
+  "event_date": "2026-11-01T02:15:00+03:00",
+  "related": [
+    "FEAT-0001",
+    "FEAT-0002",
+    "FEAT-0003",
+    "FEAT-0010",
+    "FEAT-0011"
+  ],
+  "action": "ENHANCE / VERSION BUMP",
+  "files": [
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/core/AppManager.cpp",
+    "src/apps/SystemInfoApp.cpp",
+    "src/apps/SystemInfoApp.h",
+    "src/apps/TouchTestApp.cpp",
+    "src/apps/TouchTestApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/apps/WiFiApp.cpp",
+    "src/apps/WiFiApp.h",
+    "docs/CURRENT_STATE.md",
+    "docs/CHANGELOG.md",
+    "docs/VERIFICATION_REPORT.md"
+  ],
+  "description": "Established versioning policy and bumped firmware runtime to v0.2. Centralized version constants in BoardConfig.h, eliminated periodic full-screen clearing flicker via targeted differential rendering in SystemInfoApp and TouchTestApp, and removed double-rendering on touch menu transitions.",
+  "reason": "User required explicit version increments on modifications, and reported display flickering during System Info 1-second ticks and touch transitions.",
+  "expected": "Runtime version displays NibruOS v0.2 across boot serial, home launcher, and System Info; periodic uptime ticks and touch transitions update without screen flicker.",
+  "actual": "PlatformIO build passed (RAM 46688 / 327680 bytes, Flash 757717 / 6553600 bytes); firmware uploaded successfully to ESP32-S3 on COM3.",
+  "verification": "VER-0008",
+  "risks": "Differential redraw regions must match coordinate bounds of updated labels to avoid text clipping.",
+  "commit": "UNCOMMITTED working tree based on ccbd0e625837196ce547f16788022be6465786cb",
+  "follow_up": "Observe smooth non-flickering uptime counter and verify v0.2 label on physical board."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0010",
+  "date": "2026-11-01T02:40:00+03:00",
+  "event_date": "2026-11-01T02:40:00+03:00",
+  "related": [
+    "FEAT-0005",
+    "FEAT-0010",
+    "FEAT-0012"
+  ],
+  "action": "ENHANCE / FEATURE IMPLEMENTATION / VERSION BUMP",
+  "files": [
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/hardware/DisplayManager.h",
+    "src/hardware/DisplayManager.cpp",
+    "src/services/SecurityService.h",
+    "src/services/SecurityService.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/apps/SystemInfoApp.cpp",
+    "src/core/AppContext.h",
+    "src/core/App.h",
+    "src/core/AppManager.h",
+    "tests/host/stubs/Arduino.h",
+    "tests/host/stubs/Preferences.h",
+    "tests/host/stubs/TFT_eSPI.h",
+    "docs/FEATURE_REGISTRY.md",
+    "docs/CURRENT_STATE.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Implemented FEAT-0012 adding display brightness PWM control via LEDC channel 0, inactivity auto-sleep mode with instant wake on touch/button, and persistent 4-digit PIN lock screen protection with on-screen touch numpad. Bumped runtime version to v0.3.",
+  "reason": "User requested screen brightness control, sleep mode with touch/button wakeup, PIN code locking capability, and version bump with every update cycle.",
+  "expected": "Screen brightness adjusts via hardware PWM (25..100%); display enters low-power sleep after timeout and wakes instantly; PIN code protects wake/boot when enabled; runtime version displays v0.3.",
+  "actual": "PlatformIO build passed (RAM 46816 / 327680 bytes, Flash 770661 / 6553600 bytes). Documentation checks passed.",
+  "verification": "VER-0009",
+  "risks": "PWM frequency on backlight GPIO38 must avoid audible coil whine or display flicker (5 kHz selected); CST816S must remain powered during display sleep for touch wakeup.",
+  "commit": "UNCOMMITTED working tree based on ccbd0e625837196ce547f16788022be6465786cb",
+  "follow_up": "Flash firmware to board on COM3 and verify brightness presets, sleep timeout wakeup, and PIN lock verification on physical device."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0011",
+  "date": "2026-11-01T03:00:00+03:00",
+  "event_date": "2026-11-01T03:00:00+03:00",
+  "related": [
+    "FEAT-0005",
+    "FEAT-0010",
+    "FEAT-0012",
+    "FEAT-0013"
+  ],
+  "action": "ENHANCE / HARDWARE FIX / ARCHITECTURE / POLICY",
+  "files": [
+    "src/hardware/DisplayManager.h",
+    "src/hardware/DisplayManager.cpp",
+    "src/services/SettingsService.h",
+    "src/services/SettingsService.cpp",
+    "src/core/MemoryProfiler.h",
+    "src/core/MemoryProfiler.cpp",
+    "src/core/AppContext.h",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/main.cpp",
+    "AGENTS.md",
+    "docs/RESOURCE_BUDGET.md",
+    "docs/MEMORY_PROFILING.md",
+    "docs/performance/BASELINE.md",
+    "docs/FEATURE_REGISTRY.md",
+    "docs/CURRENT_STATE.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Resolved backlight dimming failure on physical LilyGO T-Display-S3 by implementing AW9364 single-wire pulse-dimming protocol on GPIO38. Built centralized SettingsService for typed persistent configuration in NVS, created lightweight MemoryProfiler for real ESP-IDF heap and PSRAM runtime metrics, implemented Essential Settings v0.1 (Display, Theme Accent, Memory Monitor, Wi-Fi Diagnostics, Device Reboot and Settings Reset), and established permanent project-wide Memory Profiling & Resource Budget Policy.",
+  "reason": "User reported that backlight brightness control did not work on the physical device (caused by AW9364 pulse-driver incompatibility with continuous 5 kHz LEDC PWM and TFT_eSPI pin overriding), and requested Essential Settings v0.1 along with a mandatory permanent engineering resource policy.",
+  "expected": "Backlight brightness physically steps between 25%, 50%, 75%, and 100% on the board; centralized settings persist safely; real runtime metrics are profiled without fictional estimates; permanent engineering policy is codified.",
+  "actual": "PlatformIO build SUCCESS (RAM 46752 / 327680 bytes [14.3%], Flash 766705 / 6553600 bytes [11.7%]). Uploaded to COM3 and verified boot log: restored 50% brightness and Cyber Cyan theme.",
+  "verification": "VER-0010",
+  "risks": "AW9364 requires holding LOW > 2.5ms to reset followed by precise microsecond pulses; delayMicroseconds is used to maintain strict timing windows.",
+  "commit": "UNCOMMITTED working tree based on ccbd0e625837196ce547f16788022be6465786cb",
+  "follow_up": "Physically observe multi-level screen dimming on the board and test the confirmation reboot modal."
+}
+```

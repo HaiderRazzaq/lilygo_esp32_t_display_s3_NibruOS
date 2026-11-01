@@ -7,15 +7,15 @@ snapshot; [development history](DEVELOPMENT_LOG.md) is append-only.
 {
   "record_type": "state",
   "date": "2026-11-01",
-  "runtime_version": "v0.1",
+  "runtime_version": "v0.3",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "ccbd0e625837196ce547f16788022be6465786cb",
   "working_tree": "Clean at discovery; engineering-memory changes are uncommitted",
-  "implemented_features": ["FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-0004", "FEAT-0005", "FEAT-0006", "FEAT-0008", "FEAT-0009", "FEAT-0010", "FEAT-0011"],
+  "implemented_features": ["FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-0004", "FEAT-0005", "FEAT-0006", "FEAT-0008", "FEAT-0009", "FEAT-0010", "FEAT-0011", "FEAT-0012", "FEAT-0013"],
   "planned_features": ["FEAT-0007"],
   "active_issues": ["BUG-0001", "BUG-0002", "BUG-0003", "BUG-0004", "BUG-0005"],
-  "latest_build": "VER-0007",
+  "latest_build": "VER-0010",
   "documentation_verification": "VER-0005",
   "current_host_attempt": "VER-0002",
   "source_constants": {

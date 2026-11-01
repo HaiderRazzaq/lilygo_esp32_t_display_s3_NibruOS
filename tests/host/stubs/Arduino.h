@@ -12,6 +12,9 @@ inline void delay(uint32_t ms){fakeMs+=ms;}
 inline void pinMode(int,int){}
 inline void digitalWrite(int pin,int value){fakePins[pin]=value;}
 inline int digitalRead(int pin){return fakePins[pin];}
+inline void ledcSetup(uint8_t, double, uint8_t){}
+inline void ledcAttachPin(uint8_t, uint8_t){}
+inline void ledcWrite(uint8_t, uint32_t){}
 template<class T> T constrain(T x, T low, T high){return x<low?low:(x>high?high:x);}
 class String {
 public:

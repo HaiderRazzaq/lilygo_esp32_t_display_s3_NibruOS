@@ -3,6 +3,7 @@
 #include <cstdarg>
 struct TFT_eSPI {
   void init(){}
+  void writecommand(uint8_t){}
   void setRotation(uint8_t){}
   void setTextWrap(bool){}
   int width() const { return 320; }
@@ -19,4 +20,5 @@ struct TFT_eSPI {
   void drawRoundRect(int,int,int,int,int,uint16_t){}
   void fillRoundRect(int,int,int,int,int,uint16_t){}
   void drawCircle(int,int,int,uint16_t){}
+  void fillCircle(int,int,int,uint16_t){}
 };

@@ -33,6 +33,7 @@ public:
     return idx < count_ ? &networks_[idx] : nullptr;
   }
   uint32_t scanStartedAt() const { return stageStartedAt_; }
+  uint32_t lastScanDurationMs() const { return lastScanDurationMs_; }
   uint8_t attempt() const { return attempt_; }
   const char* lastError() const { return error_; }
 
@@ -71,6 +72,7 @@ private:
   uint8_t count_ = 0;
   uint8_t attempt_ = 0;
   uint32_t stageStartedAt_ = 0;
+  uint32_t lastScanDurationMs_ = 0;
   const char* error_ = "";
 
   // Connect state

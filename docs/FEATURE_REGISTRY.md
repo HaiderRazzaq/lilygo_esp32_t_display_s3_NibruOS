@@ -380,3 +380,76 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "registration": "wifiApp"
 }
 ```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0012",
+  "name": "Display Controls, Sleep Mode and PIN Security",
+  "purpose": "Screen brightness PWM control, inactivity auto-sleep with touch/button wakeup, and persistent 4-digit PIN lock screen protection",
+  "module": "src/hardware/DisplayManager + src/services/SecurityService + src/apps/SettingsApp",
+  "files": [
+    "src/hardware/DisplayManager.cpp",
+    "src/hardware/DisplayManager.h",
+    "src/services/SecurityService.cpp",
+    "src/services/SecurityService.h",
+    "src/apps/SettingsApp.cpp",
+    "src/apps/SettingsApp.h",
+    "src/main.cpp"
+  ],
+  "dependencies": [
+    "FEAT-0005",
+    "FEAT-0010"
+  ],
+  "hardware": "ST7789V parallel TFT, CST816S capacitive touch, Backlight GPIO38 PWM",
+  "gpio": "GPIO38 (backlight LEDC PWM), GPIO15 (display power), GPIO0/14 (buttons)",
+  "lifecycle": "LEDC PWM brightness control (25..100%); inactivity sleep with DISPOFF and 0ms wake; PIN code lock gatekeeper on wakeup and boot",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0009",
+    "host": "VER-0009",
+    "hardware": "NOT VERIFIED"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0010"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0013",
+  "name": "Essential Settings v0.1 and Memory Profiler",
+  "purpose": "Lightweight settings app with central SettingsService, AW9364 pulse dimming (25..100%), theme accent selection, memory monitor, Wi-Fi diagnostics, reboot and safe reset",
+  "module": "src/services/SettingsService + src/core/MemoryProfiler + src/apps/SettingsApp",
+  "files": [
+    "src/services/SettingsService.cpp",
+    "src/services/SettingsService.h",
+    "src/core/MemoryProfiler.cpp",
+    "src/core/MemoryProfiler.h",
+    "src/apps/SettingsApp.cpp",
+    "src/apps/SettingsApp.h",
+    "src/hardware/DisplayManager.cpp",
+    "src/hardware/DisplayManager.h"
+  ],
+  "dependencies": [
+    "FEAT-0005",
+    "FEAT-0010"
+  ],
+  "hardware": "AW9364 pulse-controlled backlight driver on GPIO38, ST7789 parallel LCD, CST816S touch",
+  "gpio": "GPIO38 (AW9364 backlight), GPIO15 (display power), GPIO0/14 (buttons)",
+  "lifecycle": "Central typed preferences in NVS, AW9364 pulse dimming, real ESP-IDF heap/PSRAM profiling, non-blocking diagnostics",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0010",
+    "host": "VER-0010",
+    "hardware": "NOT VERIFIED"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0011"
+  ]
+}
+```

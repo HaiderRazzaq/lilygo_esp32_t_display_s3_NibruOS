@@ -2,6 +2,7 @@
 #include "core/AppContext.h"
 #include "services/WiFiService.h"
 #include "hardware/DisplayManager.h"
+#include "BoardConfig.h"
 #include <Arduino.h>
 #include <WiFi.h>
 #include <cstdio>
@@ -54,7 +55,7 @@ void SystemInfoApp::render(AppContext& ctx) {
     t.drawRoundRect(210, 36, 100, 94, 6, Colors::Border);
     t.fillRoundRect(212, 38, 96, 22, 4, Colors::Panel);
     screen.label(225, 45, "NibruOS", Colors::Cyan, 1, Colors::Panel);
-    screen.label(222, 112, "v0.1.1", Colors::Border, 1);
+    screen.label(225, 112, Board::kVersion, Colors::Muted, 1, Colors::Bg);
 
     screen.footer("GPIO14 = Back  |  BOOT = Select");
     fullRedraw_ = false;

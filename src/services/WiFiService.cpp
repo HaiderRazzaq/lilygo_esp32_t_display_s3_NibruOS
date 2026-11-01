@@ -251,7 +251,8 @@ void WiFiService::collectResults(int n) {
   }
   WiFi.scanDelete();
   state_ = ScanState::Complete;
-  Serial.printf("[WiFi] Scan complete: %u APs discovered\n", count_);
+  lastScanDurationMs_ = (stageStartedAt_ > 0 && millis() >= stageStartedAt_) ? (millis() - stageStartedAt_) : 0;
+  Serial.printf("[WiFi] Scan complete: %u APs discovered in %lu ms\n", count_, static_cast<unsigned long>(lastScanDurationMs_));
 }
 
 const char* WiFiService::statusName() const {

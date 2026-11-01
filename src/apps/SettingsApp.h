@@ -1,11 +1,15 @@
 #pragma once
 #include "core/App.h"
-#include "apps/SystemInfoApp.h"
 #include "apps/TouchTestApp.h"
+#include <stdint.h>
 
 enum class SettingsSubView : uint8_t {
   Menu,
-  SystemInfo,
+  Display,
+  Theme,
+  Memory,
+  WiFiDiag,
+  Device,
   TouchTest
 };
 
@@ -13,7 +17,7 @@ class SettingsApp final : public App {
 public:
   const char* title() const override { return "Settings"; }
   const char* shortTitle() const override { return "SET"; }
-  const char* subtitle() const override { return "Config"; }
+  const char* subtitle() const override { return "System"; }
 
   void onEnter(AppContext& ctx) override;
   void onExit(AppContext& ctx) override;
@@ -25,9 +29,26 @@ public:
 
 private:
   SettingsSubView subView_ = SettingsSubView::Menu;
-  SystemInfoApp systemInfo_;
+  uint8_t focusedIndex_ = 0; // For physical button navigation (0..5)
   TouchTestApp touchTest_;
+  uint32_t lastMetricTickMs_ = 0;
+  bool fullRedraw_ = true;
+
+  // Confirmation dialog state for Device actions
+  enum class ConfirmAction : uint8_t { None, Reboot, ResetSettings };
+  ConfirmAction confirmAction_ = ConfirmAction::None;
 
   void renderMenu(AppContext& ctx);
-};
+  void renderDisplay(AppContext& ctx);
+  void renderTheme(AppContext& ctx);
+  void renderMemory(AppContext& ctx);
+  void renderWiFiDiag(AppContext& ctx);
+  void renderDevice(AppContext& ctx);
 
+  void handleMenuTouch(AppContext& ctx, const TouchEvent& ev);
+  void handleDisplayTouch(AppContext& ctx, const TouchEvent& ev);
+  void handleThemeTouch(AppContext& ctx, const TouchEvent& ev);
+  void handleMemoryTouch(AppContext& ctx, const TouchEvent& ev);
+  void handleWiFiDiagTouch(AppContext& ctx, const TouchEvent& ev);
+  void handleDeviceTouch(AppContext& ctx, const TouchEvent& ev);
+};
