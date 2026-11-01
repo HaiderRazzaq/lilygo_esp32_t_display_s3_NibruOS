@@ -16,7 +16,7 @@ UNKNOWN means evidence is missing. Electrical allocation belongs in
 | Battery ADC GPIO4 and power/charger circuitry | Board integrated | No battery-reading feature | Calibration, revision, safe battery/connector polarity unknown |
 | Battery/cell | UNKNOWN whether installed | No battery gauge | Model, protection, power conditions unknown |
 | External antenna + pigtail | Ownership reported in prior pinout doc | RF path not selected by this code | Connection, matching and resistor population NOT VERIFIED |
-| External SPI MicroSD reader | Owner reports acquired; **not confirmed connected** | **Not implemented** (FEAT-0007) | Model, card, level shifters and current unknown; proposed 3.3V wiring only |
+| External SPI MicroSD reader | Owner acquired; **CONFIRMED NOT CONNECTED** (User stated: not connected) | **Not implemented** (FEAT-0007 unallocated) | No physical connection; GPIOs 10–13 remain unconfigured/floating |
 | Optional SD shield | Proposed board accessory, ownership UNKNOWN | Not implemented | Its CMD13/CLK11/D0=12 mapping is not external SPI mapping |
 | Other sensors/NFC/SubGHz | No installation or ownership evidence | Not implemented | Do not infer from expansion headers |
 

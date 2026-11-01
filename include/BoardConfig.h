@@ -1,5 +1,7 @@
 #pragma once
 #include <stdint.h>
+#include "PinDefinitions.h"
+#include "NibruConfig.h"
 
 namespace Board {
 // Firmware runtime versioning

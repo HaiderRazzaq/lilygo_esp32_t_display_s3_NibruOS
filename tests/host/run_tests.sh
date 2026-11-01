@@ -5,7 +5,7 @@ cd "$(dirname "$0")/../.."
 "${PYTHON:-python}" tools/check_docs.py
 mkdir -p .testbuild
 c++ -std=c++17 -Wall -Wextra -Werror -Itests/host/stubs -Iinclude -Isrc \
-  src/core/*.cpp src/hardware/*.cpp src/services/*.cpp src/apps/*.cpp \
+  src/core/*.cpp src/hardware/*.cpp src/ui/*.cpp src/services/*.cpp src/apps/*.cpp \
   tests/host/test_main.cpp tests/host/test_settings.cpp -o .testbuild/nibru_smoke
 # The real entry unit is separately compile-checked with mock Arduino headers.
 c++ -std=c++17 -Wall -Wextra -Werror -Itests/host/stubs -Iinclude -Isrc \

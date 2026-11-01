@@ -367,6 +367,12 @@ void WiFiService::getGatewayIP(char* buffer, size_t maxLen) const {
   }
 }
 
+void WiFiService::getMacAddress(char* buffer, size_t maxLen) const {
+  if (!buffer || maxLen == 0) return;
+  const String mac = WiFi.macAddress();
+  mac.toCharArray(buffer, maxLen);
+}
+
 int8_t WiFiService::currentChannel() const {
   return (connectState_ == ConnectState::Connected) ? static_cast<int8_t>(WiFi.channel()) : 0;
 }

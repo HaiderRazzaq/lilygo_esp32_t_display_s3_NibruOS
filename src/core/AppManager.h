@@ -1,7 +1,7 @@
 #pragma once
 #include "core/App.h"
 #include "core/AppContext.h"
-#include "hardware/ButtonManager.h"
+#include "core/EventTypes.h"
 #include <stdint.h>
 
 class AppManager {

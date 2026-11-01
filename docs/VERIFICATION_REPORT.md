@@ -692,3 +692,52 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Compilation only; does not upload to physical hardware."
 }
 ```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0027",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + modular refactor",
+  "verification_type": "HOST",
+  "scope": "Automated desktop simulator suite, host Zig smoke tests, and doc mutation tests after modular refactoring",
+  "hardware": "Desktop SDL2 simulation & Zig host mock",
+  "wiring": "Simulated CST816S (SDA18/SCL17), BOOT/USER buttons, and ST7789 display",
+  "procedure": "tools\\run_desktop_tests.bat; $env:CXX='.testbuild/toolchain/ziglang/zig.exe c++'; python tools/run_host_tests.py; python -m unittest discover -s tests/docs -v",
+  "expected": "All core lifecycle, UI transforms, Wi-Fi simulation, settings persistence, modular HAL contracts, and 25 lifecycle cycles pass with zero errors",
+  "actual": "All desktop automated tests PASS. Host Zig smoke tests PASS. 17 doc mutation tests PASS. 6 resource tests PASS.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-architecture-refactor-tests.txt"
+  ],
+  "evidence_kind": "Automated test execution logs and unit test reports",
+  "environment": "Windows 11 / MSVC 2022 / Ninja / Zig 0.16.0 / Python 3.14",
+  "limitations": "Host and simulator execution only; does not prove physical RF Wi-Fi reception or AW9364 pulse modulation."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0028",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + modular refactor",
+  "verification_type": "BUILD",
+  "scope": "ESP32-S3 PlatformIO multi-target builds (default, profile, ledc) after modular refactoring",
+  "hardware": "Target LILYGO T-Display-S3 Touch Glass (software compile test)",
+  "wiring": "Standard baseline: SDA18, SCL17, RST21, INT16, LCD parallel pins",
+  "procedure": "pio run -e lilygo-t-display-s3 -e lilygo-t-display-s3-profile -e lilygo-t-display-s3-ledc; python tools/check_resources.py",
+  "expected": "All 3 PlatformIO environments compile successfully; binary size fits within app0 partition; flash growth < 5%",
+  "actual": "All 3 environments SUCCESS. Default env Flash: 843,565 B (+44 B, +0.005%). RAM: 61,240 B (unchanged). Binary: 843,936 B (+48 B). Resource check PASS.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-architecture-builds.txt"
+  ],
+  "evidence_kind": "PlatformIO build logs and check_resources.py artifact report",
+  "environment": "Windows 11 / PlatformIO / espressif32@6.5.0 / Arduino 2.0.14",
+  "limitations": "Compilation and ELF analysis only; does not upload to physical hardware."
+}
+```

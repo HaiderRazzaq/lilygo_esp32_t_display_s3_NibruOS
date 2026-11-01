@@ -17,6 +17,16 @@ current rows (not new evidence of the old hardware claims).
 | Partition capacity/growth warnings | VER-0020 | VER-0018 (six resource tests) | Static-only, N/A hardware |
 | Documentation consistency | N/A | VER-0018 (17 mutation tests + checker) | N/A |
 
+## Modular Architecture & HAL — current
+
+| Scope | Software | Physical |
+|---|---|---|
+| EventTypes & IApp interface decoupling | VER-0027 HOST PASS, VER-0028 BUILD PASS | NOT APPLICABLE (Software architecture) |
+| UI Layer & HomeScreen drawing extraction | VER-0027 HOST PASS, VER-0028 BUILD PASS | HWT-0012 pending |
+| Centralized PinDefinitions & NibruConfig | VER-0027 HOST PASS, VER-0028 BUILD PASS | N/A (Compile-time layout) |
+| WiFiService MAC encapsulation & boundary | VER-0027 HOST PASS, VER-0028 BUILD PASS | HWT-0012 pending |
+| Multi-target build stability (default, profile, ledc) | VER-0028 BUILD PASS | Upload pending owner request |
+
 ## Touch and redraw repair — current
 
 | Scope | Software | Physical |

@@ -780,3 +780,87 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Use desktop simulator for rapid interactive app development; verify final changes on physical LILYGO board."
 }
 ```
+
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0021",
+  "date": "2026-11-01",
+  "related": [
+    "FEAT-0001",
+    "FEAT-0005",
+    "FEAT-0006",
+    "FEAT-0015"
+  ],
+  "action": "ARCHITECTURE AUDIT AND MODULAR REFACTORING",
+  "files": [
+    "src/core/EventTypes.h",
+    "src/core/IApp.h",
+    "src/core/App.h",
+    "src/core/AppManager.h",
+    "src/core/AppManager.cpp",
+    "src/ui/Theme.h",
+    "src/ui/HomeScreen.h",
+    "src/ui/HomeScreen.cpp",
+    "src/hardware/DisplayManager.h",
+    "src/hardware/ButtonManager.h",
+    "src/services/WiFiService.h",
+    "src/services/WiFiService.cpp",
+    "src/apps/SystemInfoApp.cpp",
+    "include/PinDefinitions.h",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "platform/desktop/DesktopInput.h",
+    "tests/desktop/test_simulator.cpp",
+    "tests/host/test_main.cpp",
+    "CMakeLists.txt",
+    "tools/run_host_tests.py",
+    "tests/host/run_tests.sh",
+    "docs/ARCHITECTURE.md",
+    "docs/decisions/0002-modular-architecture.md",
+    "docs/decisions/README.md",
+    "AGENTS.md"
+  ],
+  "description": "Conducted complete architecture audit of NibruOS. Implemented Feature-Based Modular Monolith with Layered Responsibilities and HAL. Extracted normalized input events into src/core/EventTypes.h, breaking inverted Core->Hardware dependency on ButtonManager.h. Formalized IApp interface standard in src/core/IApp.h. Extracted 76 lines of Home Screen UI card drawing and badge layout from AppManager into src/ui/HomeScreen.* and centralized color palettes and UI metrics into src/ui/Theme.h. Centralized board GPIO pin reservations in include/PinDefinitions.h (including explicit unverified markers for proposed SPI MicroSD pins) and global system parameters in include/NibruConfig.h while preserving include/BoardConfig.h backward compatibility. Encapsulated MAC address retrieval in WiFiService to eliminate direct <WiFi.h> hardware bypass in SystemInfoApp. Added permanent architecture and module organization rules to AGENTS.md. Added modular HAL tests to desktop simulator and host suites.",
+  "reason": "Transform NibruOS into a clean, modular, maintainable, resource-efficient ESP32-S3 firmware platform with clear separation between applications, UI, services, core lifecycle, and hardware drivers.",
+  "expected": "Clean downward dependency directions, zero circular dependencies, zero breaking changes to public interfaces, image fits in app0, all desktop simulator and PlatformIO builds pass.",
+  "actual": "All automated desktop simulator tests, host Zig smoke tests, and 17 doc mutation tests PASS. PlatformIO builds for default (843,565 B Flash, +44 B), profile (844,121 B Flash), and ledc (849,333 B Flash) SUCCESS. check_resources PASS (+0.005% flash change, well within 5% limit). check_docs PASS.",
+  "verification": "VER-0027; VER-0028; python tools/check_docs.py",
+  "risks": "Physical CST816S touch responsiveness and AW9364 pulse dimming require hardware acceptance on real LILYGO board (HWT-0012 pending).",
+  "commit": "UNCOMMITTED based on 8239bb6",
+  "follow_up": "Validate binary on physical LILYGO T-Display-S3 Touch Glass hardware; complete HWT-0012."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0022",
+  "date": "2026-11-01",
+  "related": [
+    "FEAT-0010",
+    "FEAT-0013",
+    "FEAT-0015",
+    "FEAT-0007",
+    "HWT-0014"
+  ],
+  "action": "HARDWARE FLASH / USER CLARIFICATION",
+  "files": [
+    "include/PinDefinitions.h",
+    "docs/HARDWARE_PINOUT.md",
+    "docs/HARDWARE_INVENTORY.md",
+    "docs/CURRENT_STATE.md",
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/evidence/2026-11-01-modular-architecture-upload-com5.txt"
+  ],
+  "description": "Updated hardware documentation and pin definitions to record user explicit clarification that external SPI MicroSD is NOT connected (GPIOs 10-13 unallocated). Flashed modular architecture refactored NibruOS default firmware to physical LILYGO T-Display-S3 Touch Glass on COM5 per user request. Flashed bootloader, partitions, and application (843,936 bytes) in 7.4s at 460800 baud; hash verified; reset triggered via RTS.",
+  "reason": "User confirmed MicroSD is not connected and requested firmware flashing to device.",
+  "expected": "Flashing succeeds without error; device resets into newly refactored firmware; documentation accurately records disconnected MicroSD state and hardware upload outcome.",
+  "actual": "PlatformIO upload to COM5 SUCCESS (32.056s total duration, 843,936 bytes flashed, hash verified, RTS hard reset executed).",
+  "verification": "HWT-0014",
+  "risks": "Physical runtime UI interaction and CST816S touch responsiveness pending user verification on device screen.",
+  "commit": "UNCOMMITTED based on 8239bb6",
+  "follow_up": "User tests interactive Home launcher navigation, Settings, and 2FA Authenticator on the physical display."
+}
+```

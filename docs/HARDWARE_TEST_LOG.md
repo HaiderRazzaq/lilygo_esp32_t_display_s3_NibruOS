@@ -318,3 +318,27 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Flash-write/hash/reset verification only; physical UI/touch/heap/latency/power acceptance HWT-0012 still pending."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0014",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 modular refactored",
+  "commit": "8239bb6 + modular architecture refactoring",
+  "verification_type": "HARDWARE",
+  "scope": "Physical upload of modular architecture refactored NibruOS image to COM5",
+  "hardware": "ESP32-S3 (revision v0.2, VID:303A PID:1001) on COM5",
+  "wiring": "USB-C COM5; ST7789 8-bit parallel, CST816S I2C; MicroSD not connected",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "Write modular refactored firmware, verify partition and application hashes, execute RTS reset",
+  "actual": "SUCCESS 32.056s. Flashed bootloader, partitions, and application (843,936 bytes, 547,299 compressed) at 0x10000 in 7.4s (915.2 kbit/s). Hash verified, hard reset via RTS pin.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-modular-architecture-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool v4.5.1 device flashing output, MAC sanitized",
+  "environment": "Windows 11, PlatformIO Core 6.5.0, espressif32@6.5.0, esptool 4.5.1",
+  "limitations": "Physical verification confirms successful flash write, hash validation, and bootloader reset. Interactive runtime UI/touch observation on physical screen remains pending owner testing."
+}
+```

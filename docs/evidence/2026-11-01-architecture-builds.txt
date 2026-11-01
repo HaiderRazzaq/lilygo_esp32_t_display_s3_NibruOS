@@ -1,0 +1,37 @@
+NibruOS Architecture Refactor Build Verification
+Date: 2026-11-01
+Commit Baseline: 8239bb6
+
+1. Target lilygo-t-display-s3:
+Command: pio run -e lilygo-t-display-s3
+Result: SUCCESS (00:00:11.846)
+RAM: 61,240 bytes (18.7%)
+Flash: 843,565 bytes (12.9% of 6,553,600 bytes)
+Binary size: 843,936 bytes
+Growth: +48 bytes (+0.005%) vs baseline
+
+2. Target lilygo-t-display-s3-profile:
+Command: pio run -e lilygo-t-display-s3-profile
+Result: SUCCESS (00:00:32.989)
+RAM: 61,240 bytes (18.7%)
+Flash: 844,121 bytes (12.9%)
+
+3. Target lilygo-t-display-s3-ledc:
+Command: pio run -e lilygo-t-display-s3-ledc
+Result: SUCCESS (00:00:31.231)
+RAM: 61,312 bytes (18.7%)
+Flash: 849,333 bytes (13.0%)
+
+4. Resource Budget Verification:
+Command: python tools/check_resources.py
+Result:
+{
+  "binary_bytes": 843936,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5709664,
+  "sha256": "0a79e714adcac62fc239aad14966af3d433d506409fdee08c56d28b89f7803b1",
+  "growth_percent": 0.26041171662643275,
+  "warnings": [],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)

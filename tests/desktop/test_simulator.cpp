@@ -2,9 +2,15 @@
 #include <Arduino.h>
 #include "core/AppContext.h"
 #include "core/AppManager.h"
+#include "core/IApp.h"
+#include "core/EventTypes.h"
 #include "core/ResourceManager.h"
 #include "core/WakeInputGate.h"
 #include "hardware/DisplayManager.h"
+#include "ui/Theme.h"
+#include "ui/HomeScreen.h"
+#include "PinDefinitions.h"
+#include "NibruConfig.h"
 #include "services/WiFiService.h"
 #include "services/SecurityService.h"
 #include "services/SettingsService.h"
@@ -267,6 +273,39 @@ void testRepeatedLifecycleCycles(AppManager& launcher) {
   std::printf("  -> 25 Lifecycle Cycles PASS (Zero leaks, clean state)\n");
 }
 
+void testModularArchitecture(AppContext& ctx) {
+  std::printf("[Test] Running Modular Architecture & HAL Contract Tests...\n");
+
+  // 1. EventTypes & IApp compliance
+  IApp* appPtr = nullptr;
+  WiFiApp wifiApp;
+  appPtr = &wifiApp;
+  assert(std::strcmp(appPtr->title(), "Wi-Fi") == 0);
+
+  // 2. Theme & Colors
+  assert(Theme::getAccentColor(0) == Colors::Cyan);
+  assert(Theme::getAccentColor(1) == Colors::Green);
+  assert(Theme::getAccentColor(2) == Colors::Amber);
+  assert(Theme::getAccentColor(3) == Colors::Magenta);
+  assert(Theme::HeaderHeight == 33);
+  assert(Theme::FooterHeight == 18);
+
+  // 3. Centralized Pin Definitions
+  assert(Pins::TouchSda == 18);
+  assert(Pins::TouchScl == 17);
+  assert(Pins::TouchReset == 21);
+  assert(Pins::TouchInterrupt == 16);
+  assert(Pins::ButtonBoot == 0);
+  assert(Pins::ButtonUser == 14);
+
+  // 4. WiFiService MAC address retrieval (service layer boundary)
+  char macBuf[32]{};
+  ctx.wifi.getMacAddress(macBuf, sizeof(macBuf));
+  assert(std::strlen(macBuf) > 0);
+
+  std::printf("  -> Modular Architecture & HAL Tests PASS\n");
+}
+
 int main() {
   std::printf("\n==================================================\n");
   std::printf("  NibruOS Automated Desktop & Shared Logic Tests\n");
@@ -305,6 +344,7 @@ int main() {
   testUITransformationsAndGestures();
   testWiFiSimulation(context);
   testSettingsPersistence(context);
+  testModularArchitecture(context);
   testRepeatedLifecycleCycles(launcher);
 
   std::printf("\n==================================================\n");

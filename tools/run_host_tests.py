@@ -14,7 +14,7 @@ flags = ['-std=c++17', '-Wall', '-Wextra', '-Werror', '-Itests/host/stubs', '-Ii
 flags += sys.argv[1:]
 if 'zig.exe' in compiler[0]:
     flags += ['-Wno-nullability-completeness']
-sources = [str(p) for d in ('core', 'hardware', 'services', 'apps') for p in (ROOT / 'src' / d).glob('*.cpp')]
+sources = [str(p) for d in ('core', 'hardware', 'ui', 'services', 'apps') for p in (ROOT / 'src' / d).glob('*.cpp')]
 exe = str(out / ('nibru_smoke.exe' if os.name == 'nt' else 'nibru_smoke'))
 subprocess.run(compiler + flags + sources + ['tests/host/test_main.cpp', 'tests/host/test_settings.cpp', '-o', exe], check=True)
 subprocess.run(compiler + flags + ['-c', 'src/main.cpp', '-o', str(out / 'main.o')], check=True)

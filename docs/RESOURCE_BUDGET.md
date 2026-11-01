@@ -10,6 +10,7 @@ Every runtime, memory, storage, timing, peripheral or power change needs the rep
 below, including fixes, refactors, libraries, flags, tasks and hardware additions.
 Documentation-only changes use a short impact assessment. Read
 [baseline](performance/BASELINE.md) first; measure before/after where possible.
+See [Architecture resource impact](performance/ARCHITECTURE_RESOURCE_IMPACT.md).
 
 | Resource | Control | Evidence / acceptance |
 |---|---|---|
@@ -119,10 +120,15 @@ EVIDENCE:
 Logs, measurements, or relevant test references.
 ```
 
-## 4. Cross-Platform Desktop Simulator Impact
+## 5. Cross-Platform Desktop Simulator Impact
 
 The Native Desktop Simulator (`platform/desktop/`) introduces zero memory or flash overhead to the physical ESP32-S3 firmware image.
 - Desktop-only headers and SDL2 link libraries are isolated strictly to the CMake desktop build target.
 - The embedded PlatformIO target (`lilygo-t-display-s3`) compiles exclusively from `src/` and official libraries.
 - Firmware size before and after simulator additions remains constant (Flash: 843,521 bytes [12.9%], static RAM: 61,240 bytes [18.7%]).
 - Desktop process memory (~25-35 MB) reflects native host CRT, SDL2, and graphics surfaces, and must never be conflated with embedded SRAM or PSRAM metrics.
+
+## 6. Resource Impact Reports
+- [Settings resource impact](performance/SETTINGS_RESOURCE_IMPACT.md)
+- [Touch fix resource impact](performance/TOUCH_FIX_RESOURCE_IMPACT.md)
+- [Architecture resource impact](performance/ARCHITECTURE_RESOURCE_IMPACT.md)

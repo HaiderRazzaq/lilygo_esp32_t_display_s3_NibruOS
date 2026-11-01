@@ -11,7 +11,7 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
-  "working_tree": "Clean at discovery; Essential Settings completion is uncommitted",
+  "working_tree": "Clean at discovery; Architecture audit and modular refactoring completed",
   "implemented_features": [
     "FEAT-0001",
     "FEAT-0002",
@@ -40,10 +40,10 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "BUG-0007",
     "BUG-0008"
   ],
-  "latest_build": "VER-0026",
-  "latest_upload": "HWT-0013",
-  "documentation_verification": "VER-0018",
-  "current_host_attempt": "VER-0025",
+  "latest_build": "VER-0028",
+  "latest_upload": "HWT-0014",
+  "documentation_verification": "VER-0027",
+  "current_host_attempt": "VER-0027",
   "source_constants": {
     "kTouchSda": 18,
     "kTouchScl": 17,
@@ -95,8 +95,7 @@ No commit or push performed. Host cycles
 are control-flow tests and do not establish leak freedom or radio reception.
 
 No SD driver/file manager, BLE settings or OTA implementation exists. SPIFFS/OTA
-partition reservations do not implement features. External MicroSD is owned,
-wiring CS10/MOSI11/SCK12/MISO13 remains proposed, not allocated or verified.
+partition reservations do not implement features. External MicroSD reader is owned, but the owner confirmed it is NOT connected to the device; GPIOs 10–13 remain unallocated and floating.
 
 Next: perform HWT-0008 and profiling scenarios A–E; >=20 Settings/Wi-Fi cycles,
 brightness, timeout/wake/confirmation behavior, NVS restart/reset preservation,

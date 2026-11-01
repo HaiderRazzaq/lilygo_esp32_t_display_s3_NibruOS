@@ -11,7 +11,7 @@
 - Diagram/image copied to `docs/assets/T-Display-S3-user-pinout.png`. Complete pin reservations and exposed contacts in `docs/HARDWARE_PINOUT.md`.
 
 ## Architecture and editing rules
-- Entry: `src/main.cpp`. App lifecycle: `src/core/App.h`, manager `src/core/AppManager.*`, shared context `src/core/AppContext.h`. All apps are in `src/apps/`.
+- Entry: `src/main.cpp`. App lifecycle: `src/core/App.h`, `src/core/IApp.h`, manager `src/core/AppManager.*`, shared context `src/core/AppContext.h`. All apps are in `src/apps/`.
 - Hardware is accessed by drivers in `src/hardware/`; shared Wi-Fi owned through `ResourceManager` (`ResourceOwner::WiFiScanner`). Avoid direct Wi-Fi/display/touch initialization in individual apps.
 - **Non-blocking** `onTick()` and touch events. Never run multi-second while-loops or synchronous network scans on the UI event loop. `onExit()` must release acquired resources; a Back button must remain responsive.
 - Add a feature via the `App` interface; register it in `main.cpp`; keep app-local state; use shared managers; document every extra GPIO. Consult `docs/ADDING_AN_APP.md`.
@@ -121,6 +121,34 @@ Every future AI agent modifying or extending NibruOS must:
 8. **Document unsupported or hardware-only functionality**: Clearly distinguish simulated vs. hardware-dependent features (e.g. physical AW9364 backlight pulses, real RF Wi-Fi reception).
 9. **Record regressions and actual verification results**: Document build and test results honestly in `docs/DEVELOPMENT_LOG.md` and `docs/VERIFICATION_REPORT.md`.
 10. **Never equate desktop simulation success with hardware verification**: Mark all desktop simulation outcomes as HOST / SIMULATOR verification, never as physical HARDWARE verification.
+
+## NibruOS Architecture & Module Organization Policy
+
+**CRITICAL: NibruOS follows a Feature-Based Modular Monolith with Layered Responsibilities and Hardware Abstraction (HAL). Every AI agent must strictly enforce these module organization rules:**
+
+1. **Read Project Documentation First**: Always inspect [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md), [docs/FEATURE_REGISTRY.md](docs/FEATURE_REGISTRY.md), and [docs/decisions/0002-modular-architecture.md](docs/decisions/0002-modular-architecture.md) before writing code.
+2. **Follow Layered Modular Structure**:
+   - `src/core/`: Application lifecycle (`AppManager`), interfaces (`IApp`, `App`), resource leasing (`ResourceManager`), shared context (`AppContext`), and input events (`EventTypes`). Core must never include hardware driver headers or application-specific drawing code.
+   - `src/ui/`: Reusable presentation components (`HomeScreen`), system color palettes, and styling metrics (`Theme.h`).
+   - `src/services/`: System capabilities (`WiFiService`, `SettingsService`, `SecurityService`, `CryptoService`, `TimeService`, `TotpService`, `UsbHidService`, `MemoryProfiler`).
+   - `include/` and `src/hardware/`: Hardware abstraction and driver layer (`PinDefinitions.h`, `BoardConfig.h`, `DisplayManager`, `TouchManager`, `ButtonManager`).
+   - `src/apps/`: Discrete application implementations (`WiFiApp`, `TotpApp`, `SettingsApp`, `SystemInfoApp`, `TouchTestApp`, `WiFiScannerApp`).
+3. **Centralize Hardware Pin Configuration**: All physical GPIO numbers must be defined in [include/PinDefinitions.h](include/PinDefinitions.h) and [include/BoardConfig.h](include/BoardConfig.h). Never hardcode numeric GPIO literals in application or service code.
+4. **Prevent Circular and Inverted Dependencies**: Dependencies must flow strictly downward: Applications -> Core / UI / Services; UI -> Theme / Display; Services -> HAL / Crypto; Core -> EventTypes. Core must never depend on concrete Hardware classes.
+5. **Reuse Shared Services via AppContext**: Applications must consume system capabilities through `AppContext` references. Never instantiate duplicate service singletons or bypass service boundaries (e.g., do not call raw `<WiFi.h>` in application code).
+6. **Enforce Predictable Application Lifecycle**:
+   - `onEnter()`: Validate services, acquire required `ResourceManager` leases, initialize view state.
+   - `onTick()`: Keep processing strictly non-blocking. Maintain UI responsiveness.
+   - `onTouch()` / `onPrimaryAction()` / `onActivate()` / `onBack()`: Process normalized user inputs.
+   - `onExit()`: Cancel background jobs, release acquired resource leases, close buffers, and return clean state.
+7. **Eliminate Duplicated Responsibilities**: Avoid re-implementing common UI rendering, NVS persistence schemas, or input debouncing across applications.
+8. **Preserve Verified Hardware Baselines**: Do not alter verified ST7789 display timing, CST816S touch initialization, or AW9364 pulse control without physical device evidence.
+9. **Assess Resource Impacts**: Evaluate Flash, Internal SRAM, PSRAM, FreeRTOS stacks, CPU latency, and power for every meaningful change.
+10. **Follow Memory Profiling & Resource Budget Policy**: Enforce application partition capacity (`app0` = 6,553,600 B) and maintain >= 150 KiB free internal heap headroom.
+11. **Maintain Multi-Target Test Coverage**: When adding or refactoring functionality, update both `tests/desktop/test_simulator.cpp` (MSVC desktop suite) and host/unit test suites.
+12. **Update Engineering Records Permanently**: Record changes in [docs/DEVELOPMENT_LOG.md](docs/DEVELOPMENT_LOG.md), [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md), [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md), [docs/FEATURE_REGISTRY.md](docs/FEATURE_REGISTRY.md), and [CHANGELOG.md](CHANGELOG.md). Major architectural decisions require an ADR in [docs/decisions/](docs/decisions/).
+13. **Report Physical Hardware Outcomes Honestly**: Distinguish between unit tests, host mocks, simulator passes, PlatformIO builds, and actual hardware testing. Mark unverified physical behavior as NOT VERIFIED or NOT RUN.
+14. **Pragmatic Engineering Over Abstraction**: Prefer small, safe, testable, and maintainable changes. Do not introduce heavy enterprise frameworks, dynamic plugin loaders, or complex dependency injection containers.
 
 ## Source of truth
 Actual source code > explanatory documents if they diverge; user-verified hardware wiring > contradictory image labels. External validation sources: https://github.com/Xinyuan-LilyGO/T-Display-S3 , https://wiki.lilygo.cc/products/t-display-series/t-display-s3/ , https://docs.espressif.com/projects/arduino-esp32/en/latest/api/wifi.html .

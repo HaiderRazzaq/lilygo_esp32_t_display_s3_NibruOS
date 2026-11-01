@@ -77,6 +77,7 @@ set(NIBRU_SHARED_SOURCES
   src/hardware/DisplayManager.cpp
   src/hardware/TouchManager.cpp
   src/hardware/ButtonManager.cpp
+  src/ui/HomeScreen.cpp
   src/services/WiFiService.cpp
   src/services/SettingsService.cpp
   src/services/SecurityService.cpp

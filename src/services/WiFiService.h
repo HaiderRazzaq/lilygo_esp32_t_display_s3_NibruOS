@@ -49,6 +49,7 @@ public:
   uint32_t connectStartedAt() const { return connectStartedAt_; }
   void getLocalIP(char* buffer, size_t maxLen) const;
   void getGatewayIP(char* buffer, size_t maxLen) const;
+  void getMacAddress(char* buffer, size_t maxLen) const;
   int8_t currentChannel() const;
   int16_t currentRSSI() const;
 

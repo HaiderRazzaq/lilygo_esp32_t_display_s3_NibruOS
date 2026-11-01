@@ -6,6 +6,17 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 
 ## Unreleased
 
+### Architecture Audit & Modular Refactoring — 2026-11-01
+
+- Adopted Feature-Based Modular Monolith with Layered Responsibilities and Hardware Abstraction (HAL) ([ADR-0002](docs/decisions/0002-modular-architecture.md)).
+- Extracted platform-neutral input event types (TouchEvent, TouchGesture, ButtonAction) into src/core/EventTypes.h, breaking inverted dependency of AppManager.h on ButtonManager.h.
+- Formalized application lifecycle standard via src/core/IApp.h.
+- Extracted Home Screen UI rendering logic out of AppManager into src/ui/HomeScreen.* and centralized system palettes and UI dimensions in src/ui/Theme.h.
+- Centralized board GPIO pin configurations into include/PinDefinitions.h (including explicit unverified notes on proposed SPI MicroSD pins) and global system parameters into include/NibruConfig.h, while maintaining exact backward compatibility in include/BoardConfig.h.
+- Added getMacAddress service method to WiFiService and eliminated direct <WiFi.h> hardware bypass from SystemInfoApp.
+- Added permanent Architecture & Module Organization Policy to AGENTS.md.
+- Added modular architecture contract tests to desktop simulator automated test suite.
+
 ### Native Desktop Simulator & Cross-Platform Target — 2026-11-01
 
 - Added interactive Windows/Desktop Simulator (`FEAT-0015`) using C++17, SDL2, and CMake. Reuses shared NibruOS core, applications (`WiFiApp`, `TotpApp`, `SettingsApp`, `SystemInfoApp`, `TouchTestApp`), and services with zero business logic duplication.

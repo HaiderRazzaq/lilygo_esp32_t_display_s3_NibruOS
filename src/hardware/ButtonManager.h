@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
+#include "core/EventTypes.h"
 
-enum class ButtonAction : uint8_t { None, SelectNext, Activate, Back };
 class ButtonManager {
 public:
   void begin();

@@ -1,21 +1,8 @@
 #pragma once
 #include <stdint.h>
+#include "core/EventTypes.h"
 
 struct AppContext;
-
-// Input events are physical screen coordinates after Rotation 1 mapping.
-enum class TouchGesture : uint8_t {
-  Tap, SwipeUp, SwipeDown, SwipeLeft, SwipeRight, DoubleTap, LongPress, Unknown
-};
-struct TouchEvent {
-  int16_t x;
-  int16_t y;
-  int16_t rawX;
-  int16_t rawY;
-  TouchGesture gesture;
-  uint32_t contactId = 0; // TouchManager contact identity; not a timestamp.
-  uint32_t contactStartedMs = 0;
-};
 
 class App {
 public:

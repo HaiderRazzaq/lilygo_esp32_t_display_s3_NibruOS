@@ -1,4 +1,9 @@
 #include "core/AppManager.h"
+#include "core/IApp.h"
+#include "core/EventTypes.h"
+#include "ui/Theme.h"
+#include "PinDefinitions.h"
+#include "NibruConfig.h"
 #include "BoardConfig.h"
 #include "core/AppContext.h"
 #include "core/ResourceManager.h"
@@ -400,6 +405,15 @@ int main() {
   secService.lock();
   assert(!secService.hasActiveKey());
   assert(secService.getActiveVaultKey() == nullptr);
+
+  // Modular architecture and HAL tests
+  IApp* appTestPtr = &info;
+  assert(std::strcmp(appTestPtr->title(), "System Info") == 0);
+  assert(Theme::getAccentColor(0) == Colors::Cyan);
+  assert(Pins::TouchSda == 18 && Pins::TouchScl == 17);
+  char testMac[24]{};
+  wifi.getMacAddress(testMac, sizeof(testMac));
+  assert(std::strlen(testMac) > 0);
 
   testSettings(context);
   puts("PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests");

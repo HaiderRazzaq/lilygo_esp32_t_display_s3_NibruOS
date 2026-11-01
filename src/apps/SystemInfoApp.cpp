@@ -4,7 +4,7 @@
 #include "hardware/DisplayManager.h"
 #include "BoardConfig.h"
 #include <Arduino.h>
-#include <WiFi.h>
+
 #include <cstdio>
 
 void SystemInfoApp::onEnter(AppContext&) {
@@ -47,8 +47,9 @@ void SystemInfoApp::render(AppContext& ctx) {
     screen.label(10, 52, line, Colors::Cyan);
 
     // 4. MAC Address (static)
-    String mac = WiFi.macAddress();
-    snprintf(line, sizeof(line), "MAC:   %s", mac.c_str());
+    char macBuf[24]{};
+    ctx.wifi.getMacAddress(macBuf, sizeof(macBuf));
+    snprintf(line, sizeof(line), "MAC:   %s", macBuf);
     screen.label(10, 84, line, Colors::White);
 
     // Right status badge card border and static labels

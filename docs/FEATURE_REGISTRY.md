@@ -20,7 +20,12 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "src/core/App.h",
     "src/core/AppContext.h",
     "src/core/AppManager.cpp",
-    "src/core/ResourceManager.cpp"
+    "src/core/ResourceManager.cpp",
+    "src/core/EventTypes.h",
+    "src/core/IApp.h",
+    "src/ui/HomeScreen.cpp",
+    "src/ui/HomeScreen.h",
+    "src/ui/Theme.h"
   ],
   "dependencies": [
     "Arduino",
@@ -39,7 +44,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   },
   "issues": [],
   "history": [
-    "DEV-0001"
+    "DEV-0001",
+    "DEV-0021"
   ]
 }
 ```
@@ -157,7 +163,9 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "src/hardware/TouchManager.cpp",
     "src/hardware/ButtonManager.cpp",
     "include/BoardConfig.h",
-    "platformio.ini"
+    "platformio.ini",
+    "include/PinDefinitions.h",
+    "include/NibruConfig.h"
   ],
   "dependencies": [
     "TFT_eSPI 2.5.43",
@@ -179,7 +187,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ],
   "history": [
     "DEV-0001",
-    "DEV-0017"
+    "DEV-0017",
+    "DEV-0021"
   ]
 }
 ```
@@ -211,7 +220,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   },
   "issues": [],
   "history": [
-    "DEV-0001"
+    "DEV-0001",
+    "DEV-0021"
   ]
 }
 ```
@@ -563,7 +573,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   },
   "issues": [],
   "history": [
-    "DEV-0020"
+    "DEV-0020",
+    "DEV-0021"
   ]
 }
 ```

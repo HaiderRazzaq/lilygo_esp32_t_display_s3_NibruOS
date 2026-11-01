@@ -135,15 +135,16 @@ every GPIO's electrical measurement or current firmware operation.
 | 43, 44 | UART TX, RX / small connector | UART/3.3V digital | BOARD SHARED / conditional | Verify connector/revision and UART use first | Owner diagram, local schematic; no extra app allocation |
 | 1, 2 | Expansion candidates | GPIO/ADC1 | UNALLOCATED | Not physically tested for external peripherals | Owner exposed-pad map; no firmware definitions |
 | 3 | Expansion candidate | GPIO; boot strap | CONDITIONAL | Boot loading restriction; not physically tested | Owner diagram; no firmware definition |
-| 10 | Proposed external SD CS | SPI output | PROPOSED / UNVERIFIED | No wiring/driver evidence; do not allocate twice | FEAT-0007; no source definition |
-| 11 | Proposed external SD MOSI | SPI output | PROPOSED / UNVERIFIED | Optional shield conflict; no wiring/driver evidence | FEAT-0007; no source definition |
-| 12 | Proposed external SD SCK | SPI clock output | PROPOSED / UNVERIFIED | Optional shield conflict; no wiring/driver evidence | FEAT-0007; no source definition |
-| 13 | Proposed external SD MISO | SPI input | PROPOSED / UNVERIFIED | Optional shield conflict; no wiring/driver evidence | FEAT-0007; no source definition |
+| 10 | Proposed external SD CS | SPI output | PROPOSED / UNALLOCATED | User confirmed NOT connected; unconfigured | FEAT-0007; no active driver |
+| 11 | Proposed external SD MOSI | SPI output | PROPOSED / UNALLOCATED | User confirmed NOT connected; unconfigured | FEAT-0007; no active driver |
+| 12 | Proposed external SD SCK | SPI clock output | PROPOSED / UNALLOCATED | User confirmed NOT connected; unconfigured | FEAT-0007; no active driver |
+| 13 | Proposed external SD MISO | SPI input | PROPOSED / UNALLOCATED | User confirmed NOT connected; unconfigured | FEAT-0007; no active driver |
 
-GPIO10–13 remain expansion candidates, with a documented **proposal**, not an
-installed allocation. Proposed SD supply: compatible **3.3V** and GND; module
-model/current/level shifting/SPI speed must be checked first. Do not confuse
-these SPI signals with the separate optional SD shield CMD/CLK/D0 map above.
+GPIO10–13 remain unallocated expansion candidates. The owner explicitly confirmed on
+2026-11-01 that the external MicroSD module is **not connected**. No pins are
+initialized, driven, or read for SD storage in NibruOS firmware. Proposed SD supply:
+compatible **3.3V** and GND if ever wired in the future. Do not confuse these SPI
+signals with the separate optional SD shield CMD/CLK/D0 map above.
 
 Pin definitions: [BoardConfig](../include/BoardConfig.h),
 [TFT setup](../platformio.ini), [drivers](../src/hardware/TouchManager.cpp).
