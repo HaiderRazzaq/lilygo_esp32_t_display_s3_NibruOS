@@ -1,55 +1,91 @@
-# Memory Profiling & Resource Verification Guide
+# Memory profiling and resource verification
 
-Instructions and standardized profiling scenarios for **NibruOS** on the **LILYGO T-Display-S3 Touch Glass**.
+The [permanent policy](RESOURCE_BUDGET.md) applies to every meaningful change.
+Start from an identified image/build and a sanitized serial capture; follow
+[baseline](performance/BASELINE.md) and keep results by verification level.
 
----
+## Instrumentation and commands
 
-## 1. Supported Profiling Methods
+`MemoryProfiler::capture()` is available for diagnostics in every build. On the
+ESP32 it uses INTERNAL|8BIT heap free/min/largest, PSRAM total/free/min/largest,
+ESP sketch/flash APIs, reset reason, uptime and current loop-task stack HWM.
+ESP-IDF's stack HWM unit is **bytes**. These are capability-specific pools;
+ESP.getFreeHeap() and unused linker RAM must not be labeled free internal SRAM.
+The host returns `available=false`, no invented device numbers, and a HOST label.
 
-1. **`MemoryProfiler` API (`src/core/MemoryProfiler.h`):**
-   - Lightweight, zero-allocation runtime snapshot mechanism.
-   - Captures `heap_caps_get_free_size(MALLOC_CAP_INTERNAL)`, `heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL)`, and `heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL)`.
-   - Reports total and free external PSRAM (`ESP.getPsramSize()`, `ESP.getFreePsram()`).
-   - Retrieves actual binary sketch size and total SPI flash capacity.
-   - Decodes hardware reset reason via `esp_reset_reason()`.
-2. **PlatformIO Build Inspection:**
-   - Command: `& "$env:USERPROFILE\.platformio\penv\Scripts\pio.exe" run -e lilygo-t-display-s3`
-   - Reports linked Flash bytes vs 6,553,600-byte application partition capacity, and static SRAM consumption.
-3. **Serial Runtime Diagnostics:**
-   - Monitored over USB CDC (`COM3` at 115200 baud).
-   - Logged at boot and on major state transitions (e.g. Wi-Fi connection, settings updates).
+```powershell
+pio run -e lilygo-t-display-s3
+python tools/check_resources.py
+pio run -e lilygo-t-display-s3-profile
+# Upload only when intended; replace COM7 with the observed port.
+pio run -e lilygo-t-display-s3-profile -t upload --upload-port COM7
+pio device monitor -p COM7 -b 115200
+```
 
----
+NIBRU_PROFILE defaults to 0; the profile environment enables it. Fixed snapshots
+are printed at startup-basic, display-touch-ready, home-services-ready,
+before-entry, after-entry and after-exit. App entry/exit durations are logged.
+Main loop work maximum excludes delay(12) and includes input, service ticks and
+rendering; no per-loop serial output or unbounded history. Snapshot formatting
+and serial transport perturb entry/exit and loop timing: compare both profile
+and ordinary builds before accepting latency. Current instrumentation measures
+only the task executing it, not all FreeRTOS stacks or CPU utilization. Touch
+latency and full redraw latency require targeted physical measurement. No new
+FreeRTOS task, file or filesystem exporter exists. Capture serial to the host;
+SD export is deferred until a real storage service exists.
 
-## 2. Standard Profiling Scenarios
+## Record with every session
 
-### Scenario A — Startup
-- Measure memory immediately after `setup()` completes.
-- Record baseline free internal heap, largest free block, and free PSRAM.
+Date/time, board/revision, supply, connected peripherals, exact image SHA-256,
+firmware version/commit/dirty state, build environment/flags/dependencies,
+partition allocation, active Wi-Fi/BLE, user brightness/timeout/accent, and reset
+reason. Never log credentials, tokens, PINs or secrets. Record instrument overhead
+and compare equivalent workload/configuration before and after.
 
-### Scenario B — Application Entry
-- Record memory before opening an app from the Home Launcher.
-- Enter the app, trigger its main views, and record memory under typical workload.
+## Scenario A — Startup
 
-### Scenario C — Application Exit
-- Exit the application back to the Home Launcher via the Back button or header chevron.
-- Ensure all app-owned resources and `ResourceManager` tokens are released.
-- Measure memory and compare against pre-entry baseline.
+Capture startup-basic, display-touch-ready, and home-services-ready. Inspect
+actual flash/PSRAM detection and free/min/largest internal and PSRAM pools;
+collect loop stack HWM. Note initialization failures, brownouts and watchdogs.
+Basic checkpoint is after Serial.begin; earlier startup allocations are outside
+its observation. Boot Wi-Fi auto-connect may change later measurements.
 
-### Scenario D — Repeated Lifecycle Testing
-- Cycle entry and exit 20 consecutive times.
-- Verify that internal free heap and largest allocatable block do not monotonically degrade.
+## Scenario B — Application entry/workload
 
-### Scenario E — Combined Workloads
-- Profile Wi-Fi scanning while display and touch UI remain active.
-- Verify non-blocking operation (main loop tick <= 25 ms).
+Capture before-entry and after-entry for Settings. Visit display/theme,
+system/memory pages, Wi-Fi diagnostics and device controls, plus preserved
+subviews if used. Record normal/heaviest workload memory and observed max update,
+redraw/touch latency. Memory page samples current APIs once per second. Capture
+Wi-Fi async scan separately, without inventing concurrent active applications.
 
----
+## Scenario C — Exit
 
-## 3. Verification Levels
-1. **STATIC CHECK:** Code inspection and syntax analysis.
-2. **UNIT TEST:** Isolated module tests (e.g. Python doc checks).
-3. **HOST SIMULATION:** Mocked native tests (`tests/host`).
-4. **BUILD VERIFIED:** Successful compilation for `lilygo-t-display-s3`.
-5. **HARDWARE VERIFIED:** Verified on physical device supported by serial logs and observation.
+Exit via Back to menu then Home; also test app replacement. Capture after-exit
+and compare to pre-entry. Settings owns no radio lease/task/file/buffer.
+Scanner releases its scan lease; the existing shared Wi-Fi connection and NTP
+may intentionally persist and must be recorded, not misclassified as a leak.
 
+## Scenario D — Repeated lifecycle
+
+At least 20 entry/workload/exit cycles for Settings and relevant Wi-Fi workload.
+Record every cycle's free/min/largest internal and PSRAM values, stack HWM,
+resource owner and max loop time. Investigate repeatable losses and caches;
+a one-time free-heap reduction alone is not proof of leakage. Host 20-cycle
+assertions only validate control flow/ownership, never physical leak freedom.
+
+## Scenario E — Combined workloads
+
+Display/touch/buttons plus supported background Wi-Fi connection/NTP while in
+Settings; separately display/touch plus asynchronous Scanner. Check Back/wake,
+allocation/init failures, radio ownership and >=150 KiB internal headroom.
+No SD/BLE combination exists; do not claim it tested. Observe power and thermal
+behavior on USB then suitable battery supply when physically available.
+
+## Acceptance and unavailable metrics
+
+Image must fit actual app0. Run artifact checks; >5% image growth is a warning
+requiring review. Internal minimum/largest drops >10% and repeatable latency
+regression require investigation. Allocation/watchdog/ownership failures block
+acceptance. All device scenarios remain NOT RUN until captured on the actual
+image. Separate STATIC, UNIT/DOCUMENTATION, HOST SIMULATION, BUILD and HARDWARE
+results; unknown heap/stack/power data remains NOT MEASURED.

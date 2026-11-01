@@ -6,6 +6,7 @@ class ButtonManager {
 public:
   void begin();
   ButtonAction poll(uint32_t nowMs);
+  bool anyPressed() const;
 private:
   struct State {
     bool previousDown = false;

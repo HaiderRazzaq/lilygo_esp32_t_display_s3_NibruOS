@@ -15,6 +15,11 @@ One change needs one meaningful development record, not a log of every edit.
 4. Keep changes focused. Record major decisions as ADRs, meaningful failures and
    reverts in the development log, and diagnostics without secrets. Avoid
    changing pins, library versions, partitions, or framework by accident.
+5. Apply the permanent [resource policy](RESOURCE_BUDGET.md) to every change with
+   runtime/storage/timing/peripheral/power impact. Read the current
+   [baseline](performance/BASELINE.md), capture what is available, and include a
+   Resource Impact Report. Follow [scenarios A–E](MEMORY_PROFILING.md), with at
+   least 20 lifecycle cycles. Missing device measurements stay NOT MEASURED.
 
 ## After a change / Definition of Done
 
@@ -31,6 +36,10 @@ One change needs one meaningful development record, not a log of every edit.
    review, or an older independent sketch never validates the current device image.
 5. Run `python tools/check_docs.py`. Review that IDs, links, records, evidence,
    and documentation match the source. Record remaining limitations and follow-up.
+6. Run `python tools/check_resources.py` after a target build; inspect the
+   generated report and provisional growth warnings. Never accept runtime heap,
+   stack, latency or power from a static artifact check. Document-only changes
+   need a brief impact assessment, not an unnecessary firmware build.
 
 A task is complete only after implementation, appropriate verification, and
 required documentation are addressed. Where tests cannot run, report

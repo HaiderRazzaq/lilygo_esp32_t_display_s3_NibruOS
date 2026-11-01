@@ -16,3 +16,5 @@ jobs:
         run: python -m unittest discover -s tests/docs -v
       - name: Run existing mocked firmware tests
         run: bash tests/host/run_tests.sh
+      - name: Test resource artifact validation
+        run: python -m unittest discover -s tests/resources -v

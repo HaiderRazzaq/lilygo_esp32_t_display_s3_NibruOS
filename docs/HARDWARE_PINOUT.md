@@ -158,3 +158,14 @@ The local [schematic PDF](T_Display_S3.pdf), added by commit ccbd0e6, has a
 - Manufacturer: https://github.com/Xinyuan-LilyGO/T-Display-S3
 - Manufacturer wiki: https://wiki.lilygo.cc/products/t-display-series/t-display-s3/
 - The small expansion connector labeling and RF antenna selection should be confirmed electrically/revision-specifically. The pictured module shows a U.FL connector, but doesn't guarantee correct populated RF switch selection on your particular board.
+
+## Settings backlight and resource policy — 2026-11-01
+
+No pin allocation or voltage change. DisplayManager retains GPIO15 HIGH and
+GPIO38 AW9364 pulse dimming by default; LCD/touch setup is preserved. Optional
+`lilygo-t-display-s3-ledc` reserves LEDC channel0 (5kHz/8-bit, Arduino-ESP32 2.x).
+Initialization failure gives visible HIGH fallback, LOW during inactivity sleep.
+Existing historical PWM incompatibility report means the opt-in path is not
+accepted on this board without physical verification. No MicroSD pins are
+allocated, and no current/brightness/power measurement is inferred from build.
+See [Settings](SETTINGS.md) and [resource budget](RESOURCE_BUDGET.md).

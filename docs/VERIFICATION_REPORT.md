@@ -348,3 +348,347 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Physical observation of touch interactions on the glass."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings completion",
+  "hardware": "Target LILYGO T-Display-S3 Touch Glass; software checks only",
+  "wiring": "No external GPIO change; no device accessed",
+  "expected": "Record real result at the indicated verification level",
+  "evidence_kind": "Captured command output or explicitly labeled attempt summary",
+  "environment": "Windows; Python 3.14; PlatformIO 6.2.0; local Zig 0.16.0 for HOST",
+  "limitations": "No physical/runtime resource acceptance from build or mocks",
+  "id": "VER-0013",
+  "verification_type": "BUILD",
+  "scope": "Pre-change identified target baseline",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "result": "PASS",
+  "actual": "Linked Flash 841377 B; static RAM 61168 B; actual image 841744 B; SHA in baseline.",
+  "evidence": [
+    "docs/evidence/2026-11-01-settings-before-build.txt"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings completion",
+  "hardware": "Target LILYGO T-Display-S3 Touch Glass; software checks only",
+  "wiring": "No external GPIO change; no device accessed",
+  "expected": "Record real result at the indicated verification level",
+  "evidence_kind": "Captured command output or explicitly labeled attempt summary",
+  "environment": "Windows; Python 3.14; PlatformIO 6.2.0; local Zig 0.16.0 for HOST",
+  "limitations": "No physical/runtime resource acceptance from build or mocks",
+  "id": "VER-0014",
+  "verification_type": "HOST",
+  "scope": "Initial host environment/stub/setup failures",
+  "procedure": "bash availability check; Python host runner with Zig",
+  "result": "FAIL",
+  "actual": "WSL unavailable; stale mocks/duplicate variable and old test setup caused initial failures. Corrected and rerun in VER-0017.",
+  "evidence": [
+    "docs/evidence/2026-11-01-settings-failed-attempts.txt"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings completion",
+  "hardware": "Target LILYGO T-Display-S3 Touch Glass; software checks only",
+  "wiring": "No external GPIO change; no device accessed",
+  "expected": "Record real result at the indicated verification level",
+  "evidence_kind": "Captured command output or explicitly labeled attempt summary",
+  "environment": "Windows; Python 3.14; PlatformIO 6.2.0; local Zig 0.16.0 for HOST",
+  "limitations": "No physical/runtime resource acceptance from build or mocks",
+  "id": "VER-0015",
+  "verification_type": "DOCUMENTATION",
+  "scope": "New tooling RED tests and encoding correction",
+  "procedure": "unittest docs/resources before implementations/corrections",
+  "result": "FAIL",
+  "actual": "Missing checker module, resource required-doc tests and temporary Windows text encoding failures; fixed and rerun in VER-0018.",
+  "evidence": [
+    "docs/evidence/2026-11-01-settings-failed-attempts.txt"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings completion",
+  "hardware": "Target LILYGO T-Display-S3 Touch Glass; software checks only",
+  "wiring": "No external GPIO change; no device accessed",
+  "expected": "Record real result at the indicated verification level",
+  "evidence_kind": "Captured command output or explicitly labeled attempt summary",
+  "environment": "Windows; Python 3.14; PlatformIO 6.2.0; local Zig 0.16.0 for HOST",
+  "limitations": "No physical/runtime resource acceptance from build or mocks",
+  "id": "VER-0016",
+  "verification_type": "BUILD",
+  "scope": "Resource post-image integration failure",
+  "procedure": "pio run -e lilygo-t-display-s3 with new hook",
+  "result": "FAIL",
+  "actual": "Compilation succeeded; post-image check rejected OTA0 subtype 0x10 because parser assumed subtype0. Regression test and parser corrected before final builds.",
+  "evidence": [
+    "docs/evidence/2026-11-01-settings-failed-attempts.txt"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings completion",
+  "hardware": "Target LILYGO T-Display-S3 Touch Glass; software checks only",
+  "wiring": "No external GPIO change; no device accessed",
+  "expected": "Record real result at the indicated verification level",
+  "evidence_kind": "Captured command output or explicitly labeled attempt summary",
+  "environment": "Windows; Python 3.14; PlatformIO 6.2.0; local Zig 0.16.0 for HOST",
+  "limitations": "No physical/runtime resource acceptance from build or mocks",
+  "id": "VER-0017",
+  "verification_type": "HOST",
+  "scope": "Full firmware mock suite and entry compile; default and profile+LEDC",
+  "procedure": "CXX=.testbuild/toolchain/ziglang/zig.exe c++; python tools/run_host_tests.py; repeat with -DNIBRU_PROFILE=1 -DNIBRU_BACKLIGHT_LEDC=1",
+  "result": "PASS",
+  "actual": "Both modes PASS: persistent restore/validation/migration/failed loads+writes/scoped reset; physical navigation/cancel/reboot; held wake/contact; raw double-tap confirmation; timeout wrap; 20 lifecycle cycles.",
+  "evidence": [
+    "docs/evidence/2026-11-01-settings-host.txt",
+    "docs/evidence/2026-11-01-settings-host-ledc-profile.txt"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings completion",
+  "hardware": "Target LILYGO T-Display-S3 Touch Glass; software checks only",
+  "wiring": "No external GPIO change; no device accessed",
+  "expected": "Record real result at the indicated verification level",
+  "evidence_kind": "Captured command output or explicitly labeled attempt summary",
+  "environment": "Windows; Python 3.14; PlatformIO 6.2.0; local Zig 0.16.0 for HOST",
+  "limitations": "No physical/runtime resource acceptance from build or mocks",
+  "id": "VER-0018",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation and resource artifact unit tests",
+  "procedure": "python tools/check_docs.py; python -m unittest discover -s tests/docs -v; python -m unittest discover -s tests/resources -v",
+  "result": "PASS",
+  "actual": "Final checker and 17 documentation mutation tests; six resource unit tests. Software-only; evidence files record exact outcomes.",
+  "evidence": [
+    "docs/evidence/2026-11-01-settings-doc-tests.txt",
+    "docs/evidence/2026-11-01-settings-resource-tests.txt"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings completion",
+  "hardware": "Target LILYGO T-Display-S3 Touch Glass; software checks only",
+  "wiring": "No external GPIO change; no device accessed",
+  "expected": "Record real result at the indicated verification level",
+  "evidence_kind": "Captured command output or explicitly labeled attempt summary",
+  "environment": "Windows; Python 3.14; PlatformIO 6.2.0; local Zig 0.16.0 for HOST",
+  "limitations": "No physical/runtime resource acceptance from build or mocks",
+  "id": "VER-0019",
+  "verification_type": "BUILD",
+  "scope": "Default, profile and LEDC real target builds with partition checks",
+  "procedure": "pio run -e lilygo-t-display-s3 -e lilygo-t-display-s3-profile -e lilygo-t-display-s3-ledc",
+  "result": "PASS",
+  "actual": "All three SUCCESS. Default linked Flash842461/static RAM61200/image842832 B; profile image843408 B; LEDC image848592 B; all fit 6553600 B app0.",
+  "evidence": [
+    "docs/evidence/2026-11-01-settings-target-builds.txt",
+    "docs/evidence/2026-11-01-settings-artifact-reports.txt"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0020",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted final contact regression fix",
+  "verification_type": "BUILD",
+  "scope": "Final three target builds after rejecting delayed reports from early second touch contact",
+  "hardware": "Compile target LILYGO T-Display-S3 Touch Glass; no physical device test",
+  "wiring": "Unchanged; no upload",
+  "procedure": "pio run -e lilygo-t-display-s3 -e lilygo-t-display-s3-profile -e lilygo-t-display-s3-ledc",
+  "expected": "All target images fit generated app0, no provisional 5% growth warning",
+  "actual": "All three SUCCESS. Default linked Flash842481/static RAM61200/image842848 B; profile linked843061/image843440 B; LEDC linked848241/static RAM61272/image848608 B. Default growth1104 B (+0.1312%) vs measured before. VER-0019 remains the earlier successful checkpoint with its original capture restored; this record supersedes its current-image metrics.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-settings-target-builds-final.txt",
+    "docs/evidence/2026-11-01-settings-artifact-final.txt"
+  ],
+  "evidence_kind": "Actual PlatformIO command output and generated partition artifact reports",
+  "environment": "Windows, PlatformIO6.2.0, espressif32@6.5.0/core2.0.14",
+  "limitations": "Runtime heap, stack, latency, brightness and power remain NOT MEASURED; HWT-0008 NOT RUN"
+}
+```
+
+**Correction to VER-0020 (2026-11-01):** The profile image byte count in the actual field was transcribed as 843440; the generated artifact and captured build show **843424 bytes**, leaving **5710176 bytes** in app0. Linked program843061 B is unchanged. The resource report uses the actual artifact value; this corrects transcription only and adds no new physical evidence.
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0021",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings changes",
+  "verification_type": "BUILD",
+  "scope": "Fresh default build and artifact-capacity check immediately before authorized upload",
+  "hardware": "Target LILYGO T-Display-S3 Touch Glass; build is software evidence",
+  "wiring": "No source/pin/partition change",
+  "procedure": "pio run -e lilygo-t-display-s3; python tools/check_resources.py",
+  "expected": "Current default builds and matches previously reviewed image; fits app0",
+  "actual": "Build SUCCESS7.118s; linked Flash842481 B, static RAM61200 B, image842848 B; app06553600 B, remainder5710752 B, no growth warning. SHA-256 f170c68ce03ee3e8967f648598942c5c162067d69e454060e7a384e08a04fb9b.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-settings-upload-preflight.txt",
+    "docs/evidence/2026-11-01-settings-artifact-final.txt"
+  ],
+  "evidence_kind": "Fresh target build output and unchanged generated image hash/capacity",
+  "environment": "Windows/PlatformIO6.2.0/espressif32@6.5.0/Arduino2.0.14",
+  "limitations": "Compilation/static usage only; physical upload evidence is HWT-0009; runtime budgets remain unmeasured."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings/touch repair",
+  "hardware": "LILYGO T-Display-S3 Touch Glass; physical observation only when explicitly indicated",
+  "wiring": "Unchanged SDA18/SCL17/RST21/IRQ16, power15/backlight38/buttons0/14",
+  "expected": "One action per physical press; supported swipes/Back/wake and safe confirmations; no per-touch full-screen wipe",
+  "environment": "Windows, PlatformIO6.2.0/espressif32@6.5.0/core2.0.14; Zig0.16.0 for host mocks",
+  "limitations": "Mock/build results do not validate physical touch timing, brightness, heap, stack, latency or power",
+  "id": "VER-0022",
+  "verification_type": "HOST",
+  "scope": "RED regressions for user-reported touch repetition/flicker and review edge cases",
+  "procedure": "python tools/run_host_tests.py against pre-fix variants before each correction",
+  "actual": "Five failures reproduced: NONE/down prematurely taps; repeated Settings full clear; overlay restoration skipped by cached drawing; late delivered confirmation contact begun too early; coalesced/missed Up prevents next contact. Each received a focused fix before VER-0023.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-01-touch-red-tests.txt"
+  ],
+  "evidence_kind": "Captured assertion failure lines from actual native mock executions"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings/touch repair",
+  "hardware": "LILYGO T-Display-S3 Touch Glass; physical observation only when explicitly indicated",
+  "wiring": "Unchanged SDA18/SCL17/RST21/IRQ16, power15/backlight38/buttons0/14",
+  "expected": "One action per physical press; supported swipes/Back/wake and safe confirmations; no per-touch full-screen wipe",
+  "environment": "Windows, PlatformIO6.2.0/espressif32@6.5.0/core2.0.14; Zig0.16.0 for host mocks",
+  "limitations": "Mock/build results do not validate physical touch timing, brightness, heap, stack, latency or power",
+  "id": "VER-0023",
+  "verification_type": "HOST",
+  "scope": "Final full native suite including input/drawing/restoration/contact-time regressions",
+  "procedure": "CXX=.testbuild/toolchain/ziglang/zig.exe c++; python tools/run_host_tests.py; repeat -DNIBRU_PROFILE=1 -DNIBRU_BACKLIGHT_LEDC=1",
+  "actual": "Both modes PASS, actual entry unit compile included. Tests exercise repeated click/long reports, release-only gesture completion after observed Down, new-Down recovery, swipe mapping, changed-value incremental render, no-op drawing, lock-overlay restoration, raw driver-to-Settings deferred-contact confirmation, existing navigation/resources/NVS and20 lifecycle cycles.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-touch-host.txt",
+    "docs/evidence/2026-11-01-touch-host-alt.txt"
+  ],
+  "evidence_kind": "Actual native mock test output; no physical measurements"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings/touch repair",
+  "hardware": "LILYGO T-Display-S3 Touch Glass; physical observation only when explicitly indicated",
+  "wiring": "Unchanged SDA18/SCL17/RST21/IRQ16, power15/backlight38/buttons0/14",
+  "expected": "One action per physical press; supported swipes/Back/wake and safe confirmations; no per-touch full-screen wipe",
+  "environment": "Windows, PlatformIO6.2.0/espressif32@6.5.0/core2.0.14; Zig0.16.0 for host mocks",
+  "limitations": "Mock/build results do not validate physical touch timing, brightness, heap, stack, latency or power",
+  "id": "VER-0024",
+  "verification_type": "BUILD",
+  "scope": "Three final target builds after touch and Settings drawing repair",
+  "procedure": "pio run -e lilygo-t-display-s3 -e lilygo-t-display-s3-profile -e lilygo-t-display-s3-ledc; generated artifact capacity checks",
+  "actual": "All3 SUCCESS. Default linked Flash843521 B, static RAM61240 B, firmware843888 B; profile image844448 B; LEDC image849664 B. All fit app0=6553600 B. Default +1040 B image and +40 B static RAM relative to prior HWT-0009 image.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-touch-builds.txt",
+    "docs/evidence/2026-11-01-touch-artifacts.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO output and generated artifact reports"
+}
+```
+```json
+{
+  "record_type": "test",
+  "id": "VER-0025",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Desktop Simulator",
+  "verification_type": "HOST",
+  "scope": "Automated Desktop Simulator test suite and headless smoke execution",
+  "hardware": "Windows x64 Host Target; simulated 320x170 display and touch",
+  "wiring": "Not applicable (Host Simulation)",
+  "procedure": "cmake -B build -G Ninja; cmake --build build; .\\build\\nibru_tests.exe; .\\build\\nibru_simulator.exe --headless --test-frames=10",
+  "expected": "All core lifecycle, UI transform, Wi-Fi fault injection, settings persistence, and 25-cycle stress tests PASS; simulator boots and shuts down cleanly",
+  "actual": "Both targets built cleanly. nibru_tests passed all assertions across 5 test suites. nibru_simulator executed 10 headless frames and terminated cleanly.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-simulator-tests.txt"
+  ],
+  "evidence_kind": "Captured stdout from native build and test executable runs",
+  "environment": "Windows 11 / MSVC 19.44 / CMake 3.31.6 / Ninja / SDL2 2.30.10",
+  "limitations": "Host-only simulation; does not measure physical ESP32 SRAM, PSRAM, AW9364 pulse backlight, or physical radio reception."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0026",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Desktop Simulator",
+  "verification_type": "BUILD",
+  "scope": "ESP32-S3 PlatformIO regression build after desktop simulator integration",
+  "hardware": "Target LILYGO T-Display-S3 Touch Glass (software compile test)",
+  "wiring": "Standard baseline: SDA18, SCL17, RST21, INT16, LCD parallel pins",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds; no desktop files or SDL2 dependencies leak into embedded build; image fits within app0 partition",
+  "actual": "Build SUCCESS in 7.01s. RAM used: 61,240 bytes (18.7%). Flash used: 843,521 bytes (12.9% of 6,553,600 bytes). Zero compilation warnings.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-simulator-pio-build.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO build report and artifact sizing",
+  "environment": "Windows 11 / PlatformIO / espressif32@6.5.0 / Arduino 2.0.14",
+  "limitations": "Compilation only; does not upload to physical hardware."
+}
+```

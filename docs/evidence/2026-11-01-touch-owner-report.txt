@@ -1,0 +1,5 @@
+2026-11-01 — Owner report in this chat after HWT-0009 upload:
+الاعدادات غير جيده و خصوصا في اللمس لان اللمس يتكرر في الثانيه الواحده عدة مرات و ترمش الشاشه مع كل لمسه
+Provenance: user-reported physical behavior. No raw controller trace or camera
+capture. Latest known upload was the 842848-byte default image (HWT-0009);
+running-image identity was not independently read from the board.

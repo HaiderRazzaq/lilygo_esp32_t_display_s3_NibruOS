@@ -1,0 +1,15 @@
+Software mock regression failures before the corresponding fixes.
+touch-repeat-red.log
+Assertion failed: !frame(NONE, 1, 0), file tests/host/test_main.cpp, line 44
+
+settings-flicker-red.log
+Assertion failed: ctx.display.gfx().fullClears == displayClears, file tests/host/test_settings.cpp, line 92
+
+touch-surface-red.log
+Assertion failed: ctx.display.gfx().fullClears == lockClears + 1, file tests/host/test_settings.cpp, line 114
+
+touch-contact-time-red.log
+Assertion failed: ctx.settings.brightness() == 25, file tests/host/test_settings.cpp, line 178
+
+touch-missed-up-red.log
+Assertion failed: frame(SINGLE_CLICK, 1, 2), file tests/host/test_main.cpp, line 53

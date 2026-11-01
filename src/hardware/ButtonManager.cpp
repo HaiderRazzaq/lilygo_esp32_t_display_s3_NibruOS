@@ -6,6 +6,9 @@ void ButtonManager::begin() {
   pinMode(Board::kButtonBoot, INPUT_PULLUP);
   pinMode(Board::kButtonUser, INPUT_PULLUP);
 }
+bool ButtonManager::anyPressed() const {
+  return digitalRead(Board::kButtonBoot) == LOW || digitalRead(Board::kButtonUser) == LOW;
+}
 ButtonAction ButtonManager::pollOne(State& s, int pin, uint32_t now,
                                    ButtonAction shortAction, ButtonAction longAction) {
   const bool down = digitalRead(pin) == LOW;

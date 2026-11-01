@@ -1,57 +1,36 @@
-# NibruOS — Complete project context for AI IDEs
+# NibruOS project context
 
-## Purpose and scope
-A **single ESP32-S3 firmware** containing a touch-controlled home launcher and embedded modular applications, designed to grow from three apps into a portable multifunction tool. It is **not** an OS with processes, Linux, dynamic executables, and it **does not flash or launch Bruce/GhostESP binaries**. Adding a new native C++ app requires rebuilding/flashing the combined firmware.
+NibruOS is one modular ESP32-S3 Arduino/PlatformIO firmware, not Linux or a loader
+for other firmware binaries. Target: LILYGO T-Display-S3 Touch Glass, 16 MB flash,
+8 MB PSRAM, ST7789 8-bit parallel 320x170 landscape, CST816S touch. Inspect
+[pinout](HARDWARE_PINOUT.md) and AGENTS.md before editing. SDA18/SCL17/RST21/IRQ16,
+power15/backlight38 and buttons0/14 remain reserved and unchanged.
 
-## Device
-LILYGO T-Display-S3 **Touch Glass** board; ESP32-S3R8 (dual-core), **16MB external Flash, 8MB PSRAM**, 1.9-inch **ST7789V** IPS 170x320, **CST816S** touch, Wi-Fi 2.4GHz, BLE, USB-C, GPIO buttons 0/14, battery sense GPIO4, U.FL footprint for an external antenna arrangement. **Verify the antenna routing and required matching/modification on this specific PCB before switching antenna paths.** Not every radio feature is present without extra modules: no 5GHz Wi-Fi, no onboard NFC/SubGHz/SD slot.
+Runtime version v0.3; Home currently registers Wi-Fi Hub, 2FA Authenticator and
+Settings. Existing security/vault/time/USB functionality predates this task;
+it is not evidence of hardware or security certification. Essential Settings
+completion and resource policy are described in [Settings](SETTINGS.md),
+[architecture](ARCHITECTURE.md), [current state](CURRENT_STATE.md),
+[feature registry](FEATURE_REGISTRY.md) and [issues](KNOWN_ISSUES.md).
 
-Critical board data: see `docs/HARDWARE_PINOUT.md` including a full GPIO map, expansion header and strict reserved-pin policy. The earlier owner-tested Arduino sketch established display + touch behavior. The existing NibruOS firmware itself was loaded by the user and **Wi-Fi Scanner showed “Scan timed out”**. All other individual functions of the newly modified release still need explicit hardware validation.
+Code entry is src/main.cpp; lifecycle/router/context/resource ownership are in
+src/core; shared drivers in src/hardware; services in src/services; apps in
+src/apps. Keep apps non-blocking, use shared services and release app-owned jobs
+on exit. Never duplicate display/touch/Wi-Fi initialization in apps.
 
-## Current release / status
-Runtime baseline **v0.1**; legacy documentation calls the included Wi-Fi patch **v0.1.1-source-patch**, with no matching version constant or Git release tag. Apps: System Info, Touch Test, Wi-Fi Scanner. Windows workflow: VS Code + PlatformIO. **2026-11-01 target build PASS**, current host rerun BLOCKED (no desktop C++ compiler), earlier simulated PASS preserved. No patched-firmware physical test performed in this session. Read [CURRENT_STATE](CURRENT_STATE.md) for the dated snapshot and exact Git baseline; [engineering workflow](ENGINEERING_WORKFLOW.md) and [documentation index](README.md) govern maintenance.
+Toolchain stays espressif32@6.5.0 / Arduino-ESP32 2.0.14, TFT_eSPI 2.5.43 and
+CST816S Git library. platformio.ini preserves all verified TFT pins and default
+16MB partition table. Compare actual firmware image with app0 6,553,600 B, not all
+16 MB. Build/main host stubs are software checks only. See
+[dependencies](DEPENDENCIES.md), [baseline](performance/BASELINE.md) and
+[resource policy](RESOURCE_BUDGET.md).
 
-Wi-Fi incident: original `WiFiService` called `WiFi.mode(WIFI_STA)` and immediately `WiFi.scanNetworks(true)`, without a STA warmup; used `WiFi.scanDelete()` during shutdown but did not explicitly stop underlying driver scan. `WiFi.scanComplete()` apparently did not deliver results before the application's 16-second timeout. Root cause may still be Arduino-ESP32 event/driver, RF, power or board configuration, and is **not proven**. Patch: `Preparing` stage with 650ms radio warmup, scan polling before timeout, bounded asynchronous scan (300ms/channel), `esp_wifi_scan_stop()` when aborting, radio reset & one retry, status display + log at 115200. Standalone blocking diagnostic sketch under `tools/wifi_scan_diagnostic/` isolates radio independently of launcher. See `docs/WIFI_DIAGNOSTICS.md`.
+Older device scanning showed Scan timed out; its mitigation remains unverified
+on this changed firmware. Follow [Wi-Fi diagnostics](WIFI_DIAGNOSTICS.md), preserve
+historical failures, and never infer reception from compilation. MicroSD and
+antenna hardware are owned/planned, not evidence of a connected working module;
+see [hardware inventory](HARDWARE_INVENTORY.md). No SD/BLE/OTA feature is added.
 
-## Complete code map
-- `platformio.ini`: toolchain, board, Arduino build flags, TFT_eSPI parallel bus, libraries, USB CDC.
-- `include/BoardConfig.h`: pins, rotation, timeouts, scan limits. All pin values must originate here or TFT setup flags.
-- `src/main.cpp`: global singleton objects; begin/loop; register 3 apps; poll buttons/touch/tick in main loop.
-- `src/core/App.h`: pure virtual lifecycle and dirty render state; inspect exact methods before implementing.
-- `src/core/AppManager.*`: register apps, home paging (3 per page), route gestures, open/close & release on exit, header back action, render.
-- `src/core/AppContext.h`: pass display, resources, Wi-Fi service references without global dependencies in apps.
-- `src/core/ResourceManager.*`: enforce exclusive Wi-Fi owner; expand conservatively for Bluetooth/USB/storage.
-- `src/hardware/DisplayManager.*`: TFT_eSPI init, drawing primitives and styles.
-- `src/hardware/TouchManager.*`: CST816S exact wiring, reset sequence, raw/landscape coordinate mapping, rotated swipe decoding.
-- `src/hardware/ButtonManager.*`: GPIO0/14 active low, short/long press detection, always-accessible Back.
-- `src/services/WiFiService.*`: non-blocking scan state machine and results in fixed-capacity array.
-- `src/apps/SystemInfoApp.*`: ESP/heap/flash/PSRAM/uptime stats.
-- `src/apps/TouchTestApp.*`: raw + converted touch coordinates and gesture.
-- `src/apps/WiFiScannerApp.*`: resource owner, scan UI, rescan, scroll, exit.
-- `tests/host/*`: stubs and local smoke suite, not a full ESP/driver emulator.
-- `tools/wifi_scan_diagnostic/*`: independent temporary diagnostic (reflashing required).
-
-## Runtime flow
-1. `setup()` starts Serial at 115200, initializes display (`GPIO15 HIGH`, `GPIO38 HIGH`, `tft.init()`, rotation 1), then touch (GPIO16 pull-up, GPIO21 reset pulse, `touch.begin(FALLING)`), then buttons.
-2. `AppManager` registers and draws Home with the three apps.
-3. `loop()` reads touch/button events; passes events to AppManager, then calls current app `onTick()` and redraws only on invalidate; delay(12) yields.
-4. On app opening, manager invokes `onEnter(ctx)`. Wi-Fi Scanner acquires radio then begins state-machine init; on each tick calls WiFiService `tick`. On Back calls `onExit` which stops/releases radio.
-
-## UI rules
-- Display 320×170 pixels, landscape, `tft.setRotation(1)`.
-- Home 3 app tiles per page. Tap tile to open; BOOT short select next, BOOT hold activate; GPIO14 always returns home. Tap top-left back arrow inside apps.
-- Touch transform screenX=rawY, screenY=169-rawX, clipped to screen bounds; swipe directions rotated in driver. Verify actual perceived swipe on board; the earlier sketch confirmed coordinate mapping, not necessarily every rotated swipe enum.
-- Never let scan, file I/O, sensor reads, or network connect block > a few milliseconds per `loop()` iteration.
-
-## Build / dependencies / tests
-`platformio.ini`: `platform=espressif32@6.5.0`, board `lilygo-t-display-s3`, framework `arduino`, TFT_eSPI `2.5.43`, CST816S GitHub source. `board_build.arduino.memory_type=qio_opi`, `board_build.partitions=default_16MB.csv`, native USB CDC flags, PSRAM flag. Confirm outputs after build; these settings were inherited from the earlier project and must not be changed casually. See `docs/BUILD_AND_TEST.md` for Windows build/flash and test procedure. Host C++ tests use stubs and check navigation, input, Wi-Fi scan states/retries, resource ownership.
-
-## Next work / roadmap
-1. User flashes patched build and attaches serial log if Wi-Fi scan still fails. Verify touch gestures separately and confirm button input works after USB reconnection.
-2. Validate build, `.bin` size, flash/PSRAM reports; check PSRAM test, network scan, exit/re-enter and repeated rescans.
-3. Add app-specific error reporting, richer Wi-Fi results, lazy rendering of large lists.
-4. Optional safe BLE scanner / sensor apps / NVS-backed settings. Integrate any secret vault only after dedicated security design (device lock, at-rest confidentiality, key management, safe provisioning, threat model).
-5. As more apps arrive, review flash partition, heap/PSRAM, radio coexistence, task scheduling, USB HID security, and OTA integrity/rollback.
-
-## AI agent contract
-Preserve user-confirmed pins. Inspect entire affected flow before editing. Never randomly transplant firmware code; port features via cohesive App + service architecture. Avoid global and duplicate hardware init. Keep resources balanced. Update docs/tests and report what was actually executed. If you require new sensors/modules, specify exact pin wiring and power/voltage/current considerations first.
+Start each change with code/context/budget inspection and a short verification
+plan; update engineering records and run tools/check_docs.py. Follow
+[documentation responsibilities](README.md) and [workflow](ENGINEERING_WORKFLOW.md).

@@ -95,13 +95,16 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "lifecycle": "App-local last event; shell owns Back; shared TouchManager polls device",
   "implementation": "IMPLEMENTED",
   "verification": {
-    "build": "VER-0001",
-    "host": "VER-0002",
-    "hardware": "NOT VERIFIED"
+    "build": "VER-0024",
+    "host": "VER-0023",
+    "hardware": "HWT-0010 owner touch/flicker FAIL before repair; HWT-0012 repaired acceptance NOT RUN"
   },
-  "issues": [],
+  "issues": [
+    "BUG-0008"
+  ],
   "history": [
-    "DEV-0001"
+    "DEV-0001",
+    "DEV-0017"
   ]
 }
 ```
@@ -163,18 +166,20 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ],
   "hardware": "Integrated ST7789V/CST816S/buttons",
   "gpio": "All LCD/touch/button reservations in HARDWARE_PINOUT; power15/backlight38; active LOW buttons0/14",
-  "lifecycle": "Single instances in main; reset delays only at boot; 145ms touch and 35ms button edge debounce; long press650ms",
+  "lifecycle": "Shared hardware init preserved; contact phase/gesture latch and coordinate transform; physical button debounce unchanged",
   "implementation": "IMPLEMENTED",
   "verification": {
-    "build": "VER-0001",
-    "host": "VER-0002",
-    "hardware": "HWT-0001 (independent reference sketch only); current firmware NOT VERIFIED"
+    "build": "VER-0024",
+    "host": "VER-0023",
+    "hardware": "HWT-0010 owner touch/flicker FAIL before repair; HWT-0012 repaired acceptance NOT RUN"
   },
   "issues": [
-    "BUG-0002"
+    "BUG-0002",
+    "BUG-0008"
   ],
   "history": [
-    "DEV-0001"
+    "DEV-0001",
+    "DEV-0017"
   ]
 }
 ```
@@ -255,7 +260,11 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "docs/ENGINEERING_WORKFLOW.md",
     "tools/check_docs.py",
     "tests/docs/test_check_docs.py",
-    ".github/workflows/validate.yml"
+    ".github/workflows/validate.yml",
+    "docs/RESOURCE_BUDGET.md",
+    "docs/MEMORY_PROFILING.md",
+    "docs/performance/BASELINE.md",
+    "tools/check_resources.py"
   ],
   "dependencies": [
     "Python 3.10+ standard library",
@@ -266,7 +275,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "lifecycle": "Read/validate repository without modifying firmware; maintain logs by explicit human/agent records",
   "implementation": "IMPLEMENTED",
   "verification": {
-    "documentation": "VER-0005",
+    "documentation": "VER-0018",
     "hardware": "NOT APPLICABLE (repository tooling)"
   },
   "issues": [
@@ -318,7 +327,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "record_type": "feature",
   "id": "FEAT-0010",
   "name": "Settings App",
-  "purpose": "Main settings menu organizing System Info and Touch Test diagnostics with hierarchical Back navigation",
+  "purpose": "Essential Settings: scroll/focus/activate, validated persistent display preferences, diagnostics and confirmed scoped device actions",
   "module": "src/apps/SettingsApp",
   "files": [
     "src/apps/SettingsApp.cpp",
@@ -331,16 +340,21 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ],
   "hardware": "Display, CST816S capacitive touch",
   "gpio": "GPIO14 Back, BOOT 0",
-  "lifecycle": "Submenu container view delegates to sub-apps with hierarchical onBack navigation before exiting to Home",
+  "lifecycle": "No owned radio/task/buffer; short BOOT focuses, hold activates; Back cancels then menu/Home; current SettingsService owns preference blob",
   "implementation": "IMPLEMENTED",
   "verification": {
-    "build": "VER-0006",
-    "host": "VER-0006",
-    "hardware": "NOT VERIFIED"
+    "build": "VER-0024",
+    "host": "VER-0023",
+    "hardware": "HWT-0010 owner touch/flicker FAIL before repair; HWT-0012 repaired acceptance NOT RUN"
   },
-  "issues": [],
+  "issues": [
+    "BUG-0007",
+    "BUG-0008"
+  ],
   "history": [
-    "DEV-0007"
+    "DEV-0007",
+    "DEV-0014",
+    "DEV-0017"
   ],
   "registration": "settingsApp"
 }
@@ -386,7 +400,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "record_type": "feature",
   "id": "FEAT-0012",
   "name": "Display Controls, Sleep Mode and PIN Security",
-  "purpose": "Screen brightness PWM control, inactivity auto-sleep with touch/button wakeup, and persistent 4-digit PIN lock screen protection",
+  "purpose": "Existing display controls, inactivity sleep and PIN security (Security retained, not expanded by Settings completion)",
   "module": "src/hardware/DisplayManager + src/services/SecurityService + src/apps/SettingsApp",
   "files": [
     "src/hardware/DisplayManager.cpp",
@@ -401,9 +415,9 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "FEAT-0005",
     "FEAT-0010"
   ],
-  "hardware": "ST7789V parallel TFT, CST816S capacitive touch, Backlight GPIO38 PWM",
-  "gpio": "GPIO38 (backlight LEDC PWM), GPIO15 (display power), GPIO0/14 (buttons)",
-  "lifecycle": "LEDC PWM brightness control (25..100%); inactivity sleep with DISPOFF and 0ms wake; PIN code lock gatekeeper on wakeup and boot",
+  "hardware": "Shared ST7789/CST816S, AW9364 backlight on GPIO38",
+  "gpio": "GPIO38 pulse control by default; GPIO15 power, buttons0/14",
+  "lifecycle": "Shared DisplayManager inactivity sleep/wake; existing SecurityService PIN gate remains; LEDC is opt-in only",
   "implementation": "IMPLEMENTED",
   "verification": {
     "build": "VER-0009",
@@ -422,7 +436,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "record_type": "feature",
   "id": "FEAT-0013",
   "name": "Essential Settings v0.1 and Memory Profiler",
-  "purpose": "Lightweight settings app with central SettingsService, AW9364 pulse dimming (25..100%), theme accent selection, memory monitor, Wi-Fi diagnostics, reboot and safe reset",
+  "purpose": "Essential Settings: scroll/focus/activate, validated persistent display preferences, diagnostics and confirmed scoped device actions",
   "module": "src/services/SettingsService + src/core/MemoryProfiler + src/apps/SettingsApp",
   "files": [
     "src/services/SettingsService.cpp",
@@ -439,17 +453,23 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "FEAT-0010"
   ],
   "hardware": "AW9364 pulse-controlled backlight driver on GPIO38, ST7789 parallel LCD, CST816S touch",
-  "gpio": "GPIO38 (AW9364 backlight), GPIO15 (display power), GPIO0/14 (buttons)",
-  "lifecycle": "Central typed preferences in NVS, AW9364 pulse dimming, real ESP-IDF heap/PSRAM profiling, non-blocking diagnostics",
+  "gpio": "No extra GPIO; default AW9364 GPIO38 retained, opt-in LEDC channel0 build requires physical acceptance",
+  "lifecycle": "One gesture/contact, partial/no-op repaint, full view/overlay restore; contact-start guarded confirmations; no owned radio/task/framebuffer",
   "implementation": "IMPLEMENTED",
   "verification": {
-    "build": "VER-0010",
-    "host": "VER-0010",
-    "hardware": "NOT VERIFIED"
+    "build": "VER-0024",
+    "host": "VER-0023",
+    "hardware": "HWT-0010 owner touch/flicker FAIL before repair; HWT-0012 repaired acceptance NOT RUN"
   },
-  "issues": [],
+  "issues": [
+    "BUG-0007",
+    "BUG-0008"
+  ],
   "history": [
-    "DEV-0011"
+    "DEV-0011",
+    "DEV-0014",
+    "DEV-0015",
+    "DEV-0017"
   ]
 }
 ```
@@ -494,6 +514,56 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "issues": [],
   "history": [
     "DEV-0012"
+  ]
+}
+```
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0015",
+  "name": "Desktop Simulator & Cross-Platform Host Target",
+  "purpose": "Native Windows/desktop simulation environment reusing shared C++ application logic, navigation, UI layout and settings with SDL2 rendering and mock hardware services",
+  "module": "platform/desktop",
+  "files": [
+    "platform/desktop/DesktopMain.cpp",
+    "platform/desktop/SDLDisplay.cpp",
+    "platform/desktop/SDLDisplay.h",
+    "platform/desktop/DesktopInput.cpp",
+    "platform/desktop/DesktopInput.h",
+    "platform/desktop/MockWiFiService.cpp",
+    "platform/desktop/MockWiFiService.h",
+    "platform/desktop/DesktopStorage.cpp",
+    "platform/desktop/DesktopStorage.h",
+    "platform/desktop/DesktopDiagnostics.cpp",
+    "platform/desktop/DesktopDiagnostics.h",
+    "platform/desktop/stubs/Arduino.h",
+    "platform/desktop/stubs/TFT_eSPI.h",
+    "platform/desktop/stubs/Preferences.h",
+    "platform/desktop/stubs/WiFi.h",
+    "CMakeLists.txt",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "dependencies": [
+    "FEAT-0001",
+    "FEAT-0002",
+    "FEAT-0003",
+    "FEAT-0004",
+    "FEAT-0008",
+    "FEAT-0010",
+    "FEAT-0014"
+  ],
+  "hardware": "Desktop host GPU/Display via SDL2; simulated ST7789 320x170 and CST816S touch",
+  "gpio": "No GPIO allocation; simulated in software",
+  "lifecycle": "Full application lifecycle, Home Launcher routing, mouse-to-touch events, keyboard-to-buttons, persistent NVS file storage, deterministic Wi-Fi scans and fault injection",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0025",
+    "host": "VER-0025",
+    "hardware": "NOT APPLICABLE (Desktop Target)"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0020"
   ]
 }
 ```

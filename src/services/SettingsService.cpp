@@ -2,6 +2,7 @@
 #include "hardware/DisplayManager.h"
 #include <Arduino.h>
 #include <Preferences.h>
+#include <cstring>
 
 namespace {
 constexpr const char* kNvsNamespace = "nibru_settings";
@@ -11,91 +12,119 @@ constexpr const char* kLegacyNamespace = "nibru_cfg";
 void SettingsService::begin(DisplayManager* display) {
   display_ = display;
   load();
-  applyToDisplay();
   Serial.printf("[Settings] Loaded: Bright=%u%% Timeout=%us Theme=%s\n",
                 brightness_, screenTimeoutSec_, themeName());
 }
 
 void SettingsService::load() {
+  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0;
+  writable_ = true; lastSaveOk_ = true;
   Preferences prefs;
-  if (prefs.begin(kNvsNamespace, true)) {
-    brightness_ = prefs.getUChar("bright", 100);
-    screenTimeoutSec_ = prefs.getUShort("timeout", 30);
-    theme_ = prefs.getUChar("theme", 0);
-    prefs.end();
-  } else if (prefs.begin(kLegacyNamespace, true)) {
-    // Migration from older v0.2/v0.3 config
-    brightness_ = prefs.getUChar("bright", 100);
-    screenTimeoutSec_ = prefs.getUShort("sleep_sec", 30);
-    theme_ = 0;
-    prefs.end();
-  } else {
+  bool migrated = false;
+  // Opening read-write distinguishes an absent namespace (created empty) from
+  // an unavailable NVS backend. Never allow writes after an unread load.
+  if (!prefs.begin(kNvsNamespace, false)) {
+    writable_ = false; lastSaveOk_ = false;
+    applyToDisplay();
+    return;
+  }
+  {
+    if (prefs.isKey("config")) {
+      uint8_t data[5]{};
+      const bool valid = prefs.getBytesLength("config") == sizeof(data) &&
+                         prefs.getBytes("config", data, sizeof(data)) == sizeof(data);
+      prefs.end();
+      if (!valid || data[0] != 1) {
+        // Never silently overwrite a corrupt/unknown schema. Explicit reset may.
+        writable_ = false; lastSaveOk_ = false;
+        applyToDisplay();
+        return;
+      }
+      brightness_ = data[1];
+      screenTimeoutSec_ = static_cast<uint16_t>(data[2] | (data[3] << 8));
+      theme_ = data[4];
+    } else if (prefs.isKey("bright") || prefs.isKey("timeout") || prefs.isKey("theme")) {
+      brightness_ = prefs.getUChar("bright", 100);
+      screenTimeoutSec_ = prefs.getUShort("timeout", 30);
+      theme_ = prefs.getUChar("theme", 0);
+      prefs.end();
+      migrated = true;
+    } else {
+      prefs.end();
+      if (prefs.begin(kLegacyNamespace, true)) {
+        brightness_ = prefs.getUChar("bright", 100);
+        screenTimeoutSec_ = prefs.getUShort("sleep_sec", 30);
+        prefs.end();
+        migrated = true;
+      }
+    }
+  }
+  if (brightness_ != 25 && brightness_ != 50 && brightness_ != 75 && brightness_ != 100)
     brightness_ = 100;
-    screenTimeoutSec_ = 30;
-    theme_ = 0;
-  }
-
-  // Validate inputs
-  if (brightness_ != 25 && brightness_ != 50 && brightness_ != 75 && brightness_ != 100) {
-    brightness_ = 100;
-  }
-  if (screenTimeoutSec_ != 30 && screenTimeoutSec_ != 60 &&
-      screenTimeoutSec_ != 180 && screenTimeoutSec_ != 300 && screenTimeoutSec_ != 0) {
-    screenTimeoutSec_ = 30;
-  }
-  if (theme_ > 3) {
-    theme_ = 0;
-  }
-}
-
-void SettingsService::save() {
-  Preferences prefs;
-  if (prefs.begin(kNvsNamespace, false)) {
-    prefs.putUChar("bright", brightness_);
-    prefs.putUShort("timeout", screenTimeoutSec_);
-    prefs.putUChar("theme", theme_);
-    prefs.end();
-    Serial.println("[Settings] Saved to NVS");
-  }
-}
-
-void SettingsService::resetToDefaults() {
-  brightness_ = 100;
-  screenTimeoutSec_ = 30;
-  theme_ = 0;
-  save();
+  if (screenTimeoutSec_ != 0 && screenTimeoutSec_ != 30 && screenTimeoutSec_ != 60 &&
+      screenTimeoutSec_ != 180 && screenTimeoutSec_ != 300) screenTimeoutSec_ = 30;
+  if (theme_ > 3) theme_ = 0;
+  if (migrated) save();
   applyToDisplay();
-  Serial.println("[Settings] Reset to defaults");
+}
+
+bool SettingsService::save() {
+  if (!writable_) return lastSaveOk_ = false;
+  Preferences prefs;
+  if (!prefs.begin(kNvsNamespace, false)) return lastSaveOk_ = false;
+  // One NVS blob commit prevents mixed preferences after an interrupted write.
+  const uint8_t data[] = {1, brightness_, static_cast<uint8_t>(screenTimeoutSec_),
+                         static_cast<uint8_t>(screenTimeoutSec_ >> 8), theme_};
+  uint8_t stored[sizeof(data)]{};
+  const bool unchanged = prefs.getBytesLength("config") == sizeof(data) &&
+      prefs.getBytes("config", stored, sizeof(stored)) == sizeof(stored) &&
+      memcmp(data, stored, sizeof(data)) == 0;
+  lastSaveOk_ = unchanged || prefs.putBytes("config", data, sizeof(data)) == sizeof(data);
+  prefs.end();
+  if (!lastSaveOk_) Serial.println("[Settings] NVS write failed; preferences unchanged");
+  return lastSaveOk_;
+}
+
+bool SettingsService::resetToDefaults() {
+  const uint8_t oldB = brightness_, oldT = theme_;
+  const uint16_t oldS = screenTimeoutSec_;
+  const bool oldWritable = writable_;
+  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; writable_ = true;
+  if (!save()) {
+    brightness_ = oldB; screenTimeoutSec_ = oldS; theme_ = oldT; writable_ = oldWritable;
+    return false;
+  }
+  applyToDisplay();
+  return true;
 }
 
 bool SettingsService::setBrightness(uint8_t percent) {
-  if (percent != 25 && percent != 50 && percent != 75 && percent != 100) {
-    return false;
-  }
-  if (brightness_ == percent) return true;
+  if (percent != 25 && percent != 50 && percent != 75 && percent != 100) return false;
+  if (brightness_ == percent) return lastSaveOk_;
+  const uint8_t old = brightness_;
   brightness_ = percent;
-  save();
-  applyToDisplay();
+  if (!save()) { brightness_ = old; return false; }
+  if (display_) display_->setBrightness(brightness_);
   return true;
 }
 
 bool SettingsService::setScreenTimeoutSec(uint16_t sec) {
-  if (sec != 30 && sec != 60 && sec != 180 && sec != 300 && sec != 0) {
-    return false;
-  }
-  if (screenTimeoutSec_ == sec) return true;
+  if (sec != 0 && sec != 30 && sec != 60 && sec != 180 && sec != 300) return false;
+  if (screenTimeoutSec_ == sec) return lastSaveOk_;
+  const uint16_t old = screenTimeoutSec_;
   screenTimeoutSec_ = sec;
-  save();
-  applyToDisplay();
+  if (!save()) { screenTimeoutSec_ = old; return false; }
+  if (display_) display_->setSleepTimeoutSeconds(sec);
   return true;
 }
 
-bool SettingsService::setTheme(uint8_t themeIndex) {
-  if (themeIndex > 3) return false;
-  if (theme_ == themeIndex) return true;
-  theme_ = themeIndex;
-  save();
-  applyToDisplay();
+bool SettingsService::setTheme(uint8_t index) {
+  if (index > 3) return false;
+  if (theme_ == index) return lastSaveOk_;
+  const uint8_t old = theme_;
+  theme_ = index;
+  if (!save()) { theme_ = old; return false; }
+  if (display_) display_->setThemeColor(themeColor());
   return true;
 }
 

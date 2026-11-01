@@ -13,11 +13,23 @@
 #include <cstdio>
 #include <cstring>
 
-void SettingsApp::onEnter(AppContext& ctx) {
+namespace {
+// Fixed-width opaque glyphs replace old text without blanking a whole panel.
+void metricLabel(DisplayManager& screen, int x, int y, const char* text,
+                 uint16_t color = Colors::White, uint8_t size = 1,
+                 uint16_t bg = Colors::Bg) {
+  char padded[49];
+  snprintf(padded, sizeof(padded), "%-48.48s", text);
+  screen.label(x, y, padded, color, size, bg);
+}
+}
+
+void SettingsApp::onEnter(AppContext&) {
   subView_ = SettingsSubView::Menu;
-  focusedIndex_ = 0;
+  focusedIndex_ = menuIndex_ = scrollOffset_ = metricPage_ = 0;
   confirmAction_ = ConfirmAction::None;
   fullRedraw_ = true;
+  hasRendered_ = false;
   lastMetricTickMs_ = millis();
   pinInputLen_ = 0;
   pinInputBuffer_[0] = '\0';
@@ -32,6 +44,13 @@ void SettingsApp::onExit(AppContext& ctx) {
   CryptoService::secureZero(pinInputBuffer_, sizeof(pinInputBuffer_));
   pinInputLen_ = 0;
   subView_ = SettingsSubView::Menu;
+}
+
+void SettingsApp::onDisplayRestored(AppContext& ctx) {
+  fullRedraw_ = true;
+  hasRendered_ = false;
+  if (subView_ == SettingsSubView::TouchTest) touchTest_.onDisplayRestored(ctx);
+  invalidate();
 }
 
 void SettingsApp::onTick(AppContext& ctx, uint32_t nowMs) {
@@ -49,6 +68,7 @@ void SettingsApp::onTick(AppContext& ctx, uint32_t nowMs) {
 bool SettingsApp::onBack(AppContext& ctx) {
   if (confirmAction_ != ConfirmAction::None) {
     confirmAction_ = ConfirmAction::None;
+    focusedIndex_ = deviceIndex_;
     invalidate();
     return true;
   }
@@ -74,12 +94,60 @@ bool SettingsApp::onBack(AppContext& ctx) {
 
 void SettingsApp::onPrimaryAction(AppContext& ctx) {
   if (subView_ == SettingsSubView::Menu) {
-    // BOOT button cycles focus
-    focusedIndex_ = static_cast<uint8_t>((focusedIndex_ + 1) % 6);
-    invalidate();
+    menuIndex_ = static_cast<uint8_t>((menuIndex_ + 1) % 7);
+    if (menuIndex_ < scrollOffset_ || menuIndex_ >= scrollOffset_ + 3)
+      scrollOffset_ = menuIndex_ > 2 ? menuIndex_ - 2 : 0;
+  } else if (subView_ == SettingsSubView::Display) {
+    focusedIndex_ = (focusedIndex_ + 1) % 10;
+  } else if (subView_ == SettingsSubView::Theme) {
+    focusedIndex_ = (focusedIndex_ + 1) % 4;
+  } else if (subView_ == SettingsSubView::Device) {
+    focusedIndex_ = (focusedIndex_ + 1) % 2;
+  } else if (subView_ == SettingsSubView::Memory) {
+    metricPage_ ^= 1; fullRedraw_ = true;
   } else if (subView_ == SettingsSubView::TouchTest) {
     touchTest_.onPrimaryAction(ctx);
   }
+  invalidate();
+}
+
+void SettingsApp::onActivate(AppContext& ctx) {
+  if (subView_ == SettingsSubView::Menu) {
+    static const SettingsSubView views[] = {SettingsSubView::Display, SettingsSubView::Theme,
+      SettingsSubView::Memory, SettingsSubView::WiFiDiag, SettingsSubView::Device,
+      SettingsSubView::Security, SettingsSubView::TouchTest};
+    subView_ = views[menuIndex_]; focusedIndex_ = metricPage_ = 0; fullRedraw_ = true;
+    if (subView_ == SettingsSubView::TouchTest) touchTest_.onEnter(ctx);
+  } else if (subView_ == SettingsSubView::Display) {
+    const uint8_t bright[] = {25, 50, 75, 100};
+    const uint16_t timeout[] = {30, 60, 180, 300, 0};
+    if (focusedIndex_ < 4) ctx.settings.setBrightness(bright[focusedIndex_]);
+    else if (focusedIndex_ < 9) ctx.settings.setScreenTimeoutSec(timeout[focusedIndex_ - 4]);
+    else ctx.display.sleep();
+  } else if (subView_ == SettingsSubView::Theme) ctx.settings.setTheme(focusedIndex_);
+  else if (subView_ == SettingsSubView::Device) {
+    if (confirmAction_ == ConfirmAction::None) {
+      deviceIndex_ = focusedIndex_;
+      confirmAction_ = focusedIndex_ == 0 ? ConfirmAction::Reboot : ConfirmAction::ResetSettings;
+      focusedIndex_ = 0; // Cancel is always the initial selection.
+    } else if (focusedIndex_ == 0) {
+      confirmAction_ = ConfirmAction::None;
+      focusedIndex_ = deviceIndex_;
+    }
+    else {
+      if (confirmAction_ == ConfirmAction::Reboot) {
+        ctx.wifi.shutdown();
+        ctx.resources.releaseWiFi(ResourceOwner::WiFiScanner);
+        ctx.security.lock();
+        Serial.println("[Settings] Confirmed restart; radio stopped");
+        Serial.flush();
+        ESP.restart();
+      } else ctx.settings.resetToDefaults();
+      confirmAction_ = ConfirmAction::None;
+      focusedIndex_ = deviceIndex_;
+    }
+  } else if (subView_ == SettingsSubView::Memory) onPrimaryAction(ctx);
+  invalidate();
 }
 
 void SettingsApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
@@ -122,170 +190,94 @@ void SettingsApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
 }
 
 void SettingsApp::handleMenuTouch(AppContext& ctx, const TouchEvent& ev) {
-  if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
-
-  const int col = (ev.x >= 164) ? 1 : 0;
-  if (ev.x < 10 || ev.x > 310) return;
-
-  int row = -1;
-  if (ev.y >= 36 && ev.y <= 68) row = 0;
-  else if (ev.y >= 74 && ev.y <= 106) row = 1;
-  else if (ev.y >= 112 && ev.y <= 144) row = 2;
-  if (row < 0) return;
-
-  const uint8_t idx = static_cast<uint8_t>(col * 3 + row);
-  focusedIndex_ = idx;
-
-  switch (idx) {
-    case 0: subView_ = SettingsSubView::Display; break;
-    case 1: subView_ = SettingsSubView::Theme; break;
-    case 2: subView_ = SettingsSubView::Memory; fullRedraw_ = true; break;
-    case 3: subView_ = SettingsSubView::Security; fullRedraw_ = true; break;
-    case 4: subView_ = SettingsSubView::WiFiDiag; fullRedraw_ = true; break;
-    case 5: subView_ = SettingsSubView::Device; confirmAction_ = ConfirmAction::None; break;
+  if (ev.gesture == TouchGesture::SwipeUp || ev.gesture == TouchGesture::SwipeDown) {
+    if (ev.gesture == TouchGesture::SwipeUp && scrollOffset_ < 4) ++scrollOffset_;
+    if (ev.gesture == TouchGesture::SwipeDown && scrollOffset_ > 0) --scrollOffset_;
+    menuIndex_ = scrollOffset_; invalidate(); return;
   }
-  invalidate();
+  if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
+  if (ev.x < 10 || ev.x >= 310 || ev.y < 36 || ev.y >= 144) return;
+  const uint8_t row = (ev.y - 36) / 36;
+  if ((ev.y - 36) % 36 >= 32) return;
+  menuIndex_ = scrollOffset_ + row;
+  onActivate(ctx);
 }
 
 void SettingsApp::handleDisplayTouch(AppContext& ctx, const TouchEvent& ev) {
   if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
-
-  // Brightness row (Y: 48..70)
-  if (ev.y >= 48 && ev.y <= 70) {
-    if (ev.x >= 14 && ev.x <= 80) {
-      ctx.settings.setBrightness(25);
-      invalidate();
-      return;
+  const int bx[] = {14, 88, 162, 236};
+  const int sx[] = {10, 70, 130, 190, 250};
+  if (ev.y >= 48 && ev.y < 70) {
+    for (uint8_t i = 0; i < 4; ++i) if (ev.x >= bx[i] && ev.x < bx[i] + 66) {
+      focusedIndex_ = i; onActivate(ctx); return;
     }
-    if (ev.x >= 88 && ev.x <= 154) {
-      ctx.settings.setBrightness(50);
-      invalidate();
-      return;
+  } else if (ev.y >= 88 && ev.y < 110) {
+    for (uint8_t i = 0; i < 5; ++i) if (ev.x >= sx[i] && ev.x < sx[i] + 54) {
+      focusedIndex_ = i + 4; onActivate(ctx); return;
     }
-    if (ev.x >= 162 && ev.x <= 228) {
-      ctx.settings.setBrightness(75);
-      invalidate();
-      return;
-    }
-    if (ev.x >= 236 && ev.x <= 302) {
-      ctx.settings.setBrightness(100);
-      invalidate();
-      return;
-    }
-  }
-
-  // Timeout row (Y: 88..110): 30s, 1m, 3m, 5m, Never
-  if (ev.y >= 88 && ev.y <= 110) {
-    if (ev.x >= 10 && ev.x <= 64) {
-      ctx.settings.setScreenTimeoutSec(30);
-      invalidate();
-      return;
-    }
-    if (ev.x >= 70 && ev.x <= 124) {
-      ctx.settings.setScreenTimeoutSec(60);
-      invalidate();
-      return;
-    }
-    if (ev.x >= 130 && ev.x <= 184) {
-      ctx.settings.setScreenTimeoutSec(180);
-      invalidate();
-      return;
-    }
-    if (ev.x >= 190 && ev.x <= 244) {
-      ctx.settings.setScreenTimeoutSec(300);
-      invalidate();
-      return;
-    }
-    if (ev.x >= 250 && ev.x <= 308) {
-      ctx.settings.setScreenTimeoutSec(0); // Never
-      invalidate();
-      return;
-    }
-  }
-
-  // Sleep now button (Y: 118..144, X: 60..260)
-  if (ev.y >= 118 && ev.y <= 144 && ev.x >= 60 && ev.x <= 260) {
-    ctx.display.sleep();
-    return;
+  } else if (ev.y >= 118 && ev.y < 144 && ev.x >= 60 && ev.x < 260) {
+    focusedIndex_ = 9; onActivate(ctx);
   }
 }
 
 void SettingsApp::handleThemeTouch(AppContext& ctx, const TouchEvent& ev) {
   if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
-
-  // 4 Theme cards: Row 0 (Y: 48..82), Row 1 (Y: 92..126)
-  if (ev.y >= 48 && ev.y <= 82) {
-    if (ev.x >= 14 && ev.x <= 154) {
-      ctx.settings.setTheme(0); // Cyber Cyan
-      invalidate();
-      return;
-    }
-    if (ev.x >= 164 && ev.x <= 304) {
-      ctx.settings.setTheme(1); // Emerald Green
-      invalidate();
-      return;
-    }
-  } else if (ev.y >= 92 && ev.y <= 126) {
-    if (ev.x >= 14 && ev.x <= 154) {
-      ctx.settings.setTheme(2); // Amber Gold
-      invalidate();
-      return;
-    }
-    if (ev.x >= 164 && ev.x <= 304) {
-      ctx.settings.setTheme(3); // Neon Magenta
-      invalidate();
-      return;
+  for (uint8_t i = 0; i < 4; ++i) {
+    const int x = i % 2 ? 164 : 14, y = i < 2 ? 50 : 92;
+    if (ev.x >= x && ev.x < x + 142 && ev.y >= y && ev.y < y + 34) {
+      focusedIndex_ = i; onActivate(ctx); return;
     }
   }
 }
 
-void SettingsApp::handleMemoryTouch(AppContext&, const TouchEvent&) {}
+void SettingsApp::handleMemoryTouch(AppContext& ctx, const TouchEvent& ev) {
+  if (ev.gesture == TouchGesture::SwipeLeft || ev.gesture == TouchGesture::SwipeRight ||
+      ev.gesture == TouchGesture::SwipeUp || ev.gesture == TouchGesture::SwipeDown) onPrimaryAction(ctx);
+}
 
 void SettingsApp::handleWiFiDiagTouch(AppContext&, const TouchEvent&) {}
 
 void SettingsApp::handleDeviceTouch(AppContext& ctx, const TouchEvent& ev) {
-  if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
-
+  // Double taps do not confirm destructive actions.
+  if (ev.gesture != TouchGesture::Tap) return;
   if (confirmAction_ == ConfirmAction::None) {
-    // Card 1: Reboot (Y: 46..84, X: 16..304)
-    if (ev.y >= 46 && ev.y <= 84 && ev.x >= 16 && ev.x <= 304) {
-      confirmAction_ = ConfirmAction::Reboot;
-      invalidate();
-      return;
-    }
-    // Card 2: Reset Settings (Y: 96..134, X: 16..304)
-    if (ev.y >= 96 && ev.y <= 134 && ev.x >= 16 && ev.x <= 304) {
-      confirmAction_ = ConfirmAction::ResetSettings;
-      invalidate();
-      return;
-    }
+    if (ev.x < 16 || ev.x >= 304) return;
+    if (ev.y >= 44 && ev.y < 84) focusedIndex_ = 0;
+    else if (ev.y >= 94 && ev.y < 134) focusedIndex_ = 1;
+    else return;
+    confirmContactId_ = ev.contactId;
+    confirmOpenedMs_ = millis();
   } else {
-    // Modal buttons: Cancel (X: 35..135, Y: 100..128), Confirm (X: 185..285, Y: 100..128)
-    if (ev.y >= 100 && ev.y <= 128) {
-      if (ev.x >= 35 && ev.x <= 135) {
-        confirmAction_ = ConfirmAction::None;
-        invalidate();
+    if (ev.y < 96 || ev.y >= 124) return;
+    if (ev.x >= 35 && ev.x < 145) focusedIndex_ = 0;
+    else if (ev.x >= 175 && ev.x < 285) {
+      // NONE/down and delayed SINGLE_CLICK may both be Tap for one contact.
+      // Require a fresh contact beyond the double-tap window, without blocking.
+      const int32_t contactDelta = static_cast<int32_t>(ev.contactId - confirmContactId_);
+      if (static_cast<int32_t>(ev.contactStartedMs - confirmOpenedMs_) < 500) {
+        // A contact begun inside the rejection window stays rejected even if
+        // its delayed SINGLE_CLICK arrives after the window has elapsed.
+        if (contactDelta > 0) confirmContactId_ = ev.contactId;
         return;
       }
-      if (ev.x >= 185 && ev.x <= 285) {
-        if (confirmAction_ == ConfirmAction::Reboot) {
-          ctx.display.clear(Colors::Bg);
-          ctx.display.label(100, 75, "Restarting NibruOS...", Colors::Cyan, 1, Colors::Bg);
-          Serial.println("[System] Reboot confirmed by user. Restarting...");
-          delay(200);
-          ESP.restart();
-        } else if (confirmAction_ == ConfirmAction::ResetSettings) {
-          ctx.settings.resetToDefaults();
-          confirmAction_ = ConfirmAction::None;
-          invalidate();
-          return;
-        }
-      }
+      if (contactDelta <= 0) return;
+      focusedIndex_ = 1;
     }
+    else return;
   }
+  onActivate(ctx);
 }
 
 void SettingsApp::render(AppContext& ctx) {
+  if (!hasRendered_ || drawnView_ != subView_ || drawnConfirmation_ != confirmAction_ ||
+      drawnSaveOk_ != ctx.settings.lastSaveOk())
+    fullRedraw_ = true;
+  const bool controls = subView_ == SettingsSubView::Menu || subView_ == SettingsSubView::Display ||
+                        subView_ == SettingsSubView::Theme || subView_ == SettingsSubView::Device;
+  if (controls && !fullRedraw_ && drawnFocus_ == focusedIndex_ && drawnMenu_ == menuIndex_ &&
+      drawnScroll_ == scrollOffset_ && drawnBrightness_ == ctx.settings.brightness() &&
+      drawnTheme_ == ctx.settings.theme() && drawnTimeout_ == ctx.settings.screenTimeoutSec() &&
+      drawnSaveOk_ == ctx.settings.lastSaveOk()) return;
   switch (subView_) {
     case SettingsSubView::Menu:      renderMenu(ctx); break;
     case SettingsSubView::Display:   renderDisplay(ctx); break;
@@ -297,63 +289,55 @@ void SettingsApp::render(AppContext& ctx) {
     case SettingsSubView::TouchTest: touchTest_.render(ctx); break;
     case SettingsSubView::SetPin:    renderSetPin(ctx); break;
   }
+  if (!ctx.settings.lastSaveOk()) ctx.display.footer("NVS error: preferences were not saved");
+  hasRendered_ = true; drawnView_ = subView_; drawnConfirmation_ = confirmAction_;
+  drawnFocus_ = focusedIndex_; drawnMenu_ = menuIndex_; drawnScroll_ = scrollOffset_;
+  drawnBrightness_ = ctx.settings.brightness(); drawnTheme_ = ctx.settings.theme();
+  drawnTimeout_ = ctx.settings.screenTimeoutSec(); drawnSaveOk_ = ctx.settings.lastSaveOk();
+  fullRedraw_ = false;
 }
 
 void SettingsApp::renderMenu(AppContext& ctx) {
-  DisplayManager& screen = ctx.display;
-  TFT_eSPI& t = screen.gfx();
-  screen.clear();
-  screen.header("Settings", true);
-
-  struct MenuItem {
-    const char* tag;
-    const char* title;
-    const char* sub;
-    uint16_t color;
-    int col;
-    int row;
-  };
-
-  const MenuItem items[6] = {
-    {"DISP", "Display", "Backlight & Sleep", Colors::Cyan, 0, 0},
-    {"THM",  "Theme",   ctx.settings.themeName(), Colors::Green, 0, 1},
-    {"MEM",  "Memory",  "ESP32-S3 & Heap", Colors::Amber, 0, 2},
-    {"SEC",  "Security", ctx.security.isPinEnabled() ? "PIN Protected" : "PIN Disabled",
-                         ctx.security.isPinEnabled() ? Colors::Green : Colors::Amber, 1, 0},
-    {"WIFI", "Wi-Fi Diag", "Radio & Scanner", Colors::Cyan, 1, 1},
-    {"DEV",  "Device",  "Reboot & Reset", Colors::Red, 1, 2}
-  };
-
-  for (uint8_t i = 0; i < 6; ++i) {
-    const int x = (items[i].col == 0) ? 10 : 164;
-    const int y = 36 + items[i].row * 38;
-    const bool isFocused = (focusedIndex_ == i);
-
-    t.fillRoundRect(x, y, 146, 33, 5, Colors::Panel);
-    t.drawRoundRect(x, y, 146, 33, 5, isFocused ? ctx.settings.themeColor() : Colors::Border);
-
-    // Tag badge
-    t.fillRoundRect(x + 4, y + 5, 34, 23, 3, items[i].color);
-    screen.label(x + 7, y + 12, items[i].tag, Colors::Bg, 1, items[i].color);
-
-    // Title and sub
-    screen.label(x + 42, y + 6, items[i].title, Colors::White, 1, Colors::Panel);
-    screen.label(x + 42, y + 18, items[i].sub, Colors::Muted, 1, Colors::Panel);
+  auto& screen = ctx.display;
+  auto& t = screen.gfx();
+  if (fullRedraw_) {
+    screen.clear(); screen.header("Settings", true);
+    screen.footer("Swipe | BOOT next/hold open | Back");
   }
-
-  screen.footer("Tap card | BOOT = cycle focus");
+  const bool rowsChanged = fullRedraw_ || drawnScroll_ != scrollOffset_;
+  const char* titles[] = {"Display & timeout", "Accent color", "System & memory",
+    "Wi-Fi diagnostics", "Reboot / reset settings", "Security (existing)", "Touch test"};
+  for (uint8_t row = 0; row < 3; ++row) {
+    const uint8_t i = scrollOffset_ + row;
+    const int y = 36 + row * 36;
+    if (rowsChanged) {
+      t.fillRoundRect(10, y, 294, 32, 5, Colors::Panel);
+      screen.label(20, y + 10, titles[i], Colors::White, 1, Colors::Panel);
+    }
+    if (rowsChanged || i == menuIndex_ || i == drawnMenu_)
+      t.drawRoundRect(10, y, 294, 32, 5, i == menuIndex_ ? screen.themeColor() : Colors::Border);
+  }
+  if (rowsChanged) {
+    t.fillRect(312, 36, 3, 108, Colors::Bg);
+    t.fillRect(312, 36 + scrollOffset_ * 12, 3, 40, screen.themeColor());
+  }
 }
 
 void SettingsApp::renderDisplay(AppContext& ctx) {
   DisplayManager& screen = ctx.display;
   TFT_eSPI& t = screen.gfx();
-  screen.clear();
-  screen.header("Display & Screen", true);
+  if (fullRedraw_) {
+    screen.clear(); screen.header("Display & Screen", true);
+    screen.footer("BOOT next/hold set | Touch to wake");
+  }
 
   // Section 1: Brightness
   char bStr[32];
   snprintf(bStr, sizeof(bStr), "BRIGHTNESS: %u%%", ctx.settings.brightness());
-  screen.label(14, 36, bStr, Colors::Cyan, 1, Colors::Bg);
+  if (fullRedraw_ || drawnBrightness_ != ctx.settings.brightness()) {
+    t.fillRect(14, 36, 292, 10, Colors::Bg);
+    screen.label(14, 36, bStr, Colors::Cyan, 1, Colors::Bg);
+  }
 
   const uint8_t brightVals[4] = {25, 50, 75, 100};
   const char* brightLabels[4] = {"25%", "50%", "75%", "100%"};
@@ -364,10 +348,14 @@ void SettingsApp::renderDisplay(AppContext& ctx) {
     const bool active = (currentB == brightVals[i]);
     const uint16_t bg = active ? Colors::Cyan : Colors::Panel;
     const uint16_t tc = active ? Colors::Bg : Colors::White;
-    t.fillRoundRect(bX[i], 48, 66, 22, 4, bg);
-    t.drawRoundRect(bX[i], 48, 66, 22, 4, active ? Colors::White : Colors::Border);
-    const int tx = bX[i] + (66 - static_cast<int>(strlen(brightLabels[i])) * 6) / 2;
-    screen.label(tx, 55, brightLabels[i], tc, 1, bg);
+    const bool valueChanged = fullRedraw_ || drawnBrightness_ != currentB;
+    if (valueChanged) {
+      t.fillRoundRect(bX[i], 48, 66, 22, 4, bg);
+      const int tx = bX[i] + (66 - static_cast<int>(strlen(brightLabels[i])) * 6) / 2;
+      screen.label(tx, 55, brightLabels[i], tc, 1, bg);
+    }
+    if (valueChanged || focusedIndex_ == i || drawnFocus_ == i)
+      t.drawRoundRect(bX[i], 48, 66, 22, 4, focusedIndex_ == i ? Colors::White : Colors::Border);
   }
 
   // Section 2: Screen Timeout (A4: 30s, 1m, 3m, 5m, Never)
@@ -380,7 +368,10 @@ void SettingsApp::renderDisplay(AppContext& ctx) {
   } else {
     snprintf(sStr, sizeof(sStr), "SCREEN TIMEOUT: %u sec", sec);
   }
-  screen.label(14, 75, sStr, Colors::Green, 1, Colors::Bg);
+  if (fullRedraw_ || drawnTimeout_ != sec) {
+    t.fillRect(14, 75, 292, 10, Colors::Bg);
+    screen.label(14, 75, sStr, Colors::Green, 1, Colors::Bg);
+  }
 
   const uint16_t sleepVals[5] = {30, 60, 180, 300, 0};
   const char* sleepLabels[5] = {"30s", "1m", "3m", "5m", "Off"};
@@ -390,27 +381,34 @@ void SettingsApp::renderDisplay(AppContext& ctx) {
     const bool active = (sec == sleepVals[i]);
     const uint16_t bg = active ? Colors::Green : Colors::Panel;
     const uint16_t tc = active ? Colors::Bg : Colors::White;
-    t.fillRoundRect(sX[i], 88, 54, 22, 4, bg);
-    t.drawRoundRect(sX[i], 88, 54, 22, 4, active ? Colors::White : Colors::Border);
-    const int tx = sX[i] + (54 - static_cast<int>(strlen(sleepLabels[i])) * 6) / 2;
-    screen.label(tx, 95, sleepLabels[i], tc, 1, bg);
+    const bool valueChanged = fullRedraw_ || drawnTimeout_ != sec;
+    if (valueChanged) {
+      t.fillRoundRect(sX[i], 88, 54, 22, 4, bg);
+      const int tx = sX[i] + (54 - static_cast<int>(strlen(sleepLabels[i])) * 6) / 2;
+      screen.label(tx, 95, sleepLabels[i], tc, 1, bg);
+    }
+    if (valueChanged || focusedIndex_ == i + 4 || drawnFocus_ == i + 4)
+      t.drawRoundRect(sX[i], 88, 54, 22, 4, focusedIndex_ == i + 4 ? Colors::White : Colors::Border);
   }
 
   // Sleep now test button
-  t.fillRoundRect(60, 118, 200, 26, 6, Colors::Panel);
-  t.drawRoundRect(60, 118, 200, 26, 6, Colors::Amber);
-  screen.label(78, 126, "[ TEST SLEEP MODE NOW ]", Colors::Amber, 1, Colors::Panel);
-
-  screen.footer("Tap option to apply | Touch to wake");
+  if (fullRedraw_) {
+    t.fillRoundRect(60, 118, 200, 26, 6, Colors::Panel);
+    screen.label(78, 126, "[ TEST SLEEP MODE NOW ]", Colors::Amber, 1, Colors::Panel);
+  }
+  if (fullRedraw_ || focusedIndex_ == 9 || drawnFocus_ == 9)
+    t.drawRoundRect(60, 118, 200, 26, 6, focusedIndex_ == 9 ? Colors::White : Colors::Amber);
 }
 
 void SettingsApp::renderTheme(AppContext& ctx) {
   DisplayManager& screen = ctx.display;
   TFT_eSPI& t = screen.gfx();
-  screen.clear();
-  screen.header("Theme Accent", true);
-
-  screen.label(14, 36, "SELECT SYSTEM ACCENT COLOR:", Colors::White, 1, Colors::Bg);
+  if (fullRedraw_) {
+    screen.clear();
+    screen.label(14, 36, "SELECT SYSTEM ACCENT COLOR:", Colors::White, 1, Colors::Bg);
+    screen.footer("BOOT next/hold set | Back: menu");
+  }
+  if (fullRedraw_ || drawnTheme_ != ctx.settings.theme()) screen.header("Theme Accent", true);
 
   const char* names[4] = {"Cyber Cyan", "Emerald Green", "Amber Gold", "Neon Magenta"};
   const uint16_t colors[4] = {Colors::Cyan, Colors::Green, Colors::Amber, Colors::Magenta};
@@ -420,9 +418,14 @@ void SettingsApp::renderTheme(AppContext& ctx) {
     const int x = (i % 2 == 0) ? 14 : 164;
     const int y = (i < 2) ? 50 : 92;
     const bool active = (curTheme == i);
-
+    if (!fullRedraw_ && drawnTheme_ == curTheme) {
+      if (i == focusedIndex_ || i == drawnFocus_)
+        t.drawRoundRect(x, y, 142, 34, 5, focusedIndex_ == i ? Colors::White : Colors::Border);
+      continue;
+    }
+    if (!fullRedraw_ && i != curTheme && i != drawnTheme_ && i != focusedIndex_ && i != drawnFocus_) continue;
     t.fillRoundRect(x, y, 142, 34, 5, Colors::Panel);
-    t.drawRoundRect(x, y, 142, 34, 5, active ? colors[i] : Colors::Border);
+    t.drawRoundRect(x, y, 142, 34, 5, focusedIndex_ == i ? Colors::White : Colors::Border);
 
     // Color swatch circle
     t.fillCircle(x + 18, y + 17, 8, colors[i]);
@@ -433,75 +436,36 @@ void SettingsApp::renderTheme(AppContext& ctx) {
     screen.label(x + 36, y + 13, names[i], active ? colors[i] : Colors::White, 1, Colors::Panel);
   }
 
-  screen.footer("Theme accent applies across NibruOS");
 }
 
 void SettingsApp::renderMemory(AppContext& ctx) {
-  DisplayManager& screen = ctx.display;
-  TFT_eSPI& t = screen.gfx();
-  char line[64];
-
-  MemorySnapshot mem = MemoryProfiler::capture();
-
+  auto& screen = ctx.display;
+  char line[48];
+  const auto m = MemoryProfiler::capture();
   if (fullRedraw_) {
-    screen.clear();
-    screen.header("Memory Monitor", true);
-
-    // Left info card
-    t.fillRoundRect(10, 36, 146, 108, 6, Colors::Panel);
-    t.drawRoundRect(10, 36, 146, 108, 6, Colors::Border);
-    screen.label(16, 42, "DEVICE & SYSTEM", Colors::Cyan, 1, Colors::Panel);
-
-    snprintf(line, sizeof(line), "Ver:   %s", Board::kVersion);
-    screen.label(16, 56, line, Colors::White, 1, Colors::Panel);
-
-    snprintf(line, sizeof(line), "Chip:  ESP32-S3");
-    screen.label(16, 68, line, Colors::White, 1, Colors::Panel);
-
-    snprintf(line, sizeof(line), "CPU:   %d MHz", ESP.getCpuFreqMHz());
-    screen.label(16, 80, line, Colors::White, 1, Colors::Panel);
-
-    snprintf(line, sizeof(line), "Flash: %lu MB", static_cast<unsigned long>(mem.flashSize / 1048576UL));
-    screen.label(16, 92, line, Colors::White, 1, Colors::Panel);
-
-    snprintf(line, sizeof(line), "Image: %lu KB", static_cast<unsigned long>(mem.sketchSize / 1024UL));
-    screen.label(16, 104, line, Colors::Muted, 1, Colors::Panel);
-
-    snprintf(line, sizeof(line), "Rst:   %s", mem.resetReason);
-    screen.label(16, 116, line, Colors::Amber, 1, Colors::Panel);
-
-    // Right card 1: Internal SRAM
-    t.fillRoundRect(164, 36, 146, 56, 5, Colors::Panel);
-    t.drawRoundRect(164, 36, 146, 56, 5, Colors::Border);
-    screen.label(170, 41, "INTERNAL SRAM", Colors::Green, 1, Colors::Panel);
-
-    // Right card 2: External PSRAM
-    t.fillRoundRect(164, 96, 146, 48, 5, Colors::Panel);
-    t.drawRoundRect(164, 96, 146, 48, 5, Colors::Border);
-    screen.label(170, 101, "EXTERNAL PSRAM", Colors::Cyan, 1, Colors::Panel);
-
-    screen.footer("Real ESP-IDF runtime metrics");
-    fullRedraw_ = false;
+    screen.clear(); screen.header(metricPage_ ? "Memory monitor" : "System info", true);
+    screen.footer("Swipe / BOOT: page | Back: menu"); fullRedraw_ = false;
   }
-
-  // Dynamic values inside SRAM card
-  t.fillRect(170, 54, 134, 32, Colors::Panel);
-  snprintf(line, sizeof(line), "Free:  %lu KB", static_cast<unsigned long>(mem.freeInternalHeap / 1024UL));
-  screen.label(170, 54, line, Colors::White, 1, Colors::Panel);
-
-  snprintf(line, sizeof(line), "Min:   %lu KB", static_cast<unsigned long>(mem.minFreeInternalHeap / 1024UL));
-  screen.label(170, 65, line, Colors::Muted, 1, Colors::Panel);
-
-  snprintf(line, sizeof(line), "Block: %lu KB", static_cast<unsigned long>(mem.largestFreeBlock / 1024UL));
-  screen.label(170, 76, line, Colors::Cyan, 1, Colors::Panel);
-
-  // Dynamic values inside PSRAM card
-  t.fillRect(170, 114, 134, 24, Colors::Panel);
-  snprintf(line, sizeof(line), "Total: %lu MB", static_cast<unsigned long>(mem.totalPsram / 1048576UL));
-  screen.label(170, 114, line, Colors::White, 1, Colors::Panel);
-
-  snprintf(line, sizeof(line), "Free:  %lu KB", static_cast<unsigned long>(mem.freePsram / 1024UL));
-  screen.label(170, 126, line, Colors::Green, 1, Colors::Panel);
+  if (!metricPage_) {
+    snprintf(line, sizeof(line), "Firmware: %s | Chip: %.16s", Board::kVersion, ESP.getChipModel());
+    metricLabel(screen, 10, 38, line);
+    snprintf(line, sizeof(line), "CPU: %d MHz | Flash: %lu KiB", ESP.getCpuFreqMHz(), (unsigned long)(m.flashSize/1024));
+    metricLabel(screen, 10, 54, line);
+    snprintf(line, sizeof(line), "Firmware image: %lu bytes", (unsigned long)m.sketchSize);
+    metricLabel(screen, 10, 70, line);
+    snprintf(line, sizeof(line), "Uptime: %lu s", (unsigned long)m.uptimeSec);
+    metricLabel(screen, 10, 86, line);
+    snprintf(line, sizeof(line), "Reset: %.36s", m.resetReason);
+    metricLabel(screen, 10, 102, line);
+  } else {
+    snprintf(line, sizeof(line), "Internal free: %lu B", (unsigned long)m.freeInternalHeap); metricLabel(screen, 10,38,line);
+    snprintf(line, sizeof(line), "Internal min: %lu B", (unsigned long)m.minFreeInternalHeap); metricLabel(screen, 10,54,line);
+    snprintf(line, sizeof(line), "Largest internal: %lu B", (unsigned long)m.largestFreeBlock); metricLabel(screen, 10,70,line);
+    snprintf(line, sizeof(line), "PSRAM total/free: %lu / %lu B", (unsigned long)m.totalPsram, (unsigned long)m.freePsram); metricLabel(screen, 10,86,line);
+    snprintf(line, sizeof(line), "PSRAM min: %lu B", (unsigned long)m.minFreePsram); metricLabel(screen, 10,102,line);
+    snprintf(line, sizeof(line), "Loop stack HWM: %lu bytes", (unsigned long)m.stackHighWaterBytes); metricLabel(screen, 10,118,line);
+  }
+  if (!m.available) metricLabel(screen, 10,134,"HOST MOCK - no device measurements",Colors::Amber);
 }
 
 void SettingsApp::renderWiFiDiag(AppContext& ctx) {
@@ -519,22 +483,21 @@ void SettingsApp::renderWiFiDiag(AppContext& ctx) {
     fullRedraw_ = false;
   }
 
-  t.fillRect(16, 40, 288, 98, Colors::Panel);
 
   // Status & Link
   const char* status = ctx.wifi.statusName();
   const bool isConn = (ctx.wifi.connectState() == ConnectState::Connected);
   snprintf(line, sizeof(line), "Link:   %s", isConn ? ctx.wifi.connectedSSID() : "(Disconnected)");
-  screen.label(16, 42, line, isConn ? Colors::Green : Colors::White, 1, Colors::Panel);
+  metricLabel(screen, 16, 42, line, isConn ? Colors::Green : Colors::White, 1, Colors::Panel);
 
   snprintf(line, sizeof(line), "Status: %s (RSSI: %d dBm)", status, ctx.wifi.currentRSSI());
-  screen.label(16, 54, line, isConn ? Colors::Cyan : Colors::Muted, 1, Colors::Panel);
+  metricLabel(screen, 16, 54, line, isConn ? Colors::Cyan : Colors::Muted, 1, Colors::Panel);
 
   // IP Address
   char ipBuf[24]{};
   ctx.wifi.getLocalIP(ipBuf, sizeof(ipBuf));
   snprintf(line, sizeof(line), "IP:     %s", ipBuf[0] ? ipBuf : "0.0.0.0");
-  screen.label(16, 66, line, Colors::White, 1, Colors::Panel);
+  metricLabel(screen, 16, 66, line, Colors::White, 1, Colors::Panel);
 
   // Scan state & duration
   const char* scanStateStr = "Idle";
@@ -547,45 +510,56 @@ void SettingsApp::renderWiFiDiag(AppContext& ctx) {
   }
   snprintf(line, sizeof(line), "Scan:   %s (%lu ms)", scanStateStr,
            static_cast<unsigned long>(ctx.wifi.lastScanDurationMs()));
-  screen.label(16, 78, line, Colors::Amber, 1, Colors::Panel);
+  metricLabel(screen, 16, 78, line, Colors::Amber, 1, Colors::Panel);
 
   // Discovered APs & Retry
   snprintf(line, sizeof(line), "APs:    %u found | Attempt: %u/2",
            ctx.wifi.count(), ctx.wifi.attempt());
-  screen.label(16, 90, line, Colors::White, 1, Colors::Panel);
+  metricLabel(screen, 16, 90, line, Colors::White, 1, Colors::Panel);
 
   // Resource Owner
   const bool hasOwner = (ctx.resources.wifiOwner() != ResourceOwner::None);
   snprintf(line, sizeof(line), "Owner:  %s", hasOwner ? "WiFiScanner (Active)" : "Available");
-  screen.label(16, 102, line, hasOwner ? Colors::Amber : Colors::Green, 1, Colors::Panel);
+  metricLabel(screen, 16, 102, line, hasOwner ? Colors::Amber : Colors::Green, 1, Colors::Panel);
 
   // Last error
   const char* err = ctx.wifi.lastError();
   if (!err || !err[0]) err = "None";
   snprintf(line, sizeof(line), "Error:  %s", err);
-  screen.label(16, 114, line, (err && strcmp(err, "None") != 0) ? Colors::Red : Colors::Muted, 1, Colors::Panel);
+  metricLabel(screen, 16, 114, line, (err && strcmp(err, "None") != 0) ? Colors::Red : Colors::Muted, 1, Colors::Panel);
 }
 
 void SettingsApp::renderDevice(AppContext& ctx) {
   DisplayManager& screen = ctx.display;
   TFT_eSPI& t = screen.gfx();
-  screen.clear();
-  screen.header("Device Controls", true);
+  if (!fullRedraw_) {
+    if (confirmAction_ == ConfirmAction::None) {
+      t.drawRoundRect(16, 44, 288, 40, 6, focusedIndex_ == 0 ? Colors::White : Colors::Amber);
+      t.drawRoundRect(16, 94, 288, 40, 6, focusedIndex_ == 1 ? Colors::White : Colors::Red);
+    } else {
+      t.drawRoundRect(35, 96, 110, 28, 5, focusedIndex_ == 0 ? Colors::White : Colors::Border);
+      t.drawRoundRect(175, 96, 110, 28, 5, focusedIndex_ == 1 ? Colors::White : Colors::Border);
+    }
+    return;
+  }
+  if (!hasRendered_ || drawnView_ != subView_) {
+    screen.clear(); screen.header("Device Controls", true);
+  } else t.fillRect(0, 33, 320, 118, Colors::Bg);
 
   if (confirmAction_ == ConfirmAction::None) {
     // Card 1: Reboot
     t.fillRoundRect(16, 44, 288, 40, 6, Colors::Panel);
-    t.drawRoundRect(16, 44, 288, 40, 6, Colors::Amber);
+    t.drawRoundRect(16, 44, 288, 40, 6, focusedIndex_ == 0 ? Colors::White : Colors::Amber);
     screen.label(28, 52, "REBOOT DEVICE", Colors::Amber, 1, Colors::Panel);
     screen.label(28, 66, "Flush resources and perform software restart", Colors::Muted, 1, Colors::Panel);
 
     // Card 2: Reset Settings
     t.fillRoundRect(16, 94, 288, 40, 6, Colors::Panel);
-    t.drawRoundRect(16, 94, 288, 40, 6, Colors::Red);
+    t.drawRoundRect(16, 94, 288, 40, 6, focusedIndex_ == 1 ? Colors::White : Colors::Red);
     screen.label(28, 102, "RESET SETTINGS TO DEFAULTS", Colors::Red, 1, Colors::Panel);
     screen.label(28, 116, "Restore default brightness, timeout & theme", Colors::Muted, 1, Colors::Panel);
 
-    screen.footer("Tap option | Confirmation required");
+    screen.footer("BOOT next/hold open | Back: menu");
   } else {
     // Modal confirmation box
     t.fillRoundRect(24, 40, 272, 94, 8, Colors::Panel);
@@ -603,6 +577,8 @@ void SettingsApp::renderDevice(AppContext& ctx) {
     t.fillRoundRect(35, 96, 110, 28, 5, Colors::Border);
     screen.label(65, 104, "CANCEL", Colors::White, 1, Colors::Border);
 
+    t.drawRoundRect(35, 96, 110, 28, 5, focusedIndex_ == 0 ? Colors::White : Colors::Border);
+
     // Confirm button
     const uint16_t cBg = (confirmAction_ == ConfirmAction::Reboot) ? Colors::Amber : Colors::Red;
     t.fillRoundRect(175, 96, 110, 28, 5, cBg);
@@ -610,15 +586,17 @@ void SettingsApp::renderDevice(AppContext& ctx) {
                  confirmAction_ == ConfirmAction::Reboot ? "REBOOT" : "RESET",
                  Colors::Bg, 1, cBg);
 
-    screen.footer("Select CANCEL or CONFIRM");
+    t.drawRoundRect(175, 96, 110, 28, 5, focusedIndex_ == 1 ? Colors::White : Colors::Border);
+    screen.footer("BOOT next/hold confirm | Back: cancel");
   }
 }
 
 void SettingsApp::renderSecurity(AppContext& ctx) {
   DisplayManager& screen = ctx.display;
   TFT_eSPI& t = screen.gfx();
-  screen.clear();
-  screen.header("Security & PIN", true);
+  if (fullRedraw_) {
+    screen.clear(); screen.header("Security & PIN", true);
+  }
 
   const bool pinEn = ctx.security.isPinEnabled();
 
@@ -686,14 +664,16 @@ void SettingsApp::handleSecurityTouch(AppContext& ctx, const TouchEvent& ev) {
 void SettingsApp::renderSetPin(AppContext& ctx) {
   DisplayManager& screen = ctx.display;
   TFT_eSPI& t = screen.gfx();
-  screen.clear();
-  screen.header("Set Security PIN", true);
+  if (fullRedraw_) {
+    screen.clear(); screen.header("Set Security PIN", true);
+  }
+  t.fillRect(10, 34, 300, 12, Colors::Bg);
 
   // Status & Guidance (Y: 30..44)
   if (pinError_) {
-    screen.label(64, 32, "Error: PIN must be 4 to 8 digits!", Colors::Red, 1, Colors::Bg);
+    screen.label(64, 36, "Error: PIN must be 4 to 8 digits!", Colors::Red, 1, Colors::Bg);
   } else {
-    screen.label(60, 32, "Enter 4 to 8 digits, then tap SAVE", Colors::White, 1, Colors::Bg);
+    screen.label(60, 36, "Enter 4 to 8 digits, then tap SAVE", Colors::White, 1, Colors::Bg);
   }
 
   // PIN Display Box (Y: 46..64)
@@ -716,7 +696,7 @@ void SettingsApp::renderSetPin(AppContext& ctx) {
     {"9", "0", "DEL", "SAVE"}
   };
 
-  for (int row = 0; row < 3; ++row) {
+  if (fullRedraw_) for (int row = 0; row < 3; ++row) {
     const int ry = 68 + row * 26;
     for (int col = 0; col < 4; ++col) {
       const int rx = 16 + col * 74;
@@ -739,7 +719,7 @@ void SettingsApp::renderSetPin(AppContext& ctx) {
     }
   }
 
-  screen.footer("Tap Cancel to discard | PBKDF2 Encrypted");
+  if (fullRedraw_) screen.footer("Tap Back to discard | PIN hidden");
 }
 
 void SettingsApp::handleSetPinTouch(AppContext& ctx, const TouchEvent& ev) {

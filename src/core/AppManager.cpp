@@ -1,6 +1,7 @@
 #include "core/AppManager.h"
 #include "hardware/DisplayManager.h"
 #include "BoardConfig.h"
+#include "core/MemoryProfiler.h"
 #include <Arduino.h>
 #include <cstdio>
 
@@ -13,17 +14,26 @@ bool AppManager::registerApp(App& app) {
 void AppManager::begin() { goHome(); }
 void AppManager::goHome() {
   if (active_) {
-    active_->onExit(ctx_);  // release app-owned resources before home rendering
+    {
+      ProfileScope timer("app-exit");
+      active_->onExit(ctx_);  // release app-owned resources before home rendering
+    }
     active_ = nullptr;
+    MemoryProfiler::checkpoint("after-exit");
   }
   homeDirty_ = true;
 }
 bool AppManager::open(uint8_t index) {
   if (index >= count_) return false;
-  if (active_) active_->onExit(ctx_);
+  if (active_) goHome();
+  MemoryProfiler::checkpoint("before-entry");
   active_ = apps_[index];
   selected_ = index;
-  active_->onEnter(ctx_);
+  {
+    ProfileScope timer("app-entry");
+    active_->onEnter(ctx_);
+  }
+  MemoryProfiler::checkpoint("after-entry");
   return true;
 }
 void AppManager::selectNext() {
@@ -42,7 +52,7 @@ void AppManager::handleButton(ButtonAction action) {
       break;
     case ButtonAction::Activate:
       if (isHome()) open(selected_);
-      else active_->onPrimaryAction(ctx_);
+      else active_->onActivate(ctx_);
       break;
     default: break;
   }
@@ -149,7 +159,7 @@ void AppManager::drawHome() {
       const uint8_t i = static_cast<uint8_t>(page * 3 + col);
       if (i >= count_) break;
       const int x = 8 + col * 102;
-      const uint16_t accent = accents[col % 3];
+      const uint16_t accent = i == selected_ ? screen.themeColor() : accents[col % 3];
       t.fillRoundRect(x, 48, 94, 93, 9, Colors::Panel);
       t.drawRoundRect(x, 48, 94, 93, 9, i == selected_ ? accent : Colors::Border);
 

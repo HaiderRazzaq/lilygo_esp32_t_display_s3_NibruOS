@@ -178,3 +178,76 @@ Status vocabulary and resolution rules: [workflow](ENGINEERING_WORKFLOW.md).
   "risks": "Structural validation still cannot prove real device observations or enforce append-only history against Git."
 }
 ```
+
+```json
+{
+  "record_type": "issue",
+  "id": "BUG-0007",
+  "title": "Essential Settings current-image hardware/resource acceptance pending",
+  "status": "OPEN",
+  "description": "Software completion passes build/mocks, but current brightness, contact timing, NVS physical recovery and resource budgets have no device evidence.",
+  "symptoms": "Resource/device acceptance incomplete. Owner reported touch repetition/flicker (BUG-0008); other physical resource metrics remain unobserved.",
+  "reproduction": "Follow HWT-0008 and MEMORY_PROFILING scenarios A–E on identified image.",
+  "affected_versions": "v0.3 + current uncommitted Settings completion",
+  "suspected_cause": "Unavailable physical evidence, not established code defect",
+  "root_cause": "NOT ESTABLISHED; no physical test performed",
+  "files": [
+    "docs/SETTINGS.md",
+    "docs/MEMORY_PROFILING.md",
+    "docs/performance/SETTINGS_RESOURCE_IMPACT.md"
+  ],
+  "attempts": [
+    "Initial existing source had Settings gaps/stale mocks; software fixes and failed attempts recorded in DEV-0014 and VER-0014 through VER-0019.",
+    "No upload, serial monitor or physical profiling in this change.",
+    "HWT-0009 upload followed by owner failure HWT-0010; focused repair tracked by BUG-0008, VER-0023/VER-0024 and HWT-0011; repaired UI still pending."
+  ],
+  "fix": "Implementation complete for software scope; pending physical validation.",
+  "verification": [
+    "VER-0017",
+    "VER-0018",
+    "VER-0019",
+    "HWT-0008"
+  ],
+  "risks": "Do not infer >=150 KiB free heap, brightness compatibility, reception, touch responsiveness or power from static/mock PASS."
+}
+```
+
+```json
+{
+  "record_type": "issue",
+  "id": "BUG-0008",
+  "title": "Repeated touch actions and full-screen Settings flicker",
+  "status": "FIXED — UNVERIFIED",
+  "description": "Owner physically reported repeated actions and flashes with every touch after HWT-0009.",
+  "symptoms": "Multiple actions per second for one contact; screen clears on every settings touch, including unchanged selections.",
+  "reproduction": "HWT-0010 owner report; native tests replay NONE/Down and repeated SINGLE_CLICK/Contact reports and count screen clears. Physical repaired recheck is HWT-0012.",
+  "affected_versions": "HWT-0009 default image842848 B, runtimev0.3; repaired uncommitted source awaiting owner validation",
+  "suspected_cause": "Source permits repeated classified gestures and premature NONE tap; Settings clears/repaints full screen unconditionally.",
+  "root_cause": "Confirmed software paths by failing mock regressions; exact raw board event sequence was not captured.",
+  "files": [
+    "src/hardware/TouchManager.cpp",
+    "src/apps/SettingsApp.cpp",
+    "src/core/App.h",
+    "src/core/AppManager.h",
+    "src/main.cpp",
+    "tests/host/test_main.cpp",
+    "tests/host/test_settings.cpp"
+  ],
+  "attempts": [
+    "Owner failure preserved as HWT-0010, never replaced with build PASS.",
+    "RED assertions VER-0022; per-contact gesture latch and deferred NONE fallback, incremental/no-op rendering, surface restoration and contact-start confirmation added.",
+    "Final native default/alternate tests PASS VER-0023; all3 target builds PASS VER-0024.",
+    "Repaired default image uploaded COM5; HWT-0011 verifies write/hash/reset only. Await owner HWT-0012 recheck."
+  ],
+  "fix": "One classified action/contact, fallback only after release, new-Down recovery; redraw changed widgets, preserve static view and force restore after overlays; confirm using contact-start time.",
+  "verification": [
+    "HWT-0010",
+    "VER-0022",
+    "VER-0023",
+    "VER-0024",
+    "HWT-0012",
+    "HWT-0011"
+  ],
+  "risks": "Physical controller event coalescing and actual panel flicker still need HWT-0012; no claim of verified physical resolution or memory headroom."
+}
+```

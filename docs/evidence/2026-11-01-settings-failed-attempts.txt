@@ -1,0 +1,35 @@
+2026-11-01, software-only failed attempts (sanitized summary)
+- Initial host environment: WSL bash had no installed distribution; c++ absent.
+  Installed Zig 0.16.0 only in ignored .testbuild/toolchain for local tests.
+- Existing host suite initially failed compilation: stale Preferences/Arduino/TFT/
+  Wi-Fi stubs and duplicate SettingsService/SettingsApp local variable name.
+  Extended mocks to current APIs; no firmware library upgrade.
+- Existing host assertions then failed: mock always returned nonzero local IP,
+  saved-network test assumed no prior connection, lock test omitted enabling PIN.
+  Corrected mock/test setup against actual production behavior, retained coverage.
+- Resource tests initially failed import before checker implementation (RED).
+- New post-image hook rejected real app0: checker assumed subtype 0 rather than
+  generated OTA0 subtype 0x10. Added real-layout regression: three errors RED,
+  corrected parser; six resource tests GREEN and actual partition checks PASS.
+- Documentation mutation suite initially failed three resource-document tests
+  because policy documents were not required by checker; required list extended.
+- Documentation run then failed UTF-8 decoding after two documentation files
+  were written in Windows local encoding. Re-encoded those files to UTF-8.
+- Settings confirmation regression failed at test_settings.cpp:104: cancel lost
+  reset focus and selected reboot next. Restored initial device-action focus.
+- Review regression: unread NVS silently loaded defaults; assertion
+  !restored.lastSaveOk() failed (nvs-load-red.log). Backend-open failures are now
+  visible/write-protected, empty destination imports legacy settings.
+- Contact tracking test initially failed compile before isPressed API; implemented
+  contact state independently of gesture dispatch, with held-contact wake gating.
+- Raw double-tap confirmation regression failed behavior at test_settings.cpp:126
+  before fix. Fresh contact identity + 500ms non-blocking confirmation window now
+  prevents initial NONE and delayed tap reports confirming a reset.
+All final HOST and artifact tests passed. None of these results is a physical test.
+- During final evidence assembly, docs checker/test run failed because the newly referenced docs-test capture did not exist yet. Capturing the final run directly at that path resolves the missing-evidence prerequisite; prior failed output is retained in .testbuild/docs-final.log.
+- Final review extended the raw double-tap case: a second contact begun inside the
+  500ms rejection window could emit SINGLE_CLICK after the window. The new held-
+  second-contact test failed (early-contact-red.log); retaining the rejected
+  contact identity until a later new contact fixes it. Final full HOST reruns PASS.
+- git diff --check initially found doubled CR line endings in two rewritten policy
+  documents after encoding repair; normalized their line endings, then check PASS.

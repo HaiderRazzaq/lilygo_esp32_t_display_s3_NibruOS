@@ -1,0 +1,10 @@
+{
+  "date": "2026-11-01",
+  "commit": "8239bb6",
+  "environment": "lilygo-t-display-s3",
+  "linked_flash_bytes": 841377,
+  "static_ram_bytes": 61168,
+  "binary_bytes": 841744,
+  "sha256": "de13bcfea614fc3c8d5c5e2b6b88861d2d6e19bb0dfe8b6cacd0213041c552e3",
+  "runtime_metrics": "NOT MEASURED"
+}

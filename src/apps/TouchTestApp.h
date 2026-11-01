@@ -11,6 +11,7 @@ public:
   void onTick(AppContext& ctx, uint32_t nowMs) override;
   void onTouch(AppContext& ctx, const TouchEvent& ev) override;
   void render(AppContext& ctx) override;
+  void onDisplayRestored(AppContext&) override { fullRedraw_ = true; invalidate(); }
 private:
   bool touched_ = false;
   bool fullRedraw_ = true;

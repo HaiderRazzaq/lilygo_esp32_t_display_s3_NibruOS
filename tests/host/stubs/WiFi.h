@@ -3,6 +3,14 @@
 #include <cstring>
 
 static constexpr int WIFI_STA = 1, WIFI_OFF = 0, WIFI_AUTH_OPEN = 0;
+static constexpr int WIFI_ALL_CHANNEL_SCAN = 0, WIFI_CONNECT_AP_BY_SIGNAL = 0;
+using WiFiEvent_t = int;
+using wifi_err_reason_t = int;
+static constexpr int ARDUINO_EVENT_WIFI_STA_DISCONNECTED = 1;
+static constexpr int ARDUINO_EVENT_WIFI_STA_CONNECTED = 2;
+static constexpr int ARDUINO_EVENT_WIFI_STA_GOT_IP = 3;
+static constexpr int WIFI_REASON_AUTH_FAIL = 202, WIFI_REASON_NO_AP_FOUND = 201;
+struct WiFiEventInfo_t { struct { uint8_t reason; } wifi_sta_disconnected; };
 static constexpr int WIFI_SCAN_RUNNING = -1, WIFI_SCAN_FAILED = -2;
 
 using wl_status_t = int;
@@ -22,6 +30,8 @@ struct IPAddress {
 };
 
 struct MockWiFi {
+  template<class T> void onEvent(T) {}
+  const char* disconnectReasonName(wifi_err_reason_t) { return "Mock reason"; }
   int modeValue = 0;
   int started = 0;
   int stopped = 0;
@@ -58,7 +68,11 @@ struct MockWiFi {
   }
 
   wl_status_t status() { return statusValue; }
-  IPAddress localIP() { return IPAddress{}; }
+  IPAddress localIP() {
+    IPAddress ip;
+    if (statusValue != WL_CONNECTED) for (auto& b : ip.bytes) b = 0;
+    return ip;
+  }
   IPAddress gatewayIP() { return IPAddress{}; }
   String macAddress() { return String("44:1B:F6:D3:AA:BC"); }
 

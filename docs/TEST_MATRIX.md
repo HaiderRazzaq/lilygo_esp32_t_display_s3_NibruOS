@@ -1,9 +1,42 @@
 # Verification matrix
 
-Current as of 2026-11-01. **BUILD** verifies compilation/linking only; **HOST**
-uses stubs; **HARDWARE** requires device observations of the actual image.
-Historical host PASS claims are preserved in [VERIFICATION_REPORT](VERIFICATION_REPORT.md).
-This session's host attempt is BLOCKED (VER-0002), not a fresh PASS.
+Current snapshot: 2026-11-01 Essential Settings completion. BUILD and HOST are
+software checks; all physical acceptance for this changed image remains pending.
+The older table below is retained as a historical baseline, superseded by these
+current rows (not new evidence of the old hardware claims).
+
+| Current scope | Build | Host/tooling | Physical |
+|---|---|---|---|
+| Default firmware physical upload | VER-0024 | Image/capacity match | HWT-0013 PASS: COM5 repaired image write/hash/reset only |
+| Settings persistence/migration/failure/reset | VER-0020 | VER-0017 | HWT-0008 NOT RUN |
+| Scroll/buttons/focus/confirm/wake gating | VER-0020 | VER-0017, including held/raw double-tap cases | HWT-0008 NOT RUN |
+| 20 Settings entry/exit cycles | VER-0020 | VER-0017 control flow/ownership only | HWT-0008, heap/PSRAM/latency NOT MEASURED |
+| System/memory/Wi-Fi diagnostics | VER-0020 | Mock rendering only, not sensor validation | HWT-0008 NOT RUN; BUG-0001 remains |
+| Default AW9364 / opt-in LEDC fallback | VER-0020 | VER-0017 duties/fallback/sleep assertions | HWT-0008 NOT RUN; LEDC not accepted on AW9364 |
+| Profiling build switch / checkpoints | VER-0020 | VER-0017 profile-enabled compile/run | A–E pending, no free-heap/stack/power PASS |
+| Partition capacity/growth warnings | VER-0020 | VER-0018 (six resource tests) | Static-only, N/A hardware |
+| Documentation consistency | N/A | VER-0018 (17 mutation tests + checker) | N/A |
+
+## Touch and redraw repair — current
+
+| Scope | Software | Physical |
+|---|---|---|
+| Duplicate click/hold suppression; swipes/release/new-Down recovery | VER-0023 HOST PASS, VER-0024 BUILD PASS | Original owner FAIL HWT-0010; repair HWT-0012 NOT RUN |
+| Incremental/no-op paint; lock-overlay restore | Mock drawing counts and restore regression PASS VER-0023 | Actual flicker/latency HWT-0012 NOT RUN |
+| Contact-start confirmation and raw wake | Driver-to-app regressions PASS VER-0023 | HWT-0012 NOT RUN |
+| Resource costs | +1040 B image/+40 B static RAM vsHWT-0009 | Heap/PSRAM/stack/power NOT MEASURED |
+
+## Desktop simulator — current
+
+| Scope | Software | Physical |
+|---|---|---|
+| Desktop Simulator Target (FEAT-0015) | VER-0025 HOST PASS, VER-0026 BUILD PASS | NOT APPLICABLE (Host Target) |
+| SDL2 320x170 display & typography | Verified in nibru_tests and simulator window | NOT APPLICABLE |
+| DesktopInput mouse/keyboard mapping | Verified in nibru_tests (Tap/Swipes/Keys) | NOT APPLICABLE |
+| Deterministic Wi-Fi & fault injection | Verified in nibru_tests (Normal/Timeout/Error) | NOT APPLICABLE |
+| Desktop persistent NVS storage | Verified in nibru_tests across reloads | NOT APPLICABLE |
+
+## Historical baseline table
 
 | Capability / feature | Build verification | Unit / simulated verification | Hardware verification | Pending / blocked procedure |
 |---|---|---|---|---|

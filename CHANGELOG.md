@@ -6,6 +6,52 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 
 ## Unreleased
 
+### Native Desktop Simulator & Cross-Platform Target — 2026-11-01
+
+- Added interactive Windows/Desktop Simulator (`FEAT-0015`) using C++17, SDL2, and CMake. Reuses shared NibruOS core, applications (`WiFiApp`, `TotpApp`, `SettingsApp`, `SystemInfoApp`, `TouchTestApp`), and services with zero business logic duplication.
+- Implemented 320x170 RGB565 framebuffer with 1x/2x/3x/4x integer nearest-neighbor scaling and pixel-accurate 5x7 GLCD typography.
+- Implemented `DesktopInput` mapping mouse clicks and drags to `TouchEvent` taps and swipes, keyboard keys to `ButtonAction` (BOOT and User buttons), and developer shortcuts (`F1`..`F9`).
+- Implemented deterministic Wi-Fi simulation supporting normal discovery, timeout (BUG-0001), scan errors, and connection handshakes.
+- Implemented persistent NVS file storage in `simulator/runtime/nvs_store.dat` and sandboxed MicroSD storage in `simulator/runtime/sdcard/`.
+- Added automated desktop test suite (`nibru_tests`) verifying lifecycle transitions, UI transforms, Wi-Fi fault injection, settings persistence across reloads, and 25-cycle stress tests.
+- Preserved existing PlatformIO embedded target (`lilygo-t-display-s3`) with zero size regression or dependency leakage.
+
+### Touch and Settings repaint repair — 2026-11-01
+
+- Fixed repeated SINGLE_CLICK actions for one contact and premature NONE/down
+  taps; preserved swipe completion and raw wake, with new-Down recovery.
+- Fixed whole-screen clears on same-page control changes and no-op selections;
+  update changed widgets/text and restore static page after the PIN overlay.
+- Fixed delayed confirmation using actual press-start timing; keypad paints once
+  per view. No framebuffer, new task, dependency or GPIO change.
+- Owner's earlier physical FAIL remains recorded; repaired UI acceptance is pending.
+
+
+### Authorized device upload — 2026-11-01
+
+- Uploaded the latest default AW9364 image to the detected ESP32-S3 on COM5;
+  write/hash verification and RTS reset command succeeded (HWT-0009).
+  Runtime acceptance/profiling remains pending; no source or resource-cost change.
+
+### Essential Settings completion — 2026-11-01
+
+- Added scrollable Settings rows, physical focus/hold activation, two-page real
+  system/memory diagnostics and confirmed resource-clean reboot/scoped reset.
+- Fixed atomic versioned preference persistence, legacy migration through empty
+  destinations, NVS failure reporting, unchanged-write suppression and safe
+  defaults. Reset preserves credentials, security/vault and unrelated namespaces.
+- Fixed rollover-safe inactivity timing and consumption of held wake contacts;
+  touch confirmation requires a new contact beyond the double-tap window.
+- Added opt-in serial profiling and LEDC build; AW9364 remains the default.
+- Added generated-partition/image capacity checks, provisional growth warnings,
+  resource tooling tests and executable host regression coverage.
+- Changed resource documentation to withdraw unsupported approximate runtime
+  baseline values. Build/static RAM figures never establish free heap headroom.
+- No physical tests/upload/commit in this change; current acceptance remains
+  IMPLEMENTED, verification incomplete. Historical entries below are retained;
+  prior physical/PASS claims do not validate this image.
+
+
 ### Added
 - Large tactile side navigation buttons in `TotpApp` (expanded from 32px to 46px width with double cyan border, solid filled triangle chevrons, and 54px wide hitboxes).
 - Dedicated `Security` subview in `SettingsApp` featuring live status of PIN protection, PBKDF2-HMAC-SHA256 (2048 iterations) crypto details, and on-demand immediate device lock.

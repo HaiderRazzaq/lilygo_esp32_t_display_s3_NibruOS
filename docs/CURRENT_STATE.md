@@ -1,7 +1,7 @@
 # Current state
 
-Snapshot recorded **2026-11-01, Asia/Baghdad (UTC+03:00)**. This is a mutable
-snapshot; [development history](DEVELOPMENT_LOG.md) is append-only.
+Snapshot: 2026-11-01, Asia/Baghdad. Implementation and physical acceptance are
+separate; [history](DEVELOPMENT_LOG.md) is append-only.
 
 ```json
 {
@@ -10,85 +10,105 @@ snapshot; [development history](DEVELOPMENT_LOG.md) is append-only.
   "runtime_version": "v0.3",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
-  "baseline_commit": "ccbd0e625837196ce547f16788022be6465786cb",
-  "working_tree": "Clean at discovery; engineering-memory changes are uncommitted",
-  "implemented_features": ["FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-0004", "FEAT-0005", "FEAT-0006", "FEAT-0008", "FEAT-0009", "FEAT-0010", "FEAT-0011", "FEAT-0012", "FEAT-0013", "FEAT-0014"],
-  "planned_features": ["FEAT-0007"],
-  "active_issues": ["BUG-0001", "BUG-0002", "BUG-0003", "BUG-0004", "BUG-0005"],
-  "latest_build": "VER-0012",
-  "documentation_verification": "VER-0005",
-  "current_host_attempt": "VER-0002",
+  "baseline_commit": "8239bb6",
+  "working_tree": "Clean at discovery; Essential Settings completion is uncommitted",
+  "implemented_features": [
+    "FEAT-0001",
+    "FEAT-0002",
+    "FEAT-0003",
+    "FEAT-0004",
+    "FEAT-0005",
+    "FEAT-0006",
+    "FEAT-0008",
+    "FEAT-0009",
+    "FEAT-0010",
+    "FEAT-0011",
+    "FEAT-0012",
+    "FEAT-0013",
+    "FEAT-0014",
+    "FEAT-0015"
+  ],
+  "planned_features": [
+    "FEAT-0007"
+  ],
+  "active_issues": [
+    "BUG-0001",
+    "BUG-0002",
+    "BUG-0003",
+    "BUG-0004",
+    "BUG-0005",
+    "BUG-0007",
+    "BUG-0008"
+  ],
+  "latest_build": "VER-0026",
+  "latest_upload": "HWT-0013",
+  "documentation_verification": "VER-0018",
+  "current_host_attempt": "VER-0025",
   "source_constants": {
-    "kTouchSda": 18, "kTouchScl": 17, "kTouchReset": 21,
-    "kTouchInterrupt": 16, "kButtonBoot": 0, "kButtonUser": 14,
-    "kDisplayPower": 15, "kDisplayBacklight": 38,
-    "kScreenWidth": 320, "kScreenHeight": 170, "kRotation": 1,
+    "kTouchSda": 18,
+    "kTouchScl": 17,
+    "kTouchReset": 21,
+    "kTouchInterrupt": 16,
+    "kButtonBoot": 0,
+    "kButtonUser": 14,
+    "kDisplayPower": 15,
+    "kDisplayBacklight": 38,
+    "kScreenWidth": 320,
+    "kScreenHeight": 170,
+    "kRotation": 1,
     "kTouchDebounceMs": 180,
-    "kWiFiWarmupMs": 650, "kScanTimeoutMs": 11000,
-    "kScanMsPerChannel": 300, "kScanMaxAttempts": 2,
+    "kWiFiWarmupMs": 650,
+    "kScanTimeoutMs": 11000,
+    "kScanMsPerChannel": 300,
+    "kScanMaxAttempts": 2,
     "kConnectTimeoutMs": 20000
   }
 }
 ```
 
-## Firmware and repository baseline
+One ESP32-S3 Arduino firmware, runtime **v0.3**. Current source registers Wi-Fi
+Hub, 2FA Authenticator and Settings. Settings contains System/memory diagnostics,
+Touch Test, brightness/timeout/accent, Wi-Fi status and confirmed reboot/reset;
+existing Security/PIN subviews are retained. No new advanced settings implemented.
+[Settings behavior](SETTINGS.md), [architecture](ARCHITECTURE.md).
 
-Single Arduino/PlatformIO ESP32-S3 firmware; target LILYGO T-Display-S3 **Touch
-Glass**, ESP32-S3R8, 16 MB flash/8 MB PSRAM. Configured platform 6.5.0/core
-2.0.14; [resolved dependencies](DEPENDENCIES.md). Runtime Home and serial say
-**v0.1**. No centralized version constant, version manifest or Git tag exists.
-The Wi-Fi patch is present despite older titles; no version bump made here.
+Pre-change build at 8239bb6: linked Flash 841,377 B; static RAM 61,168 B;
+firmware.bin 841,744 B. Actual app0 is 6,553,600 B. Current costs and exact image
+hashes are in [Touch repair resource report](performance/TOUCH_FIX_RESOURCE_IMPACT.md).
+The old approximate physical heap/PSRAM baseline is withdrawn as unsupported.
+All free/min/largest heap, stack, latency and power acceptance remains
+**NOT MEASURED** until the current image is observed on hardware.
 
-Git has two commits, is not shallow, and provides no earlier development
-history: `d6cf029` (2026-10-26, complete imported source including Wi-Fi patch)
-and `ccbd0e6` (2026-10-27, schematic PDF only). No claim that the `stable`
-commit title proves device stability. New documentation describes an uncommitted
-working-tree change on the baseline, not a new code revision or release.
+Settings uses one validated versioned NVS blob; failed writes preserve previous
+runtime settings, unread/corrupt/unknown schema is write-protected until reload
+or explicit reset. Reset touches only the three user preferences, preserving
+credentials/security/vault/unrelated NVS. GPIO38 AW9364 default retained; optional
+LEDC environment is not physically accepted. No pins, partitions or framework
+versions changed. Profiling is off by default and available as a separate build.
 
-## Features and evidence
+The owner verified an older independent display/touch sketch (HWT-0001). Earlier
+NibruOS scan timed out (HWT-0002); BUG-0001 remains FIXED — UNVERIFIED physically.
+Latest repaired default firmware re-upload on explicit request succeeded (HWT-0013):
+843,888 B written, hash verified, RTS reset sent. Current build is VER-0024.
+No repaired serial runtime/UI acceptance performed; HWT-0012 and full profiling remain NOT RUN.
+No commit or push performed. Host cycles
+are control-flow tests and do not establish leak freedom or radio reception.
 
-System Info, Touch Test, Wi-Fi Scanner with AP connection and virtual on-screen keyboard,
-Home/navigation/input and the independent radio diagnostic are implemented.
-See the [feature registry](FEATURE_REGISTRY.md) for exact modules, resource contracts
-and test references. The target build has passed; firmware was uploaded to ESP32-S3 on COM3.
-Documentation tooling has its own tests; it is not a firmware feature or a physical test.
+No SD driver/file manager, BLE settings or OTA implementation exists. SPIFFS/OTA
+partition reservations do not implement features. External MicroSD is owned,
+wiring CS10/MOSI11/SCK12/MISO13 remains proposed, not allocated or verified.
 
-Owner-reported independent-sketch display/touch success is [HWT-0001](HARDWARE_TEST_LOG.md).
-An earlier flashed NibruOS scan timed out ([HWT-0002](HARDWARE_TEST_LOG.md)).
-That failure's root cause is unconfirmed. The patched Wi-Fi code, rotated
-gestures, buttons, launcher responsiveness, actual flash/PSRAM reports and
-memory stability all await explicit tests of this firmware on the board.
-Nothing here establishes that Wi-Fi reception currently works.
+Next: perform HWT-0008 and profiling scenarios A–E; >=20 Settings/Wi-Fi cycles,
+brightness, timeout/wake/confirmation behavior, NVS restart/reset preservation,
+actual heap/stack/PSRAM/latency and power. Do not mark hardware readiness from
+build or mock PASS. Use the [permanent budget](RESOURCE_BUDGET.md).
 
-No SD driver/service, storage app, persistence, OTA, BLE service, vault, TOTP,
-NFC or SubGHz feature exists. SPIFFS/FS being linked by TFT_eSPI and partition
-space reserved for SPIFFS/OTA do not implement storage or OTA functionality.
+## Latest owner-reported regression and repair
 
-## Hardware allocation and installation
-
-Integrated LCD/touch, buttons, radio, flash/PSRAM, USB and battery ADC are
-reserved as detailed in [pinout](HARDWARE_PINOUT.md). No external module is
-confirmed physically connected. Owner reports owning an SPI MicroSD module;
-CS10/MOSI11/SCK12/MISO13 at 3.3V are **proposed/unverified**, not configured in
-firmware. Antenna ownership/routing and battery configuration need confirmation;
-see [inventory](HARDWARE_INVENTORY.md). GPIO10–13 remain expansion candidates
-pending actual allocation and SD/shield conflict review.
-
-## Latest actual verification
-
-Target build on this Windows machine: PASS; RAM 45,976/327,680 bytes, linked
-flash 741,117/6,553,600 bytes (the app partition is 6.25 MiB, not all 16 MB).
-Recorded in [VER-0006](VERIFICATION_REPORT.md). Device upload performed on COM3.
-These are build-time figures, not measured free heap/PSRAM or a memory soak test.
-
-## Next recommended work
-
-1. Follow [physical acceptance](BUILD_AND_TEST.md) and HWT-0003: boot, exact
-   display/touch mapping, four swipe directions, buttons and Home escape.
-2. Run HWT-0004 and the Wi-Fi diagnostics; save sanitized serial output and
-   exact image hash, then update BUG-0001 only from that evidence.
-3. Test virtual keyboard touch input and Wi-Fi connection with visible password.
-4. Run HWT-0005: 20 Wi-Fi/Home cycles and sustained memory observation on USB,
-   then appropriate battery power. Do not equate linker RAM usage with stability.
-5. Confirm MicroSD module model, voltage/current and physical wiring before
-   implementing FEAT-0007 or running HWT-0006.
+Owner reported repeated touch actions and Settings flashes after HWT-0009
+(HWT-0010 FAIL, BUG-0008). Per-contact dispatch/release handling and incremental
+Settings paint are implemented; final host and3 target builds pass
+(VER-0023/VER-0024). Current default image843888 B, static RAM61240 B;
+[focused resource impact](performance/TOUCH_FIX_RESOURCE_IMPACT.md).
+Do not equate software PASS or upload with the repaired physical UI outcome;
+HWT-0012 and complete memory/stack/latency/power scenarios remain NOT RUN.

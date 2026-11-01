@@ -1,10 +1,15 @@
 #include "hardware/DisplayManager.h"
 #include "BoardConfig.h"
 #include <Arduino.h>
+#ifndef NIBRU_BACKLIGHT_LEDC
+#define NIBRU_BACKLIGHT_LEDC 0
+#endif
 
 void DisplayManager::begin() {
   pinMode(Board::kDisplayPower, OUTPUT);
   digitalWrite(Board::kDisplayPower, HIGH);
+  pinMode(Board::kDisplayBacklight, OUTPUT);
+  digitalWrite(Board::kDisplayBacklight, HIGH);
 
   // Initialize display controller first
   tft_.init();
@@ -13,6 +18,12 @@ void DisplayManager::begin() {
   clear();
 
   // Apply backlight AFTER tft_.init() so TFT_eSPI doesn't override pin state
+#if NIBRU_BACKLIGHT_LEDC
+  // Arduino-ESP32 2.0.14 API. Channel 0 reserved here; no other LEDC user.
+  pwmReady_ = ledcSetup(0, 5000, 8) != 0;
+  if (pwmReady_) ledcAttachPin(Board::kDisplayBacklight, 0);
+  else Serial.println("[Display] LEDC unavailable; visible HIGH fallback");
+#endif
   applyBacklight(brightnessPercent_);
 
   Serial.printf("[Display] size=%dx%d expected=320x170 bright=%u%% sleep=%us\n",
@@ -50,6 +61,10 @@ void DisplayManager::footer(const char* message) {
 }
 
 void DisplayManager::applyBacklight(uint8_t percent) {
+#if NIBRU_BACKLIGHT_LEDC
+  if (pwmReady_) ledcWrite(0, (static_cast<uint32_t>(percent) * 255 + 50) / 100);
+  else digitalWrite(Board::kDisplayBacklight, percent ? HIGH : LOW);
+#else
   pinMode(Board::kDisplayBacklight, OUTPUT);
 
   if (percent == 0) {
@@ -88,6 +103,7 @@ void DisplayManager::applyBacklight(uint8_t percent) {
     digitalWrite(Board::kDisplayBacklight, HIGH);
     delayMicroseconds(20);
   }
+#endif
 }
 
 void DisplayManager::setBrightness(uint8_t percent) {
@@ -131,11 +147,6 @@ void DisplayManager::wake() {
 void DisplayManager::tick(uint32_t nowMs) {
   if (sleeping_) return;
   if (sleepTimeoutSec_ == 0) return; // 0 = Never sleep
-
-  if (nowMs < lastActivityMs_) {
-    lastActivityMs_ = nowMs;
-    return;
-  }
 
   if (nowMs - lastActivityMs_ >= (static_cast<uint32_t>(sleepTimeoutSec_) * 1000UL)) {
     sleep();

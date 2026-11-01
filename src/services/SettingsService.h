@@ -8,8 +8,9 @@ class SettingsService {
 public:
   void begin(DisplayManager* display = nullptr);
   void load();
-  void save();
-  void resetToDefaults();
+  bool save();
+  bool resetToDefaults();
+  bool lastSaveOk() const { return lastSaveOk_; }
 
   // Screen Brightness: 25, 50, 75, 100 (%)
   uint8_t brightness() const { return brightness_; }
@@ -27,6 +28,8 @@ public:
 
 private:
   DisplayManager* display_ = nullptr;
+  bool writable_ = true;
+  bool lastSaveOk_ = true;
   uint8_t brightness_ = 100;
   uint16_t screenTimeoutSec_ = 30;
   uint8_t theme_ = 0;

@@ -21,15 +21,29 @@ void TouchManager::begin() {
 bool TouchManager::poll(TouchEvent& ev) {
   if (!touch_.available()) return false;
   const uint32_t now = millis();
-
-  // If CST816S reports points == 0 or event == 1 (Up), finger was lifted
-  if (touch_.data.points == 0 || touch_.data.event == 1) {
-    touchDown_ = false;
-    return false;
+  const bool wasPressed = contactActive_;
+  contactActive_ = touch_.data.points != 0 && touch_.data.event != 1;
+  const bool newDown = contactActive_ && touch_.data.event == 0 && lastPhase_ != 0;
+  lastPhase_ = touch_.data.event;
+  if (!wasPressed && !contactActive_) return false; // duplicate/orphan release
+  if (contactActive_ && (!wasPressed || newDown)) {
+    ++contactId_;
+    gestureSent_ = false;
+    moved_ = false;
+    downAt_ = now;
+    startX_ = touch_.data.x;
+    startY_ = touch_.data.y;
   }
-
-  // Minimum debounce gap between any accepted touch reports
-  if (now - lastTouchTime_ < Board::kTouchDebounceMs) return false;
+  if (contactActive_) {
+    pending_.rawX = touch_.data.x;
+    pending_.rawY = touch_.data.y;
+    pending_.x = constrain(static_cast<int>(pending_.rawY), 0, Board::kScreenWidth - 1);
+    pending_.y = constrain(Board::kScreenHeight - 1 - static_cast<int>(pending_.rawX),
+                           0, Board::kScreenHeight - 1);
+    const int dx = touch_.data.x - startX_, dy = touch_.data.y - startY_;
+    if (dx > 12 || dx < -12 || dy > 12 || dy < -12) moved_ = true;
+  }
+  if (gestureSent_) return false; // one semantic event per physical contact
 
   TouchGesture gesture = TouchGesture::Unknown;
   switch (touch_.data.gestureID) {
@@ -39,30 +53,21 @@ bool TouchManager::poll(TouchEvent& ev) {
     case SWIPE_RIGHT: gesture = TouchGesture::SwipeUp; break;
     case DOUBLE_CLICK: gesture = TouchGesture::DoubleTap; break;
     case LONG_PRESS: gesture = TouchGesture::LongPress; break;
-    case SINGLE_CLICK:
-      gesture = TouchGesture::Tap;
-      break;
+    case SINGLE_CLICK: gesture = TouchGesture::Tap; break;
     case NONE:
-      // When CST816S reports NONE during touch contact:
-      // Only fire Tap once when the touch first begins; suppress continuous hold repeats!
-      if (touchDown_) {
-        return false;
+      // A Down/NONE may become a swipe. Commit a fallback tap only on release.
+      if (!contactActive_ && !moved_) {
+        gesture = now - downAt_ >= Board::kButtonLongPressMs ?
+                    TouchGesture::LongPress : TouchGesture::Tap;
       }
-      gesture = TouchGesture::Tap;
       break;
     default: break;
   }
-
   if (gesture == TouchGesture::Unknown) return false;
-
-  touchDown_ = true;
-  lastTouchTime_ = now;
-
-  ev.rawX = touch_.data.x;
-  ev.rawY = touch_.data.y;
-  ev.x = constrain(static_cast<int>(ev.rawY), 0, Board::kScreenWidth - 1);
-  ev.y = constrain(Board::kScreenHeight - 1 - static_cast<int>(ev.rawX),
-                   0, Board::kScreenHeight - 1);
+  gestureSent_ = true;
+  ev = pending_;
   ev.gesture = gesture;
+  ev.contactId = contactId_;
+  ev.contactStartedMs = downAt_;
   return true;
 }

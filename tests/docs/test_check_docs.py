@@ -18,7 +18,7 @@ class DocumentationChecks(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name) / "repo"
         shutil.copytree(ROOT, self.root, ignore=shutil.ignore_patterns(
-            ".git", ".pio", ".testbuild", "__pycache__"))
+            ".git", ".pio", ".testbuild", ".build", "build", "__pycache__"))
 
     def edit(self, path, old, new):
         target = self.root / path
@@ -125,6 +125,16 @@ class DocumentationChecks(unittest.TestCase):
     def test_invalid_test_outcome(self):
         self.edit("docs/HARDWARE_TEST_LOG.md", '"result": "PASS"', '"result": "SUCCESS"')
         self.assert_rejected("invalid result")
+
+    def test_resource_policy_documents_are_required(self):
+        for name in ('docs/RESOURCE_BUDGET.md', 'docs/MEMORY_PROFILING.md',
+                     'docs/performance/BASELINE.md'):
+            with self.subTest(name=name):
+                target = self.root / name
+                content = target.read_text(encoding='utf-8')
+                target.unlink()
+                self.assert_rejected('required document')
+                target.write_text(content, encoding='utf-8')
 
 
 if __name__ == "__main__":

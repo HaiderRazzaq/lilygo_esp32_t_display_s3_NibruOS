@@ -15,7 +15,7 @@ public:
   bool open(uint8_t index);
   void goHome();
   void invalidate() {
-    if (active_) active_->invalidate();
+    if (active_) active_->onDisplayRestored(ctx_);
     else homeDirty_ = true;
   }
   bool isHome() const { return active_ == nullptr; }

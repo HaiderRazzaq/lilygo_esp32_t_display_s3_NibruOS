@@ -551,3 +551,232 @@ Corrections must be appended with the original ID reference.
   "follow_up": "User physically tests thumb side button clicks in 2FA Authenticator, enters Settings -> Security to set custom 4-8 digit PIN, and verifies lock and unlock behavior."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0014",
+  "date": "2026-11-01",
+  "related": [
+    "FEAT-0013",
+    "FEAT-0010",
+    "FEAT-0008",
+    "BUG-0007"
+  ],
+  "action": "COMPLETE / FIX / RESOURCE POLICY / EVIDENCE CORRECTION",
+  "files": [
+    "src/apps/SettingsApp.cpp",
+    "src/services/SettingsService.cpp",
+    "src/core/MemoryProfiler.cpp",
+    "src/core/WakeInputGate.h",
+    "src/hardware/TouchManager.cpp",
+    "src/core/AppManager.cpp",
+    "platformio.ini",
+    "tools/check_resources.py",
+    "tools/run_host_tests.py",
+    "AGENTS.md",
+    "docs/RESOURCE_BUDGET.md",
+    "docs/MEMORY_PROFILING.md",
+    "docs/performance/BASELINE.md",
+    "docs/performance/SETTINGS_RESOURCE_IMPACT.md"
+  ],
+  "description": "Completed existing Settings with scroll/buttons/atomic preferences/migration/error handling/system diagnostics/scoped confirmed actions. Added contact-aware wake/confirmation, sparse opt-in profiling, artifact partition checks and permanent workflow. Preserved existing AW9364 default and Security/2FA; LEDC remains opt-in. Corrected unsupported approximate runtime baseline and stale current docs without deleting history.",
+  "reason": "User supplied Essential Settings v0.1 and permanent project-wide resource policy execution request.",
+  "expected": "Focused implementation, honest resource evidence and pending physical procedures; no unrelated advanced feature, upload or commit.",
+  "actual": "Three target builds PASS; host default/profile+LEDC PASS; default image +1088 B and static RAM +32 B. Runtime resource measurements NOT MEASURED. Failed attempts retained; independent review issues covered by regressions.",
+  "verification": "VER-0013 through VER-0019; HWT-0008 NOT RUN",
+  "risks": "No hardware/latency/power/NVS power-loss proof. LEDC not accepted as default. Existing Security/2FA not audited. DEV-0012 linker RAM remainder did not prove runtime heap; earlier approximate baseline values are unsupported and withdrawn. DEV-0013 described synchronous PBKDF2 as non-blocking; this task does not reclassify that existing security operation.",
+  "commit": "UNCOMMITTED based on 8239bb62d28ae5ac9c736033c7636c4e82ac8f30",
+  "follow_up": "Run HWT-0008 with sanitized image-bound evidence; compare A–E and review thresholds before hardware acceptance."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0015",
+  "date": "2026-11-01",
+  "related": [
+    "FEAT-0013",
+    "BUG-0007"
+  ],
+  "action": "FINAL CONTACT REGRESSION / RESOURCE CORRECTION",
+  "files": [
+    "src/apps/SettingsApp.cpp",
+    "tests/host/test_settings.cpp",
+    "tests/host/test_main.cpp",
+    "docs/performance/SETTINGS_RESOURCE_IMPACT.md"
+  ],
+  "description": "Added regression for a second contact begun inside the double-tap window but reporting SINGLE_CLICK later. Failed assertion reproduced unintended confirmation; retaining the rejected contact threshold fixes it. Tests also assert TouchManager emits distinct contact identities after release.",
+  "reason": "Final source review extended raw-double-tap safety through delayed held-second-contact reports.",
+  "expected": "A new confirming touch must begin after the rejection window; no action from early or held contacts.",
+  "actual": "Full HOST default/profile+LEDC reruns PASS. Three final target builds PASS (VER-0020). Default image842848 B, growth1104 B (+0.1312%); static RAM61200 B (+32). These current-image metrics supersede DEV-0014 earlier checkpoint costs; historical attempts remain intact.",
+  "verification": "VER-0017 final host captures; VER-0020 final target build; HWT-0008 NOT RUN",
+  "risks": "All physical metrics/contact timing remain pending; software mocks do not prove controller behavior.",
+  "commit": "UNCOMMITTED based on 8239bb6",
+  "follow_up": "Run HWT-0008 and resource scenarios A–E with final image hashes."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0016",
+  "date": "2026-11-01",
+  "related": [
+    "FEAT-0013",
+    "BUG-0007"
+  ],
+  "action": "USER-AUTHORIZED DEVICE UPLOAD",
+  "files": [
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/CURRENT_STATE.md",
+    "docs/TEST_MATRIX.md",
+    "docs/performance/SETTINGS_RESOURCE_IMPACT.md"
+  ],
+  "description": "User explicitly requested uploading the latest firmware. Discovered actual ESP32 USB onCOM5 (COM3/COM4 are Bluetooth), reran default AW9364 build and capacity/hash checks, then uploaded without changing firmware source.",
+  "reason": "Direct user request: ارفعه للجهاز",
+  "expected": "Flash current default image and report actual upload result without claiming unobserved runtime success.",
+  "actual": "Build/capacity PASS; COM5 upload SUCCESS19.734s,842848 B written, hash verified, RTS reset command. No full-flash erase or preferences reset. Updated current records; no commit/push.",
+  "verification": "VER-0021; HWT-0009; python tools/check_docs.py",
+  "risks": "Upload verification does not establish application boot, brightness/touch/Wi-Fi functionality or free heap/stack/power. No new runtime code or resource-cost change.",
+  "commit": "UNCOMMITTED based on8239bb6",
+  "follow_up": "User checks Settings/menu/touch/brightness/Back on device; follow HWT-0008 for complete A–E acceptance."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0017",
+  "date": "2026-11-01",
+  "related": [
+    "BUG-0008",
+    "FEAT-0013",
+    "FEAT-0005",
+    "FEAT-0003"
+  ],
+  "action": "REPAIR TOUCH / INCREMENTAL SETTINGS UI",
+  "files": [
+    "src/hardware/TouchManager.cpp",
+    "src/hardware/TouchManager.h",
+    "src/apps/SettingsApp.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/TouchTestApp.h",
+    "src/core/App.h",
+    "src/core/AppManager.h",
+    "src/main.cpp",
+    "tests/host/test_main.cpp",
+    "tests/host/test_settings.cpp",
+    "docs/performance/TOUCH_FIX_RESOURCE_IMPACT.md"
+  ],
+  "description": "Diagnosed owner-reported repeat/flicker from repeated SINGLE_CLICK acceptance and full-screen clear per touch. Added one gesture per contact with NONE release fallback and phase recovery, raw wake visibility, small drawing cache/partial widget updates/no-op skip, padded diagnostic text and static keypad paint. Independent review exposed lock-overlay restoration and contact-start confirmation timing; both fixed with failing regression coverage.",
+  "reason": "User reported poor Settings touch behavior on the just-uploaded physical device.",
+  "expected": "One intended interaction per press, preserved swipes/wake/Back/confirmation safety and lower redraw work without a framebuffer, new task, hardware reinit or GPIO change.",
+  "actual": "Native default/alternate suites PASS;3 target builds PASS. Default image843888 B (+1040 B/+0.1234% vs842848 B), static RAM61240 B (+40 B). Runtime memory/latency/power NOT MEASURED; repaired physical UI acceptance pending.",
+  "verification": "VER-0022 RED; VER-0023 HOST PASS; VER-0024 BUILD PASS; HWT-0010 owner FAIL; HWT-0012 NOT RUN",
+  "risks": "Actual CST816S timing/IRQ coalescing and panel response need owner recheck. No dependency/pin/partition/power changes; existing AW9364 retained. No commit/push.",
+  "commit": "UNCOMMITTED based on8239bb6",
+  "follow_up": "Upload default repaired image under existing authorization, record flash result separately, then owner performs HWT-0012 and resource scenarios A–E."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0018",
+  "date": "2026-11-01",
+  "related": [
+    "BUG-0008",
+    "FEAT-0013"
+  ],
+  "action": "UPLOAD REPAIRED DEFAULT IMAGE",
+  "files": [
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/CURRENT_STATE.md",
+    "docs/performance/TOUCH_FIX_RESOURCE_IMPACT.md"
+  ],
+  "description": "Uploaded the repaired AW9364 default image to the detected ESP32-S3 COM5 under the existing device-upload authorization; preserved source wiring/NVS/partitions and did not commit/push.",
+  "reason": "Continue the user-authorized device workflow after correcting their reported touch/flicker regression.",
+  "expected": "Actual upload confirmation with no invented repaired-UI PASS.",
+  "actual": "HWT-0011 PASS flash843888 B/data hash/RTS reset; actual repaired display/contact behavior remains unobserved. Documentation checks pass after records update.",
+  "verification": "VER-0023/VER-0024 software; HWT-0011 flash only; HWT-0012 UI NOT RUN",
+  "risks": "Touch issue remains FIXED — UNVERIFIED until user physical feedback. Runtime resource metrics remain NOT MEASURED.",
+  "commit": "UNCOMMITTED based on8239bb6",
+  "follow_up": "Owner tests one held contact, repeated separate taps, Settings selection/scroll/Back, wake/PIN restoration and safe confirmations on the new image."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0019",
+  "date": "2026-11-01",
+  "related": [
+    "BUG-0008",
+    "FEAT-0013"
+  ],
+  "action": "REPEAT UPLOAD ON EXPLICIT REQUEST",
+  "files": [
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/CURRENT_STATE.md"
+  ],
+  "description": "User requested upload again. Re-detected ESP32-S3 COM5 and uploaded current default repaired image without source/configuration or resource-cost change.",
+  "reason": "Direct user request: ارفع",
+  "expected": "Perform and report actual repeat upload.",
+  "actual": "HWT-0013 PASS;843888 B, verified hash, RTS reset. Same image as HWT-0011; no new runtime metrics measured. Documentation-only assessment: no new Flash/RAM/PSRAM/task/GPIO/power cost.",
+  "verification": "HWT-0013; python tools/check_docs.py",
+  "risks": "No physical UI verification or secret/preferences reset performed; HWT-0012 remains pending.",
+  "commit": "UNCOMMITTED based on8239bb6",
+  "follow_up": "Owner checks repaired touch/display; no commit or push."
+}
+```
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0020",
+  "date": "2026-11-01",
+  "related": [
+    "FEAT-0015",
+    "FEAT-0001",
+    "FEAT-0003",
+    "FEAT-0004",
+    "FEAT-0010"
+  ],
+  "action": "IMPLEMENT DESKTOP SIMULATOR TARGET",
+  "files": [
+    "CMakeLists.txt",
+    "platform/desktop/DesktopMain.cpp",
+    "platform/desktop/SDLDisplay.cpp",
+    "platform/desktop/SDLDisplay.h",
+    "platform/desktop/DesktopInput.cpp",
+    "platform/desktop/DesktopInput.h",
+    "platform/desktop/MockWiFiService.cpp",
+    "platform/desktop/MockWiFiService.h",
+    "platform/desktop/DesktopStorage.cpp",
+    "platform/desktop/DesktopStorage.h",
+    "platform/desktop/DesktopDiagnostics.cpp",
+    "platform/desktop/DesktopDiagnostics.h",
+    "platform/desktop/stubs/Arduino.h",
+    "platform/desktop/stubs/TFT_eSPI.h",
+    "platform/desktop/stubs/Preferences.h",
+    "platform/desktop/stubs/WiFi.h",
+    "tests/desktop/test_simulator.cpp",
+    "tools/run_simulator.bat",
+    "tools/run_desktop_tests.bat",
+    "docs/DESKTOP_SIMULATOR.md",
+    "docs/SIMULATOR_ARCHITECTURE.md",
+    "docs/SIMULATOR_TESTING.md",
+    "AGENTS.md"
+  ],
+  "description": "Designed and implemented interactive Native Desktop Simulator for Windows using C++17, SDL2, and CMake. Reuses shared NibruOS core (AppManager, AppContext, ResourceManager), applications (WiFiApp, TotpApp, SettingsApp, SystemInfoApp, TouchTestApp), and services. Implemented 320x170 RGB565 framebuffer with 1x/2x/3x/4x nearest-neighbor scaling and pixel-exact 5x7 GLCD typography. Implemented DesktopInput mouse-to-touchscreen and keyboard-to-buttons mapping. Implemented persistent NVS file storage in simulator/runtime/nvs_store.dat and deterministic Wi-Fi simulation supporting normal scans, timeouts (BUG-0001), scan failures, and connection handshakes. Created automated desktop test suite covering lifecycle, UI transforms, Wi-Fi fault injection, settings persistence, and 25-cycle stress test.",
+  "reason": "Enable interactive execution, visual verification, UI testing, and fault simulation on Windows without requiring physical ESP32-S3 hardware for every iteration.",
+  "expected": "One maintainable codebase supporting two execution targets: physical ESP32-S3 and Windows desktop simulator. Zero duplication of application business logic. Clean verification.",
+  "actual": "Both nibru_simulator.exe and nibru_tests.exe compile cleanly with MSVC 2022 and CMake/Ninja. All automated desktop tests PASS. pio run -e lilygo-t-display-s3 builds successfully without size regression (RAM 61240 B, Flash 843521 B).",
+  "verification": "VER-0025; VER-0026; python tools/check_docs.py",
+  "risks": "Desktop memory and timing do not replicate embedded SRAM or hardware AW9364 pulse modulation. Physical device acceptance remains mandatory before claiming hardware verification.",
+  "commit": "UNCOMMITTED based on 8239bb6",
+  "follow_up": "Use desktop simulator for rapid interactive app development; verify final changes on physical LILYGO board."
+}
+```

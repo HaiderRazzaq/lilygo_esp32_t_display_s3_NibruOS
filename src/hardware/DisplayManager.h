@@ -1,6 +1,9 @@
 #pragma once
 #include <TFT_eSPI.h>
 #include <stdint.h>
+#ifndef NIBRU_BACKLIGHT_LEDC
+#define NIBRU_BACKLIGHT_LEDC 0
+#endif
 
 class DisplayManager {
 public:
@@ -36,6 +39,9 @@ private:
   uint16_t sleepTimeoutSec_ = 30;
   uint32_t lastActivityMs_ = 0;
   uint16_t themeAccent_ = 0x05FF; // Default Cyan
+#if NIBRU_BACKLIGHT_LEDC
+  bool pwmReady_ = false;
+#endif
 
   void applyBacklight(uint8_t percent);
 };

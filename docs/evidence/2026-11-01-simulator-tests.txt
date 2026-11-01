@@ -1,0 +1,75 @@
+
+==================================================
+  NibruOS Automated Desktop & Shared Logic Tests
+==================================================
+
+[DesktopStorage] Loaded 1 NVS namespace(s) from 'simulator/runtime_test/nvs_store.dat'
+[DesktopStorage] Initialized with runtime directory 'simulator/runtime_test'
+[Test] Running Core Lifecycle & AppManager Tests...
+  -> Core Lifecycle Tests PASS
+[Test] Running UI & Coordinate Transformation Tests...
+  -> UI & Transformation Tests PASS
+[Test] Running Wi-Fi Service & Fault Injection Tests...
+[MockWiFi] Simulation mode set to: Normal (Success)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 1700 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Scan completed with 5 APs
+[WiFi] Scan complete: 5 APs discovered in 1300 ms
+[MockWiFi] Simulation mode set to: Timeout (11s delay -> retry)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 3700 ms (mode: Timeout (11s delay -> retry))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[WiFi] attempt 1/2 failed: Scan timed out
+[WiFi] retrying scan (attempt 2/2)...
+[MockWiFi] Disconnected
+[WiFi] attempt 2/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 15900 ms (mode: Timeout (11s delay -> retry))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[WiFi] attempt 2/2 failed: Scan timed out
+[MockWiFi] Simulation mode set to: ScanFailed (Immediate error)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Simulating immediate scan start failure
+[WiFi] scanNetworks(async)=-2, freeHeap=215000
+[WiFi] attempt 1/2 failed: Scan start rejected
+[WiFi] retrying scan (attempt 2/2)...
+[MockWiFi] Disconnected
+[WiFi] attempt 2/2: STA preparing (650 ms warmup)
+[MockWiFi] Simulating immediate scan start failure
+[WiFi] scanNetworks(async)=-2, freeHeap=215000
+[WiFi] attempt 2/2 failed: Scan start rejected
+[MockWiFi] Simulation mode set to: Normal (Success)
+  -> Wi-Fi Simulation Tests PASS
+[Test] Running Settings Persistence & Desktop NVS Tests...
+[DesktopStorage] NVS storage reset to empty
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+[Settings] Loaded: Bright=100% Timeout=30s Theme=Cyber Cyan
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Settings] Loaded: Bright=50% Timeout=60s Theme=Amber Gold
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+  -> Settings Persistence Tests PASS
+[Test] Running 25 Repeated Lifecycle Entry/Exit Cycles...
+[TotpApp] Entered single-card 2FA Authenticator.
+[TotpApp] Exited 2FA Authenticator.
+[TotpApp] Entered single-card 2FA Authenticator.
+[TotpApp] Exited 2FA Authenticator.
+[TotpApp] Entered single-card 2FA Authenticator.
+[TotpApp] Exited 2FA Authenticator.
+[TotpApp] Entered single-card 2FA Authenticator.
+[TotpApp] Exited 2FA Authenticator.
+[TotpApp] Entered single-card 2FA Authenticator.
+[TotpApp] Exited 2FA Authenticator.
+  -> 25 Lifecycle Cycles PASS (Zero leaks, clean state)
+
+==================================================
+  ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY!
+==================================================
+

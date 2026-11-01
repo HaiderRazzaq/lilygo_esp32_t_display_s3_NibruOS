@@ -1,8 +1,14 @@
 .pio/
 .vscode/
 .testbuild/
+.build/
+build/
+simulator/runtime/
+simulator/vendor/
 *.bin
 *.elf
 *.map
+*.dll
+*.exe
 .DS_Store
 __pycache__/

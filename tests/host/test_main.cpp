@@ -26,11 +26,53 @@ int fakePins[64]{};
 MockSerial Serial;
 MockESP ESP;
 MockWiFi WiFi;
+void testSettings(AppContext& ctx);
 bool fakeTouchPending=false;
 TouchData fakeTouchData{};
 
+void testTouchPressCycles() {
+  TouchManager driver;
+  driver.begin();
+  TouchEvent event{};
+  auto frame = [&](byte gesture, byte points, byte phase) {
+    fakeMs += 200;
+    fakeTouchData = TouchData{gesture, points, phase, 42, 75};
+    fakeTouchPending = true;
+    return driver.poll(event);
+  };
+  // Down is not a completed tap: it may still become a swipe.
+  assert(!frame(NONE, 1, 0));
+  assert(driver.isPressed());
+  assert(frame(SINGLE_CLICK, 1, 2));
+  assert(event.gesture == TouchGesture::Tap);
+  const uint32_t id = event.contactId;
+  for (int i = 0; i < 8; ++i) assert(!frame(SINGLE_CLICK, 1, 2));
+  assert(!frame(LONG_PRESS, 1, 2));
+  // The library has one IRQ flag: a new Down must recover from a missed Up.
+  assert(!frame(NONE, 1, 0));
+  assert(frame(SINGLE_CLICK, 1, 2));
+  assert(event.contactId != id);
+  assert(!frame(NONE, 0, 1));
+  assert(!driver.isPressed());
+  assert(!frame(NONE, 1, 0));
+  assert(frame(SWIPE_UP, 0, 1)); // recognized gesture may arrive on release
+  assert(event.gesture == TouchGesture::SwipeLeft && event.contactId != id);
+  assert(!frame(SWIPE_UP, 0, 1)); // duplicate release cannot create another gesture
+  assert(!frame(NONE, 1, 0));
+  assert(frame(SINGLE_CLICK, 0, 1));
+  assert(event.gesture == TouchGesture::Tap);
+  assert(!frame(SINGLE_CLICK, 0, 1));
+  // A contact with no decoded gesture still produces one tap when released.
+  assert(!frame(NONE, 1, 0));
+  assert(frame(NONE, 0, 1));
+  assert(event.gesture == TouchGesture::Tap);
+  assert(!frame(NONE, 0, 1));
+  fakeTouchData = TouchData{};
+}
+
 int main() {
   for(auto& p:fakePins)p=HIGH;
+  testTouchPressCycles();
   // Verify tested Touch Glass landscape conversion and gesture mapping.
   TouchManager touchDriver;
   touchDriver.begin();
@@ -43,6 +85,19 @@ int main() {
   assert(touchDriver.poll(touchEvent));
   assert(touchEvent.x==75 && touchEvent.y==127);
   assert(touchEvent.gesture==TouchGesture::SwipeRight); // native DOWN -> visible RIGHT
+  assert(touchDriver.isPressed());
+  const uint32_t firstContact = touchEvent.contactId;
+  assert(firstContact != 0);
+  fakeTouchData.gestureID = NONE;
+  fakeTouchPending = true;
+  fakeMs += 700;
+  assert(!touchDriver.poll(touchEvent));
+  assert(touchDriver.isPressed()); // contact exists without a dispatchable event
+  fakeTouchData.points = 0;
+  fakeTouchPending = true;
+  assert(!touchDriver.poll(touchEvent));
+  assert(!touchDriver.isPressed());
+  fakeTouchData.points = 1;
   assert(!touchDriver.poll(touchEvent));
   // Other directions are likewise rotated for landscape navigation.
   struct GestureCase { byte native; TouchGesture landscape; };
@@ -58,6 +113,14 @@ int main() {
     fakeTouchPending = true;
     assert(touchDriver.poll(touchEvent));
     assert(touchEvent.gesture == c.landscape);
+    assert(touchEvent.contactId != firstContact);
+    fakeTouchData.points = 0;
+    fakeTouchData.event = 1;
+    fakeTouchData.gestureID = NONE;
+    fakeTouchPending = true;
+    assert(!touchDriver.poll(touchEvent));
+    fakeTouchData.points = 1;
+    fakeTouchData.event = 0;
   }
   // Physical buttons: BOOT short changes selection, BOOT long activates;
   // GPIO14 short must provide escape.
@@ -246,19 +309,19 @@ int main() {
   assert(wifi.connectState() == ConnectState::Connecting);
   wifi.tick(fakeMs + Board::kConnectTimeoutMs + 10);
   assert(wifi.connectState() == ConnectState::ConnectFailed);
-  assert(std::strcmp(wifi.connectError(), "Connection timed out") == 0);
+  assert(std::strncmp(wifi.connectError(), "Timed out", 9) == 0);
   wifi.shutdown();
 
   // SettingsApp sub-navigation test
-  SettingsApp settings;
-  settings.onEnter(context);
+  SettingsApp settingsApp;
+  settingsApp.onEnter(context);
   // Tap System Info card in Settings menu
-  settings.onTouch(context, TouchEvent{100, 60, 0, 0, TouchGesture::Tap});
+  settingsApp.onTouch(context, TouchEvent{100, 60, 0, 0, TouchGesture::Tap});
   // Back returns to Settings Menu
-  assert(settings.onBack(context) == true);
+  assert(settingsApp.onBack(context) == true);
   // At menu, Back returns false so AppManager shell can return Home
-  assert(settings.onBack(context) == false);
-  settings.onExit(context);
+  assert(settingsApp.onBack(context) == false);
+  settingsApp.onExit(context);
 
   // WiFiApp sub-navigation test
   WiFiApp wifiApp;
@@ -276,6 +339,7 @@ int main() {
   wifiApp.onExit(context);
 
   // Saved networks persistence and management tests
+  while (wifi.savedCount()) wifi.forgetNetwork(static_cast<uint8_t>(0));
   assert(wifi.savedCount() == 0);
   assert(wifi.saveNetwork("HomeNet", "Password123"));
   assert(wifi.savedCount() == 1);
@@ -332,9 +396,11 @@ int main() {
   assert(secService.verifyPin("4321")); // Correct PIN
   assert(secService.hasActiveKey());
   assert(secService.getActiveVaultKey() != nullptr);
+  secService.setPinEnabled(true);
   secService.lock();
   assert(!secService.hasActiveKey());
   assert(secService.getActiveVaultKey() == nullptr);
 
-  puts("PASS: host navigation/resource/async scan/timeout/connect/crypto smoke tests");
+  testSettings(context);
+  puts("PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests");
 }

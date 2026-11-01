@@ -4,40 +4,57 @@ Permanent project-wide engineering resource policy and budget specifications for
 
 ---
 
-## 1. Permanent Resource Budgets & Constraints
+## 1. Controls and evidence
 
-| Resource | Hard Constraint / Capacity | Baseline (v0.3) | Target Operational Headroom | Review Warning Trigger |
-| :--- | :--- | :--- | :--- | :--- |
-| **Flash Partition** | `app0` = 6,553,600 B (6.25 MB) | 766,705 B (11.7%) | >= 3,000,000 B (>= 45%) | Growth > 5% (+38 KB) |
-| **Internal SRAM** | 512 KB total (~320 KB heap) | 46,752 B static (14.3%) | Free Heap >= 150 KB | Free heap drop > 10% |
-| **Largest Free Block** | Contiguous internal block | ~180 KB observed | Largest block >= 80 KB | Block drop > 10% |
-| **External PSRAM** | 8 MB (8,388,608 B) | ~8.0 MB free | Free PSRAM >= 7.0 MB | Unexpected leak > 64 KB |
-| **Main Loop Latency** | Watchdog / UI responsiveness | 12 ms target tick | Average update < 25 ms | Spike > 50 ms sustained |
-| **Wi-Fi Scanner** | 12 records max; async bounded | Single radio owner | Max 11s scan deadline | Attempt timeout / leak |
-| **GPIO Allocation** | 0 conflicting reassignments | LCD/Touch reserved | GPIO10..13 unverified | Any unreviewed pin clash |
+Every runtime, memory, storage, timing, peripheral or power change needs the report
+below, including fixes, refactors, libraries, flags, tasks and hardware additions.
+Documentation-only changes use a short impact assessment. Read
+[baseline](performance/BASELINE.md) first; measure before/after where possible.
 
----
+| Resource | Control | Evidence / acceptance |
+|---|---|---|
+| Flash | Image must fit actual app0; currently 6,553,600 B (6.25 MiB) | Generated partitions.bin + firmware.bin; post-build check |
+| Internal SRAM | >=150 KiB free internal byte-addressable heap | Physical capability-specific runtime measurement, NOT static linker remainder |
+| Largest internal block | Track before/after fragmentation | Physical; >10% decrease requires review, no justified absolute baseline yet |
+| PSRAM | Verify detection and usable allocations | Total/free/min/largest measured on device; no assumed 8 MB free |
+| FreeRTOS stack | Track important task HWM (ESP-IDF bytes) | Current loop-task snapshot; other tasks need separate instrumentation |
+| UI/CPU | Responsive Back/touch; no multi-second work in loop | Record loop/update/render/input timings on device |
+| Wi-Fi/BLE | Existing WiFiService and cooperative ownership only | No new radio task/manager; BLE remains unimplemented |
+| Storage | Bounded NVS records and checked commits | Settings uses one 5-byte blob; no SD integration |
+| GPIO/buses | No pin conflicts, 3.3V logic | Existing LCD/touch/buttons; GPIO38 driver owns backlight |
+| Power | Preserve GPIO15 and supply constraints | Current and thermal effects NOT MEASURED; no Deep Sleep |
 
-## 2. Hard Failure Rules
-1. **Partition Overflow:** Firmware binary exceeding 6,553,600 bytes is an immediate build failure.
-2. **Internal Memory Exhaustion:** Internal free heap falling below 64 KB triggers critical review.
-3. **Repeated Lifecycle Leak:** Sustained decrease in free heap across 20 app entry/exit cycles.
-4. **Pin Assignment Clash:** Overwriting LCD parallel bus or CST816S touch pins (18/17/21/16/15/38).
-5. **Fabricated PASS:** Reporting hardware pass or runtime metrics without physical observation.
+Image growth >5%, internal minimum heap or largest block drop >10%, repeatable
+latency degradation, large retained buffers/tasks/radio allocations all require
+engineering review. These percentages are provisional, not universal safety
+limits. Missing measurements never constitute PASS. Replace provisional targets
+only after representative device evidence and documented justification.
 
----
+## 2. Blocking conditions
 
-## 3. Resource Ownership Matrix
+Partition overflow, exhaustion, repeatable allocation/init failures, watchdog
+failures, pin/electrical conflicts, verified regressions and unbalanced resource
+ownership block acceptance. Investigate persistent lifecycle loss over >=20
+cycles: allocator caching or intentionally retained services are not automatically
+leaks. The >=150 KiB internal headroom requirement remains a device acceptance
+condition until explicitly revised from evidence.
 
-| Resource | Primary Owner | Secondary / Shared Access | Cleanup Rule on `onExit()` |
-| :--- | :--- | :--- | :--- |
-| **ST7789 Display** | `DisplayManager` | Shared via `AppContext` | Reset local redraw flags |
-| **CST816S Touch** | `TouchManager` | Event polling in `loop()` | Discard stale touch gestures |
-| **Backlight PWM** | `DisplayManager` / `AW9364` | `SettingsService` | Restore configured brightness |
-| **2.4 GHz Radio** | `ResourceManager` | `WiFiScannerApp` (`WiFiApp`) | Stop scan, release `WiFiScanner` lock |
-| **Preferences NVS** | `SettingsService`, `WiFiService` | Namespaced (`nibru_settings`) | Close handle (`prefs.end()`) |
+## 3. Ownership and cleanup
 
----
+| Resource | Owner / lifetime | Cleanup |
+|---|---|---|
+| Display, touch, buttons | main-owned singleton drivers | Apps reset local state, never reinitialize shared drivers |
+| GPIO38 backlight | DisplayManager; AW9364 default | Sleep LOW; wake restores configured step; optional LEDC channel0 |
+| Settings NVS | SettingsService, nibru_settings | Close each Preferences handle; never clear unrelated namespaces |
+| Saved Wi-Fi/security/vault | Existing owning services, separate namespaces | Settings reset preserves them; no duplicate persistence in UI |
+| Wi-Fi scanning | Scanner under ResourceOwner::WiFiScanner | Scanner cancels its job/releases lease; Settings diagnostics is read-only |
+| Background connection/NTP | Existing shared services ticked in main | May intentionally survive app exit; reboot explicitly shuts Wi-Fi down |
+| Profiler | Fixed snapshots/counters; no new task | No stored history, callback, file or heap buffer to release |
+
+Applications cancel owned jobs, close files, free temporary buffers, unregister
+callbacks, stop owned tasks safely and release their locks on exit. Never stop a
+shared service owned elsewhere merely because a diagnostics view closes. No new
+SPI/I2C/USB/BLE/storage owner is introduced by Settings.
 
 ## 4. Standard Resource Impact Report Format
 
@@ -102,3 +119,10 @@ EVIDENCE:
 Logs, measurements, or relevant test references.
 ```
 
+## 4. Cross-Platform Desktop Simulator Impact
+
+The Native Desktop Simulator (`platform/desktop/`) introduces zero memory or flash overhead to the physical ESP32-S3 firmware image.
+- Desktop-only headers and SDL2 link libraries are isolated strictly to the CMake desktop build target.
+- The embedded PlatformIO target (`lilygo-t-display-s3`) compiles exclusively from `src/` and official libraries.
+- Firmware size before and after simulator additions remains constant (Flash: 843,521 bytes [12.9%], static RAM: 61,240 bytes [18.7%]).
+- Desktop process memory (~25-35 MB) reflects native host CRT, SDL2, and graphics surfaces, and must never be conflated with embedded SRAM or PSRAM metrics.

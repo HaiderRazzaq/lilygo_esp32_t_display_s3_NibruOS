@@ -1,30 +1,33 @@
-# NibruOS v0.1 — T-Display-S3 Touch Glass
+# NibruOS — T-Display-S3 Touch Glass
 
-**First deliverable:** a small, extensible Arduino/PlatformIO firmware shell for the owner's **LILYGO T-Display-S3 Touch Glass**, with a Home Launcher and three apps: **System Info**, **Touch Test**, and **Wi-Fi Scanner**.
+One ESP32-S3 Arduino/PlatformIO firmware with Wi-Fi Hub, 2FA Authenticator and
+Essential Settings (runtime v0.3). This change completes existing Settings and
+establishes resource acceptance procedures. Physical tests of this changed image
+remain pending; see [current state](docs/CURRENT_STATE.md),
+[verification](docs/VERIFICATION_REPORT.md) and [resource report](docs/performance/SETTINGS_RESOURCE_IMPACT.md).
 
-> **Status (2026-11-01):** Real PlatformIO target build PASS; current host rerun BLOCKED by missing desktop C++ compiler. Earlier host PASS reports are preserved. Patched firmware has not been physically verified in this session. Runtime says v0.1; legacy documentation calls the Wi-Fi patch v0.1.1-source-patch. See [current state](docs/CURRENT_STATE.md), [test matrix](docs/TEST_MATRIX.md), and [build/device procedures](docs/BUILD_AND_TEST.md).
-
-Engineering memory starts at [AGENTS.md](AGENTS.md) and the [documentation index](docs/README.md).
-Current features, issues, hardware plans, history and test evidence have separate
-records; [engineering workflow](docs/ENGINEERING_WORKFLOW.md) explains updates.
+Start with [AGENTS.md](AGENTS.md) and the [documentation index](docs/README.md).
+Every runtime-impacting change must follow the permanent
+[resource policy](docs/RESOURCE_BUDGET.md).
 
 ## Setup / تشغيل سريع
 
-1. Install **VS Code** and **PlatformIO IDE** extension. Open this entire directory (the directory containing `platformio.ini`) with VS Code.
-2. Keep internet connected on your Windows PC during the first build; PlatformIO will download its platform and dependencies.
-3. Run **PlatformIO: Build** (`pio run -e lilygo-t-display-s3`).
-4. Connect the board via data-capable USB-C, select the device COM port, and run **Upload** (`pio run -e lilygo-t-display-s3 -t upload`).
-5. Use the touch screen to choose an app. Physical buttons: **BOOT (GPIO0)** short = select next, hold ~650 ms = open; **GPIO14** short or long = return Home. Touch the **`<`** in the upper-left corner to return Home.
+1. Open the directory in VS Code/PlatformIO; retain the pinned framework/libraries.
+2. Build: `pio run -e lilygo-t-display-s3` (also checks actual app0 image capacity).
+3. Upload only when intended, with the observed COM port; procedures are in
+   [BUILD_AND_TEST](docs/BUILD_AND_TEST.md). Latest repaired COM5 upload passed (HWT-0013); runtime acceptance remains pending.
+4. Touch opens apps; BOOT short selects, hold activates. Settings scrolls with
+   vertical swipes and supports physical focus/activation. GPIO14/header Back
+   cancels a confirmation, returns to menu, then Home.
+5. [Settings](docs/SETTINGS.md) explains brightness, timeout, accent, diagnostics,
+   confirmed reboot/reset, preservation scope and the opt-in LEDC build.
+6. [Profiling](docs/MEMORY_PROFILING.md) explains sparse serial instrumentation
+   and pending hardware scenarios A–E. Runtime resource use is NOT MEASURED.
 
-### Apps included
-
-| App | Function | Resource behaviour |
-|---|---|---|
-| System Info | ESP32 model / CPU, flash, PSRAM, free heap, uptime | No radio required |
-| Touch Test | Live mapped and raw coordinates; CST816S gesture reporting | No radio required |
-| Wi-Fi Scanner | Nonblocking 2.4 GHz network discovery; name, channel, RSSI, security | Acquires radio on entry, turns Wi-Fi off on exit; 650 ms warmup + 11 s scan deadline per attempt, at most 2 attempts |
-
-**No Wi-Fi password or account secret is embedded in this firmware.** This is a read-only scan of networks. No packet injection, capture, portal, or HID automation in v0.1.
+Existing Wi-Fi credential/security/vault functionality predates this scope.
+Settings reset preserves that data; do not use production secrets in development
+captures. Current implementation is not proof of secure hardware storage or
+physical acceptance. No new BLE, SD, OTA or Deep Sleep implementation is added.
 
 ## Tested hardware baseline retained
 
@@ -55,14 +58,22 @@ src/
   core/App.h                  ← app lifecycle interface
   core/AppContext.h           ← typed dependency access
   core/AppManager.{h,cpp}     ← home/menu/router
-  core/ResourceManager.*      ← Wi-Fi ownership
+  core/ResourceManager.*      ← scanner ownership
+  core/MemoryProfiler.*       ← bounded resource snapshots
+  core/WakeInputGate.h        ← consume wake contacts
   hardware/DisplayManager.*  ← TFT_eSPI & common UI
   hardware/TouchManager.*    ← CST816S + coordinates
   hardware/ButtonManager.*   ← debounced GPIO0/14
-  services/WiFiService.*      ← async scan and cleanup
+  services/WiFiService.*      ← async scan / saved connections
+  services/SettingsService.*  ← typed user preferences
+  services/SecurityService.*  ← existing PIN/session state
+  services/{Crypto,Time,Totp,UsbHid}Service.* ← existing 2FA services
   apps/SystemInfoApp.*
   apps/TouchTestApp.*
   apps/WiFiScannerApp.*
+  apps/WiFiApp.*
+  apps/TotpApp.*
+  apps/SettingsApp.*
 tests/host/                    ← desktop mock smoke tests
 docs/                          ← architecture, build, adding new apps, acceptance checks
 ```
@@ -78,8 +89,8 @@ docs/                          ← architecture, build, adding new apps, accepta
 ## Boundaries / الحدود
 
 - Firmware applications are **compiled into one image**; it does not hot-load standalone `.bin` programs or Bruce/GhostESP firmware.
-- This project intentionally does not include Password Vault or TOTP; their security architecture and time handling require a separate implementation.
-- No OTA, filesystem, task scheduler, battery percentage estimate, or multi-radio scheduler in v0.1.
+- Existing Security/2FA/vault code is retained; it has not received an independent security or physical acceptance audit in this change.
+- No OTA/filesystem/SD service, battery percentage estimate or multi-radio scheduler exists. No new task is introduced by Settings.
 - The board's physical Touch Glass panel might differ across production variants. If `TFT_eSPI` works but touch does not, verify the CST816S chip/driver against the working original sketch.
 
 **References**

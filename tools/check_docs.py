@@ -19,8 +19,10 @@ REQUIRED = (
     "docs/KNOWN_ISSUES.md", "docs/FEATURE_REGISTRY.md", "docs/DEPENDENCIES.md",
     "docs/ENGINEERING_WORKFLOW.md", "docs/VERIFICATION_REPORT.md",
     "docs/decisions/README.md", "docs/releases/README.md",
+    "docs/RESOURCE_BUDGET.md", "docs/MEMORY_PROFILING.md",
+    "docs/performance/BASELINE.md", "docs/performance/build-baseline.json",
 )
-IGNORED = {".git", ".pio", ".testbuild", "__pycache__", "node_modules"}
+IGNORED = {".git", ".pio", ".testbuild", ".build", "build", "__pycache__", "node_modules"}
 ID = re.compile(r"(?:FEAT|BUG|DEV|HWT|VER)-\d{4}\b")
 FIELDS = {
     "feature": "id name purpose module files dependencies hardware gpio lifecycle implementation verification issues history",

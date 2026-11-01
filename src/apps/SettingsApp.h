@@ -26,19 +26,30 @@ public:
   void onTick(AppContext& ctx, uint32_t nowMs) override;
   void onTouch(AppContext& ctx, const TouchEvent& ev) override;
   void onPrimaryAction(AppContext& ctx) override;
+  void onActivate(AppContext& ctx) override;
   bool onBack(AppContext& ctx) override;
   void render(AppContext& ctx) override;
+  void onDisplayRestored(AppContext& ctx) override;
 
 private:
   SettingsSubView subView_ = SettingsSubView::Menu;
-  uint8_t focusedIndex_ = 0; // For physical button navigation (0..5)
+  uint8_t focusedIndex_ = 0;
+  uint8_t menuIndex_ = 0, scrollOffset_ = 0, metricPage_ = 0;
+  uint8_t deviceIndex_ = 0;
   TouchTestApp touchTest_;
   uint32_t lastMetricTickMs_ = 0;
   bool fullRedraw_ = true;
+  bool hasRendered_ = false, drawnSaveOk_ = true;
+  SettingsSubView drawnView_ = SettingsSubView::Menu;
+  uint8_t drawnFocus_ = 255, drawnMenu_ = 255, drawnScroll_ = 255;
+  uint8_t drawnBrightness_ = 0, drawnTheme_ = 255;
+  uint16_t drawnTimeout_ = 65535;
 
   // Confirmation dialog state for Device actions
   enum class ConfirmAction : uint8_t { None, Reboot, ResetSettings };
   ConfirmAction confirmAction_ = ConfirmAction::None;
+  ConfirmAction drawnConfirmation_ = ConfirmAction::None;
+  uint32_t confirmContactId_ = 0, confirmOpenedMs_ = 0;
 
   // Security & PIN Setup state
   char pinInputBuffer_[10]{};

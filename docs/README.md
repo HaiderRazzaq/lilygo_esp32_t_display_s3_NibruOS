@@ -26,6 +26,15 @@ Start with [AGENTS](../AGENTS.md), [project context](PROJECT_CONTEXT.md), and
 | [WIFI_DIAGNOSTICS](WIFI_DIAGNOSTICS.md) | Detailed timeout incident and isolation procedures |
 | [ADDING_AN_APP](ADDING_AN_APP.md) | App integration recipe |
 | [AI_IDE_QUICKSTART](AI_IDE_QUICKSTART.md) | IDE handoff prompts |
+| [RESOURCE_BUDGET](RESOURCE_BUDGET.md) | Permanent limits, review triggers and resource report template |
+| [MEMORY_PROFILING](MEMORY_PROFILING.md) | Device scenarios A–E, serial instrumentation and overhead |
+| [Performance baseline](performance/BASELINE.md) | Identified build evidence; pending physical measurements |
+| [Settings](SETTINGS.md) | Essential Settings controls, persistence, reset scope and deferred work |
+| [Touch repair impact](performance/TOUCH_FIX_RESOURCE_IMPACT.md) | Reported touch/flicker regression, software fixes and pending physical acceptance |
+| [Resource impact](performance/SETTINGS_RESOURCE_IMPACT.md) | Before/after build costs and remaining verification |
+| [Desktop simulator](DESKTOP_SIMULATOR.md) | Windows/SDL2 desktop simulator user manual, controls and developer shortcuts |
+| [Simulator architecture](SIMULATOR_ARCHITECTURE.md) | Cross-platform simulation architecture, platform boundaries and shared code |
+| [Simulator testing](SIMULATOR_TESTING.md) | Automated desktop test suite, Wi-Fi fault injection and lifecycle validation |
 
 Evidence files live under [evidence](evidence/README.md). Records complement Git;
 they cannot reconstruct changes before the first available commit.

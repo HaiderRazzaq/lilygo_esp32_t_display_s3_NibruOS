@@ -177,3 +177,144 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Physical runtime verification of touch taps on the 46px chevrons and Settings PIN change."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings completion",
+  "hardware": "Target LILYGO T-Display-S3 Touch Glass; software checks only",
+  "wiring": "No external GPIO change; no device accessed",
+  "expected": "Actual current image observations; >=150 KiB internal headroom, bounded latency and balanced cleanup; no unintended confirmation; no unexpected credential/secret loss",
+  "evidence_kind": "Pending reproducible procedure; no observed physical result",
+  "environment": "Windows; Python 3.14; PlatformIO 6.2.0; local Zig 0.16.0 for HOST",
+  "limitations": "Physical heap/PSRAM/stack/latency/power/brightness/reception remain NOT MEASURED",
+  "id": "HWT-0008",
+  "verification_type": "HARDWARE",
+  "scope": "Essential Settings and resource profiling scenarios A–E",
+  "procedure": "Use identified default/profile images; boot checkpoints; test all brightness/timeout/accent values, restart persistence, corrupt/unavailable NVS recovery, reset preservation, BOOT/touch/Back, held wake and raw double taps; record 20 entry/exit cycles and supported Wi-Fi+display/touch workloads. Compare USB and suitable battery supply. LEDC requires separately observed compatibility; do not replace AW9364 blindly.",
+  "actual": "NOT RUN: no upload, serial capture or physical observation performed in this change.",
+  "result": "NOT RUN",
+  "evidence": []
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0009",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 runtime, Essential Settings completion",
+  "commit": "8239bb6 + uncommitted Settings changes",
+  "verification_type": "HARDWARE",
+  "scope": "User-authorized default AW9364 firmware upload to connected ESP32-S3 on COM5 only",
+  "hardware": "Connected ESP32-S3 USB device VID303A:PID1001, detected by PlatformIO/esptool",
+  "wiring": "USB-C serial COM5, upload460800 baud; firmware pins/partitions unchanged",
+  "procedure": "pio device list; pio run -e lilygo-t-display-s3; python tools/check_resources.py; pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "Upload latest default firmware, verify written data and send reset; preserve NVS partitions",
+  "actual": "SUCCESS in19.734s. Wrote842848 bytes (546464 compressed) at0x00010000 in7.3s. Hash of data verified; hard reset via RTS requested. Firmware SHA-256 f170c68ce03ee3e8967f648598942c5c162067d69e454060e7a384e08a04fb9b. No unrestricted erase, reset-preferences action or serial runtime observation performed.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-settings-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured actual PlatformIO/esptool physical upload output; device MAC redacted",
+  "environment": "Windows, PlatformIO6.2.0, espressif32@6.5.0/Arduino2.0.14, lilygo-t-display-s3",
+  "limitations": "PASS is limited to flash write/hash/reset command. No boot/UI/touch/brightness/Wi-Fi reception or runtime resource validation; HWT-0008 remains NOT RUN."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings/touch repair",
+  "hardware": "LILYGO T-Display-S3 Touch Glass; physical observation only when explicitly indicated",
+  "wiring": "Unchanged SDA18/SCL17/RST21/IRQ16, power15/backlight38/buttons0/14",
+  "expected": "One action per physical press; supported swipes/Back/wake and safe confirmations; no per-touch full-screen wipe",
+  "environment": "Windows, PlatformIO6.2.0/espressif32@6.5.0/core2.0.14; Zig0.16.0 for host mocks",
+  "limitations": "Mock/build results do not validate physical touch timing, brightness, heap, stack, latency or power",
+  "id": "HWT-0010",
+  "verification_type": "HARDWARE",
+  "scope": "Owner-reported Settings repeated touch actions and screen flicker after latest upload",
+  "procedure": "User operated Settings on their device after HWT-0009 and reported behavior in chat.",
+  "actual": "Owner reports touch repeats several times per second and screen flashes with every touch. No raw contact trace, video or independently read running image identifier; latest known upload was HWT-0009.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-01-touch-owner-report.txt"
+  ],
+  "evidence_kind": "Direct owner report in this chat, preserved verbatim"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3",
+  "commit": "8239bb6 + uncommitted Settings/touch repair",
+  "hardware": "LILYGO T-Display-S3 Touch Glass; physical observation only when explicitly indicated",
+  "wiring": "Unchanged SDA18/SCL17/RST21/IRQ16, power15/backlight38/buttons0/14",
+  "expected": "One action per physical press; supported swipes/Back/wake and safe confirmations; no per-touch full-screen wipe",
+  "environment": "Windows, PlatformIO6.2.0/espressif32@6.5.0/core2.0.14; Zig0.16.0 for host mocks",
+  "limitations": "Mock/build results do not validate physical touch timing, brightness, heap, stack, latency or power",
+  "id": "HWT-0012",
+  "verification_type": "HARDWARE",
+  "scope": "Pending physical acceptance of touch-repeat and Settings redraw repair",
+  "procedure": "On repaired default image: hold each control2s (one action), release and tap again; repeat10 separate taps/keypad digits; swipe all directions and scroll Settings without opening rows; test same-value brightness/timeout/accent touches and focus without whole-screen flash. Test raw wake consumption and PIN lock/unlock restoring the previous Settings page; Back and reset/reboot Cancel; confirmation requires a distinct press begun>=500ms after dialog. Run20 Settings entry/exit cycles and A–E resources. Record image hash, raw trace if any failures, and sanitized observations.",
+  "actual": "NOT RUN: repaired UI/touch behavior has not been physically observed by the agent or confirmed by owner.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending reproducible physical procedure; no PASS observation"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0011",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3, repaired touch and Settings repaint",
+  "commit": "8239bb6 + uncommitted focused repair",
+  "verification_type": "HARDWARE",
+  "scope": "Physical upload of repaired default AW9364 image; flash verification only",
+  "hardware": "Detected ESP32-S3 USB VID303A:PID1001 on COM5",
+  "wiring": "USB-C COM5; source pins/partition table unchanged",
+  "procedure": "pio device list; python tools/check_docs.py; python tools/check_resources.py; pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "Write repaired default firmware, verify flash data and send reset without full-flash erase",
+  "actual": "SUCCESS19.893s; wrote843888 B (547349 compressed) at0x10000 in7.4s; data hash verified, RTS reset command sent. Image SHA-256 2d68c7dd233c5404626eee4d8a6aa4613b9ad50323e321e3a7b0a3de6dcacdd1.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-touch-upload-com5.txt",
+    "docs/evidence/2026-11-01-touch-artifacts.txt"
+  ],
+  "evidence_kind": "Captured actual PlatformIO/esptool device-write output, MAC redacted",
+  "environment": "Windows, PlatformIO6.2.0, espressif32@6.5.0/core2.0.14",
+  "limitations": "PASS means flash write/hash/reset command only. Repaired UI/touch/brightness/heap/stack/power and radio reception not observed; owner recheck HWT-0012 required."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0013",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 repaired touch/Settings",
+  "commit": "8239bb6 + uncommitted repair",
+  "verification_type": "HARDWARE",
+  "scope": "Repeated user-requested upload of latest default AW9364 firmware",
+  "hardware": "ESP32-S3 USB VID303A:PID1001 detected on COM5",
+  "wiring": "USB-C COM5; firmware wiring/partitions unchanged",
+  "procedure": "pio device list; python tools/check_docs.py; pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "Write current default image, verify hash and send reset",
+  "actual": "SUCCESS20.013s. Wrote843888 bytes (547349 compressed) at0x10000 in7.4s; hash verified and RTS reset sent. Unchanged image SHA-256 2d68c7dd233c5404626eee4d8a6aa4613b9ad50323e321e3a7b0a3de6dcacdd1.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-touch-repeat-upload-com5.txt"
+  ],
+  "evidence_kind": "Actual PlatformIO/esptool output with MAC redacted",
+  "environment": "Windows/PlatformIO6.2.0/espressif32@6.5.0/core2.0.14",
+  "limitations": "Flash-write/hash/reset verification only; physical UI/touch/heap/latency/power acceptance HWT-0012 still pending."
+}
+```

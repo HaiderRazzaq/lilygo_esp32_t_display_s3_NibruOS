@@ -1,11 +1,11 @@
 # Dependency and build baseline
 
 Observed 2026-11-01; configuration is [platformio.ini](../platformio.ini).
-No dependency versions or flags were changed for this documentation work.
+Framework/library pins are unchanged. Settings completion adds two opt-in build environments and a post-image resource checker; see the current report.
 
 | Component | Configured | Locally resolved evidence |
 |---|---|---|
-| PlatformIO Core | Not pinned by repo | 6.2.0 on Windows; installed `pio.exe` is outside PATH |
+| PlatformIO Core | Not pinned by repo | 6.2.0 on Windows; current session finds pio.exe through PATH |
 | Platform | `espressif32@6.5.0` | Build selects Espressif 32 6.5.0, not the other globally installed pioarduino platform |
 | Board / framework | `lilygo-t-display-s3`, `arduino` | ESP32-S3, 240 MHz; Arduino-ESP32 2.0.14 |
 | Framework package | Selected by platform | `framework-arduinoespressif32@3.20014.231204` |
@@ -14,8 +14,8 @@ No dependency versions or flags were changed for this documentation work.
 | TFT_eSPI | `bodmer/TFT_eSPI@2.5.43` | 2.5.43; project `USER_SETUP_LOADED` build flags |
 | CST816S | Git URL, **not commit-pinned** | library 1.3.0, SHA `11fe1fbae1f226c328a9b08d808fb8f97d8a4c50` in local checkout |
 | Arduino FS / SPIFFS / Wire / WiFi | Bundled with core | Build dependency graph 2.0.0; FS/SPIFFS linkage is not app persistence |
-| Python documentation tooling | Standard library, Python 3.10+ | Run on Python 3.12; no third-party runtime dependencies |
-| Host tests | Bash + desktop `c++`, C++17 | Git Bash available; desktop compiler missing this session |
+| Python documentation tooling | Standard library, Python 3.10+ | Current run Python 3.14; standard library only |
+| Host tests | Bash + desktop `c++`, C++17 | Current run: Zig 0.16.0 C++ on Windows, installed only in ignored .testbuild/toolchain; Bash/WSL has no distribution |
 
 ## Settings and limits
 
@@ -40,3 +40,6 @@ configuration lock. Target build diagnostics and memory usage:
 TFT_eSPI warns that parallel mode has no DMA and its own TOUCH_CS functions are
 disabled. This project uses CST816S over I2C; do not add an arbitrary TOUCH_CS to
 silence that warning. Physical compatibility is still not proven by compilation.
+
+Host compiler setup is development-only; no firmware dependency was added.
+The Python host runner accepts CXX; POSIX CI still uses c++. Current evidence: VER-0017.

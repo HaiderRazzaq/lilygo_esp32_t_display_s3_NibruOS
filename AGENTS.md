@@ -26,7 +26,8 @@
 - `pio run -e lilygo-t-display-s3`
 - `pio run -e lilygo-t-display-s3 -t upload --upload-port COM7` (replace COM port)
 - `pio device monitor -p COM7 -b 115200`
-- On a host with g++/bash: `bash tests/host/run_tests.sh` (mock unit/smoke tests; **not** hardware tests).
+- `tools\run_simulator.bat` (launch interactive Windows desktop simulator with SDL2)
+- `tools\run_desktop_tests.bat` (run automated desktop test suite)
 - PlatformIO pins from `platformio.ini`: `espressif32@6.5.0`, Arduino-ESP32 2.0.14, TFT_eSPI 2.5.43, CST816S via its GitHub repository. Do not silently upgrade the framework or rewrite the board manifest.
 
 ## Standard workflow for each requested change
@@ -87,6 +88,39 @@ Every future AI agent must:
 6. **Produce a Resource Impact Report** for every resource-impacting change following the standard format in [RESOURCE_BUDGET.md](docs/RESOURCE_BUDGET.md).
 7. **Clean up shared resources** on `onExit()`: cancel active jobs, release buffers, unregister callbacks, and release `ResourceManager` locks.
 8. **Never claim hardware validation without physical evidence**: clearly distinguish compile-time results, host mocks, and physical measurements.
+9. This applies to fixes, refactors, dependency/build/partition changes, UI,
+   tasks and all radio/bus/storage integrations. Documentation-only changes may
+   use a lightweight assessment. Unknown runtime usage is **NOT MEASURED**.
+10. Compare actual `firmware.bin` bytes with generated `partitions.bin` app0,
+    using `python tools/check_resources.py`; the PlatformIO post-image hook also
+    enforces capacity and warns on >5% image growth. Update the accepted baseline
+    only with identified evidence, never simply to hide a warning.
+11. Internal headroom means **>=150 KiB free internal, byte-addressable heap**,
+    not unused linker RAM or PSRAM. The 5%/10% triggers are provisional reviews,
+    not universal safety guarantees. Watchdog/allocation failures and proven
+    regressions block acceptance. Stack/PSRAM/latency/power need device evidence.
+12. Use the `lilygo-t-display-s3-profile` build for sparse lifecycle serial
+    checkpoints. Keep profiling off by default, bounded and free of secrets;
+    record overhead. Export to storage only after storage is implemented.
+13. Do not replace the existing AW9364 pulse backlight with PWM by default.
+    `lilygo-t-display-s3-ledc` is a compile-tested alternative, not an accepted
+    physical brightness path. Preserve the owner's display/touch baseline.
+
+## Desktop Simulator & Cross-Platform Development Policy
+
+**CRITICAL: The NibruOS desktop simulator is a permanent cross-platform capability that shares real application, UI, navigation, and settings code between the Windows host and the physical ESP32-S3.**
+
+Every future AI agent modifying or extending NibruOS must:
+1. **Preserve the shared-code architecture**: Maintain "One Project -> Shared Application Code -> Two Execution Targets". Applications and UI layout logic must live in `src/` and remain platform-neutral.
+2. **Keep desktop-only dependencies out of the embedded target**: Do not include SDL2, desktop filesystem headers, or host simulation code into the ESP32 PlatformIO build.
+3. **Extend the desktop simulation when adding a new application**: Whenever adding a new app or view, register and verify it in both `src/main.cpp` and `platform/desktop/DesktopMain.cpp`.
+4. **Avoid duplicating business/application logic**: Never create a separate "mock UI" or divergent desktop application implementation.
+5. **Add simulation tests for relevant new features**: Extend `tests/desktop/test_simulator.cpp` whenever adding new application flows, service interfaces, or settings.
+6. **Continue building and testing the ESP32 target**: Running or passing the desktop simulator does NOT replace building with PlatformIO (`pio run -e lilygo-t-display-s3`).
+7. **Follow Memory Profiling & Resource Budget rules**: Evaluate flash impact on the ESP32 partition and enforce resource controls.
+8. **Document unsupported or hardware-only functionality**: Clearly distinguish simulated vs. hardware-dependent features (e.g. physical AW9364 backlight pulses, real RF Wi-Fi reception).
+9. **Record regressions and actual verification results**: Document build and test results honestly in `docs/DEVELOPMENT_LOG.md` and `docs/VERIFICATION_REPORT.md`.
+10. **Never equate desktop simulation success with hardware verification**: Mark all desktop simulation outcomes as HOST / SIMULATOR verification, never as physical HARDWARE verification.
 
 ## Source of truth
 Actual source code > explanatory documents if they diverge; user-verified hardware wiring > contradictory image labels. External validation sources: https://github.com/Xinyuan-LilyGO/T-Display-S3 , https://wiki.lilygo.cc/products/t-display-series/t-display-s3/ , https://docs.espressif.com/projects/arduino-esp32/en/latest/api/wifi.html .

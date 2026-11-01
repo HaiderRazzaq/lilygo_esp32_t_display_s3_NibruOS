@@ -2,6 +2,8 @@
 #include "core/AppContext.h"
 #include "core/AppManager.h"
 #include "core/ResourceManager.h"
+#include "core/MemoryProfiler.h"
+#include "core/WakeInputGate.h"
 #include "hardware/DisplayManager.h"
 #include "hardware/TouchManager.h"
 #include "hardware/ButtonManager.h"
@@ -31,14 +33,17 @@ AppManager launcher(context);
 WiFiApp wifiApp;
 TotpApp totpApp;
 SettingsApp settingsApp;
+WakeInputGate wakeInput;
 }
 
 void setup() {
   Serial.begin(115200);
   Serial.println("\n[NibruOS] boot v0.3");
+  MemoryProfiler::checkpoint("startup-basic");
   display.begin();
   settings.begin(&display);
   touch.begin();
+  MemoryProfiler::checkpoint("display-touch-ready");
   buttons.begin();
   wifi.begin(millis());
   security.begin();
@@ -49,6 +54,8 @@ void setup() {
   launcher.registerApp(totpApp);
   launcher.registerApp(settingsApp);
   launcher.begin();
+  launcher.tick(millis());
+  MemoryProfiler::checkpoint("home-services-ready");
 
   if (security.isPinEnabled()) {
     security.lock();
@@ -56,18 +63,25 @@ void setup() {
 }
 
 void loop() {
+#if NIBRU_PROFILE
+  const uint32_t loopStart = micros();
+#endif
   uint32_t now = millis();
   TouchEvent ev{};
   const bool hasTouch = touch.poll(ev);
   const ButtonAction action = buttons.poll(now);
 
   if (display.isSleeping()) {
-    if (hasTouch || action != ButtonAction::None) {
+    if (hasTouch || touch.isPressed() || action != ButtonAction::None) {
       display.wake();
+      wakeInput.arm(now);
       if (security.isPinEnabled()) {
         security.lock();
       }
     }
+  } else if (wakeInput.consume(hasTouch, action != ButtonAction::None,
+                               buttons.anyPressed() || touch.isPressed(), now)) {
+    display.notifyActivity(now);
   } else if (security.isLocked()) {
     if (hasTouch) {
       display.notifyActivity(now);
@@ -105,5 +119,8 @@ void loop() {
   } else {
     launcher.tick(now);
   }
+#if NIBRU_PROFILE
+  MemoryProfiler::observeLoop(micros() - loopStart);
+#endif
   delay(12);
 }

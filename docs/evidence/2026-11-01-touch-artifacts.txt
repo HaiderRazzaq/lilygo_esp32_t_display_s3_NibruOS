@@ -1,0 +1,55 @@
+{
+  "before": {
+    "binary_bytes": 842848,
+    "application_partition_bytes": 6553600,
+    "remaining_bytes": 5710752,
+    "sha256": "f170c68ce03ee3e8967f648598942c5c162067d69e454060e7a384e08a04fb9b",
+    "growth_percent": 0.13115626603813035,
+    "warnings": [],
+    "runtime_metrics": "NOT MEASURED"
+  },
+  "after": [
+    [
+      "lilygo-t-display-s3",
+      61240,
+      843521,
+      {
+        "binary_bytes": 843888,
+        "application_partition_bytes": 6553600,
+        "remaining_bytes": 5709712,
+        "sha256": "2d68c7dd233c5404626eee4d8a6aa4613b9ad50323e321e3a7b0a3de6dcacdd1",
+        "growth_percent": 0.2547092702769488,
+        "warnings": [],
+        "runtime_metrics": "NOT MEASURED"
+      }
+    ],
+    [
+      "lilygo-t-display-s3-profile",
+      61240,
+      844077,
+      {
+        "binary_bytes": 844448,
+        "application_partition_bytes": 6553600,
+        "remaining_bytes": 5709152,
+        "sha256": "758abce5bac92cbf0bd8d0aae0e1dfbf015be37e8ae0400c624ba8848b5556a5",
+        "growth_percent": 0.32123781102092797,
+        "warnings": [],
+        "runtime_metrics": "NOT MEASURED"
+      }
+    ],
+    [
+      "lilygo-t-display-s3-ledc",
+      61312,
+      849293,
+      {
+        "binary_bytes": 849664,
+        "application_partition_bytes": 6553600,
+        "remaining_bytes": 5703936,
+        "sha256": "cf7bc962c8d7ab93d24d259d392e67945f0c447d804f51af1ee7e0fff0465fd1",
+        "growth_percent": 0.9409036476648482,
+        "warnings": [],
+        "runtime_metrics": "NOT MEASURED"
+      }
+    ]
+  ]
+}
