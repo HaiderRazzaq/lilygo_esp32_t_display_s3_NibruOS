@@ -453,3 +453,47 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ]
 }
 ```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0014",
+  "name": "Hardware 2FA Authenticator & Crypto Vault",
+  "purpose": "Hardware-accelerated TOTP code generator, AES-256-GCM vault, PBKDF2 PIN derivation, persistent brute-force lockout, and native USB HID keystroke injection",
+  "module": "src/services/CryptoService + src/services/TimeService + src/services/TotpService + src/services/UsbHidService + src/apps/TotpApp",
+  "files": [
+    "src/services/CryptoService.cpp",
+    "src/services/CryptoService.h",
+    "src/services/SecurityService.cpp",
+    "src/services/SecurityService.h",
+    "src/services/TimeService.cpp",
+    "src/services/TimeService.h",
+    "src/services/TotpService.cpp",
+    "src/services/TotpService.h",
+    "src/services/UsbHidService.cpp",
+    "src/services/UsbHidService.h",
+    "src/apps/TotpApp.cpp",
+    "src/apps/TotpApp.h",
+    "src/main.cpp"
+  ],
+  "dependencies": [
+    "FEAT-0001",
+    "FEAT-0005",
+    "FEAT-0010"
+  ],
+  "hardware": "Integrated ST7789V parallel LCD, CST816S touch, Native USB OTG",
+  "gpio": "Shared display/touch GPIOs, Native USB D+/D-",
+  "lifecycle": "Touch-driven 2FA code display, non-blocking NTP sync, RFC 6238 generation, instant USB HID keystroke typing, and in-memory key zeroization",
+  "registration": "totpApp",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0011",
+    "host": "VER-0011",
+    "hardware": "NOT VERIFIED"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0012"
+  ]
+}
+```

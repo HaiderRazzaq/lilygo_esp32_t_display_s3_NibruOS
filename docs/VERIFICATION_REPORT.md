@@ -300,3 +300,51 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Physical observation of display dimming steps (25%, 50%, 75%, 100%) and touch responsiveness on the glass."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0011",
+  "date": "2026-11-01T03:22:00+03:00",
+  "firmware_version": "v0.3 runtime",
+  "commit": "UNCOMMITTED working tree based on ccbd0e6",
+  "verification_type": "BUILD",
+  "scope": "Main firmware target build with FEAT-0014: Hardware 2FA Authenticator, CryptoService, TotpService, TimeService, UsbHidService, and TotpApp",
+  "hardware": "Target lilygo-t-display-s3 (ESP32-S3R8, 16 MB flash, 8 MB PSRAM)",
+  "wiring": "Connected via USB CDC on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "Clean compilation, linking, and flashing of single-token 2FA Authenticator with compact typography and flicker-free differential renderer.",
+  "actual": "Target build and upload SUCCESS (25.02s, RAM 61152 / 327680 bytes [18.7%], Flash 838065 / 6553600 bytes [12.8%]). Flashed 838432 bytes in 8.2s (effective 814.4 kbit/s). Verified hash and hard reset via RTS pin.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-target-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build terminal output",
+  "environment": "Windows 11, PlatformIO Core 6.2.0, espressif32@6.5.0",
+  "limitations": "Physical observation of touch on screen and actual keystroke injection into host computer via USB."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0012",
+  "date": "2026-11-01T03:51:00+03:00",
+  "firmware_version": "v0.3 runtime",
+  "commit": "UNCOMMITTED working tree based on ccbd0e6",
+  "verification_type": "BUILD",
+  "scope": "Main firmware target build and flash with FEAT-0014 UI refinement and FEAT-0013 Security/PIN configuration subviews",
+  "hardware": "Target lilygo-t-display-s3 (ESP32-S3R8, 16 MB flash, 8 MB PSRAM)",
+  "wiring": "Connected via USB CDC on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 && pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "Compile, link, and upload firmware with 46px navigation chevrons, interactive PIN setup in Settings, and hardened lock screen.",
+  "actual": "Build SUCCESS (12.88s, RAM 61168 / 327680 bytes [18.7%], Flash 841353 / 6553600 bytes [12.8%]); upload to COM3 SUCCESS (24.29s). Flashed 841712 bytes (545626 compressed) at 0x00010000 in 8.2s (819.3 kbit/s). Verified hash, hard reset via RTS.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-target-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build and flash terminal output",
+  "environment": "Windows 11, PlatformIO Core 6.2.0, espressif32@6.5.0",
+  "limitations": "Physical observation of touch interactions on the glass."
+}
+```

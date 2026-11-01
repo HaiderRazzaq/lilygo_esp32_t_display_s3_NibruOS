@@ -153,17 +153,19 @@ void AppManager::drawHome() {
       t.fillRoundRect(x, 48, 94, 93, 9, Colors::Panel);
       t.drawRoundRect(x, 48, 94, 93, 9, i == selected_ ? accent : Colors::Border);
 
-      // Centered badge
+      // Centered badge with overflow guard
       t.fillRoundRect(x + 29, 58, 36, 26, 4, accent);
-      const char* shortT = apps_[i]->shortTitle();
-      const int shortW = static_cast<int>(strlen(shortT)) * 6;
-      screen.label(x + 29 + (36 - shortW) / 2, 67, shortT, Colors::Bg, 1, accent);
+      char safeShort[6]{};
+      strncpy(safeShort, apps_[i]->shortTitle(), sizeof(safeShort) - 1);
+      const int shortW = static_cast<int>(strlen(safeShort)) * 6;
+      screen.label(x + 29 + (36 - shortW) / 2, 67, safeShort, Colors::Bg, 1, accent);
 
-      // Centered title
-      const char* title = apps_[i]->title();
-      const int titleW = static_cast<int>(strlen(title)) * 6;
+      // Centered title with overflow guard
+      char safeTitle[15]{};
+      strncpy(safeTitle, apps_[i]->title(), sizeof(safeTitle) - 1);
+      const int titleW = static_cast<int>(strlen(safeTitle)) * 6;
       const int titleX = x + (94 - titleW) / 2;
-      screen.label(titleX > x + 3 ? titleX : x + 3, 94, title, Colors::White, 1, Colors::Panel);
+      screen.label(titleX > x + 3 ? titleX : x + 3, 94, safeTitle, Colors::White, 1, Colors::Panel);
 
       // Centered subtitle
       const char* sub = apps_[i]->subtitle();

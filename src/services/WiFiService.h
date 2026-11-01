@@ -41,6 +41,7 @@ public:
   bool connect(const char* ssid, const char* password, uint32_t nowMs);
   void disconnect();
   ConnectState connectState() const { return connectState_; }
+  bool isConnected() const { return connectState_ == ConnectState::Connected; }
   const char* connectedSSID() const { return connectedSsid_; }
   const char* targetSSID() const { return targetSsid_; }
   const char* connectError() const { return connectErrorBuf_; }

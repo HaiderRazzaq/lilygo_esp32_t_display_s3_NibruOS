@@ -152,3 +152,28 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "No SD driver or confirmed connection; no SD access attempted. Timing/speed/current budget unknown."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0007",
+  "date": "2026-11-01",
+  "recorded_at": "2026-11-01T03:51:00+03:00",
+  "firmware_version": "v0.3 runtime",
+  "commit": "ccbd0e625837196ce547f16788022be6465786cb (uncommitted working tree)",
+  "verification_type": "HARDWARE",
+  "scope": "Physical firmware upload and ROM bootloader execution on COM3",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3R8, 16 MB flash, 8 MB PSRAM, ST7789V parallel LCD, CST816S touch)",
+  "wiring": "Connected via USB-C to host on COM3 (ROM Bootloader mode VID:303A PID:1001)",
+  "procedure": "esptool.py v4.5.1 write_flash at 460800 baud on COM3 via PlatformIO",
+  "expected": "Successful chip detection (ESP32-S3 revision v0.2, 40MHz crystal), flash erase, compression, flashing, verification of SHA-256 hash, and RTS reset.",
+  "actual": "PASS: Successfully detected ESP32-S3 (revision v0.2, MAC 44:1b:f6:d3:aa:bc), erased flash regions, flashed 841712 bytes in 8.2 seconds (819.3 kbit/s), verified hash, and executed hard reset via RTS pin.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-target-build.txt"
+  ],
+  "evidence_kind": "esptool v4.5.1 flash output",
+  "environment": "Windows 11, USB CDC, PlatformIO Core 6.2.0, esptool 4.5.1",
+  "limitations": "Physical runtime verification of touch taps on the 46px chevrons and Settings PIN change."
+}
+```

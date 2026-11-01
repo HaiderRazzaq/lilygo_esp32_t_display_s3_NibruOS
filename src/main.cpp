@@ -8,7 +8,11 @@
 #include "services/WiFiService.h"
 #include "services/SecurityService.h"
 #include "services/SettingsService.h"
+#include "services/TimeService.h"
+#include "services/TotpService.h"
+#include "services/UsbHidService.h"
 #include "apps/WiFiApp.h"
+#include "apps/TotpApp.h"
 #include "apps/SettingsApp.h"
 
 namespace {
@@ -19,9 +23,13 @@ ResourceManager resources;
 WiFiService wifi;
 SecurityService security;
 SettingsService settings;
-AppContext context{display, resources, wifi, security, settings};
+TimeService timeService;
+TotpService totp;
+UsbHidService usbHid;
+AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid};
 AppManager launcher(context);
 WiFiApp wifiApp;
+TotpApp totpApp;
 SettingsApp settingsApp;
 }
 
@@ -34,7 +42,11 @@ void setup() {
   buttons.begin();
   wifi.begin(millis());
   security.begin();
+  timeService.begin();
+  totp.begin();
+  usbHid.begin();
   launcher.registerApp(wifiApp);
+  launcher.registerApp(totpApp);
   launcher.registerApp(settingsApp);
   launcher.begin();
 
@@ -84,6 +96,7 @@ void loop() {
   now = millis();
   display.tick(now);
   wifi.tick(now);
+  timeService.tick(now, wifi.isConnected());
   if (security.isLocked()) {
     security.tick(now);
     if (security.consumeDirty()) {

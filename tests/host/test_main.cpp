@@ -11,6 +11,12 @@
 #include "apps/WiFiScannerApp.h"
 #include "apps/WiFiApp.h"
 #include "apps/SettingsApp.h"
+#include "services/CryptoService.h"
+#include "services/SecurityService.h"
+#include "services/SettingsService.h"
+#include "services/TimeService.h"
+#include "services/TotpService.h"
+#include "services/UsbHidService.h"
 #include <Arduino.h>
 #include <WiFi.h>
 #include <cassert>
@@ -81,7 +87,12 @@ int main() {
   DisplayManager display;
   ResourceManager resources;
   WiFiService wifi;
-  AppContext context{display, resources, wifi};
+  SecurityService security;
+  SettingsService settings;
+  TimeService timeService;
+  TotpService totpService;
+  UsbHidService usbHid;
+  AppContext context{display, resources, wifi, security, settings, timeService, totpService, usbHid};
   AppManager mgr(context);
   SystemInfoApp info;
   TouchTestApp touch;
@@ -281,5 +292,49 @@ int main() {
   assert(wifi.forgetNetwork("HomeNet"));
   assert(wifi.savedCount() == 0);
 
-  puts("PASS: host navigation/resource/async scan/timeout/connect smoke tests");
+  // CryptoService hardware/mock tests
+  uint8_t randBuf[16]{};
+  CryptoService::fillRandom(randBuf, sizeof(randBuf));
+  // Zeroize test
+  CryptoService::secureZero(randBuf, sizeof(randBuf));
+  for (size_t i = 0; i < sizeof(randBuf); ++i) {
+    assert(randBuf[i] == 0);
+  }
+  // Constant-time equality test
+  uint8_t aBuf[4] = {1, 2, 3, 4};
+  uint8_t bBuf[4] = {1, 2, 3, 4};
+  uint8_t cBuf[4] = {1, 2, 3, 5};
+  assert(CryptoService::constantTimeEquals(aBuf, bBuf, 4));
+  assert(!CryptoService::constantTimeEquals(aBuf, cBuf, 4));
+
+  // PBKDF2 key derivation test
+  uint8_t salt[16] = {0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80,
+                      0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x01};
+  uint8_t derivedKey[32]{};
+  assert(CryptoService::deriveKey("1234", 4, salt, sizeof(salt), 100, derivedKey, sizeof(derivedKey)));
+
+  // AES-GCM mock encrypt/decrypt
+  uint8_t iv[12] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+  uint8_t plain[16] = {'H', 'e', 'l', 'l', 'o', ' ', 'S', 'e', 'c', 'u', 'r', 'e', 'G', 'e', 'n', '!'};
+  uint8_t cipher[16]{};
+  uint8_t tag[16]{};
+  uint8_t decrypted[16]{};
+  assert(CryptoService::aesGcmEncrypt(derivedKey, 256, iv, sizeof(iv), nullptr, 0, plain, sizeof(plain), cipher, tag, sizeof(tag)));
+  assert(CryptoService::aesGcmDecrypt(derivedKey, 256, iv, sizeof(iv), nullptr, 0, cipher, sizeof(cipher), tag, sizeof(tag), decrypted));
+  assert(std::memcmp(plain, decrypted, sizeof(plain)) == 0);
+
+  // SecurityService PIN & session vault key lifecycle tests
+  SecurityService secService;
+  secService.begin();
+  assert(secService.setPin("4321"));
+  assert(!secService.verifyPin("0000")); // Wrong PIN
+  assert(!secService.hasActiveKey());
+  assert(secService.verifyPin("4321")); // Correct PIN
+  assert(secService.hasActiveKey());
+  assert(secService.getActiveVaultKey() != nullptr);
+  secService.lock();
+  assert(!secService.hasActiveKey());
+  assert(secService.getActiveVaultKey() == nullptr);
+
+  puts("PASS: host navigation/resource/async scan/timeout/connect/crypto smoke tests");
 }

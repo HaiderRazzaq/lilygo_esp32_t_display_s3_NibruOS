@@ -6,6 +6,8 @@
 #include "hardware/TouchManager.h"
 #include "services/SettingsService.h"
 #include "services/WiFiService.h"
+#include "services/SecurityService.h"
+#include "services/CryptoService.h"
 #include "BoardConfig.h"
 #include <Arduino.h>
 #include <cstdio>
@@ -17,6 +19,9 @@ void SettingsApp::onEnter(AppContext& ctx) {
   confirmAction_ = ConfirmAction::None;
   fullRedraw_ = true;
   lastMetricTickMs_ = millis();
+  pinInputLen_ = 0;
+  pinInputBuffer_[0] = '\0';
+  pinError_ = false;
   invalidate();
 }
 
@@ -24,6 +29,8 @@ void SettingsApp::onExit(AppContext& ctx) {
   if (subView_ == SettingsSubView::TouchTest) {
     touchTest_.onExit(ctx);
   }
+  CryptoService::secureZero(pinInputBuffer_, sizeof(pinInputBuffer_));
+  pinInputLen_ = 0;
   subView_ = SettingsSubView::Menu;
 }
 
@@ -42,6 +49,14 @@ void SettingsApp::onTick(AppContext& ctx, uint32_t nowMs) {
 bool SettingsApp::onBack(AppContext& ctx) {
   if (confirmAction_ != ConfirmAction::None) {
     confirmAction_ = ConfirmAction::None;
+    invalidate();
+    return true;
+  }
+  if (subView_ == SettingsSubView::SetPin) {
+    CryptoService::secureZero(pinInputBuffer_, sizeof(pinInputBuffer_));
+    pinInputLen_ = 0;
+    subView_ = SettingsSubView::Security;
+    fullRedraw_ = true;
     invalidate();
     return true;
   }
@@ -88,6 +103,9 @@ void SettingsApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     case SettingsSubView::Memory:
       handleMemoryTouch(ctx, ev);
       break;
+    case SettingsSubView::Security:
+      handleSecurityTouch(ctx, ev);
+      break;
     case SettingsSubView::WiFiDiag:
       handleWiFiDiagTouch(ctx, ev);
       break;
@@ -96,6 +114,9 @@ void SettingsApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
       break;
     case SettingsSubView::TouchTest:
       touchTest_.onTouch(ctx, ev);
+      break;
+    case SettingsSubView::SetPin:
+      handleSetPinTouch(ctx, ev);
       break;
   }
 }
@@ -119,9 +140,9 @@ void SettingsApp::handleMenuTouch(AppContext& ctx, const TouchEvent& ev) {
     case 0: subView_ = SettingsSubView::Display; break;
     case 1: subView_ = SettingsSubView::Theme; break;
     case 2: subView_ = SettingsSubView::Memory; fullRedraw_ = true; break;
-    case 3: subView_ = SettingsSubView::WiFiDiag; fullRedraw_ = true; break;
-    case 4: subView_ = SettingsSubView::Device; confirmAction_ = ConfirmAction::None; break;
-    case 5: subView_ = SettingsSubView::TouchTest; touchTest_.onEnter(ctx); return;
+    case 3: subView_ = SettingsSubView::Security; fullRedraw_ = true; break;
+    case 4: subView_ = SettingsSubView::WiFiDiag; fullRedraw_ = true; break;
+    case 5: subView_ = SettingsSubView::Device; confirmAction_ = ConfirmAction::None; break;
   }
   invalidate();
 }
@@ -270,9 +291,11 @@ void SettingsApp::render(AppContext& ctx) {
     case SettingsSubView::Display:   renderDisplay(ctx); break;
     case SettingsSubView::Theme:     renderTheme(ctx); break;
     case SettingsSubView::Memory:    renderMemory(ctx); break;
+    case SettingsSubView::Security:  renderSecurity(ctx); break;
     case SettingsSubView::WiFiDiag:  renderWiFiDiag(ctx); break;
     case SettingsSubView::Device:    renderDevice(ctx); break;
     case SettingsSubView::TouchTest: touchTest_.render(ctx); break;
+    case SettingsSubView::SetPin:    renderSetPin(ctx); break;
   }
 }
 
@@ -295,9 +318,10 @@ void SettingsApp::renderMenu(AppContext& ctx) {
     {"DISP", "Display", "Backlight & Sleep", Colors::Cyan, 0, 0},
     {"THM",  "Theme",   ctx.settings.themeName(), Colors::Green, 0, 1},
     {"MEM",  "Memory",  "ESP32-S3 & Heap", Colors::Amber, 0, 2},
-    {"WIFI", "Wi-Fi Diag", "Radio & Scanner", Colors::Cyan, 1, 0},
-    {"DEV",  "Device",  "Reboot & Reset", Colors::Red, 1, 1},
-    {"TCH",  "Touch",   "Diagnostics", Colors::White, 1, 2}
+    {"SEC",  "Security", ctx.security.isPinEnabled() ? "PIN Protected" : "PIN Disabled",
+                         ctx.security.isPinEnabled() ? Colors::Green : Colors::Amber, 1, 0},
+    {"WIFI", "Wi-Fi Diag", "Radio & Scanner", Colors::Cyan, 1, 1},
+    {"DEV",  "Device",  "Reboot & Reset", Colors::Red, 1, 2}
   };
 
   for (uint8_t i = 0; i < 6; ++i) {
@@ -587,5 +611,184 @@ void SettingsApp::renderDevice(AppContext& ctx) {
                  Colors::Bg, 1, cBg);
 
     screen.footer("Select CANCEL or CONFIRM");
+  }
+}
+
+void SettingsApp::renderSecurity(AppContext& ctx) {
+  DisplayManager& screen = ctx.display;
+  TFT_eSPI& t = screen.gfx();
+  screen.clear();
+  screen.header("Security & PIN", true);
+
+  const bool pinEn = ctx.security.isPinEnabled();
+
+  // Top Card: Status & Specs (Y: 34..72)
+  t.fillRoundRect(10, 34, 300, 38, 5, Colors::Panel);
+  t.drawRoundRect(10, 34, 300, 38, 5, pinEn ? Colors::Green : Colors::Border);
+
+  char statStr[48];
+  snprintf(statStr, sizeof(statStr), "PIN LOCK: %s (LEN: %u)",
+           pinEn ? "ENABLED" : "DISABLED",
+           ctx.security.getPinLength());
+  screen.label(18, 40, statStr, pinEn ? Colors::Green : Colors::Amber, 1, Colors::Panel);
+  screen.label(18, 54, "Crypto: PBKDF2-HMAC-SHA256 (2048 iter) | TRNG Salt", Colors::Muted, 1, Colors::Panel);
+
+  // Button 1: Toggle PIN Lock (Y: 76..98, H: 22)
+  t.fillRoundRect(10, 76, 300, 22, 4, Colors::Panel);
+  t.drawRoundRect(10, 76, 300, 22, 4, pinEn ? Colors::Amber : Colors::Green);
+  const char* togStr = pinEn ? "LOCK: [ ENABLED ] (Tap to Disable)" : "LOCK: [ DISABLED ] (Tap to Enable)";
+  screen.label(30, 82, togStr, pinEn ? Colors::Green : Colors::Amber, 1, Colors::Panel);
+
+  // Button 2: Change PIN (Y: 102..124, H: 22)
+  t.fillRoundRect(10, 102, 300, 22, 4, Colors::Panel);
+  t.drawRoundRect(10, 102, 300, 22, 4, Colors::Cyan);
+  screen.label(30, 108, "[ CONFIGURE / CHANGE PIN (4-8 DIGITS) ]", Colors::Cyan, 1, Colors::Panel);
+
+  // Button 3: Lock Now (Y: 128..150, H: 22)
+  t.fillRoundRect(10, 128, 300, 22, 4, Colors::Panel);
+  t.drawRoundRect(10, 128, 300, 22, 4, Colors::Red);
+  screen.label(86, 134, "[ LOCK DEVICE NOW ]", Colors::Red, 1, Colors::Panel);
+
+  screen.footer("Tap Back to exit | Zero plaintext secrets");
+}
+
+void SettingsApp::handleSecurityTouch(AppContext& ctx, const TouchEvent& ev) {
+  if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
+
+  // Button 1: Toggle PIN Lock (Y: 76..98)
+  if (ev.y >= 76 && ev.y <= 98 && ev.x >= 10 && ev.x <= 310) {
+    ctx.security.setPinEnabled(!ctx.security.isPinEnabled());
+    invalidate();
+    return;
+  }
+
+  // Button 2: Change PIN (Y: 102..124)
+  if (ev.y >= 102 && ev.y <= 124 && ev.x >= 10 && ev.x <= 310) {
+    subView_ = SettingsSubView::SetPin;
+    pinInputLen_ = 0;
+    pinInputBuffer_[0] = '\0';
+    pinError_ = false;
+    fullRedraw_ = true;
+    invalidate();
+    return;
+  }
+
+  // Button 3: Lock Now (Y: 128..150)
+  if (ev.y >= 128 && ev.y <= 150 && ev.x >= 10 && ev.x <= 310) {
+    if (!ctx.security.isPinEnabled()) {
+      ctx.security.setPinEnabled(true);
+    }
+    ctx.security.lock();
+    return;
+  }
+}
+
+void SettingsApp::renderSetPin(AppContext& ctx) {
+  DisplayManager& screen = ctx.display;
+  TFT_eSPI& t = screen.gfx();
+  screen.clear();
+  screen.header("Set Security PIN", true);
+
+  // Status & Guidance (Y: 30..44)
+  if (pinError_) {
+    screen.label(64, 32, "Error: PIN must be 4 to 8 digits!", Colors::Red, 1, Colors::Bg);
+  } else {
+    screen.label(60, 32, "Enter 4 to 8 digits, then tap SAVE", Colors::White, 1, Colors::Bg);
+  }
+
+  // PIN Display Box (Y: 46..64)
+  t.fillRoundRect(70, 46, 180, 20, 3, Colors::Panel);
+  t.drawRoundRect(70, 46, 180, 20, 3, Colors::Border);
+
+  if (pinInputLen_ == 0) {
+    screen.label(135, 52, "(empty)", Colors::Muted, 1, Colors::Panel);
+  } else {
+    const int startX = 160 - (pinInputLen_ * 16) / 2;
+    for (uint8_t i = 0; i < pinInputLen_; ++i) {
+      t.fillCircle(startX + i * 16 + 8, 56, 4, Colors::Green);
+    }
+  }
+
+  // Keypad: 3 rows x 4 cols (Y: 68..144)
+  const char* labels[3][4] = {
+    {"1", "2", "3", "4"},
+    {"5", "6", "7", "8"},
+    {"9", "0", "DEL", "SAVE"}
+  };
+
+  for (int row = 0; row < 3; ++row) {
+    const int ry = 68 + row * 26;
+    for (int col = 0; col < 4; ++col) {
+      const int rx = 16 + col * 74;
+      const bool isSpecial = (row == 2 && (col == 2 || col == 3));
+
+      uint16_t btnColor = Colors::Panel;
+      if (isSpecial) {
+        btnColor = (col == 2) ? Colors::Red : Colors::Green;
+      }
+
+      t.fillRoundRect(rx, ry, 68, 22, 4, btnColor);
+      t.drawRoundRect(rx, ry, 68, 22, 4, Colors::Border);
+
+      const char* lbl = labels[row][col];
+      const int textW = static_cast<int>(strlen(lbl)) * (isSpecial ? 6 : 12);
+      const int tx = rx + (68 - textW) / 2;
+      const int ty = ry + (isSpecial ? 7 : 4);
+      screen.label(tx, ty, lbl, isSpecial ? (col == 2 ? Colors::White : Colors::Bg) : Colors::White,
+                   isSpecial ? 1 : 2, btnColor);
+    }
+  }
+
+  screen.footer("Tap Cancel to discard | PBKDF2 Encrypted");
+}
+
+void SettingsApp::handleSetPinTouch(AppContext& ctx, const TouchEvent& ev) {
+  if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
+
+  const char keys[3][4] = {
+    {'1', '2', '3', '4'},
+    {'5', '6', '7', '8'},
+    {'9', '0', 'D', 'S'}
+  };
+
+  for (int row = 0; row < 3; ++row) {
+    const int ry = 68 + row * 26;
+    if (ev.y >= ry && ev.y <= ry + 22) {
+      for (int col = 0; col < 4; ++col) {
+        const int rx = 16 + col * 74;
+        if (ev.x >= rx && ev.x <= rx + 68) {
+          const char k = keys[row][col];
+          if (k >= '0' && k <= '9') {
+            if (pinInputLen_ < 8) {
+              pinInputBuffer_[pinInputLen_++] = k;
+              pinInputBuffer_[pinInputLen_] = '\0';
+              pinError_ = false;
+              invalidate();
+            }
+          } else if (k == 'D') {
+            if (pinInputLen_ > 0) {
+              pinInputBuffer_[--pinInputLen_] = '\0';
+              pinError_ = false;
+              invalidate();
+            }
+          } else if (k == 'S') {
+            if (pinInputLen_ < 4) {
+              pinError_ = true;
+              invalidate();
+            } else {
+              ctx.security.setPin(pinInputBuffer_);
+              ctx.security.setPinEnabled(true);
+              CryptoService::secureZero(pinInputBuffer_, sizeof(pinInputBuffer_));
+              pinInputLen_ = 0;
+              subView_ = SettingsSubView::Security;
+              fullRedraw_ = true;
+              invalidate();
+              Serial.println("[Settings] New security PIN set and enabled.");
+            }
+          }
+          return;
+        }
+      }
+    }
   }
 }

@@ -8,9 +8,11 @@ enum class SettingsSubView : uint8_t {
   Display,
   Theme,
   Memory,
+  Security,
   WiFiDiag,
   Device,
-  TouchTest
+  TouchTest,
+  SetPin
 };
 
 class SettingsApp final : public App {
@@ -38,17 +40,26 @@ private:
   enum class ConfirmAction : uint8_t { None, Reboot, ResetSettings };
   ConfirmAction confirmAction_ = ConfirmAction::None;
 
+  // Security & PIN Setup state
+  char pinInputBuffer_[10]{};
+  uint8_t pinInputLen_ = 0;
+  bool pinError_ = false;
+
   void renderMenu(AppContext& ctx);
   void renderDisplay(AppContext& ctx);
   void renderTheme(AppContext& ctx);
   void renderMemory(AppContext& ctx);
+  void renderSecurity(AppContext& ctx);
   void renderWiFiDiag(AppContext& ctx);
   void renderDevice(AppContext& ctx);
+  void renderSetPin(AppContext& ctx);
 
   void handleMenuTouch(AppContext& ctx, const TouchEvent& ev);
   void handleDisplayTouch(AppContext& ctx, const TouchEvent& ev);
   void handleThemeTouch(AppContext& ctx, const TouchEvent& ev);
   void handleMemoryTouch(AppContext& ctx, const TouchEvent& ev);
+  void handleSecurityTouch(AppContext& ctx, const TouchEvent& ev);
   void handleWiFiDiagTouch(AppContext& ctx, const TouchEvent& ev);
   void handleDeviceTouch(AppContext& ctx, const TouchEvent& ev);
+  void handleSetPinTouch(AppContext& ctx, const TouchEvent& ev);
 };

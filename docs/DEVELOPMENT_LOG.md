@@ -471,3 +471,83 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Physically observe multi-level screen dimming on the board and test the confirmation reboot modal."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0012",
+  "date": "2026-11-01T03:20:00+03:00",
+  "event_date": "2026-11-01T03:20:00+03:00",
+  "related": [
+    "FEAT-0001",
+    "FEAT-0005",
+    "FEAT-0014"
+  ],
+  "action": "ADD / ARCHITECTURE / SECURITY / EXPANSION",
+  "files": [
+    "src/services/CryptoService.h",
+    "src/services/CryptoService.cpp",
+    "src/services/SecurityService.h",
+    "src/services/SecurityService.cpp",
+    "src/services/TimeService.h",
+    "src/services/TimeService.cpp",
+    "src/services/TotpService.h",
+    "src/services/TotpService.cpp",
+    "src/services/UsbHidService.h",
+    "src/services/UsbHidService.cpp",
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "src/core/AppContext.h",
+    "src/main.cpp",
+    "docs/FEATURE_REGISTRY.md",
+    "docs/CURRENT_STATE.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Implemented Hardware-Accelerated 2FA Authenticator & Crypto Vault (FEAT-0014) inspired by SecureGen. Built CryptoService using mbedTLS for PBKDF2-HMAC-SHA256, AES-256-GCM, HMAC-SHA1/SHA256, and secure memory zeroization. Hardened SecurityService by eliminating plaintext PIN storage, auto-migrating legacy PINs to salt+hash, enforcing reboot-persistent brute-force lockouts, and managing active in-memory session vault keys. Created TimeService with non-blocking NTP synchronization, TotpService for RFC 6238 code generation and encrypted vault persistence, UsbHidService for native USB-C keyboard keystroke injection, and TotpApp with a responsive 320x170 touch UI.",
+  "reason": "User requested architectural plan and implementation of SecureGen capabilities (starting with Wi-Fi NTP time synchronization, maximum hardware security, and keystroke injection).",
+  "expected": "Secure on-device 2FA generation with countdown timers; instant injection via USB-C; constant-time PIN validation; brute-force protection surviving reboots; zero plaintext secret exposure.",
+  "actual": "PlatformIO build SUCCESS (RAM 61136 / 327680 bytes [18.7%], Flash 838093 / 6553600 bytes [12.8%]). Remaining internal SRAM is 266 KB, maintaining healthy headroom well above the 150 KB budget.",
+  "verification": "VER-0011",
+  "risks": "Native USB HID requires device to be plugged into a host USB port; typing pacing includes 15ms inter-character delay to avoid buffer overflow on target OS.",
+  "commit": "UNCOMMITTED working tree based on ccbd0e625837196ce547f16788022be6465786cb",
+  "follow_up": "Flash firmware to device on COM3 and physically test touch code generation and USB typing into text editor."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0013",
+  "date": "2026-11-01T03:50:00+03:00",
+  "event_date": "2026-11-01T03:50:00+03:00",
+  "related": [
+    "FEAT-0005",
+    "FEAT-0013",
+    "FEAT-0014"
+  ],
+  "action": "ENHANCE / UI / SECURITY / HARDENING",
+  "files": [
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "src/services/SecurityService.h",
+    "src/services/SecurityService.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Enlarged side navigation buttons in 2FA Authenticator from 32px to 46px with high-contrast double borders, solid filled triangle chevrons, and 54px wide hitboxes for effortless thumb navigation. Upgraded lock screen keypad with prominent DEL and ENT actions and dynamic 4-8 digit verification. Implemented comprehensive Security & PIN configuration subviews in SettingsApp, allowing users to toggle PIN protection, enter custom 4-8 digit PINs with on-screen masked keypad, derive PBKDF2-HMAC-SHA256 hashes with hardware TRNG salt, and lock the device on demand.",
+  "reason": "User requested larger, clearer lateral navigation buttons for 2FA, and the ability to configure a highly secure custom PIN code to lock and protect the device.",
+  "expected": "Thumb-friendly 46px side buttons with clear visual arrows; zero screen strobing; dedicated Security subview in Settings with interactive PIN setup and lock-now capabilities; PBKDF2 hash derivation with zero plaintext leakage.",
+  "actual": "PlatformIO build SUCCESS (RAM 61168 / 327680 bytes [18.7%], Flash 841353 / 6553600 bytes [12.8%]). Flashed to physical ESP32-S3 on COM3 at 460800 baud (24.29s total, verified hash, hard reset via RTS pin).",
+  "verification": "VER-0012",
+  "risks": "Changing PIN derives PBKDF2 over 2048 iterations taking ~65ms, executed non-blockingly during the save touch event.",
+  "commit": "UNCOMMITTED working tree based on ccbd0e625837196ce547f16788022be6465786cb",
+  "follow_up": "User physically tests thumb side button clicks in 2FA Authenticator, enters Settings -> Security to set custom 4-8 digit PIN, and verifies lock and unlock behavior."
+}
+```

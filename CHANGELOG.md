@@ -7,6 +7,17 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 ## Unreleased
 
 ### Added
+- Large tactile side navigation buttons in `TotpApp` (expanded from 32px to 46px width with double cyan border, solid filled triangle chevrons, and 54px wide hitboxes).
+- Dedicated `Security` subview in `SettingsApp` featuring live status of PIN protection, PBKDF2-HMAC-SHA256 (2048 iterations) crypto details, and on-demand immediate device lock.
+- Interactive `SetPin` subview with on-screen numeric keypad (0-9, DEL, SAVE), dynamic masked digit feedback, and 4-8 digit length validation.
+- Hardened lock screen keypad with explicit `DEL` and `ENT` actions and dynamic 4-8 digit PIN verification.
+- Hardware 2FA Authenticator & Crypto Vault (`FEAT-0014`) inspired by SecureGen.
+- Hardware-accelerated `CryptoService` utilizing ESP32-S3 mbedTLS for PBKDF2-HMAC-SHA256, AES-256-GCM authenticated encryption/decryption, HMAC-SHA1/SHA256, and secure memory zeroization.
+- Hardened `SecurityService` with zero plaintext secrets in flash, automatic migration of legacy PINs to salt+hash, constant-time validation, and reboot-persistent brute-force lockout.
+- Non-blocking `TimeService` managing background NTP synchronization over Wi-Fi and real-time clock formatting.
+- `TotpService` implementing RFC 6238 time-based one-time password generation and encrypted vault storage.
+- Native `UsbHidService` enabling direct hardware keystroke injection of 2FA codes via ESP32-S3 USB-C OTG without host drivers or clipboard exposure.
+- Touch-driven `TotpApp` with 320x170 card layout, color-coded countdown timers, multi-page touch navigation, and instant `[TYPE]` USB injection button.
 - Essential Settings v0.1 (`FEAT-0013`) with 6 modular subviews: Display & Screen, Theme Accent, Memory Monitor, Wi-Fi Diagnostics, Device Controls (Reboot & Reset), and Touch Test.
 - Centralized `SettingsService` for typed, validated, and persistent user configuration in NVS namespace `nibru_settings`.
 - Lightweight, zero-allocation `MemoryProfiler` utility capturing real ESP-IDF heap and PSRAM runtime metrics without fictional estimates.
