@@ -147,6 +147,24 @@ sequenceDiagram
 
 ## 4. Execution Targets & Shared Code Policy
 
+Authenticator completion retains the existing service owners: TotpService owns
+bounded authenticated storage; TotpApp owns masked entry and secret cleanup;
+SecurityService owns atomic PIN metadata and a credential-change guard.
+UsbHidService owns bounded paced transfers and is ticked after application
+time/session checks. Native HID uses an opt-in build, preserving default USB
+Serial/JTAG. Desktop storage uses checked atomic replacement and fails closed
+on corrupt input; Windows crypto adapters use CNG. See
+[authenticator behavior and limitations](AUTHENTICATOR.md).
+
+Account entry additionally uses the shared UI TextKeyboard (2FA and Wi-Fi) and
+AppContext AccountImportService. The service validates one authenticated,
+bounded candidate; TotpApp owns explicit receive/review/SAVE and lifecycle
+cleanup. The ESP32 transport adapter uses existing Serial or a temporary
+WiFiUDP socket, under ResourceOwner::AuthenticatorImport; host tests inject
+transport bytes through the same service. It never owns Wi-Fi initialization.
+The localhost Python/browser companion is a separate development/user tool,
+not an embedded HTTP server. See [account setup](ACCOUNT_SETUP.md).
+
 NibruOS supports two targets compiled from shared application code:
 1. **Embedded Target (`lilygo-t-display-s3`)**: Real ESP32-S3R8 hardware running Arduino-ESP32, TFT_eSPI, CST816S, and native FreeRTOS.
 2. **Desktop Simulator Target (`nibru_simulator`)**: Windows desktop executable using SDL2, RGB565 framebuffer simulation, and simulated peripherals (`MockWiFiService`, `DesktopStorage`, `DesktopInput`).

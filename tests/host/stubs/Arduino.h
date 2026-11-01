@@ -30,6 +30,7 @@ public:
   String(const char* s="") : data_(s) {}
   const char* c_str() const { return data_.c_str(); }
   size_t length() const { return data_.length(); }
+  char& operator[](size_t index) { return data_[index]; }
   void toCharArray(char* buffer, size_t size) const {
     if (!size) return;
     std::strncpy(buffer,data_.c_str(),size-1);

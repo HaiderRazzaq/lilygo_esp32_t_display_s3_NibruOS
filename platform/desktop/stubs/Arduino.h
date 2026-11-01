@@ -85,6 +85,7 @@ public:
   String(unsigned long v) : data_(std::to_string(v)) {}
   const char* c_str() const { return data_.c_str(); }
   size_t length() const { return data_.length(); }
+  char& operator[](size_t index) { return data_[index]; }
   bool isEmpty() const { return data_.empty(); }
   void toCharArray(char* buffer, size_t size) const {
     if (!size || !buffer) return;

@@ -43,3 +43,17 @@ silence that warning. Physical compatibility is still not proven by compilation.
 
 Host compiler setup is development-only; no firmware dependency was added.
 The Python host runner accepts CXX; POSIX CI still uses c++. Current evidence: VER-0017.
+
+## Authenticator test tools
+No embedded dependency/framework upgrade. Optional HID uses existing Arduino
+TinyUSB. This Windows session installed test-only Zig0.15.2 and official SDL2
+2.30.10 headers/x64 import library under ignored .testbuild; neither is committed.
+Host/simulator crypto uses Windows CNG/bcrypt; non-Windows synthetic doubles
+remain explicit. Python desktop fallback installs/downloads nothing.
+See [authenticator](AUTHENTICATOR.md).
+
+Account setup adds no firmware dependency. The local helper uses Python 3
+standard library, browser WebCrypto and optional Web Serial. Node v24.8.0
+is test-only in this environment; tests/tools browser-module tests use built-in
+node:test and public fixtures. No npm package/CDN, browser extension, camera or
+external API is required.

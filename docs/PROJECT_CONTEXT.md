@@ -34,3 +34,12 @@ see [hardware inventory](HARDWARE_INVENTORY.md). No SD/BLE/OTA feature is added.
 Start each change with code/context/budget inspection and a short verification
 plan; update engineering records and run tools/check_docs.py. Follow
 [documentation responsibilities](README.md) and [workflow](ENGINEERING_WORKFLOW.md).
+
+## Authenticator completion — 2026-11-01
+FEAT-0014 now has masked entry/deletion, authenticated persistence, explicit PIN
+provisioning, time gating and cleanup. Default USB remains Serial/JTAG; HID has
+an opt-in build. Physical acceptance pending HWT-0015. No web/password-manager/
+BLE/SD/OTA feature added. See [authenticator](AUTHENTICATOR.md).
+
+## Easier account entry — 2026-11-02
+The authenticator now supports standard QWERTY/manual and paired USB/Wi-Fi paste through a localhost companion (not an embedded web cabinet). See [account setup](ACCOUNT_SETUP.md). Default image uploaded HWT-0019; native runtime and resource acceptance pending HWT-0018. No GPIO, framework, partition or display/touch/backlight change.

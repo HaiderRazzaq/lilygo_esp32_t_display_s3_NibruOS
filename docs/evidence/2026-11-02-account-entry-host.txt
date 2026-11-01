@@ -1,0 +1,3 @@
+PASS: authenticator lifecycle
+PASS: bounded paired account import
+PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests

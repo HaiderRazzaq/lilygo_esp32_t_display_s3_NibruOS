@@ -1,7 +1,10 @@
 #pragma once
 #include <stdint.h>
 #include <cstdarg>
+#include <vector>
+#include <string>
 struct TFT_eSPI {
+  std::vector<std::string> printed;
   unsigned fullClears = 0, drawCalls = 0;
   void init(){}
   void writecommand(uint8_t){}
@@ -16,7 +19,7 @@ struct TFT_eSPI {
   void setTextColor(uint16_t,uint16_t){}
   void setTextSize(uint8_t){}
   void setCursor(int,int){}
-  void print(const char*){ ++drawCalls; }
+  void print(const char* text){ ++drawCalls; printed.emplace_back(text); }
   void print(int){}
   void drawRoundRect(int,int,int,int,int,uint16_t){ ++drawCalls; }
   void fillRoundRect(int,int,int,int,int,uint16_t){ ++drawCalls; }

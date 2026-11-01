@@ -1,5 +1,10 @@
 @echo off
 setlocal
+where cmake >nul 2>&1
+if errorlevel 1 (
+  python "%~dp0run_desktop_tests.py" %*
+  exit /b
+)
 echo ===================================================
 echo   NibruOS Desktop Automated Test Runner
 echo ===================================================

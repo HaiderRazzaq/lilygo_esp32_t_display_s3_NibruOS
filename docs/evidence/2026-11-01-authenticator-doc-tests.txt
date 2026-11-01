@@ -1,0 +1,22 @@
+test_broken_link_and_anchor (test_check_docs.DocumentationChecks.test_broken_link_and_anchor) ... ok
+test_broken_reference_style_link (test_check_docs.DocumentationChecks.test_broken_reference_style_link) ... ok
+test_duplicate_id (test_check_docs.DocumentationChecks.test_duplicate_id) ... ok
+test_file_rename_preserves_immutable_development_history (test_check_docs.DocumentationChecks.test_file_rename_preserves_immutable_development_history) ... ok
+test_hardware_log_rejects_software_as_hardware (test_check_docs.DocumentationChecks.test_hardware_log_rejects_software_as_hardware) ... ok
+test_hardware_pass_requires_evidence (test_check_docs.DocumentationChecks.test_hardware_pass_requires_evidence) ... ok
+test_hardware_pass_requires_observation (test_check_docs.DocumentationChecks.test_hardware_pass_requires_observation) ... ok
+test_hardware_record_must_stay_in_dedicated_log (test_check_docs.DocumentationChecks.test_hardware_record_must_stay_in_dedicated_log) ... ok
+test_invalid_feature_id (test_check_docs.DocumentationChecks.test_invalid_feature_id) ... ok
+test_invalid_test_outcome (test_check_docs.DocumentationChecks.test_invalid_test_outcome) ... ok
+test_missing_required_document (test_check_docs.DocumentationChecks.test_missing_required_document) ... ok
+test_missing_source_reference (test_check_docs.DocumentationChecks.test_missing_source_reference) ... ok
+test_new_app_requires_registry_update (test_check_docs.DocumentationChecks.test_new_app_requires_registry_update) ... ok
+test_real_repository_is_valid (test_check_docs.DocumentationChecks.test_real_repository_is_valid) ... ok
+test_resource_policy_documents_are_required (test_check_docs.DocumentationChecks.test_resource_policy_documents_are_required) ... ok
+test_state_disagrees_with_registry (test_check_docs.DocumentationChecks.test_state_disagrees_with_registry) ... ok
+test_unknown_issue_reference (test_check_docs.DocumentationChecks.test_unknown_issue_reference) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 8.738s
+
+OK

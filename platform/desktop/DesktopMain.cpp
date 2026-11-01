@@ -1,3 +1,4 @@
+#include "services/AccountImportService.h"
 #define SDL_MAIN_HANDLED
 #include <Arduino.h>
 #include "core/AppContext.h"
@@ -31,6 +32,7 @@ int main(int argc, char* argv[]) {
   uint8_t scale = 3;
   bool headless = false;
   int maxFrames = -1;
+  const char* runtimeDir = "simulator/runtime";
 
   for (int i = 1; i < argc; ++i) {
     if (std::strcmp(argv[i], "--headless") == 0) {
@@ -39,6 +41,8 @@ int main(int argc, char* argv[]) {
       scale = static_cast<uint8_t>(std::atoi(argv[i] + 8));
     } else if (std::strncmp(argv[i], "--test-frames=", 14) == 0) {
       maxFrames = std::atoi(argv[i] + 14);
+    } else if (std::strncmp(argv[i], "--runtime-dir=", 14) == 0) {
+      runtimeDir = argv[i] + 14;
     }
   }
 
@@ -64,7 +68,7 @@ int main(int argc, char* argv[]) {
   std::printf("    F9 = Wi-Fi Mode: STA Error\n");
   std::printf("==================================================\n\n");
 
-  DesktopStorage::instance().init("simulator/runtime");
+  DesktopStorage::instance().init(runtimeDir);
 
   if (!SDLDisplay::instance().init(scale, headless)) {
     std::printf("[Error] Failed to initialize SDLDisplay backend.\n");
@@ -80,7 +84,9 @@ int main(int argc, char* argv[]) {
   TotpService totp;
   UsbHidService usbHid;
 
-  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid};
+  AccountImportService accountImport;
+
+  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport};
   AppManager launcher(context);
 
   WiFiApp wifiApp;
@@ -94,6 +100,7 @@ int main(int argc, char* argv[]) {
     display.begin();
     settings.begin(&display);
     wifi.begin(millis());
+    security.setCredentialChangeGuard(TotpService::canChangeCredentials);
     security.begin();
     timeService.begin();
     totp.begin();
@@ -128,6 +135,7 @@ int main(int argc, char* argv[]) {
     if (DesktopInput::instance().consumeRebootRequest()) {
       wifi.shutdown();
       launcher.goHome();
+      DesktopStorage::instance().reloadNvs();
       bootSystem();
       continue;
     }
@@ -174,6 +182,11 @@ int main(int argc, char* argv[]) {
 
     const uint32_t tickNow = millis();
     display.tick(tickNow);
+    if (display.isSleeping() && security.isPinEnabled() && !security.isLocked()) security.lock();
+    if (display.isSleeping() || security.isLocked()) {
+      if (totp.isLoaded()) totpApp.clearSession(context);
+      usbHid.cancel();
+    }
     wifi.tick(tickNow);
     timeService.tick(tickNow, wifi.isConnected());
 
@@ -185,6 +198,8 @@ int main(int argc, char* argv[]) {
     } else {
       launcher.tick(tickNow);
     }
+
+    usbHid.tick(tickNow);
 
     DesktopDiagnostics::instance().tick(tickNow, launcher, resources, wifi);
     DesktopDiagnostics::instance().renderOverlay();

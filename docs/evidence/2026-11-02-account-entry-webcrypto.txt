@@ -1,0 +1,13 @@
+✔ pasted key canonicalization and URI metadata (1.4682ms)
+✔ no silent algorithm or counter downgrade (0.4183ms)
+✔ WebCrypto matches independent Windows CNG envelope (7.3914ms)
+✔ busy USB open can retry without page reload (9.7689ms)
+✔ clear fields still clears when disconnected close rejects (2.4199ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 101.1536

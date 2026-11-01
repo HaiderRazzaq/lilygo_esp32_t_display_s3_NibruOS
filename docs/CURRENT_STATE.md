@@ -1,17 +1,17 @@
 # Current state
 
-Snapshot: 2026-11-01, Asia/Baghdad. Implementation and physical acceptance are
+Snapshot: 2026-11-02, Asia/Baghdad. Implementation and physical acceptance are
 separate; [history](DEVELOPMENT_LOG.md) is append-only.
 
 ```json
 {
   "record_type": "state",
-  "date": "2026-11-01",
+  "date": "2026-11-02",
   "runtime_version": "v0.3",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
-  "working_tree": "Clean at discovery; Architecture audit and modular refactoring completed",
+  "working_tree": "Uncommitted easier account entry plus phase one; default831408 B uploaded COM3 HWT-0019; native runtime acceptance pending",
   "implemented_features": [
     "FEAT-0001",
     "FEAT-0002",
@@ -38,12 +38,15 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "BUG-0004",
     "BUG-0005",
     "BUG-0007",
-    "BUG-0008"
+    "BUG-0008",
+    "BUG-0009",
+    "BUG-0010",
+    "BUG-0011"
   ],
-  "latest_build": "VER-0028",
-  "latest_upload": "HWT-0014",
-  "documentation_verification": "VER-0027",
-  "current_host_attempt": "VER-0027",
+  "latest_build": "VER-0045",
+  "latest_upload": "HWT-0019",
+  "documentation_verification": "VER-0047",
+  "current_host_attempt": "VER-0042",
   "source_constants": {
     "kTouchSda": 18,
     "kTouchScl": 17,
@@ -111,3 +114,44 @@ Settings paint are implemented; final host and3 target builds pass
 [focused resource impact](performance/TOUCH_FIX_RESOURCE_IMPACT.md).
 Do not equate software PASS or upload with the repaired physical UI outcome;
 HWT-0012 and complete memory/stack/latency/power scenarios remain NOT RUN.
+
+## Authenticator phase one — 2026-11-01
+This supersedes older current-build counts above without changing historical
+device/upload outcomes. FEAT-0014 now provides empty-first manual name/masked
+secret entry, authenticated atomic persistence/legacy reads, valid-time gating
+and cancelable USB. New installations require user PIN provisioning; credential
+changes are blocked while TOTP storage exists (BUG-0010).
+Current default image822912 B/static RAM49248 B; opt-in HID858256 B/static61368 B.
+All four builds PASS VER-0035; host/CNG and simulator PASS VER-0033/VER-0034.
+Latest physical upload remains historical HWT-0014: this source was NOT flashed.
+HWT-0015 and heap/PSRAM/stack/latency/power remain NOT RUN / NOT MEASURED.
+See [operation](AUTHENTICATOR.md) and [impact](performance/AUTHENTICATOR_RESOURCE_IMPACT.md).
+
+## Authorized default upload — 2026-11-02
+Default phase-one image822912 B uploaded to COM3 (HWT-0016); hash verification
+and RTS reset succeeded. This supersedes the earlier not-flashed statement.
+Device partition table matched exactly; no full-chip erase or NVS-range write.
+Source/image content and resource report unchanged. Default USB remains Serial/JTAG.
+Runtime boot/UI/touch/PIN/TOTP/RF/HID and resource acceptance remain pending HWT-0015.
+
+## Easier account entry — 2026-11-02
+This supersedes previous current-image counts: FEAT-0014 offers ADD methods for
+manual QWERTY or paired USB/Wi-Fi paste of a key/otpauth URI. The same keyboard
+is reused by Wi-Fi password entry. A localhost-only Python/browser helper
+provides authenticated encrypted transfer; later physical SAVE commits the
+candidate. Absolute120s expiry, Back/lock/sleep/exit and Wi-Fi lease cleanup
+are bounded. BUG-0011 remains FIXED — UNVERIFIED on the physical board.
+Default image831408 B/static SRAM50056 B (+8496/+808 B versus phase one).
+Four target builds PASS VER-0045, host/simulator/helper PASS VER-0042..VER-0044,
+capacity PASS VER-0046. No GPIO/framework/partition/backlight changes.
+Latest upload is still HWT-0016 until separately recorded; HWT-0018 native
+USB/UDP/touch and profiling A–E remain NOT RUN / NOT MEASURED.
+See [account setup](ACCOUNT_SETUP.md) and
+[resource impact](performance/ACCOUNT_ENTRY_RESOURCE_IMPACT.md).
+
+## Current default uploaded — 2026-11-02
+HWT-0019 supersedes earlier latest-upload statements: default831408 B image
+uploaded COM3, hashes verified and RTS reset sent in26.376s. VER-0049 confirms
+matching partition tables. No full erase or NVS-range write. Interactive native
+USB/UDP/touch/persistence and resources remain pending HWT-0018; this is upload
+evidence only. No commit or push performed.

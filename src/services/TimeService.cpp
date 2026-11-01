@@ -9,7 +9,7 @@ constexpr uint32_t kValidEpochThreshold = 1704067200;
 }
 
 void TimeService::begin() {
-  time_t now = time(nullptr);
+  time_t now = clock_(nullptr);
   if (now > kValidEpochThreshold) {
     synced_ = true;
   }
@@ -33,7 +33,7 @@ void TimeService::tick(uint32_t nowMs, bool wifiConnected) {
   if (nowMs - lastCheckMs_ < 1000) return;
   lastCheckMs_ = nowMs;
 
-  time_t now = time(nullptr);
+  time_t now = clock_(nullptr);
   if (now > kValidEpochThreshold) {
     if (!synced_) {
       synced_ = true;
@@ -41,6 +41,8 @@ void TimeService::tick(uint32_t nowMs, bool wifiConnected) {
       Serial.printf("[TimeService] Time synchronized successfully! Epoch: %ld\n", (long)now);
     }
   } else {
+    if (synced_) syncRequested_ = false;
+    synced_ = false;
     // If not synced, and Wi-Fi became connected, request NTP sync automatically
     if (wifiConnected && !syncRequested_) {
       requestNtpSync();
@@ -49,14 +51,14 @@ void TimeService::tick(uint32_t nowMs, bool wifiConnected) {
 }
 
 uint32_t TimeService::getEpoch() const {
-  time_t now = time(nullptr);
+  time_t now = clock_(nullptr);
   if (now < kValidEpochThreshold) return 0;
   return static_cast<uint32_t>(now);
 }
 
 void TimeService::formatTime(char* outBuf, size_t maxLen) const {
   if (!outBuf || maxLen == 0) return;
-  time_t now = time(nullptr);
+  time_t now = clock_(nullptr);
   if (now < kValidEpochThreshold) {
     strncpy(outBuf, "--:--:--", maxLen - 1);
     outBuf[maxLen - 1] = '\0';
@@ -69,7 +71,7 @@ void TimeService::formatTime(char* outBuf, size_t maxLen) const {
 
 void TimeService::formatDate(char* outBuf, size_t maxLen) const {
   if (!outBuf || maxLen == 0) return;
-  time_t now = time(nullptr);
+  time_t now = clock_(nullptr);
   if (now < kValidEpochThreshold) {
     strncpy(outBuf, "----/--/--", maxLen - 1);
     outBuf[maxLen - 1] = '\0';

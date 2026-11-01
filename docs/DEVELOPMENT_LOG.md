@@ -864,3 +864,146 @@ Corrections must be appended with the original ID reference.
   "follow_up": "User tests interactive Home launcher navigation, Settings, and 2FA Authenticator on the physical display."
 }
 ```
+
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0023",
+  "date": "2026-11-01",
+  "related": [
+    "FEAT-0012",
+    "FEAT-0014",
+    "FEAT-0015",
+    "BUG-0009",
+    "BUG-0010"
+  ],
+  "action": "CHANGED / FIXED / REMOVED / SECURITY",
+  "files": [
+    "src/apps/TotpApp.cpp",
+    "src/services/TotpService.cpp",
+    "src/services/SecurityService.cpp",
+    "src/services/UsbHidService.cpp",
+    "src/services/TimeService.cpp",
+    "src/services/CryptoService.cpp",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "platform/desktop/DesktopStorage.cpp",
+    "tests/host/test_authenticator.cpp",
+    "tests/desktop/test_simulator.cpp",
+    "docs/AUTHENTICATOR.md",
+    "docs/performance/AUTHENTICATOR_RESOURCE_IMPACT.md"
+  ],
+  "description": "Completed existing authenticator with masked entry/deletion, authenticated atomic persistence/credential writes, legacy compatibility, PIN guard, valid-time gating, cleanup and optional asynchronous HID. Removed demo seeds/token logs/fresh default PIN. Windows uses CNG/OS entropy and fail-closed atomic file storage.",
+  "reason": "Owner authorized phase one after the comparison report.",
+  "expected": "Persistent fixture accounts, valid time and truthful USB states, responsive Back, preserved board setup.",
+  "actual": "Host/default-alternate and shared desktop suites PASS, >=20 cycles and actual disk failure/corruption tests PASS, four target builds/capacity checks PASS. Independent review caught NVS-type, HID-completion, deterministic-nonce, disk-write and time-loss gaps; fixes and regressions retained.",
+  "verification": "VER-0029 through VER-0038; HWT-0015 NOT RUN",
+  "risks": "Physical heap/PSRAM/stack/latency/power/USB/UI unverified. PIN rekey/backup deferred.",
+  "commit": "UNCOMMITTED on 9513925; no commit/push/upload",
+  "follow_up": "Run HWT-0015 with public fixtures and profiling A-E, >=20 physical cycles; safe rekey/backup is separate future work."
+}
+```
+
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0024",
+  "date": "2026-11-02",
+  "related": [
+    "FEAT-0014",
+    "HWT-0016",
+    "VER-0040"
+  ],
+  "action": "AUTHORIZED DEVICE UPLOAD / DOCUMENTATION",
+  "files": [
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/CURRENT_STATE.md",
+    "docs/FEATURE_REGISTRY.md",
+    "CHANGELOG.md"
+  ],
+  "description": "User explicitly requested flashing. Selected default lilygo-t-display-s3, detected COM3, verified exact partition-layout match, uploaded identified image and retained sanitized evidence.",
+  "reason": "Explicit user instruction to flash the firmware",
+  "expected": "Verified write and reset without full-chip erase or partition-layout change",
+  "actual": "HWT-0016 PASS: 822912 B application, hashes verified, RTS reset,26.18s. No source or image-content change; NVS range not targeted by uploader.",
+  "verification": "HWT-0016 upload only; VER-0040 artifact preflight; HWT-0015 runtime NOT RUN",
+  "risks": "Interactive runtime and complete resource profiling remain unverified; default USB is Serial/JTAG, not opt-in HID.",
+  "commit": "UNCOMMITTED on9513925; no commit/push",
+  "follow_up": "Owner checks Home/touch/Settings, provisions own PIN and tests public TOTP fixture; perform HWT-0015 and profiling A-E."
+}
+```
+
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0025",
+  "date": "2026-11-02",
+  "related": [
+    "FEAT-0009",
+    "FEAT-0014",
+    "FEAT-0015",
+    "BUG-0011"
+  ],
+  "action": "ADDED / CHANGED / FIXED / SECURITY",
+  "files": [
+    "src/ui/TextKeyboard.h",
+    "src/ui/Base32Keyboard.h",
+    "src/apps/TotpApp.cpp",
+    "src/apps/WiFiScannerApp.cpp",
+    "src/services/AccountImportService.cpp",
+    "src/core/AppContext.h",
+    "src/core/ResourceManager.h",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "tools/account_setup.py",
+    "tools/account_setup/account_setup.mjs",
+    "tests/host/test_account_import.cpp",
+    "tests/desktop/test_simulator.cpp",
+    "tests/tools/test_account_setup.py",
+    "docs/ACCOUNT_SETUP.md",
+    "docs/performance/ACCOUNT_ENTRY_RESOURCE_IMPACT.md"
+  ],
+  "description": "Added standard number/QWERTY keyboard shared by 2FA/Wi-Fi, manual/USB/Wi-Fi ADD methods, bounded paired AES-GCM import and localhost-only paste companion; existing encrypted vault commits only on later physical SAVE.",
+  "reason": "Owner requested easier long-secret entry and conventional keyboard; selected more than one paste method.",
+  "expected": "Avoid manually typing long keys, preserve responsiveness, session cleanup, hardware baseline and user data.",
+  "actual": "VER-0042..VER-0046 PASS host/simulator/helper/four builds/resource checks; final independent review VER-0048 no blocker. VER-0041 preserves RED and setup failures and their fixes. Default image+1.0324%, static+808 B.",
+  "verification": "VER-0041 through VER-0046 and VER-0048; HWT-0018 pending native acceptance",
+  "risks": "Physical USB/UDP/touch/persistence/heap/PSRAM/stack/latency/power not verified; no camera QR/rekey/backup; JS strings cannot promise full RAM erasure.",
+  "commit": "UNCOMMITTED on9513925; no commit/push",
+  "follow_up": "Upload only after software/documentation checks, then HWT-0018 with public fixtures and profiling A-E, >=20 physical cycles."
+}
+```
+
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0026",
+  "date": "2026-11-02",
+  "related": [
+    "FEAT-0014",
+    "BUG-0011",
+    "VER-0049",
+    "HWT-0019"
+  ],
+  "action": "AUTHORIZED DEVICE UPLOAD / DOCUMENTATION",
+  "files": [
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/CURRENT_STATE.md",
+    "docs/FEATURE_REGISTRY.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Uploaded completed easier-account-entry default firmware after software/documentation gates, using existing owner flashing authorization.",
+  "reason": "Make requested QWERTY and multiple paste methods available on the owner device.",
+  "expected": "Verified write and reset preserving partition layout and excluding NVS flash range.",
+  "actual": "HWT-0019 PASS26.376s;831408 B app, hashes verified, reset sent. No full-chip erase, no source/image-content change after VER-0045.",
+  "verification": "HWT-0019 upload only; VER-0049 preflight; HWT-0018 interactive/native/resource acceptance remains NOT RUN.",
+  "risks": "Successful upload does not validate boot completion, real Web Serial/UDP transfer, touch/persistence or runtime resource headroom.",
+  "commit": "UNCOMMITTED on9513925; no commit/push.",
+  "follow_up": "Use launcher tools/open_account_setup.bat and public disposable fixture; complete HWT-0018 with resource scenarios A-E."
+}
+```

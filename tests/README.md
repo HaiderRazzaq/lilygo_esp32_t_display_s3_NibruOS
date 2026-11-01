@@ -49,3 +49,12 @@ from a missed Up. Mock graphics counters ensure ordinary same-page updates avoid
 full-screen clears and unchanged selections draw nothing. Lock-overlay restore
 and a real driver-to-Settings deferred contact-start confirmation path are covered.
 These are behavioral mocks, not proof of physical CST816S or panel timing.
+
+## Authenticator tests
+test_authenticator.cpp and shared AuthenticatorFlow.h cover authenticated
+reopen/migration/failures, public RFC fixtures with Windows CNG, UI entry/cleanup,
+time gating and asynchronous USB completion/cancel/disconnect. Non-Windows
+synthetic crypto is not cryptographic validation. Windows desktop fallback:
+tools\run_desktop_tests.bat --smoke; CXX/SDL2_ROOT or local ignored test tools.
+
+Account setup helper checks: python -m unittest discover -s tests/tools -v; node --test tests/tools/account_setup.test.mjs tests/tools/account_setup_ui.test.mjs. Run Windows host tests first for the public CNG envelope fixture. These are HOST tests; native USB/UDP remains pending.

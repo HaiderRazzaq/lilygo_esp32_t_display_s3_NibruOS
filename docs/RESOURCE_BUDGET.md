@@ -49,6 +49,7 @@ condition until explicitly revised from evidence.
 | Settings NVS | SettingsService, nibru_settings | Close each Preferences handle; never clear unrelated namespaces |
 | Saved Wi-Fi/security/vault | Existing owning services, separate namespaces | Settings reset preserves them; no duplicate persistence in UI |
 | Wi-Fi scanning | Scanner under ResourceOwner::WiFiScanner | Scanner cancels its job/releases lease; Settings diagnostics is read-only |
+| Account import | AccountImportService + explicit TotpApp session; AuthenticatorImport Wi-Fi lease | Close UDP on first candidate/cancel/timeout; wipe frame/key/code/candidate on session exit, lock or sleep; release lease |
 | Background connection/NTP | Existing shared services ticked in main | May intentionally survive app exit; reboot explicitly shuts Wi-Fi down |
 | Profiler | Fixed snapshots/counters; no new task | No stored history, callback, file or heap buffer to release |
 
@@ -132,3 +133,6 @@ The Native Desktop Simulator (`platform/desktop/`) introduces zero memory or fla
 - [Settings resource impact](performance/SETTINGS_RESOURCE_IMPACT.md)
 - [Touch fix resource impact](performance/TOUCH_FIX_RESOURCE_IMPACT.md)
 - [Architecture resource impact](performance/ARCHITECTURE_RESOURCE_IMPACT.md)
+
+- [Authenticator resource impact](performance/AUTHENTICATOR_RESOURCE_IMPACT.md)
+- [Account entry resource impact](performance/ACCOUNT_ENTRY_RESOURCE_IMPACT.md)

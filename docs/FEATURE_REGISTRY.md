@@ -310,7 +310,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "src/apps/WiFiScannerApp.cpp",
     "src/apps/WiFiScannerApp.h",
     "src/services/WiFiService.cpp",
-    "src/services/WiFiService.h"
+    "src/services/WiFiService.h",
+    "src/ui/TextKeyboard.h"
   ],
   "dependencies": [
     "FEAT-0004",
@@ -318,16 +319,17 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ],
   "hardware": "Integrated 2.4GHz radio and CST816S capacitive touch",
   "gpio": "Uses existing reserved pins; no additional GPIO",
-  "lifecycle": "Selection opens plaintext visible touch keyboard; non-blocking connection with 15s timeout; disconnect on onExit or user action",
+  "lifecycle": "Selection opens plaintext visible touch keyboard; non-blocking connection with 15s timeout; disconnect on onExit or user action; shared QWERTY/digit/shift/symbol presentation reused with 2FA",
   "implementation": "IMPLEMENTED",
   "verification": {
-    "build": "VER-0006",
-    "host": "VER-0006",
+    "build": "VER-0045",
+    "host": "VER-0042; VER-0043 shared keyboard",
     "hardware": "NOT VERIFIED"
   },
   "issues": [],
   "history": [
-    "DEV-0006"
+    "DEV-0006",
+    "DEV-0025"
   ]
 }
 ```
@@ -430,13 +432,15 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "lifecycle": "Shared DisplayManager inactivity sleep/wake; existing SecurityService PIN gate remains; LEDC is opt-in only",
   "implementation": "IMPLEMENTED",
   "verification": {
-    "build": "VER-0009",
-    "host": "VER-0009",
-    "hardware": "NOT VERIFIED"
+    "build": "VER-0035",
+    "host": "VER-0033; VER-0034",
+    "hardware": "HWT-0016 upload/hash/reset PASS only; HWT-0015 runtime NOT RUN"
   },
   "issues": [],
   "history": [
-    "DEV-0010"
+    "DEV-0010",
+    "DEV-0023",
+    "DEV-0024"
   ]
 }
 ```
@@ -489,8 +493,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "record_type": "feature",
   "id": "FEAT-0014",
   "name": "Hardware 2FA Authenticator & Crypto Vault",
-  "purpose": "Hardware-accelerated TOTP code generator, AES-256-GCM vault, PBKDF2 PIN derivation, persistent brute-force lockout, and native USB HID keystroke injection",
-  "module": "src/services/CryptoService + src/services/TimeService + src/services/TotpService + src/services/UsbHidService + src/apps/TotpApp",
+  "purpose": "PIN-protected TOTP entry via shared QWERTY or paired USB/Wi-Fi paste, bounded authenticated persistence, valid time and optional asynchronous HID",
+  "module": "src/services/CryptoService + src/services/TimeService + src/services/TotpService + src/services/UsbHidService + src/apps/TotpApp + src/services/AccountImportService + src/ui/TextKeyboard",
   "files": [
     "src/services/CryptoService.cpp",
     "src/services/CryptoService.h",
@@ -504,7 +508,19 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "src/services/UsbHidService.h",
     "src/apps/TotpApp.cpp",
     "src/apps/TotpApp.h",
-    "src/main.cpp"
+    "src/main.cpp",
+    "src/ui/Base32Keyboard.h",
+    "tests/host/test_authenticator.cpp",
+    "tests/support/AuthenticatorFlow.h",
+    "docs/AUTHENTICATOR.md",
+    "src/services/AccountImportService.cpp",
+    "src/services/AccountImportService.h",
+    "src/ui/TextKeyboard.h",
+    "tests/host/test_account_import.cpp",
+    "tests/support/AccountImportFixture.h",
+    "tools/account_setup.py",
+    "tools/account_setup/account_setup.mjs",
+    "docs/ACCOUNT_SETUP.md"
   ],
   "dependencies": [
     "FEAT-0001",
@@ -513,17 +529,25 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ],
   "hardware": "Integrated ST7789V parallel LCD, CST816S touch, Native USB OTG",
   "gpio": "Shared display/touch GPIOs, Native USB D+/D-",
-  "lifecycle": "Touch-driven 2FA code display, non-blocking NTP sync, RFC 6238 generation, instant USB HID keystroke typing, and in-memory key zeroization",
+  "lifecycle": "Explicit PIN session; load on entry; transactional edits; wipe plaintext/editor and cancel HID on exit/lock/sleep; default USB Serial/JTAG, opt-in HID; explicit 120s receive, one candidate, later physical SAVE; close/wipe/release on cancel/expiry/lock/sleep/exit",
   "registration": "totpApp",
   "implementation": "IMPLEMENTED",
   "verification": {
-    "build": "VER-0011",
-    "host": "VER-0011",
-    "hardware": "NOT VERIFIED"
+    "build": "VER-0045",
+    "host": "VER-0042; VER-0043; VER-0044",
+    "hardware": "HWT-0019 current upload/hash/reset PASS only; HWT-0017 prior owner entry report; HWT-0018 new native runtime NOT RUN"
   },
-  "issues": [],
+  "issues": [
+    "BUG-0009",
+    "BUG-0010",
+    "BUG-0011"
+  ],
   "history": [
-    "DEV-0012"
+    "DEV-0012",
+    "DEV-0023",
+    "DEV-0024",
+    "DEV-0025",
+    "DEV-0026"
   ]
 }
 ```
@@ -567,14 +591,16 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "lifecycle": "Full application lifecycle, Home Launcher routing, mouse-to-touch events, keyboard-to-buttons, persistent NVS file storage, deterministic Wi-Fi scans and fault injection",
   "implementation": "IMPLEMENTED",
   "verification": {
-    "build": "VER-0025",
-    "host": "VER-0025",
-    "hardware": "NOT APPLICABLE (Desktop Target)"
+    "build": "VER-0045 embedded builds remain separate",
+    "host": "VER-0043 shared QWERTY/manual/import review/SAVE; native transport injected",
+    "hardware": "HWT-0015 NOT RUN; prior outcomes historical"
   },
   "issues": [],
   "history": [
     "DEV-0020",
-    "DEV-0021"
+    "DEV-0021",
+    "DEV-0023",
+    "DEV-0025"
   ]
 }
 ```

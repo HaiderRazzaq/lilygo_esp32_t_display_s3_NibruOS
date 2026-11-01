@@ -30,8 +30,28 @@ void SecurityService::wipeSessionKey() {
 }
 
 void SecurityService::load() {
+  pinEnabled_ = false; hashInitialized_ = false; failedAttempts_ = 0; lockoutUntilMs_ = 0;
   Preferences prefs;
-  if (!prefs.begin(kPrefNamespace, false)) return;
+  if (!prefs.begin(kPrefNamespace, false)) { writable_ = false; pinEnabled_ = true; return; }
+  writable_ = true;
+
+  // Versioned credential blob: atomic PIN/salt/hash update, no mixed credentials.
+  if (prefs.isKey("credentials")) {
+    uint8_t record[51]{};
+    bool valid = prefs.getBytesLength("credentials") == sizeof(record) &&
+        prefs.getBytes("credentials", record, sizeof(record)) == sizeof(record) &&
+        record[0] == 1 && record[1] <= 1 && record[2] >= 4 && record[2] <= 8;
+    failedAttempts_ = prefs.getUInt("fail_cnt", 0);
+    prefs.end();
+    if (!valid) { writable_ = false; pinEnabled_ = true; hashInitialized_ = false; return; }
+    pinEnabled_ = record[1]; pinLength_ = record[2];
+    memcpy(salt_, record + 3, 16); memcpy(pinHash_, record + 19, 32);
+    hashInitialized_ = true;
+    CryptoService::secureZero(record, sizeof(record));
+    if (failedAttempts_ >= 3) lockoutUntilMs_ = millis() +
+        (failedAttempts_ >= 10 ? 300000 : failedAttempts_ >= 5 ? 30000 : 5000);
+    return;
+  }
 
   pinEnabled_ = prefs.getBool("enabled", false);
   failedAttempts_ = prefs.getUInt("fail_cnt", 0);
@@ -39,11 +59,13 @@ void SecurityService::load() {
 
   // Check for legacy plaintext migration
   if (prefs.isKey("pin")) {
-    String legacy = prefs.getString("pin", "1234");
-    prefs.remove("pin");
+    String legacy = prefs.getString("pin", "");
     prefs.end();
-    setPin(legacy.c_str());
-    Serial.println("[Security] Migrated legacy plaintext PIN to PBKDF2-HMAC-SHA256.");
+    if (setPin(legacy.c_str())) {
+      if (prefs.begin(kPrefNamespace, false)) { prefs.remove("pin"); prefs.end(); }
+      Serial.println("[Security] Migrated legacy PIN metadata.");
+    } else { pinEnabled_ = true; writable_ = false; }
+    if (legacy.length()) CryptoService::secureZero(&legacy[0], legacy.length());
     return;
   }
 
@@ -58,9 +80,12 @@ void SecurityService::load() {
 
   prefs.end();
 
-  // If no hash exists yet, initialize with default "1234"
+  // Fresh devices require explicit PIN provisioning. Existing vaults without
+  // valid credentials must fail closed; never invent a default over user data.
   if (!hashInitialized_) {
-    setPin("1234");
+    if (credentialChangeGuard_ && !credentialChangeGuard_()) {
+      pinEnabled_ = true; writable_ = false;
+    } else pinEnabled_ = false;
   }
 
   // If rebooted with active failed attempts penalty, enforce initial lockout
@@ -71,16 +96,16 @@ void SecurityService::load() {
   }
 }
 
-void SecurityService::save() {
+bool SecurityService::save() {
+  if (!writable_) return false;
   Preferences prefs;
-  if (!prefs.begin(kPrefNamespace, false)) return;
-
-  prefs.putBool("enabled", pinEnabled_);
-  prefs.putUChar("pin_len", pinLength_);
-  prefs.putBytes("salt", salt_, sizeof(salt_));
-  prefs.putBytes("hash", pinHash_, sizeof(pinHash_));
-  prefs.putUInt("fail_cnt", failedAttempts_);
+  if (!prefs.begin(kPrefNamespace, false)) return false;
+  uint8_t record[51] = {1, static_cast<uint8_t>(pinEnabled_), pinLength_};
+  memcpy(record + 3, salt_, 16); memcpy(record + 19, pinHash_, 32);
+  const bool ok = prefs.putBytes("credentials", record, sizeof(record)) == sizeof(record);
   prefs.end();
+  CryptoService::secureZero(record, sizeof(record));
+  return ok;
 }
 
 void SecurityService::recordFailedAttempt() {
@@ -126,16 +151,21 @@ uint32_t SecurityService::getLockoutRemainingSec(uint32_t nowMs) const {
   return (lockoutUntilMs_ - nowMs + 999) / 1000;
 }
 
-void SecurityService::setPinEnabled(bool en) {
+bool SecurityService::setPinEnabled(bool en) {
+  if (en && !hashInitialized_) return false;
+  if (!en && credentialChangeGuard_ && !credentialChangeGuard_()) return false;
+  const bool old = pinEnabled_;
   pinEnabled_ = en;
-  save();
+  if (!save()) { pinEnabled_ = old; return false; }
   if (!pinEnabled_) {
+    wipeSessionKey();
     unlock();
   }
+  return true;
 }
 
 bool SecurityService::setPin(const char* newPin) {
-  if (!newPin) return false;
+  if (!newPin || !writable_ || (credentialChangeGuard_ && !credentialChangeGuard_())) return false;
   const size_t len = strlen(newPin);
   if (len < 4 || len > 8) return false;
 
@@ -143,24 +173,39 @@ bool SecurityService::setPin(const char* newPin) {
     if (newPin[i] < '0' || newPin[i] > '9') return false;
   }
 
-  // Generate 16 bytes of true hardware random salt
+  uint8_t oldSalt[16], oldHash[32];
+  memcpy(oldSalt, salt_, sizeof(salt_)); memcpy(oldHash, pinHash_, sizeof(pinHash_));
+  const uint8_t oldLength = pinLength_;
+  const bool oldInitialized = hashInitialized_;
+  // Entropy prerequisites are supplied by the board CryptoService.
   CryptoService::fillRandom(salt_, sizeof(salt_));
 
   // Derive PBKDF2 verification hash
   if (!CryptoService::deriveKey(newPin, len, salt_, sizeof(salt_),
                                 kPbkdf2Iterations, pinHash_, sizeof(pinHash_))) {
+    memcpy(salt_, oldSalt, sizeof(salt_));
+    memcpy(pinHash_, oldHash, sizeof(pinHash_));
+    CryptoService::secureZero(oldSalt, sizeof(oldSalt));
+    CryptoService::secureZero(oldHash, sizeof(oldHash));
     return false;
   }
 
   pinLength_ = static_cast<uint8_t>(len);
   hashInitialized_ = true;
-  save();
+  const bool saved = save();
+  if (!saved) {
+    memcpy(salt_, oldSalt, sizeof(salt_)); memcpy(pinHash_, oldHash, sizeof(pinHash_));
+    pinLength_ = oldLength; hashInitialized_ = oldInitialized;
+  } else { wipeSessionKey(); }
+  CryptoService::secureZero(oldSalt, sizeof(oldSalt));
+  CryptoService::secureZero(oldHash, sizeof(oldHash));
+  if (!saved) return false;
   Serial.println("[Security] New PIN hash and salt stored securely.");
   return true;
 }
 
 bool SecurityService::verifyPin(const char* pin) {
-  if (!pin || !hashInitialized_) return false;
+  if (!pin || !hashInitialized_ || isLockedOut(millis())) return false;
   const size_t len = strlen(pin);
 
   uint8_t testHash[32]{};
@@ -184,6 +229,7 @@ bool SecurityService::verifyPin(const char* pin) {
       activeKeyValid_ = true;
     }
     CryptoService::secureZero(vaultSalt, sizeof(vaultSalt));
+    if (!activeKeyValid_) return false;
     resetFailedAttempts();
     return true;
   } else {

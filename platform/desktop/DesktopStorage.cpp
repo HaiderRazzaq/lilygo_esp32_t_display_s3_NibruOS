@@ -3,6 +3,11 @@
 #include <filesystem>
 #include <cstdio>
 #include <cstring>
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#endif
 
 namespace fs = std::filesystem;
 
@@ -38,158 +43,149 @@ void DesktopStorage::resetNvs() {
       fs::remove(nvsFilePath_);
     }
   } catch (...) {}
+  std::error_code error;
+  writable_ = !fs::exists(nvsFilePath_, error) && !error;
   std::printf("[DesktopStorage] NVS storage reset to empty\n");
+}
+
+bool DesktopStorage::reloadNvs() {
+  openNamespaces_.clear();
+  return loadNvsFromFile();
 }
 
 void DesktopStorage::flush() {
   saveNvsToFile();
 }
 
-void DesktopStorage::loadNvsFromFile() {
+bool DesktopStorage::loadNvsFromFile() {
   nvsData_.clear();
-  std::ifstream is(nvsFilePath_, std::ios::binary);
-  if (!is.is_open()) return;
-
-  char magic[4]{};
-  is.read(magic, 4);
-  if (std::memcmp(magic, "NVS1", 4) != 0) {
-    is.close();
-    std::printf("[DesktopStorage] Invalid magic in NVS store\n");
-    return;
-  }
-
-  uint32_t nsCount = 0;
-  is.read(reinterpret_cast<char*>(&nsCount), sizeof(nsCount));
-  for (uint32_t i = 0; i < nsCount; ++i) {
-    uint32_t nsLen = 0;
-    is.read(reinterpret_cast<char*>(&nsLen), sizeof(nsLen));
-    std::string ns(nsLen, '\0');
-    is.read(&ns[0], nsLen);
-
-    uint32_t keyCount = 0;
-    is.read(reinterpret_cast<char*>(&keyCount), sizeof(keyCount));
-    for (uint32_t k = 0; k < keyCount; ++k) {
-      uint32_t keyLen = 0;
-      is.read(reinterpret_cast<char*>(&keyLen), sizeof(keyLen));
-      std::string key(keyLen, '\0');
-      is.read(&key[0], keyLen);
-
-      uint32_t valLen = 0;
-      is.read(reinterpret_cast<char*>(&valLen), sizeof(valLen));
-      std::vector<uint8_t> val(valLen);
-      if (valLen > 0) {
-        is.read(reinterpret_cast<char*>(val.data()), valLen);
-      }
-      nvsData_[ns][key] = val;
+  writable_ = false;
+  std::error_code error;
+  const bool exists = fs::exists(nvsFilePath_, error);
+  if (error) return false;
+  if (!exists) { writable_ = true; return true; }
+  const auto size = fs::file_size(nvsFilePath_, error);
+  if (error || size < 8 || size > 1024 * 1024) return false;
+  std::vector<uint8_t> data(static_cast<size_t>(size));
+  std::ifstream input(nvsFilePath_, std::ios::binary);
+  if (!input.read(reinterpret_cast<char*>(data.data()), data.size()) ||
+      memcmp(data.data(), "NVS1", 4) != 0) return false;
+  size_t offset = 4;
+  auto number = [&](uint32_t& value) {
+    if (data.size() - offset < 4) return false;
+    memcpy(&value, data.data() + offset, 4); offset += 4; return true;
+  };
+  auto name = [&](std::string& value) {
+    uint32_t length = 0;
+    if (!number(length) || length == 0 || length > 64 || length > data.size() - offset) return false;
+    value.assign(reinterpret_cast<const char*>(data.data() + offset), length);
+    offset += length;
+    return value.find('\0') == std::string::npos;
+  };
+  decltype(nvsData_) parsed;
+  uint32_t namespaces = 0;
+  if (!number(namespaces) || namespaces > 64) return false;
+  for (uint32_t i = 0; i < namespaces; ++i) {
+    std::string ns;
+    uint32_t keys = 0;
+    if (!name(ns) || parsed.count(ns) || !number(keys) || keys > 512) return false;
+    auto& destination = parsed[ns];
+    for (uint32_t j = 0; j < keys; ++j) {
+      std::string key;
+      uint32_t length = 0;
+      if (!name(key) || destination.count(key) || !number(length) ||
+          length > 65536 || length > data.size() - offset) return false;
+      destination[key] = std::vector<uint8_t>(data.begin() + offset, data.begin() + offset + length);
+      offset += length;
     }
   }
-  is.close();
-  std::printf("[DesktopStorage] Loaded %zu NVS namespace(s) from '%s'\n",
-              nvsData_.size(), nvsFilePath_.c_str());
+  if (offset != data.size()) return false;
+  nvsData_ = std::move(parsed);
+  writable_ = true;
+  return true;
 }
 
-void DesktopStorage::saveNvsToFile() {
+bool DesktopStorage::saveNvsToFile() {
+  if (!writable_) return false;
   ensureDirectories();
-  std::ofstream os(nvsFilePath_, std::ios::binary | std::ios::trunc);
-  if (!os.is_open()) {
-    std::printf("[DesktopStorage] Failed to open '%s' for saving\n", nvsFilePath_.c_str());
-    return;
-  }
-
-  const char magic[4] = {'N', 'V', 'S', '1'};
-  os.write(magic, 4);
-
-  const uint32_t nsCount = static_cast<uint32_t>(nvsData_.size());
-  os.write(reinterpret_cast<const char*>(&nsCount), sizeof(nsCount));
-
+  const fs::path temporary(nvsFilePath_ + ".tmp");
+  std::ofstream os(temporary, std::ios::binary | std::ios::trunc);
+  if (!os) return false;
+  os.write("NVS1", 4);
+  const uint32_t namespaces = static_cast<uint32_t>(nvsData_.size());
+  os.write(reinterpret_cast<const char*>(&namespaces), 4);
   for (const auto& [ns, keys] : nvsData_) {
-    const uint32_t nsLen = static_cast<uint32_t>(ns.size());
-    os.write(reinterpret_cast<const char*>(&nsLen), sizeof(nsLen));
-    os.write(ns.data(), nsLen);
-
-    const uint32_t keyCount = static_cast<uint32_t>(keys.size());
-    os.write(reinterpret_cast<const char*>(&keyCount), sizeof(keyCount));
-
-    for (const auto& [k, val] : keys) {
-      const uint32_t keyLen = static_cast<uint32_t>(k.size());
-      os.write(reinterpret_cast<const char*>(&keyLen), sizeof(keyLen));
-      os.write(k.data(), keyLen);
-
-      const uint32_t valLen = static_cast<uint32_t>(val.size());
-      os.write(reinterpret_cast<const char*>(&valLen), sizeof(valLen));
-      if (valLen > 0) {
-        os.write(reinterpret_cast<const char*>(val.data()), valLen);
-      }
+    const uint32_t nsSize = static_cast<uint32_t>(ns.size());
+    os.write(reinterpret_cast<const char*>(&nsSize), 4); os.write(ns.data(), nsSize);
+    const uint32_t count = static_cast<uint32_t>(keys.size());
+    os.write(reinterpret_cast<const char*>(&count), 4);
+    for (const auto& [key, value] : keys) {
+      const uint32_t keySize = static_cast<uint32_t>(key.size()), valueSize = static_cast<uint32_t>(value.size());
+      os.write(reinterpret_cast<const char*>(&keySize), 4); os.write(key.data(), keySize);
+      os.write(reinterpret_cast<const char*>(&valueSize), 4);
+      if (valueSize) os.write(reinterpret_cast<const char*>(value.data()), valueSize);
     }
   }
+  os.flush();
+  if (!os) return false;
   os.close();
+  if (os.fail()) return false;
+#if defined(_WIN32)
+  return MoveFileExW(temporary.c_str(), fs::path(nvsFilePath_).c_str(),
+                    MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
+#else
+  std::error_code error;
+  fs::rename(temporary, nvsFilePath_, error);
+  return !error;
+#endif
 }
 
 bool DesktopStorage::nvsOpen(const std::string& ns, bool readOnly) {
+  if (!writable_) return false;
   openNamespaces_[ns] = readOnly;
-  if (!readOnly && nvsData_.find(ns) == nvsData_.end()) {
-    nvsData_[ns] = {};
-  }
-  return true;
+  if (!readOnly) nvsData_[ns];
+  return !readOnly || nvsData_.count(ns) != 0;
 }
-
-void DesktopStorage::nvsClose(const std::string& ns) {
-  openNamespaces_.erase(ns);
-}
+void DesktopStorage::nvsClose(const std::string& ns) { openNamespaces_.erase(ns); }
 
 bool DesktopStorage::nvsClear(const std::string& ns) {
   auto it = openNamespaces_.find(ns);
-  if (it == openNamespaces_.end() || it->second) return false; // read-only or not open
+  if (it == openNamespaces_.end() || it->second || !writable_) return false;
+  auto previous = nvsData_[ns];
   nvsData_[ns].clear();
-  saveNvsToFile();
-  return true;
+  if (saveNvsToFile()) return true;
+  nvsData_[ns] = std::move(previous); return false;
 }
-
 bool DesktopStorage::nvsHasKey(const std::string& ns, const std::string& key) {
-  auto nsIt = nvsData_.find(ns);
-  if (nsIt == nvsData_.end()) return false;
-  return nsIt->second.find(key) != nsIt->second.end();
+  const auto found = nvsData_.find(ns);
+  return writable_ && found != nvsData_.end() && found->second.count(key);
 }
-
 bool DesktopStorage::nvsRemove(const std::string& ns, const std::string& key) {
   auto it = openNamespaces_.find(ns);
-  if (it == openNamespaces_.end() || it->second) return false;
-  auto nsIt = nvsData_.find(ns);
-  if (nsIt == nvsData_.end()) return false;
-  bool erased = nsIt->second.erase(key) > 0;
-  if (erased) saveNvsToFile();
-  return erased;
+  if (it == openNamespaces_.end() || it->second || !nvsHasKey(ns, key)) return false;
+  auto previous = nvsData_[ns][key];
+  nvsData_[ns].erase(key);
+  if (saveNvsToFile()) return true;
+  nvsData_[ns][key] = std::move(previous); return false;
 }
-
 size_t DesktopStorage::nvsGetBytesLength(const std::string& ns, const std::string& key) {
-  auto nsIt = nvsData_.find(ns);
-  if (nsIt == nvsData_.end()) return 0;
-  auto kIt = nsIt->second.find(key);
-  if (kIt == nsIt->second.end()) return 0;
-  return kIt->second.size();
+  return nvsHasKey(ns, key) ? nvsData_[ns][key].size() : 0;
 }
-
 size_t DesktopStorage::nvsGetBytes(const std::string& ns, const std::string& key, void* out, size_t maxLen) {
-  if (!out || maxLen == 0) return 0;
-  auto nsIt = nvsData_.find(ns);
-  if (nsIt == nvsData_.end()) return 0;
-  auto kIt = nsIt->second.find(key);
-  if (kIt == nsIt->second.end()) return 0;
-
-  const size_t copyLen = std::min(maxLen, kIt->second.size());
-  std::memcpy(out, kIt->second.data(), copyLen);
-  return copyLen;
+  const size_t size = nvsGetBytesLength(ns, key);
+  if (!out || size > maxLen || !size) return 0;
+  memcpy(out, nvsData_[ns][key].data(), size); return size;
 }
-
 size_t DesktopStorage::nvsPutBytes(const std::string& ns, const std::string& key, const void* data, size_t len) {
   auto it = openNamespaces_.find(ns);
-  if (it == openNamespaces_.end() || it->second) return 0; // read-only
-  if (!data && len > 0) return 0;
-
+  if (it == openNamespaces_.end() || it->second || !writable_ || (!data && len)) return 0;
+  const bool existed = nvsHasKey(ns, key);
+  auto previous = nvsData_[ns][key];
   const auto* bytes = static_cast<const uint8_t*>(data);
-  nvsData_[ns][key] = std::vector<uint8_t>(bytes, bytes + len);
-  saveNvsToFile();
-  return len;
+  nvsData_[ns][key] = len ? std::vector<uint8_t>(bytes, bytes + len) : std::vector<uint8_t>{};
+  if (saveNvsToFile()) return len;
+  if (existed) nvsData_[ns][key] = std::move(previous); else nvsData_[ns].erase(key);
+  return 0;
 }
 
 bool DesktopStorage::isPathSafe(const std::string& relativePath, std::string* outFullPath) {

@@ -1,0 +1,1 @@
+Local in-app browser inspection of http://127.0.0.1:50094/: Arabic RTL setup page rendered, USB/Wi-Fi selector and labels present. Selecting Wi-Fi revealed device IPv4 field. No pairing code, account seed, credentials or data transmission entered. No real Web Serial/native UDP delivery tested.

@@ -8,6 +8,8 @@
  */
 class TimeService {
 public:
+  using ClockSource = time_t (*)(time_t*);
+  explicit TimeService(ClockSource source = ::time) : clock_(source ? source : ::time) {}
   void begin();
 
   // Requests non-blocking NTP synchronization
@@ -29,6 +31,7 @@ public:
   void formatDate(char* outBuf, size_t maxLen) const;
 
 private:
+  ClockSource clock_;
   bool synced_ = false;
   bool syncRequested_ = false;
   uint32_t lastCheckMs_ = 0;

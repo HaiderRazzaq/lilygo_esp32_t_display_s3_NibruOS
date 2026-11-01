@@ -741,3 +741,548 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Compilation and ELF analysis only; does not upload to physical hardware."
 }
 ```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0029",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "BUILD",
+  "scope": "Pre-change pio run -e lilygo-t-display-s3 at clean9513925",
+  "hardware": "Windows host; ESP32-S3 compile target only",
+  "wiring": "No wiring change or physical session",
+  "procedure": "Pre-change pio run -e lilygo-t-display-s3 at clean9513925",
+  "expected": "Behavior matches the phase-one design and applicable test contract",
+  "actual": "PASS: firmware843920 B; linked Flash843557 B; static RAM61240 B; app0 6553600 B; SHA256 806e275182a60f0c1b77c010fbe96dcc603c6e9101d49850c02467f62875f15d.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-authenticator-baseline-build.txt"
+  ],
+  "evidence_kind": "Captured local command output",
+  "environment": "Windows / Python 3.12.6 / Zig0.15.2 / Arduino-ESP32 2.0.14 espressif32@6.5.0",
+  "limitations": "Build only, no runtime observation."
+}
+```
+
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0030",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "HOST",
+  "scope": "Pre-change python tools/run_host_tests.py",
+  "hardware": "Windows host; ESP32-S3 compile target only",
+  "wiring": "No wiring change or physical session",
+  "procedure": "Pre-change python tools/run_host_tests.py",
+  "expected": "Behavior matches the phase-one design and applicable test contract",
+  "actual": "Existing host/navigation/settings suite PASS before product changes.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-authenticator-baseline-host.txt"
+  ],
+  "evidence_kind": "Captured local command output",
+  "environment": "Windows / Python 3.12.6 / Zig0.15.2 / Arduino-ESP32 2.0.14 espressif32@6.5.0",
+  "limitations": "Original synthetic crypto backend; no device evidence."
+}
+```
+
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0031",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "HOST",
+  "scope": "Intentional RED regressions",
+  "hardware": "Windows host; ESP32-S3 compile target only",
+  "wiring": "No wiring change or physical session",
+  "procedure": "Intentional RED regressions",
+  "expected": "Behavior matches the phase-one design and applicable test contract",
+  "actual": "Observed demo-account assertion and signed-shift panic; account-entry assertion; real OS write failure wrongly reports success; default PIN assertion; clock-loss cancellation assertion. Later corrected suites PASS.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-01-authenticator-attempts.txt"
+  ],
+  "evidence_kind": "Captured local command output",
+  "environment": "Windows / Python 3.12.6 / Zig0.15.2 / Arduino-ESP32 2.0.14 espressif32@6.5.0",
+  "limitations": "Intentional RED outcomes retained; not device failures."
+}
+```
+
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0032",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "HOST",
+  "scope": "Concurrent baseline/RED output collision",
+  "hardware": "Windows host; ESP32-S3 compile target only",
+  "wiring": "No wiring change or physical session",
+  "procedure": "Concurrent baseline/RED output collision",
+  "expected": "Behavior matches the phase-one design and applicable test contract",
+  "actual": "Link could not replace nibru_smoke.exe (Permission denied). Overlap removed; serial rerun exposed actual RED behavior.",
+  "result": "BLOCKED",
+  "evidence": [
+    "docs/evidence/2026-11-01-authenticator-attempts.txt"
+  ],
+  "evidence_kind": "Captured local command output",
+  "environment": "Windows / Python 3.12.6 / Zig0.15.2 / Arduino-ESP32 2.0.14 espressif32@6.5.0",
+  "limitations": "Tool orchestration collision, not a demonstrated firmware failure."
+}
+```
+
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0033",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "HOST",
+  "scope": "python tools/run_host_tests.py; repeat -DNIBRU_PROFILE=1 -DNIBRU_BACKLIGHT_LEDC=1",
+  "hardware": "Windows host; ESP32-S3 compile target only",
+  "wiring": "No wiring change or physical session",
+  "procedure": "python tools/run_host_tests.py; repeat -DNIBRU_PROFILE=1 -DNIBRU_BACKLIGHT_LEDC=1",
+  "expected": "Behavior matches the phase-one design and applicable test contract",
+  "actual": "Both suites PASS: real CNG RFC6238 SHA1 vectors, authenticated reopen/scalar-U8 migration/key-tag corruption, bounds, failed writes, PIN guard, entry/retry/confirmed deletion, cleanup, time/USB state and cancellation.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-authenticator-host.txt",
+    "docs/evidence/2026-11-01-authenticator-host-alternate.txt"
+  ],
+  "evidence_kind": "Captured local command output",
+  "environment": "Windows / Python 3.12.6 / Zig0.15.2 / Arduino-ESP32 2.0.14 espressif32@6.5.0",
+  "limitations": "CNG is not ESP32 mbedTLS/entropy/latency evidence. USB transport is a controlled double."
+}
+```
+
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0034",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "HOST",
+  "scope": "tools/run_desktop_tests.bat --smoke via Python/Zig/SDL2 fallback",
+  "hardware": "Windows host; ESP32-S3 compile target only",
+  "wiring": "No wiring change or physical session",
+  "procedure": "tools/run_desktop_tests.bat --smoke via Python/Zig/SDL2 fallback",
+  "expected": "Behavior matches the phase-one design and applicable test contract",
+  "actual": "Shared entry/save/reopen/cancel and >=20 cycles PASS; actual disk reopen, OS write-failure rollback, corrupt-file preservation, existing desktop suite and isolated main-loop smoke PASS. Fixture framebuffer visually inspected.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-authenticator-desktop.txt"
+  ],
+  "evidence_kind": "Captured local command output",
+  "environment": "Windows / Python 3.12.6 / Zig0.15.2 / Arduino-ESP32 2.0.14 espressif32@6.5.0",
+  "limitations": "SDL2 2.30.10/CNG host only. Existing unused-constant and pragma warnings remain; no physical leak/UI/RF claim."
+}
+```
+
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0035",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "BUILD",
+  "scope": "pio run: default, hid, profile and ledc environments",
+  "hardware": "Windows host; ESP32-S3 compile target only",
+  "wiring": "No wiring change or physical session",
+  "procedure": "pio run: default, hid, profile and ledc environments",
+  "expected": "Behavior matches the phase-one design and applicable test contract",
+  "actual": "All four builds SUCCESS. Default822912 B; HID858256 B; profile823520 B; LEDC828816 B. Native HID symbols present in opt-in ELF.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-authenticator-builds.txt",
+    "docs/evidence/2026-11-01-authenticator-resources.json"
+  ],
+  "evidence_kind": "Captured local command output",
+  "environment": "Windows / Python 3.12.6 / Zig0.15.2 / Arduino-ESP32 2.0.14 espressif32@6.5.0",
+  "limitations": "Existing TFT parallel-DMA/TOUCH_CS warnings remain. No physical HID/LEDC acceptance."
+}
+```
+
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0036",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "STATIC",
+  "scope": "python tools/check_resources.py for all final images and generated partition tables",
+  "hardware": "Windows host; ESP32-S3 compile target only",
+  "wiring": "No wiring change or physical session",
+  "procedure": "python tools/check_resources.py for all final images and generated partition tables",
+  "expected": "Behavior matches the phase-one design and applicable test contract",
+  "actual": "All images fit app0 6553600 B; no growth warnings; exact hashes and byte counts retained.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-authenticator-resources.json"
+  ],
+  "evidence_kind": "Captured local command output",
+  "environment": "Windows / Python 3.12.6 / Zig0.15.2 / Arduino-ESP32 2.0.14 espressif32@6.5.0",
+  "limitations": "Static RAM remainder cannot establish >=150 KiB free internal heap, PSRAM, stack, latency or power."
+}
+```
+
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0037",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "BUILD",
+  "scope": "Intermediate optional HID build",
+  "hardware": "Windows host; ESP32-S3 compile target only",
+  "wiring": "No wiring change or physical session",
+  "procedure": "Intermediate optional HID build",
+  "expected": "Behavior matches the phase-one design and applicable test contract",
+  "actual": "FAILED: missing tud_mounted/tud_suspended declarations and C++11 aggregate construction. Added tusb.h and explicit constructor; all final builds PASS.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-01-authenticator-attempts.txt"
+  ],
+  "evidence_kind": "Captured local command output",
+  "environment": "Windows / Python 3.12.6 / Zig0.15.2 / Arduino-ESP32 2.0.14 espressif32@6.5.0",
+  "limitations": "Intermediate source only; no upload."
+}
+```
+
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0038",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "HOST",
+  "scope": "Intermediate test-harness compilation",
+  "hardware": "Windows host; ESP32-S3 compile target only",
+  "wiring": "No wiring change or physical session",
+  "procedure": "Intermediate test-harness compilation",
+  "expected": "Behavior matches the phase-one design and applicable test contract",
+  "actual": "FAILED setup: missing Arduino include for millis and missing desktop Preferences include. Corrected; final host/desktop suites PASS.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-01-authenticator-attempts.txt"
+  ],
+  "evidence_kind": "Captured local command output",
+  "environment": "Windows / Python 3.12.6 / Zig0.15.2 / Arduino-ESP32 2.0.14 espressif32@6.5.0",
+  "limitations": "Setup errors are distinct from intentional behavioral RED."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0039",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "DOCUMENTATION",
+  "scope": "python tools/check_docs.py and python -m unittest discover -s tests/docs -v",
+  "hardware": "None",
+  "wiring": "Not applicable",
+  "procedure": "Run documentation consistency checker and full mutation suite after phase-one records",
+  "expected": "Checker PASS and all17 tests pass",
+  "actual": "Documentation checks PASS; 17 tests OK. Resource tooling unit suite separately passed6 tests; no physical evidence inferred.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-01-authenticator-doc-check.txt",
+    "docs/evidence/2026-11-01-authenticator-doc-tests.txt",
+    "docs/evidence/2026-11-01-authenticator-resource-tests.txt"
+  ],
+  "evidence_kind": "Captured command output",
+  "environment": "Windows / Python3.12 / repository documentation tooling",
+  "limitations": "Structural/source consistency only; not proof of physical outcomes or cryptographic certification."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted implementation",
+  "environment": "Windows / PlatformIO espressif32@6.5.0 / Arduino-ESP32 2.0.14 / esptool4.5.1",
+  "id": "VER-0040",
+  "verification_type": "STATIC",
+  "scope": "Upload preflight artifact identity and partition capacity",
+  "hardware": "Host artifacts plus read-only device partition snapshot",
+  "wiring": "Existing USB COM3",
+  "procedure": "python tools/check_resources.py; SHA256 of firmware.bin; compare generated/device partitions.bin",
+  "expected": "Identified phase-one image fits app0 and partition layout matches device",
+  "actual": "PASS822912 B in app0 6553600 B, remaining5730688 B, no growth warning; image SHA256 00e74d8689773ea90efc9cfb707fa48aeb593c2cc10d2b8d5edfdb5b8cd0ea8b; device/generated table exact match.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-02-authenticator-preflight.txt",
+    "docs/evidence/2026-11-02-authenticator-upload-com3.txt"
+  ],
+  "evidence_kind": "Captured artifact check and explicit byte/hash comparisons",
+  "limitations": "No code or partition-layout change; no runtime memory/power or security certification claim."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "hardware": "Windows host; target artifacts only unless stated",
+  "wiring": "No GPIO/wiring/framework/partition change",
+  "environment": "Windows / Python3.12.6 / Zig0.15.2 / SDL2 2.30.10 / Node24.8.0 / espressif32@6.5.0 Arduino2.0.14",
+  "id": "VER-0041",
+  "verification_type": "HOST",
+  "scope": "Retained behavioral RED and intermediate harness failures",
+  "procedure": "New keyboard/import/helper/USB/expiry tests before fixes; later ownership coverage fixture setup",
+  "expected": "New requested behavior and regression contracts",
+  "actual": "FAIL before fixes: QWERTY mapping; missing import linkage; non-ASCII CSRF comparison/server close and missing relay function; busy-port retry and fields not cleared on close error; expired touch-before-tick candidate committed. Additional Wi-Fi test setup initially changed raw mock status without ticking WiFiService; corrected fixture through connect/tick. All final tests PASS separately.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-02-account-entry-attempts.txt"
+  ],
+  "evidence_kind": "Captured command output; browser/source-review summaries identified separately",
+  "limitations": "Intentional RED, incomplete runner setup and fixture setup are distinct from final verified behavior; no physical attempt."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "hardware": "Windows host; target artifacts only unless stated",
+  "wiring": "No GPIO/wiring/framework/partition change",
+  "environment": "Windows / Python3.12.6 / Zig0.15.2 / SDL2 2.30.10 / Node24.8.0 / espressif32@6.5.0 Arduino2.0.14",
+  "id": "VER-0042",
+  "verification_type": "HOST",
+  "scope": "Shared keyboard/import/service/ownership/lifecycle regressions",
+  "procedure": "python tools/run_host_tests.py; repeat -DNIBRU_PROFILE=1 -DNIBRU_BACKLIGHT_LEDC=1 with Windows CNG",
+  "expected": "All default/alternate assertions pass",
+  "actual": "PASS both configurations: QWERTY/digits/Shift/symbols, actual app save/reopen, wrong key/tag/replay, bounds/overflow, expiry/rollover, no autosave, failed NVS retry, early and expired SAVE, Wi-Fi offline/conflict/lease/disconnect cleanup, sleep and >=20 import cycles.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-02-account-entry-host.txt",
+    "docs/evidence/2026-11-02-account-entry-host-alternate.txt"
+  ],
+  "evidence_kind": "Captured command output; browser/source-review summaries identified separately",
+  "limitations": "Injected I/O and mock NVS/Wi-Fi; not native USB/LAN/heap measurements."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "hardware": "Windows host; target artifacts only unless stated",
+  "wiring": "No GPIO/wiring/framework/partition change",
+  "environment": "Windows / Python3.12.6 / Zig0.15.2 / SDL2 2.30.10 / Node24.8.0 / espressif32@6.5.0 Arduino2.0.14",
+  "id": "VER-0043",
+  "verification_type": "HOST",
+  "scope": "SDL desktop shared application/UI and simulator smoke",
+  "procedure": "tools/run_desktop_tests.bat --smoke",
+  "expected": "Automated shared tests and clean simulator shutdown",
+  "actual": "PASS SDL2 suite including shared manual QWERTY and injected paired receive/review/SAVE; simulator smoke shut down cleanly. Real Windows CNG and isolated disk-fault tests retained.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-02-account-entry-desktop.txt"
+  ],
+  "evidence_kind": "Captured command output; browser/source-review summaries identified separately",
+  "limitations": "HOST/SIMULATOR only; no physical peripherals/real network delivery."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "hardware": "Windows host; target artifacts only unless stated",
+  "wiring": "No GPIO/wiring/framework/partition change",
+  "environment": "Windows / Python3.12.6 / Zig0.15.2 / SDL2 2.30.10 / Node24.8.0 / espressif32@6.5.0 Arduino2.0.14",
+  "id": "VER-0044",
+  "verification_type": "HOST",
+  "scope": "Local helper guards, browser crypto interoperability and rendered UI",
+  "procedure": "Python tests/tools unittest; Node built-in tests of parser/WebCrypto/UI; local in-app browser inspection",
+  "expected": "Four Python and five Node tests pass; UI shows USB and Wi-Fi fields",
+  "actual": "PASS 4 Python and 5 Node tests: route/Host/Origin/CSRF/body/IP/envelope bounds, URI validation, public WebCrypto/CNG envelope equality, busy USB retry and field clearing on failing close. Arabic local page rendered; choosing Wi-Fi displayed device IPv4 field. No actual seed/pairing entered.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-02-account-entry-companion.txt",
+    "docs/evidence/2026-11-02-account-entry-webcrypto.txt",
+    "docs/evidence/2026-11-02-account-entry-browser.txt"
+  ],
+  "evidence_kind": "Captured command output; browser/source-review summaries identified separately",
+  "limitations": "HTTP server and public fixtures tested; browser port selection/native Web Serial and actual UDP device delivery NOT RUN."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "hardware": "Windows host; target artifacts only unless stated",
+  "wiring": "No GPIO/wiring/framework/partition change",
+  "environment": "Windows / Python3.12.6 / Zig0.15.2 / SDL2 2.30.10 / Node24.8.0 / espressif32@6.5.0 Arduino2.0.14",
+  "id": "VER-0045",
+  "verification_type": "BUILD",
+  "scope": "Four pinned ESP32 targets",
+  "procedure": "pio run -e lilygo-t-display-s3 -e lilygo-t-display-s3-hid -e lilygo-t-display-s3-profile -e lilygo-t-display-s3-ledc",
+  "expected": "All builds succeed without pin/framework/partition change",
+  "actual": "PASS all4; binary/staticSRAM B: default831408/50056, HID866640/62184, profile831984/50064, LEDC837216/50128. Existing TFT warnings retained.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-02-account-entry-builds.txt"
+  ],
+  "evidence_kind": "Captured command output; browser/source-review summaries identified separately",
+  "limitations": "Builds are not physical runtime, resource or HID validation."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "hardware": "Windows host; target artifacts only unless stated",
+  "wiring": "No GPIO/wiring/framework/partition change",
+  "environment": "Windows / Python3.12.6 / Zig0.15.2 / SDL2 2.30.10 / Node24.8.0 / espressif32@6.5.0 Arduino2.0.14",
+  "id": "VER-0046",
+  "verification_type": "STATIC",
+  "scope": "Resource artifacts, partition limits and tooling regression",
+  "procedure": "check_resources.inspect_image per generated image/table; six tests/resources unit tests",
+  "expected": "Each image fits actual app0; report measured image/static deltas",
+  "actual": "PASS all4 fit6553600 B app0; default+8496 B (+1.0324%) vs phase one; static+808 B. No >5% review warning. Resource tooling6 tests OK; accepted baseline unchanged.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-02-account-entry-resources.json",
+    "docs/evidence/2026-11-02-account-entry-resource-tests.txt"
+  ],
+  "evidence_kind": "Captured command output; browser/source-review summaries identified separately",
+  "limitations": "All runtime free/min/largest heap, PSRAM, stacks, timing and power NOT MEASURED."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "hardware": "Windows host; target artifacts only unless stated",
+  "wiring": "No GPIO/wiring/framework/partition change",
+  "environment": "Windows / Python3.12.6 / Zig0.15.2 / SDL2 2.30.10 / Node24.8.0 / espressif32@6.5.0 Arduino2.0.14",
+  "id": "VER-0048",
+  "verification_type": "STATIC",
+  "scope": "Independent final focused source review",
+  "procedure": "Fresh review of account-entry changes and regression fixes",
+  "expected": "No remaining correctness/security blocker",
+  "actual": "Three P2 findings fixed: USB handle after successful open, clear fields before failing close, deadline checked before touch SAVE. Final review found no remaining blocker and independently reran two UI tests:2 PASS.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-02-account-entry-review.txt"
+  ],
+  "evidence_kind": "Captured command output; browser/source-review summaries identified separately",
+  "limitations": "Source review is not a security certification; reviewer performed no target/device checks."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0047",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Engineering memory consistency and documentation tooling regressions",
+  "hardware": "None",
+  "wiring": "Not applicable",
+  "procedure": "python tools/check_docs.py; python -m unittest discover -s tests/docs -v; git diff --check",
+  "expected": "Documentation consistency PASS;17 tests OK; no whitespace errors",
+  "actual": "PASS documentation checker;17 documentation tests OK; diff check exit0 with only existing LF/CRLF conversion warnings.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-02-account-entry-doc-check.txt",
+    "docs/evidence/2026-11-02-account-entry-doc-tests.txt"
+  ],
+  "evidence_kind": "Captured command output",
+  "environment": "Windows / Python3.12.6 / repository documentation tooling",
+  "limitations": "Structural consistency only, not proof of hardware or security acceptance. Final snapshot rechecked after upload records."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "environment": "Windows / espressif32@6.5.0 / Arduino-ESP32 2.0.14 / esptool4.5.1",
+  "wiring": "Existing USB-C COM3 and integrated LCD/touch/buttons; no external changes",
+  "id": "VER-0049",
+  "verification_type": "STATIC",
+  "scope": "Current upload preflight identity/partition compatibility",
+  "hardware": "Host artifacts and read-only board partition table",
+  "procedure": "Read device0x8000..0x8bff; byte-compare generated partitions.bin; hash current firmware.bin; python tools/check_resources.py",
+  "expected": "Same partition table and identified image within app0",
+  "actual": "PASS device/generated tables identical SHA256 bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce. Current image831408 B SHA256 2b43fd32b2d8fbac27263b9bd9226c22c497d331187b384397593e59bb4661f2; capacity PASS.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-02-account-entry-preflight.txt",
+    "docs/evidence/2026-11-02-account-entry-resource-check.txt"
+  ],
+  "evidence_kind": "Sanitized captured serial/tool output plus byte/hash comparison",
+  "limitations": "No runtime or account-data read; physical heap/stack/PSRAM/timing/power unmeasured."
+}
+```

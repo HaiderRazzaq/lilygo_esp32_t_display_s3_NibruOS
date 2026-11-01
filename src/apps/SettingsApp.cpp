@@ -7,6 +7,7 @@
 #include "services/SettingsService.h"
 #include "services/WiFiService.h"
 #include "services/SecurityService.h"
+#include "services/TotpService.h"
 #include "services/CryptoService.h"
 #include "BoardConfig.h"
 #include <Arduino.h>
@@ -627,7 +628,7 @@ void SettingsApp::renderSecurity(AppContext& ctx) {
   t.drawRoundRect(10, 128, 300, 22, 4, Colors::Red);
   screen.label(86, 134, "[ LOCK DEVICE NOW ]", Colors::Red, 1, Colors::Panel);
 
-  screen.footer("Tap Back to exit | Zero plaintext secrets");
+  screen.footer(pinError_ ? "Configure PIN; vault/storage may block changes" : "Tap Back to exit | PIN protects vault");
 }
 
 void SettingsApp::handleSecurityTouch(AppContext& ctx, const TouchEvent& ev) {
@@ -635,13 +636,14 @@ void SettingsApp::handleSecurityTouch(AppContext& ctx, const TouchEvent& ev) {
 
   // Button 1: Toggle PIN Lock (Y: 76..98)
   if (ev.y >= 76 && ev.y <= 98 && ev.x >= 10 && ev.x <= 310) {
-    ctx.security.setPinEnabled(!ctx.security.isPinEnabled());
+    pinError_ = !ctx.security.setPinEnabled(!ctx.security.isPinEnabled());
     invalidate();
     return;
   }
 
   // Button 2: Change PIN (Y: 102..124)
   if (ev.y >= 102 && ev.y <= 124 && ev.x >= 10 && ev.x <= 310) {
+    if (!TotpService::canChangeCredentials()) { pinError_ = true; invalidate(); return; }
     subView_ = SettingsSubView::SetPin;
     pinInputLen_ = 0;
     pinInputBuffer_[0] = '\0';
@@ -654,7 +656,7 @@ void SettingsApp::handleSecurityTouch(AppContext& ctx, const TouchEvent& ev) {
   // Button 3: Lock Now (Y: 128..150)
   if (ev.y >= 128 && ev.y <= 150 && ev.x >= 10 && ev.x <= 310) {
     if (!ctx.security.isPinEnabled()) {
-      ctx.security.setPinEnabled(true);
+      if (!ctx.security.setPinEnabled(true)) { pinError_ = true; invalidate(); return; }
     }
     ctx.security.lock();
     return;
@@ -671,7 +673,7 @@ void SettingsApp::renderSetPin(AppContext& ctx) {
 
   // Status & Guidance (Y: 30..44)
   if (pinError_) {
-    screen.label(64, 36, "Error: PIN must be 4 to 8 digits!", Colors::Red, 1, Colors::Bg);
+    screen.label(12, 36, "PIN invalid, vault active or save failed", Colors::Red, 1, Colors::Bg);
   } else {
     screen.label(60, 36, "Enter 4 to 8 digits, then tap SAVE", Colors::White, 1, Colors::Bg);
   }
@@ -756,14 +758,16 @@ void SettingsApp::handleSetPinTouch(AppContext& ctx, const TouchEvent& ev) {
               pinError_ = true;
               invalidate();
             } else {
-              ctx.security.setPin(pinInputBuffer_);
-              ctx.security.setPinEnabled(true);
+              if (!ctx.security.setPin(pinInputBuffer_) || !ctx.security.setPinEnabled(true)) {
+                pinError_ = true; invalidate(); return;
+              }
               CryptoService::secureZero(pinInputBuffer_, sizeof(pinInputBuffer_));
               pinInputLen_ = 0;
               subView_ = SettingsSubView::Security;
               fullRedraw_ = true;
               invalidate();
               Serial.println("[Settings] New security PIN set and enabled.");
+              ctx.security.lock();
             }
           }
           return;

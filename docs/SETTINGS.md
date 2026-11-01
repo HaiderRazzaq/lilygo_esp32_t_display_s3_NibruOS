@@ -90,3 +90,9 @@ once per view. No sprite/framebuffer or graphics framework was introduced.
 The owner's original physical FAIL is retained as HWT-0010; software tests/builds
 pass, but repaired runtime acceptance is HWT-0012, NOT RUN. See
 [resource impact](performance/TOUCH_FIX_RESOURCE_IMPACT.md).
+
+## Authenticator PIN compatibility
+Fresh devices require explicit PIN configuration; atomic credentials replace
+multi-key writes and valid legacy metadata remains readable. PIN changes and
+disabling are blocked while TOTP storage exists; errors are visible. Settings
+reset still preserves security/vault data. See [authenticator](AUTHENTICATOR.md).

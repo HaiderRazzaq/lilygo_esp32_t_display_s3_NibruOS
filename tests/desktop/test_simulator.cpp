@@ -1,5 +1,7 @@
+#include "services/AccountImportService.h"
 #define SDL_MAIN_HANDLED
 #include <Arduino.h>
+#include <Preferences.h>
 #include "core/AppContext.h"
 #include "core/AppManager.h"
 #include "core/IApp.h"
@@ -27,10 +29,14 @@
 #include "platform/desktop/DesktopInput.h"
 #include "platform/desktop/DesktopStorage.h"
 #include "platform/desktop/MockWiFiService.h"
+#include "tests/support/AuthenticatorFlow.h"
+#include "tests/support/AccountImportFixture.h"
 
 #include <cassert>
 #include <cstdio>
 #include <vector>
+#include <filesystem>
+#include <fstream>
 
 void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, TotpApp& totpApp, SettingsApp& settingsApp) {
   std::printf("[Test] Running Core Lifecycle & AppManager Tests...\n");
@@ -270,7 +276,7 @@ void testRepeatedLifecycleCycles(AppManager& launcher) {
     assert(launcher.isHome());
   }
 
-  std::printf("  -> 25 Lifecycle Cycles PASS (Zero leaks, clean state)\n");
+  std::printf("  -> 25 Lifecycle Cycles PASS (host control flow; no physical leak measurement)\n");
 }
 
 void testModularArchitecture(AppContext& ctx) {
@@ -312,7 +318,7 @@ int main() {
   std::printf("==================================================\n\n");
 
   // Initialize headless simulator environment
-  DesktopStorage::instance().init("simulator/runtime_test");
+  DesktopStorage::instance().init(".testbuild/auth_runtime_test");
   SDLDisplay::instance().init(1, true); // headless = true
 
   DisplayManager display;
@@ -324,7 +330,9 @@ int main() {
   TotpService totp;
   UsbHidService usbHid;
 
-  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid};
+  AccountImportService accountImport;
+
+  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport};
   AppManager launcher(context);
 
   WiFiApp wifiApp;
@@ -346,6 +354,92 @@ int main() {
   testSettingsPersistence(context);
   testModularArchitecture(context);
   testRepeatedLifecycleCycles(launcher);
+  // Shared application UI, real Windows crypto, disk-backed test-only NVS.
+  Preferences::resetMock();
+  security.setCredentialChangeGuard(TotpService::canChangeCredentials);
+  security.begin();
+  assert(security.setPin("739126"));
+  assert(security.setPinEnabled(true));
+  assert(security.verifyPin("739126")); security.unlock();
+  totp.begin();
+  testAuthenticatorEntryFlow(context, totpApp);
+  assert(DesktopStorage::instance().reloadNvs()); // Reopen from actual disk, not the in-memory map.
+  security.begin();
+  assert(security.verifyPin("739126")); security.unlock();
+  totpApp.onEnter(context);
+  totpApp.render(context);
+  // Export a fixture-only framebuffer for visual QA, outside source control.
+  if (FILE* image = std::fopen(".testbuild/authenticator-card.ppm", "wb")) {
+    std::fprintf(image, "P6\n320 170\n255\n");
+    const uint16_t* pixels = SDLDisplay::instance().framebuffer();
+    for (int i = 0; i < 320 * 170; ++i) {
+      const uint16_t p = pixels[i];
+      const unsigned char rgb[] = {static_cast<unsigned char>((p >> 11) * 255 / 31),
+          static_cast<unsigned char>(((p >> 5) & 63) * 255 / 63), static_cast<unsigned char>((p & 31) * 255 / 31)};
+      std::fwrite(rgb, 1, 3, image);
+    }
+    std::fclose(image);
+  }
+  authAdd(totpApp, context);
+  totpApp.render(context);
+  if (FILE* image = std::fopen(".testbuild/entry-keyboard.ppm", "wb")) {
+    std::fprintf(image, "P6\n320 170\n255\n");
+    for (int i = 0; i < 320 * 170; ++i) {
+      const uint16_t p = SDLDisplay::instance().framebuffer()[i];
+      const unsigned char rgb[] = {static_cast<unsigned char>((p >> 11) * 255 / 31),
+          static_cast<unsigned char>(((p >> 5) & 63) * 255 / 63), static_cast<unsigned char>((p & 31) * 255 / 31)};
+      std::fwrite(rgb,1,3,image);
+    }
+    std::fclose(image);
+  }
+  assert(totpApp.onBack(context));
+  totpApp.onExit(context);
+  AccountImportTransport io(ImportFixture::openImport, ImportFixture::closeImport, ImportFixture::readImport);
+  AccountImportService paired(&io);
+  AppContext pairedContext{display, resources, wifi, security, settings, timeService, totp, usbHid, paired};
+  totpApp.onEnter(pairedContext);
+  authTap(totpApp, pairedContext, 110, 158);
+  authTap(totpApp, pairedContext, 160, 88);
+  assert(paired.state() == ImportState::Waiting);
+  ImportFixture::input = ImportFixture::frame(paired, "Imported\tGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ\t6\t30");
+  for (unsigned i = 0; i < 8; ++i) totpApp.onTick(pairedContext, millis() + i);
+  assert(paired.state() == ImportState::Review && totp.accountCount() == 1);
+  const uint32_t confirmNow = millis() + 400;
+  setCustomMillis(confirmNow);
+  authTap(totpApp, pairedContext, 240, 125);
+  assert(totp.accountCount() == 2 && paired.state() == ImportState::Idle);
+  totpApp.onExit(pairedContext);
+  totpApp.onExit(context);
+  Preferences::resetMock();
+  {
+    auto& storage = DesktopStorage::instance();
+    const std::filesystem::path file = ".testbuild/auth_runtime_test/nvs_store.dat";
+    const std::filesystem::path backup = ".testbuild/auth_runtime_test/write-failure-backup.dat";
+    assert(storage.nvsOpen("fault_fixture", false));
+    const uint8_t before = 17, after = 29;
+    assert(storage.nvsPutBytes("fault_fixture", "value", &before, 1) == 1);
+    std::filesystem::rename(file, backup);
+    std::filesystem::create_directory(file); // Real OS replacement/write failure.
+    const size_t written = storage.nvsPutBytes("fault_fixture", "value", &after, 1);
+    std::filesystem::remove(file);
+    std::filesystem::rename(backup, file); // Restore fixture before asserting.
+    assert(written == 0);
+    uint8_t recovered = 0;
+    assert(storage.nvsGetBytes("fault_fixture", "value", &recovered, 1) == 1 && recovered == 17);
+    storage.nvsClose("fault_fixture");
+    {
+      std::ofstream corrupt(file, std::ios::binary | std::ios::trunc);
+      corrupt << "BAD";
+    }
+    assert(!storage.reloadNvs());
+    assert(!storage.nvsOpen("must_not_overwrite", false));
+    storage.flush();
+    std::ifstream preserved(file, std::ios::binary);
+    const std::string contents((std::istreambuf_iterator<char>(preserved)), {});
+    assert(contents == "BAD");
+    preserved.close();
+    storage.resetNvs(); // Explicit recovery of this test-only fixture.
+  }
 
   std::printf("\n==================================================\n");
   std::printf("  ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY!\n");

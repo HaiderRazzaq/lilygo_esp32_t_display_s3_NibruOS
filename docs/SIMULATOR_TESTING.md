@@ -116,3 +116,13 @@ ctest --test-dir build --output-on-failure
   ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY!
 ==================================================
 ```
+
+## Authenticator regressions
+Shared tests/support/AuthenticatorFlow.h exercises real app entry/save/reopen/
+cancel and >=20 cycles. Windows CNG/OS entropy replace deterministic simulator
+crypto. Actual OS write failure, corrupt-file preservation and disk reopen have
+coverage. Tests use .testbuild, preserving normal runtime/tracked fixture.
+Windows fallback: tools\run_desktop_tests.bat --smoke, or
+python tools/run_desktop_tests.py --smoke with CXX/SDL2_ROOT. See [operation](AUTHENTICATOR.md).
+
+Account entry adds actual shared QWERTY and injected USB receive/review/SAVE flows in tests/desktop/test_simulator.cpp (VER-0043). Desktop native serial/UDP is intentionally not implemented; host service fixtures exercise the same state machine.

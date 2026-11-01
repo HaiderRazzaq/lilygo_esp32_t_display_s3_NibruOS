@@ -1,0 +1,173 @@
+
+=== entry-red-keyboard.txt ===
+Assertion failed: Base32Keyboard::keyAt(18, 60) == '1', file tests/host/test_authenticator.cpp, line 29
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 21, in <module>
+    subprocess.run([exe], check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe']' returned non-zero exit status 3221226505.
+
+
+=== entry-red-import.txt ===
+lld-link: error: undefined symbol: AccountImportService::start(ImportMode, unsigned int)
+>>> referenced by C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\host\test_account_import.cpp:42
+>>>               C:\Users\haide\AppData\Local\zig\o\f32abb7ab33b3a8b3a4c25298534bd0f\test_account_import.obj:(testAccountImport())
+>>> referenced by C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\host\test_account_import.cpp:57
+>>>               C:\Users\haide\AppData\Local\zig\o\f32abb7ab33b3a8b3a4c25298534bd0f\test_account_import.obj:(testAccountImport())
+>>> referenced by C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\host\test_account_import.cpp:69
+>>>               C:\Users\haide\AppData\Local\zig\o\f32abb7ab33b3a8b3a4c25298534bd0f\test_account_import.obj:(testAccountImport())
+>>> referenced 1 more times
+
+lld-link: error: undefined symbol: AccountImportService::stop()
+>>> referenced by C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\host\test_account_import.cpp:54
+>>>               C:\Users\haide\AppData\Local\zig\o\f32abb7ab33b3a8b3a4c25298534bd0f\test_account_import.obj:(testAccountImport())
+>>> referenced by C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\host\test_account_import.cpp:68
+>>>               C:\Users\haide\AppData\Local\zig\o\f32abb7ab33b3a8b3a4c25298534bd0f\test_account_import.obj:(testAccountImport())
+>>> referenced by C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\host\test_account_import.cpp:77
+>>>               C:\Users\haide\AppData\Local\zig\o\f32abb7ab33b3a8b3a4c25298534bd0f\test_account_import.obj:(testAccountImport())
+
+lld-link: error: undefined symbol: AccountImportService::tick(unsigned int)
+>>> referenced by C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\host\test_account_import.cpp:66
+>>>               C:\Users\haide\AppData\Local\zig\o\f32abb7ab33b3a8b3a4c25298534bd0f\test_account_import.obj:(testAccountImport())
+>>> referenced by C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\host\test_account_import.cpp:70
+>>>               C:\Users\haide\AppData\Local\zig\o\f32abb7ab33b3a8b3a4c25298534bd0f\test_account_import.obj:(testAccountImport())
+>>> referenced by C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\host\test_account_import.cpp:34
+>>>               C:\Users\haide\AppData\Local\zig\o\f32abb7ab33b3a8b3a4c25298534bd0f\test_account_import.obj:((anonymous namespace)::pump(AccountImportService&, unsigned int))
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 19, in <module>
+    subprocess.run(compiler + flags + sources + ['tests/host/test_main.cpp', 'tests/host/test_settings.cpp', 'tests/host/test_authenticator.cpp', 'tests/host/test_account_import.cpp', '-o', exe] + (['-lbcrypt'] if os.name == 'nt' else []), check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['.testbuild/toolchain/ziglang/zig.exe', 'c++', '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I.', '-Itests/host/stubs', '-Iinclude', '-Isrc', '-Wno-nullability-completeness', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\AppManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\MemoryProfiler.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\ResourceManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\ButtonManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\DisplayManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\TouchManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\ui\\HomeScreen.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\CryptoService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\SecurityService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\SettingsService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\TimeService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\TotpService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\UsbHidService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\WiFiService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\SettingsApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\SystemInfoApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\TotpApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\TouchTestApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\WiFiApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\WiFiScannerApp.cpp', 'tests/host/test_main.cpp', 'tests/host/test_settings.cpp', 'tests/host/test_authenticator.cpp', 'tests/host/test_account_import.cpp', '-o', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe', '-lbcrypt']' returned non-zero exit status 1.
+
+
+=== entry-red-companion.txt ===
+test_ciphertext_only_relay (test_account_setup.SetupTests.test_ciphertext_only_relay) ... ERROR
+test_csrf_and_origin_required (test_account_setup.SetupTests.test_csrf_and_origin_required) ... ----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 7977)
+Traceback (most recent call last):
+  File "C:\Python312\Lib\socketserver.py", line 318, in _handle_request_noblock
+    self.process_request(request, client_address)
+  File "C:\Python312\Lib\socketserver.py", line 349, in process_request
+    self.finish_request(request, client_address)
+  File "C:\Python312\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Python312\Lib\socketserver.py", line 761, in __init__
+    self.handle()
+  File "C:\Python312\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\Python312\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\account_setup.py", line 67, in do_POST
+    if not self.valid_host() or self.headers.get('Origin') != origin or not hmac.compare_digest(self.headers.get('X-Nibru-CSRF', ''), token):
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: comparing strings with non-ASCII characters is not supported
+----------------------------------------
+ERROR
+test_no_remote_host_or_paths (test_account_setup.SetupTests.test_no_remote_host_or_paths) ... ok
+test_oversize_is_rejected (test_account_setup.SetupTests.test_oversize_is_rejected) ... ok
+
+======================================================================
+ERROR: test_ciphertext_only_relay (test_account_setup.SetupTests.test_ciphertext_only_relay)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\tools\test_account_setup.py", line 46, in test_ciphertext_only_relay
+    with patch.object(setup, 'send_ciphertext') as send:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\unittest\mock.py", line 1461, in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\unittest\mock.py", line 1434, in get_original
+    raise AttributeError(
+AttributeError: <module 'account_setup' from 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\tools\\account_setup.py'> does not have the attribute 'send_ciphertext'
+
+======================================================================
+ERROR: test_csrf_and_origin_required (test_account_setup.SetupTests.test_csrf_and_origin_required)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\tools\test_account_setup.py", line 43, in test_csrf_and_origin_required
+    self.assertEqual(self.request('POST', '/relay', '{}', headers)[0], 403)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\tools\test_account_setup.py", line 27, in request
+    response = connection.getresponse()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\http\client.py", line 1428, in getresponse
+    response.begin()
+  File "C:\Python312\Lib\http\client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\http\client.py", line 300, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+----------------------------------------------------------------------
+Ran 4 tests in 1.051s
+
+FAILED (errors=2)
+
+
+=== entry-red-usb-ui.txt ===
+✖ busy USB open can retry without page reload (7.0724ms)
+✖ clear fields still clears when disconnected close rejects (2.1187ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 60.5256
+
+✖ failing tests:
+
+test at tests\tools\account_setup_ui.test.mjs:21:1
+✖ busy USB open can retry without page reload (7.0724ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 2
+  
+      at file:///C:/Users/haide/OneDrive/Desktop/Electronics/lilygo_esp32_t_display_s3_NibruOS/tests/tools/account_setup_ui.test.mjs:30:12
+      at async withUI (file:///C:/Users/haide/OneDrive/Desktop/Electronics/lilygo_esp32_t_display_s3_NibruOS/tests/tools/account_setup_ui.test.mjs:15:5)
+      at async TestContext.<anonymous> (file:///C:/Users/haide/OneDrive/Desktop/Electronics/lilygo_esp32_t_display_s3_NibruOS/tests/tools/account_setup_ui.test.mjs:23:3)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tools\account_setup_ui.test.mjs:34:1
+✖ clear fields still clears when disconnected close rejects (2.1187ms)
+  Error: Disconnected
+      at Object.close (file:///C:/Users/haide/OneDrive/Desktop/Electronics/lilygo_esp32_t_display_s3_NibruOS/tests/tools/account_setup_ui.test.mjs:35:142)
+      at Object.click (file:///C:/Users/haide/OneDrive/Desktop/Electronics/lilygo_esp32_t_display_s3_NibruOS/tools/account_setup/account_setup.mjs?ui=0.45718945518612397:62:28)
+      at file:///C:/Users/haide/OneDrive/Desktop/Electronics/lilygo_esp32_t_display_s3_NibruOS/tests/tools/account_setup_ui.test.mjs:38:30
+      at async withUI (file:///C:/Users/haide/OneDrive/Desktop/Electronics/lilygo_esp32_t_display_s3_NibruOS/tests/tools/account_setup_ui.test.mjs:15:5)
+      at async TestContext.<anonymous> (file:///C:/Users/haide/OneDrive/Desktop/Electronics/lilygo_esp32_t_display_s3_NibruOS/tests/tools/account_setup_ui.test.mjs:35:3)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7)
+
+
+=== entry-red-expired-save.txt ===
+Assertion failed: totp.accountCount() == 1, file tests/host/test_account_import.cpp, line 112
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 21, in <module>
+    subprocess.run([exe], check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe']' returned non-zero exit status 3221226505.
+
+
+=== entry-wifi-test-setup-fail.txt ===
+Assertion failed: service.state() == ImportState::Waiting && resources.wifiOwner() == ResourceOwner::AuthenticatorImport, file tests/host/test_account_import.cpp, line 91
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 21, in <module>
+    subprocess.run([exe], check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe']' returned non-zero exit status 3221226505.
+

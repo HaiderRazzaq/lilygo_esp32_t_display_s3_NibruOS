@@ -15,7 +15,8 @@ public:
   void begin();
 
   bool isPinEnabled() const { return pinEnabled_; }
-  void setPinEnabled(bool en);
+  bool setPinEnabled(bool en);
+  void setCredentialChangeGuard(bool (*guard)()) { credentialChangeGuard_ = guard; }
 
   bool isLocked() const { return locked_; }
   void lock();
@@ -68,7 +69,9 @@ private:
   uint32_t lockoutUntilMs_ = 0;
 
   void load();
-  void save();
+  bool save();
+  bool (*credentialChangeGuard_)() = nullptr;
+  bool writable_ = true;
   void recordFailedAttempt();
   void resetFailedAttempts();
   void wipeSessionKey();

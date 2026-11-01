@@ -82,6 +82,7 @@ set(NIBRU_SHARED_SOURCES
   src/services/SettingsService.cpp
   src/services/SecurityService.cpp
   src/services/TotpService.cpp
+  src/services/AccountImportService.cpp
   src/services/CryptoService.cpp
   src/services/UsbHidService.cpp
   src/services/TimeService.cpp
@@ -125,6 +126,9 @@ target_include_directories(nibru_simulator PRIVATE
 target_link_libraries(nibru_simulator PRIVATE
   ${SDL2_TARGET}
 )
+if(WIN32)
+  target_link_libraries(nibru_simulator PRIVATE bcrypt)
+endif()
 
 # Target: Desktop Automated Test Runner
 add_executable(nibru_tests
@@ -150,6 +154,9 @@ target_include_directories(nibru_tests PRIVATE
 target_link_libraries(nibru_tests PRIVATE
   ${SDL2_TARGET}
 )
+if(WIN32)
+  target_link_libraries(nibru_tests PRIVATE bcrypt)
+endif()
 
 # Copy SDL2.dll next to output binaries on Windows
 if(WIN32 AND DEFINED SDL2_DLL_PATH)

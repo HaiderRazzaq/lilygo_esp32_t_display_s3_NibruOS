@@ -1,3 +1,4 @@
+#include "services/AccountImportService.h"
 #include "core/AppManager.h"
 #include "core/IApp.h"
 #include "core/EventTypes.h"
@@ -160,7 +161,8 @@ int main() {
   TimeService timeService;
   TotpService totpService;
   UsbHidService usbHid;
-  AppContext context{display, resources, wifi, security, settings, timeService, totpService, usbHid};
+  AccountImportService accountImport;
+  AppContext context{display, resources, wifi, security, settings, timeService, totpService, usbHid, accountImport};
   AppManager mgr(context);
   SystemInfoApp info;
   TouchTestApp touch;
@@ -416,5 +418,9 @@ int main() {
   assert(std::strlen(testMac) > 0);
 
   testSettings(context);
+  extern void testAuthenticator();
+  testAuthenticator();
+  extern void testAccountImport();
+  testAccountImport();
   puts("PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests");
 }

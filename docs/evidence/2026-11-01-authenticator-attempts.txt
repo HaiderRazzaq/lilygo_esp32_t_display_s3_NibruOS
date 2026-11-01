@@ -1,0 +1,578 @@
+Preserved RED, setup failure and blocked attempts.
+
+CAPTURE auth-red-empty.txt
+lld-link: error: failed to write output 'C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\.testbuild\nibru_smoke.exe': Permission denied
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 19, in <module>
+    subprocess.run(compiler + flags + sources + ['tests/host/test_main.cpp', 'tests/host/test_settings.cpp', 'tests/host/test_authenticator.cpp', '-o', exe], check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['.testbuild/toolchain/ziglang/zig.exe', 'c++', '-std=c++17', '-Wall', '-Wextra', '-Werror', '-Itests/host/stubs', '-Iinclude', '-Isrc', '-Wno-nullability-completeness', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\AppManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\MemoryProfiler.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\ResourceManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\ButtonManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\DisplayManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\TouchManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\ui\\HomeScreen.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\CryptoService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\SecurityService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\SettingsService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\TimeService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\TotpService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\UsbHidService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\WiFiService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\SettingsApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\SystemInfoApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\TotpApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\TouchTestApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\WiFiApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\WiFiScannerApp.cpp', 'tests/host/test_main.cpp', 'tests/host/test_settings.cpp', 'tests/host/test_authenticator.cpp', '-o', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe']' returned non-zero exit status 1.
+
+CAPTURE auth-red-empty-retry.txt
+thread 33488 panic: left shift of 303651611 by 5 places cannot be represented in type 'int'
+C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\src\services\TotpService.cpp:35:0: 0x7ff76d4c0eba in TotpService::decodeBase32 (TotpService.obj)
+    buffer = (buffer << 5) | val;
+
+C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\src\services\TotpService.cpp:108:0: 0x7ff76d4c1c08 in TotpService::addAccount (TotpService.obj)
+  int dLen = decodeBase32(base32Secret, decoded, sizeof(decoded));
+
+C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\src\services\TotpService.cpp:155:0: 0x7ff76d4c0c09 in TotpService::seedDefaultDemoAccounts (TotpService.obj)
+  addAccount("GitHub", "dev-sec", "JBSWY3DPEHPK3PXP", 6, 30);
+
+C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\src\services\TotpService.cpp:14:0: 0x7ff76d4c0ba4 in TotpService::begin (TotpService.obj)
+    seedDefaultDemoAccounts();
+
+C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\host\test_authenticator.cpp:7:0: 0x7ff76d4ef685 in testAuthenticator (test_authenticator.obj)
+  vault.begin();
+
+C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tests\host\test_main.cpp:420:0: 0x7ff76d4ea710 in main (test_main.obj)
+  testAuthenticator();
+
+C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\.testbuild\toolchain\ziglang\lib\libc\mingw\crt\crtexe.c:259:0: 0x7ff76d4efa5b in __tmainCRTStartup (crt2.obj)
+    mainret = _tmain (argc, argv, envp);
+
+C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\.testbuild\toolchain\ziglang\lib\libc\mingw\crt\crtexe.c:179:0: 0x7ff76d4efabb in mainCRTStartup (crt2.obj)
+  ret = __tmainCRTStartup ();
+
+???:?:?: 0x7ffd014edda6 in ??? (KERNEL32.DLL)
+???:?:?: 0x7ffd02b39c5b in ??? (ntdll.dll)
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 21, in <module>
+    subprocess.run([exe], check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe']' returned non-zero exit status 3.
+
+CAPTURE auth-red-native.txt
+Assertion failed: vault.accountCount() == 0, file tests/host/test_authenticator.cpp, line 9
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 21, in <module>
+    subprocess.run([exe], check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe']' returned non-zero exit status 3221226505.
+
+CAPTURE auth-red-usb-time.txt
+tests/host/test_authenticator.cpp:107:15: error: no matching constructor for initialization of 'TimeService'
+  107 |   TimeService clock(testClock);
+      |               ^     ~~~~~~~~~
+src/services/TimeService.h:9:7: note: candidate constructor (the implicit copy constructor) not viable: no known conversion from 'time_t (time_t *)' (aka 'long long (long long *)') to 'const TimeService' for 1st argument
+    9 | class TimeService {
+      |       ^~~~~~~~~~~
+src/services/TimeService.h:9:7: note: candidate constructor (the implicit move constructor) not viable: no known conversion from 'time_t (time_t *)' (aka 'long long (long long *)') to 'TimeService' for 1st argument
+    9 | class TimeService {
+      |       ^~~~~~~~~~~
+src/services/TimeService.h:9:7: note: candidate constructor (the implicit default constructor) not viable: requires 0 arguments, but 1 was provided
+tests/host/test_authenticator.cpp:117:3: error: unknown type name 'UsbHidTransport'
+  117 |   UsbHidTransport transport{usbReady, usbReport};
+      |   ^
+tests/host/test_authenticator.cpp:126:14: error: no member named 'transferState' in 'UsbHidService'
+  126 |   assert(usb.transferState() == UsbTransferState::Sending);
+      |          ~~~ ^
+.testbuild\toolchain\ziglang\lib\libc\include\any-windows-any/assert.h:52:7: note: expanded from macro 'assert'
+   52 |  ((!!(_Expression)) || \
+      |       ^~~~~~~~~~~
+tests/host/test_authenticator.cpp:126:33: error: use of undeclared identifier 'UsbTransferState'
+  126 |   assert(usb.transferState() == UsbTransferState::Sending);
+      |                                 ^
+tests/host/test_authenticator.cpp:127:41: error: no member named 'tick' in 'UsbHidService'
+  127 |   for (unsigned i = 0; i < 12; ++i) usb.tick(millis() + i * 20);
+      |                                     ~~~ ^
+tests/host/test_authenticator.cpp:128:14: error: no member named 'transferState' in 'UsbHidService'
+  128 |   assert(usb.transferState() == UsbTransferState::Sent && reportCount == 12);
+      |          ~~~ ^
+.testbuild\toolchain\ziglang\lib\libc\include\any-windows-any/assert.h:52:7: note: expanded from macro 'assert'
+   52 |  ((!!(_Expression)) || \
+      |       ^~~~~~~~~~~
+tests/host/test_authenticator.cpp:128:33: error: use of undeclared identifier 'UsbTransferState'
+  128 |   assert(usb.transferState() == UsbTransferState::Sent && reportCount == 12);
+      |                                 ^
+tests/host/test_authenticator.cpp:130:29: error: no member named 'tick' in 'UsbHidService'
+  130 |   acceptReport = false; usb.tick(millis());
+      |                         ~~~ ^
+tests/host/test_authenticator.cpp:131:14: error: no member named 'transferState' in 'UsbHidService'
+  131 |   assert(usb.transferState() == UsbTransferState::Failed);
+      |          ~~~ ^
+.testbuild\toolchain\ziglang\lib\libc\include\any-windows-any/assert.h:52:7: note: expanded from macro 'assert'
+   52 |  ((!!(_Expression)) || \
+      |       ^~~~~~~~~~~
+tests/host/test_authenticator.cpp:131:33: error: use of undeclared identifier 'UsbTransferState'
+  131 |   assert(usb.transferState() == UsbTransferState::Failed);
+      |                                 ^
+tests/host/test_authenticator.cpp:134:7: error: no member named 'cancel' in 'UsbHidService'
+  134 |   usb.cancel();
+      |   ~~~ ^
+tests/host/test_authenticator.cpp:135:14: error: no member named 'transferState' in 'UsbHidService'
+  135 |   assert(usb.transferState() == UsbTransferState::Idle);
+      |          ~~~ ^
+.testbuild\toolchain\ziglang\lib\libc\include\any-windows-any/assert.h:52:7: note: expanded from macro 'assert'
+   52 |  ((!!(_Expression)) || \
+      |       ^~~~~~~~~~~
+tests/host/test_authenticator.cpp:135:33: error: use of undeclared identifier 'UsbTransferState'
+  135 |   assert(usb.transferState() == UsbTransferState::Idle);
+      |                                 ^
+tests/host/test_authenticator.cpp:137:7: error: no member named 'tick' in 'UsbHidService'
+  137 |   usb.tick(millis() + 1000);
+      |   ~~~ ^
+14 errors generated.
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 19, in <module>
+    subprocess.run(compiler + flags + sources + ['tests/host/test_main.cpp', 'tests/host/test_settings.cpp', 'tests/host/test_authenticator.cpp', '-o', exe] + (['-lbcrypt'] if os.name == 'nt' else []), check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['.testbuild/toolchain/ziglang/zig.exe', 'c++', '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I.', '-Itests/host/stubs', '-Iinclude', '-Isrc', '-Wno-nullability-completeness', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\AppManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\MemoryProfiler.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\ResourceManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\ButtonManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\DisplayManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\TouchManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\ui\\HomeScreen.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\CryptoService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\SecurityService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\SettingsService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\TimeService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\TotpService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\UsbHidService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\WiFiService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\SettingsApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\SystemInfoApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\TotpApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\TouchTestApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\WiFiApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\WiFiScannerApp.cpp', 'tests/host/test_main.cpp', 'tests/host/test_settings.cpp', 'tests/host/test_authenticator.cpp', '-o', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe', '-lbcrypt']' returned non-zero exit status 1.
+
+CAPTURE auth-red-ui.txt
+In file included from tests/host/test_authenticator.cpp:10:
+./tests/support/AuthenticatorFlow.h:11:51: error: use of undeclared identifier 'millis'
+   11 |                             TouchGesture::Tap, 0, millis()});
+      |                                                   ^
+1 error generated.
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 19, in <module>
+    subprocess.run(compiler + flags + sources + ['tests/host/test_main.cpp', 'tests/host/test_settings.cpp', 'tests/host/test_authenticator.cpp', '-o', exe] + (['-lbcrypt'] if os.name == 'nt' else []), check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['.testbuild/toolchain/ziglang/zig.exe', 'c++', '-std=c++17', '-Wall', '-Wextra', '-Werror', '-I.', '-Itests/host/stubs', '-Iinclude', '-Isrc', '-Wno-nullability-completeness', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\AppManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\MemoryProfiler.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\ResourceManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\ButtonManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\DisplayManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\TouchManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\ui\\HomeScreen.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\CryptoService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\SecurityService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\SettingsService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\TimeService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\TotpService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\UsbHidService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\WiFiService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\SettingsApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\SystemInfoApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\TotpApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\TouchTestApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\WiFiApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\WiFiScannerApp.cpp', 'tests/host/test_main.cpp', 'tests/host/test_settings.cpp', 'tests/host/test_authenticator.cpp', '-o', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe', '-lbcrypt']' returned non-zero exit status 1.
+
+CAPTURE auth-red-ui-retry.txt
+Assertion failed: ctx.totp.accountCount() == 1, file ./tests/support/AuthenticatorFlow.h, line 34
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 21, in <module>
+    subprocess.run([exe], check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe']' returned non-zero exit status 3221226505.
+
+CAPTURE auth-desktop.txt
+C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\platform\desktop\MockWiFiService.cpp:10:22: warning: unused variable 'MOCK_WL_NO_SSID_AVAIL' [-Wunused-const-variable]
+   10 | static constexpr int MOCK_WL_NO_SSID_AVAIL = 1;
+      |                      ^~~~~~~~~~~~~~~~~~~~~
+C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\platform\desktop\MockWiFiService.cpp:11:22: warning: unused variable 'MOCK_WL_SCAN_COMPLETED' [-Wunused-const-variable]
+   11 | static constexpr int MOCK_WL_SCAN_COMPLETED = 2;
+      |                      ^~~~~~~~~~~~~~~~~~~~~~
+2 warnings generated.
+tests/desktop/test_simulator.cpp:351:3: error: use of undeclared identifier 'Preferences'
+  351 |   Preferences::resetMock();
+      |   ^
+tests/desktop/test_simulator.cpp:374:3: error: use of undeclared identifier 'Preferences'
+  374 |   Preferences::resetMock();
+      |   ^
+2 errors generated.
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\.testbuild\build_auth_desktop.py", line 9, in <module>
+    subprocess.run([compiler,'c++']+flags+sources+[entry,'.testbuild/sdl/SDL2.lib','-lbcrypt','-o',out],check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\toolchain\\ziglang\\zig.exe', 'c++', '-std=c++17', '-Wall', '-Wextra', '-Wno-unused-parameter', '-Wno-nullability-completeness', '-DUNIT_TEST=1', '-DNIBRU_DESKTOP_SIMULATOR=1', '-DNIBRU_HEADLESS=1', '-I.', '-Iplatform/desktop/stubs', '-Iplatform/desktop', '-Iinclude', '-Isrc', '-I.testbuild/sdl/include', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\AppManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\MemoryProfiler.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\core\\ResourceManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\ButtonManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\DisplayManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\hardware\\TouchManager.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\ui\\HomeScreen.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\CryptoService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\SecurityService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\SettingsService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\TimeService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\TotpService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\UsbHidService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\services\\WiFiService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\SettingsApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\SystemInfoApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\TotpApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\TouchTestApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\WiFiApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\src\\apps\\WiFiScannerApp.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\platform\\desktop\\DesktopDiagnostics.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\platform\\desktop\\DesktopInput.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\platform\\desktop\\DesktopStorage.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\platform\\desktop\\MockWiFiService.cpp', 'C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\platform\\desktop\\SDLDisplay.cpp', 'tests/desktop/test_simulator.cpp', '.testbuild/sdl/SDL2.lib', '-lbcrypt', '-o', '.testbuild/auth_desktop_tests.exe']' returned non-zero exit status 1.
+C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\platform\desktop\DesktopDiagnostics.cpp:14:9: warning: unknown pragma ignored [-Wunknown-pragmas]
+   14 | #pragma comment(lib, "psapi.lib")
+      |         ^
+1 warning generated.
+
+CAPTURE auth-red-disk.txt
+
+==================================================
+  NibruOS Automated Desktop & Shared Logic Tests
+==================================================
+
+[DesktopStorage] Initialized with runtime directory '.testbuild/auth_runtime_test'
+[Test] Running Core Lifecycle & AppManager Tests...
+  -> Core Lifecycle Tests PASS
+[Test] Running UI & Coordinate Transformation Tests...
+  -> UI & Transformation Tests PASS
+[Test] Running Wi-Fi Service & Fault Injection Tests...
+[MockWiFi] Simulation mode set to: Normal (Success)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 1700 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Scan completed with 5 APs
+[WiFi] Scan complete: 5 APs discovered in 1300 ms
+[MockWiFi] Simulation mode set to: Timeout (11s delay -> retry)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 3700 ms (mode: Timeout (11s delay -> retry))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[WiFi] attempt 1/2 failed: Scan timed out
+[WiFi] retrying scan (attempt 2/2)...
+[MockWiFi] Disconnected
+[WiFi] attempt 2/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 15900 ms (mode: Timeout (11s delay -> retry))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[WiFi] attempt 2/2 failed: Scan timed out
+[MockWiFi] Simulation mode set to: ScanFailed (Immediate error)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Simulating immediate scan start failure
+[WiFi] scanNetworks(async)=-2, freeHeap=215000
+[WiFi] attempt 1/2 failed: Scan start rejected
+[WiFi] retrying scan (attempt 2/2)...
+[MockWiFi] Disconnected
+[WiFi] attempt 2/2: STA preparing (650 ms warmup)
+[MockWiFi] Simulating immediate scan start failure
+[WiFi] scanNetworks(async)=-2, freeHeap=215000
+[WiFi] attempt 2/2 failed: Scan start rejected
+[MockWiFi] Simulation mode set to: Normal (Success)
+  -> Wi-Fi Simulation Tests PASS
+[Test] Running Settings Persistence & Desktop NVS Tests...
+[DesktopStorage] NVS storage reset to empty
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+[Settings] Loaded: Bright=100% Timeout=30s Theme=Cyber Cyan
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Settings] Loaded: Bright=50% Timeout=60s Theme=Amber Gold
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+  -> Settings Persistence Tests PASS
+[Test] Running Modular Architecture & HAL Contract Tests...
+  -> Modular Architecture & HAL Tests PASS
+[Test] Running 25 Repeated Lifecycle Entry/Exit Cycles...
+  -> 25 Lifecycle Cycles PASS (Zero leaks, clean state)
+[DesktopStorage] NVS storage reset to empty
+[Security] New PIN hash and salt stored securely.
+[Security] New PIN hash and salt stored securely.
+Assertion failed: written == 0, file tests/desktop/test_simulator.cpp, line 390
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\.testbuild\build_auth_desktop.py", line 10, in <module>
+    subprocess.run(['.testbuild/auth_desktop_tests.exe'],check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['.testbuild/auth_desktop_tests.exe']' returned non-zero exit status 3221226505.
+
+CAPTURE auth-final-host-attempt.txt
+Assertion failed: usb.transferState() == UsbTransferState::Idle, file tests/host/test_authenticator.cpp, line 209
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 21, in <module>
+    subprocess.run([exe], check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe']' returned non-zero exit status 3221226505.
+
+CAPTURE auth-red-default-pin.txt
+Assertion failed: !security.setPinEnabled(true), file tests/host/test_authenticator.cpp, line 107
+Traceback (most recent call last):
+  File "C:\Users\haide\OneDrive\Desktop\Electronics\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 21, in <module>
+    subprocess.run([exe], check=True)
+  File "C:\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['C:\\Users\\haide\\OneDrive\\Desktop\\Electronics\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe']' returned non-zero exit status 3221226505.
+
+CAPTURE auth-target-hid-compile-failure.txt
+Processing lilygo-t-display-s3 (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 35 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- CST816S @ 1.3.0+sha.11fe1fb
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|-- Wire @ 2.0.0
+|-- Preferences @ 2.0.0
+|-- WiFi @ 2.0.0
+Building in release mode
+Compiling .pio\build\lilygo-t-display-s3\src\apps\TotpApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3\src\main.cpp.o
+Compiling .pio\build\lilygo-t-display-s3\src\services\UsbHidService.cpp.o
+In file included from .pio/libdeps/lilygo-t-display-s3/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:7:
+.pio/libdeps/lilygo-t-display-s3/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:7:
+.pio/libdeps/lilygo-t-display-s3/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Linking .pio\build\lilygo-t-display-s3\firmware.elf
+Retrieving maximum program size .pio\build\lilygo-t-display-s3\firmware.elf
+Checking size .pio\build\lilygo-t-display-s3\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [==        ]  15.0% (used 49248 bytes from 327680 bytes)
+Flash: [=         ]  12.6% (used 822549 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3\firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32s3 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_flash(__env__)} --flash_size 16MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+check_image([".pio\build\lilygo-t-display-s3\firmware.bin"], [".pio\build\lilygo-t-display-s3\firmware.elf"])
+{
+  "binary_bytes": 822912,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5730688,
+  "sha256": "cd53c3f42d27562317ed3bfe9bc4af32ed2b14613b207c84ad04aa227eb1ba96",
+  "growth_percent": -2.237259784447528,
+  "warnings": [],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 10.31 seconds =========================
+
+Processing lilygo-t-display-s3-hid (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 35 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- CST816S @ 1.3.0+sha.11fe1fb
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|-- Wire @ 2.0.0
+|-- Preferences @ 2.0.0
+|-- USB @ 2.0.0
+|-- WiFi @ 2.0.0
+Building in release mode
+Compiling .pio\build\lilygo-t-display-s3-hid\src\apps\TotpApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\main.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\services\UsbHidService.cpp.o
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:7:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:7:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+src/services/UsbHidService.cpp: In function 'bool {anonymous}::nativeConnected()':
+src/services/UsbHidService.cpp:13:33: error: 'tud_mounted' was not declared in this scope
+ bool nativeConnected() { return tud_mounted() && !tud_suspended(); }
+                                 ^~~~~~~~~~~
+src/services/UsbHidService.cpp:13:51: error: 'tud_suspended' was not declared in this scope
+ bool nativeConnected() { return tud_mounted() && !tud_suspended(); }
+                                                   ^~~~~~~~~~~~~
+src/services/UsbHidService.cpp:13:51: note: suggested alternative: 'eSuspended'
+ bool nativeConnected() { return tud_mounted() && !tud_suspended(); }
+                                                   ^~~~~~~~~~~~~
+                                                   eSuspended
+src/services/UsbHidService.cpp: At global scope:
+src/services/UsbHidService.cpp:22:79: error: no matching function for call to 'UsbHidTransport::UsbHidTransport(<brace-enclosed initializer list>)'
+ const UsbHidTransport nativeTransport{nativeReady, nativeSend, nativeConnected};
+                                                                               ^
+In file included from src/services/UsbHidService.cpp:1:
+src/services/UsbHidService.h:10:8: note: candidate: 'UsbHidTransport::UsbHidTransport()'
+ struct UsbHidTransport {
+        ^~~~~~~~~~~~~~~
+src/services/UsbHidService.h:10:8: note:   candidate expects 0 arguments, 3 provided
+src/services/UsbHidService.h:10:8: note: candidate: 'constexpr UsbHidTransport::UsbHidTransport(const UsbHidTransport&)'
+src/services/UsbHidService.h:10:8: note:   candidate expects 1 argument, 3 provided
+src/services/UsbHidService.h:10:8: note: candidate: 'constexpr UsbHidTransport::UsbHidTransport(UsbHidTransport&&)'
+src/services/UsbHidService.h:10:8: note:   candidate expects 1 argument, 3 provided
+*** [.pio\build\lilygo-t-display-s3-hid\src\services\UsbHidService.cpp.o] Error 1
+========================== [FAILED] Took 6.83 seconds ==========================
+
+Processing lilygo-t-display-s3-profile (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 35 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- CST816S @ 1.3.0+sha.11fe1fb
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|-- Wire @ 2.0.0
+|-- Preferences @ 2.0.0
+|-- WiFi @ 2.0.0
+Building in release mode
+Compiling .pio\build\lilygo-t-display-s3-profile\src\apps\TotpApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\main.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\services\UsbHidService.cpp.o
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:7:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:7:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Linking .pio\build\lilygo-t-display-s3-profile\firmware.elf
+Retrieving maximum program size .pio\build\lilygo-t-display-s3-profile\firmware.elf
+Checking size .pio\build\lilygo-t-display-s3-profile\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [==        ]  15.0% (used 49248 bytes from 327680 bytes)
+Flash: [=         ]  12.6% (used 823153 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3-profile\firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32s3 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_flash(__env__)} --flash_size 16MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio\build\lilygo-t-display-s3-profile\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+check_image([".pio\build\lilygo-t-display-s3-profile\firmware.bin"], [".pio\build\lilygo-t-display-s3-profile\firmware.elf"])
+{
+  "binary_bytes": 823520,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5730080,
+  "sha256": "298b3e75cc5c253bb8a2d68359d0784235eeeb71a3693b24f8219d89af15171e",
+  "growth_percent": -2.165028797354065,
+  "warnings": [],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 9.95 seconds =========================
+
+Processing lilygo-t-display-s3-ledc (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 35 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- CST816S @ 1.3.0+sha.11fe1fb
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|-- Wire @ 2.0.0
+|-- Preferences @ 2.0.0
+|-- WiFi @ 2.0.0
+Building in release mode
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\apps\TotpApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\main.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\services\UsbHidService.cpp.o
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:7:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:7:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Linking .pio\build\lilygo-t-display-s3-ledc\firmware.elf
+Retrieving maximum program size .pio\build\lilygo-t-display-s3-ledc\firmware.elf
+Checking size .pio\build\lilygo-t-display-s3-ledc\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [==        ]  15.1% (used 49320 bytes from 327680 bytes)
+Flash: [=         ]  12.6% (used 828449 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3-ledc\firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32s3 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_flash(__env__)} --flash_size 16MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio\build\lilygo-t-display-s3-ledc\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+check_image([".pio\build\lilygo-t-display-s3-ledc\firmware.bin"], [".pio\build\lilygo-t-display-s3-ledc\firmware.elf"])
+{
+  "binary_bytes": 828816,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5724784,
+  "sha256": "4f3493bbff5f3c082dbcd2970121d5871ad947eb9e6439ccb3c46caba8a5bbed",
+  "growth_percent": -1.5358588834610047,
+  "warnings": [],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 9.73 seconds =========================
+
+Environment                  Status    Duration
+---------------------------  --------  ------------
+lilygo-t-display-s3          SUCCESS   00:00:10.315
+lilygo-t-display-s3-hid      FAILED    00:00:06.826
+lilygo-t-display-s3-profile  SUCCESS   00:00:09.947
+lilygo-t-display-s3-ledc     SUCCESS   00:00:09.728
+==================== 1 failed, 3 succeeded in 00:00:36.816 ====================

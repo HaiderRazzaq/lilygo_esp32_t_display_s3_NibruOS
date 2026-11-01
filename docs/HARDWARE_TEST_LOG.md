@@ -342,3 +342,126 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Physical verification confirms successful flash write, hash validation, and bootloader reset. Interactive runtime UI/touch observation on physical screen remains pending owner testing."
 }
 ```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0015",
+  "date": "2026-11-01",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted changes",
+  "verification_type": "HARDWARE",
+  "scope": "Pending authenticator device acceptance",
+  "hardware": "LILYGO T-Display-S3 Touch Glass ESP32-S3R8 N16R8; not observed in this task",
+  "wiring": "Existing LCD/touch/buttons/native USB; no connected SD/RTC/BLE module assumed",
+  "procedure": "Preserve existing data first; identify intended image/port and flash only when requested. Configure own PIN, add public fixture, sync time and compare code, power-cycle/unlock/reopen. Check invalid/lost time, USB busy/failure/disconnect/cancel/reconnect and final key release; default USB unavailable, opt-in HID CDC/keyboard enumeration and US layout. Check Back, masked editing, failed writes and delete/PIN guard. Run startup, entry, exit, >=20 cycles and combined Wi-Fi/NTP/TOTP/HID; measure >=150 KiB free internal heap, largest block, PSRAM, stack, input/loop latency and power.",
+  "expected": "Behavior matches the phase-one design and applicable test contract",
+  "actual": "NOT RUN. Default image SHA256 00e74d8689773ea90efc9cfb707fa48aeb593c2cc10d2b8d5edfdb5b8cd0ea8b; optional HID SHA256 07beb7ab38c7670e896e8b5c2ea930550a685b42bc2de19cdf266c87a60f0c55.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending procedure; no physical outcome",
+  "environment": "Windows / Python 3.12.6 / Zig0.15.2 / Arduino-ESP32 2.0.14 espressif32@6.5.0",
+  "limitations": "No physical security, USB, RF, timing or resource claim."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 authenticator phase one",
+  "commit": "9513925 + uncommitted implementation",
+  "environment": "Windows / PlatformIO espressif32@6.5.0 / Arduino-ESP32 2.0.14 / esptool4.5.1",
+  "id": "HWT-0016",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized default firmware upload to COM3",
+  "hardware": "ESP32-S3 revision v0.2, VID303A PID1001 on COM3; identifier redacted",
+  "wiring": "USB-C; existing LCD/CST816S/buttons, no external peripheral changes",
+  "procedure": "Read 3072-byte device table at0x8000 and compare; pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "Write intended default image, verify hashes, send RTS reset; preserve partition layout/NVS range",
+  "actual": "SUCCESS26.18s. Preflight table exact match bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce. Application822912 B written at0x10000 in8.0s; bootloader/table/boot metadata/application hashes verified; RTS reset sent. Image SHA256 00e74d8689773ea90efc9cfb707fa48aeb593c2cc10d2b8d5edfdb5b8cd0ea8b. No full-chip erase; NVS0x9000..0xdfff excluded from flashed ranges.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-02-authenticator-preflight.txt",
+    "docs/evidence/2026-11-02-authenticator-upload-com3.txt"
+  ],
+  "evidence_kind": "Sanitized captured esptool/PlatformIO output and partition-byte comparison",
+  "limitations": "Upload/write/hash/reset only. No observation of boot completion, UI/touch/time/PIN persistence, RF, USB HID or runtime resources; HWT-0015 remains NOT RUN."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "hardware": "Owner LILYGO T-Display-S3 Touch Glass, prior HWT-0016 image",
+  "wiring": "No GPIO/wiring/framework/partition change",
+  "environment": "Windows / Python3.12.6 / Zig0.15.2 / SDL2 2.30.10 / Node24.8.0 / espressif32@6.5.0 Arduino2.0.14",
+  "id": "HWT-0017",
+  "verification_type": "HARDWARE",
+  "scope": "Owner-reported account-entry usability on prior image",
+  "procedure": "Owner opens 2FA and adds a new account",
+  "expected": "Practical long-key entry and familiar keyboard ordering",
+  "actual": "Owner reached Base32 secret prompt, reported long manual typing cumbersome and requested conventional number/letter ordering plus multiple alternate methods.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-02-account-entry-owner-report.txt"
+  ],
+  "evidence_kind": "Owner report, imported from current chat; no independent visual observation",
+  "limitations": "Usability feedback and reachability only, not a boot/touch/TOTP/persistence/RF/resource acceptance suite."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "hardware": "LILYGO T-Display-S3 Touch Glass; new image not interactively observed",
+  "wiring": "No GPIO/wiring/framework/partition change",
+  "environment": "Windows / Python3.12.6 / Zig0.15.2 / SDL2 2.30.10 / Node24.8.0 / espressif32@6.5.0 Arduino2.0.14",
+  "id": "HWT-0018",
+  "verification_type": "HARDWARE",
+  "scope": "Pending easier account-entry and resource acceptance",
+  "procedure": "Use public disposable seed: manual QWERTY/digits/Shift/symbols; Web Serial USB paste then device SAVE; existing-network Wi-Fi paste/SAVE; no autosave/early contact; timeout/Back/lock/sleep/disconnect and reboot persistence; run profiling Startup/Entry/Exit/>=20 cycles/combined Wi-Fi-NTP-TOTP-USB and measure >=150KiB internal byte-addressable heap, largest block, PSRAM, task stack, UI latency and power.",
+  "expected": "Correct explicit provisioning, saved metadata and codes, responsive Back, bounded cleanup and resource acceptance",
+  "actual": "NOT RUN. Host/simulator/build results are separately recorded, no native USB/UDP/touch/resource evidence.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending reproducible physical procedure",
+  "limitations": "All runtime resource metrics NOT MEASURED. Default USB serial import differs from optional keyboard HID delivery."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-02",
+  "firmware_version": "v0.3 easier account entry",
+  "commit": "9513925 + uncommitted changes",
+  "environment": "Windows / espressif32@6.5.0 / Arduino-ESP32 2.0.14 / esptool4.5.1",
+  "wiring": "Existing USB-C COM3 and integrated LCD/touch/buttons; no external changes",
+  "id": "HWT-0019",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized easier-account-entry default firmware upload",
+  "hardware": "ESP32-S3 revisionv0.2, COM3 VID303A PID1001; identifier redacted",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3 after all software/documentation checks and matched partition preflight",
+  "expected": "Write intended image, verify flashed data hashes, reset; no full-chip erase/NVS-range writes",
+  "actual": "SUCCESS26.376s. Application831408 B (537975 compressed) written0x10000 in8.2s; bootloader/table/boot-metadata/application hashes verified and RTS reset sent. App SHA256 2b43fd32b2d8fbac27263b9bd9226c22c497d331187b384397593e59bb4661f2. Device/generated partitions match VER-0049. No full-chip erase; NVS0x9000..0xdfff not targeted.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-02-account-entry-preflight.txt",
+    "docs/evidence/2026-11-02-account-entry-upload-com3.txt"
+  ],
+  "evidence_kind": "Sanitized captured PlatformIO/esptool output and byte/hash identity",
+  "limitations": "Write/hash/reset only; native UI/USB/UDP/persistence and profiling acceptance HWT-0018 NOT RUN."
+}
+```

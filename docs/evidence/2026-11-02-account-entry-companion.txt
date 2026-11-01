@@ -1,0 +1,9 @@
+test_ciphertext_only_relay (test_account_setup.SetupTests.test_ciphertext_only_relay) ... ok
+test_csrf_and_origin_required (test_account_setup.SetupTests.test_csrf_and_origin_required) ... ok
+test_no_remote_host_or_paths (test_account_setup.SetupTests.test_no_remote_host_or_paths) ... ok
+test_oversize_is_rejected (test_account_setup.SetupTests.test_oversize_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 1.583s
+
+OK

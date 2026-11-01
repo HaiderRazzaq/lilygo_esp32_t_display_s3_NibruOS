@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="csrf" content="__CSRF__"><title>إضافة حساب — NibruOS</title><link rel="stylesheet" href="/account_setup.css">
+<script type="module" src="/account_setup.mjs"></script></head>
+<body><main><div class="brand">NibruOS <span>ACCOUNT SETUP</span></div>
+<h1>انسخ المفتاح، ثم أكّد على جهازك</h1><p class="intro">افتح 2FA ← ADD على الجهاز، واختر USB أو Wi‑Fi. الصق مفتاح الإعداد هنا بدل كتابته على الشاشة الصغيرة.</p>
+<div class="note">مفتاح الإعداد يظهر عادةً تحت «تعذّر مسح QR» عند تفعيل المصادقة في الموقع. هذا المفتاح مختلف عن رمز الدخول المكوّن من 6 أرقام.</div>
+<label for="mode">طريقة الإرسال</label><select id="mode"><option value="usb">كابل USB</option><option value="wifi">Wi‑Fi — نفس الشبكة المحلية</option></select>
+<div id="wifiFields" hidden><label for="ip">عنوان الجهاز الظاهر على شاشته</label><input id="ip" dir="ltr" placeholder="192.168.1.20" autocomplete="off"></div>
+<label for="name">اسم الحساب — حروف إنجليزية، حتى 23 حرفًا</label><input id="name" dir="ltr" placeholder="GitHub / Personal" maxlength="23" autocomplete="off" spellcheck="false">
+<label for="secret">مفتاح Base32 أو رابط إعداد otpauth</label><div class="secret"><input id="secret" type="password" dir="ltr" autocomplete="off" spellcheck="false" maxlength="2048" placeholder="Paste setup key or otpauth://totp/... here"><button id="reveal" type="button">إظهار / إخفاء</button></div>
+<label for="pairing">رمز الاقتران المؤقت الظاهر على شاشة NibruOS</label><input id="pairing" dir="ltr" autocomplete="off" spellcheck="false" maxlength="24" placeholder="16 characters · ABCD EFGH IJKL MNOP">
+<p class="hint">الرمز صالح لجلسة واحدة ولمدة دقيقتين. لا تستخدم PIN الجهاز هنا. تُشفّر البيانات داخل المتصفح، ولا تُحفظ في ملف أو خدمة سحابية.</p>
+<div class="actions"><button id="send" type="button">إرسال إلى الجهاز</button><button id="close" class="secondary" type="button">مسح الحقول وإغلاق الاتصال</button></div>
+<p id="status" role="status">بعد الإرسال، راجع اسم الحساب واضغط SAVE على شاشة الجهاز. زر Back يلغي العملية.</p>
+<footer>تعمل هذه الصفحة محليًا على هذا الكمبيوتر. USB يحتاج Chrome أو Edge ومنفذًا غير مشغول بمراقب Serial.</footer>
+</main></body></html>

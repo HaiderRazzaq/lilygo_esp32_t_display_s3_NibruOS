@@ -251,3 +251,118 @@ Status vocabulary and resolution rules: [workflow](ENGINEERING_WORKFLOW.md).
   "risks": "Physical controller event coalescing and actual panel flicker still need HWT-0012; no claim of verified physical resolution or memory headroom."
 }
 ```
+
+
+```json
+{
+  "record_type": "issue",
+  "id": "BUG-0009",
+  "title": "Authenticator demo/persistence/time/USB lifecycle incomplete",
+  "status": "FIXED — UNVERIFIED",
+  "description": "Prior app seeded public demo accounts, did not wire vault reopen, substituted uptime, logged tokens and reported unchecked USB success.",
+  "symptoms": "Prior app seeded public demo accounts, did not wire vault reopen, substituted uptime, logged tokens and reported unchecked USB success.",
+  "reproduction": "See AUTHENTICATOR.md and HWT-0015; host regressions in tests/host/test_authenticator.cpp",
+  "affected_versions": "9513925 baseline / v0.3 phase one",
+  "suspected_cause": "Inspected source and host reproductions",
+  "root_cause": "Prior app seeded public demo accounts, did not wire vault reopen, substituted uptime, logged tokens and reported unchecked USB success.",
+  "files": [
+    "src/apps/TotpApp.cpp",
+    "src/services/TotpService.cpp",
+    "src/services/SecurityService.cpp",
+    "src/services/UsbHidService.cpp",
+    "docs/AUTHENTICATOR.md"
+  ],
+  "attempts": [
+    "VER-0031 RED",
+    "VER-0033 HOST PASS",
+    "VER-0034 SIMULATOR PASS",
+    "VER-0035 BUILD PASS"
+  ],
+  "fix": "Explicit provisioning, authenticated atomic persistence/migration, time gating, cleanup and bounded HID state; software checks pass, physical acceptance pending.",
+  "verification": [
+    "VER-0033",
+    "VER-0034",
+    "VER-0035",
+    "HWT-0015"
+  ],
+  "risks": "Physical acceptance NOT RUN; no secure-boot/flash-encryption/security-certification claim."
+}
+```
+
+
+
+```json
+{
+  "record_type": "issue",
+  "id": "BUG-0010",
+  "title": "PIN rekey and backup not implemented for stored TOTP accounts",
+  "status": "OPEN",
+  "description": "Changing PIN/salt changes the vault key and would orphan ciphertext. Safe rewrap/export remains unimplemented.",
+  "symptoms": "Changing PIN/salt changes the vault key and would orphan ciphertext. Safe rewrap/export remains unimplemented.",
+  "reproduction": "See AUTHENTICATOR.md and HWT-0015; host regressions in tests/host/test_authenticator.cpp",
+  "affected_versions": "9513925 baseline / v0.3 phase one",
+  "suspected_cause": "Inspected source and host reproductions",
+  "root_cause": "Changing PIN/salt changes the vault key and would orphan ciphertext. Safe rewrap/export remains unimplemented.",
+  "files": [
+    "src/apps/TotpApp.cpp",
+    "src/services/TotpService.cpp",
+    "src/services/SecurityService.cpp",
+    "src/services/UsbHidService.cpp",
+    "docs/AUTHENTICATOR.md"
+  ],
+  "attempts": [
+    "VER-0031 RED",
+    "VER-0033 HOST PASS",
+    "VER-0034 SIMULATOR PASS",
+    "VER-0035 BUILD PASS"
+  ],
+  "fix": "Block PIN change/disabling while any TOTP storage exists. Explicit last-account deletion clears only TOTP storage. Never delete sole recovery data to change PIN.",
+  "verification": [
+    "VER-0033",
+    "VER-0034",
+    "VER-0035",
+    "HWT-0015"
+  ],
+  "risks": "Physical acceptance NOT RUN; no secure-boot/flash-encryption/security-certification claim."
+}
+```
+
+
+```json
+{
+  "record_type": "issue",
+  "id": "BUG-0011",
+  "title": "Long setup-key entry and unfamiliar keyboard make account provisioning cumbersome",
+  "status": "FIXED — UNVERIFIED",
+  "description": "Owner reached ADD/Base32 on the uploaded firmware and requested easier entry plus conventional number/letter order.",
+  "symptoms": "Long secrets require manual touch entry; prior alphabetic keypad order differs from mobile/laptop.",
+  "reproduction": "Owner report HWT-0017; new behavior test_account_import.cpp and test_authenticator.cpp; physical acceptance HWT-0018.",
+  "affected_versions": "v0.3 phase-one image822912 B uploaded HWT-0016",
+  "suspected_cause": "Manual-only provisioning and compact alphabetic keypad",
+  "root_cause": "No paired paste channel existed; previous keypad did not use QWERTY.",
+  "files": [
+    "src/apps/TotpApp.cpp",
+    "src/apps/WiFiScannerApp.cpp",
+    "src/ui/TextKeyboard.h",
+    "src/services/AccountImportService.cpp",
+    "tools/account_setup.py",
+    "tools/account_setup/account_setup.mjs"
+  ],
+  "attempts": [
+    "VER-0041 RED/intermediate setup failures retained",
+    "VER-0042 HOST PASS",
+    "VER-0043 SIMULATOR PASS",
+    "VER-0044 helper/browser checks PASS",
+    "VER-0048 final source review"
+  ],
+  "fix": "Shared number/QWERTY rows with Shift/symbols; USB and existing-network Wi-Fi paste through one-use authenticated session with later physical SAVE.",
+  "verification": [
+    "VER-0042",
+    "VER-0043",
+    "VER-0044",
+    "VER-0045",
+    "HWT-0018"
+  ],
+  "risks": "Native serial/UDP and touch/resource acceptance NOT RUN; no QR camera/export."
+}
+```

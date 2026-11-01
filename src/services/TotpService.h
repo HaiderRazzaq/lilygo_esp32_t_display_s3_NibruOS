@@ -19,6 +19,11 @@ struct TotpAccount {
 class TotpService {
 public:
   void begin();
+  void lock();
+  bool isLoaded() const { return loaded_; }
+  bool hasStorageError() const { return storageError_; }
+  // Fail closed if storage is unavailable; changing PIN would change the vault key.
+  static bool canChangeCredentials();
 
   // Decodes RFC 4648 Base32 string into binary buffer
   static int decodeBase32(const char* base32Str, uint8_t* outBuf, size_t maxOutLen);
@@ -32,9 +37,9 @@ public:
   uint8_t accountCount() const { return accountCount_; }
   const TotpAccount* getAccount(uint8_t index) const;
 
-  bool addAccount(const char* name, const char* user, const char* base32Secret,
+  bool addAccount(const uint8_t* vaultKey, const char* name, const char* user, const char* base32Secret,
                   uint8_t digits = 6, uint8_t period = 30);
-  bool removeAccount(uint8_t index);
+  bool removeAccount(const uint8_t* vaultKey, uint8_t index);
 
   // Computes code for registered account
   bool getAccountCode(uint8_t index, uint32_t epoch, char* outCode, size_t maxCodeLen,
@@ -48,6 +53,7 @@ private:
   TotpAccount accounts_[kMaxTotpAccounts]{};
   uint8_t accountCount_ = 0;
 
-  void seedDefaultDemoAccounts();
+  bool loaded_ = false;
+  bool storageError_ = false;
 };
 

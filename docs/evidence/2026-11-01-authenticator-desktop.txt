@@ -1,0 +1,102 @@
+
+==================================================
+  NibruOS Automated Desktop & Shared Logic Tests
+==================================================
+
+[DesktopStorage] Initialized with runtime directory '.testbuild/auth_runtime_test'
+[Test] Running Core Lifecycle & AppManager Tests...
+  -> Core Lifecycle Tests PASS
+[Test] Running UI & Coordinate Transformation Tests...
+  -> UI & Transformation Tests PASS
+[Test] Running Wi-Fi Service & Fault Injection Tests...
+[MockWiFi] Simulation mode set to: Normal (Success)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 1700 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Scan completed with 5 APs
+[WiFi] Scan complete: 5 APs discovered in 1300 ms
+[MockWiFi] Simulation mode set to: Timeout (11s delay -> retry)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 3700 ms (mode: Timeout (11s delay -> retry))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[WiFi] attempt 1/2 failed: Scan timed out
+[WiFi] retrying scan (attempt 2/2)...
+[MockWiFi] Disconnected
+[WiFi] attempt 2/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 15900 ms (mode: Timeout (11s delay -> retry))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[WiFi] attempt 2/2 failed: Scan timed out
+[MockWiFi] Simulation mode set to: ScanFailed (Immediate error)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Simulating immediate scan start failure
+[WiFi] scanNetworks(async)=-2, freeHeap=215000
+[WiFi] attempt 1/2 failed: Scan start rejected
+[WiFi] retrying scan (attempt 2/2)...
+[MockWiFi] Disconnected
+[WiFi] attempt 2/2: STA preparing (650 ms warmup)
+[MockWiFi] Simulating immediate scan start failure
+[WiFi] scanNetworks(async)=-2, freeHeap=215000
+[WiFi] attempt 2/2 failed: Scan start rejected
+[MockWiFi] Simulation mode set to: Normal (Success)
+  -> Wi-Fi Simulation Tests PASS
+[Test] Running Settings Persistence & Desktop NVS Tests...
+[DesktopStorage] NVS storage reset to empty
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+[Settings] Loaded: Bright=100% Timeout=30s Theme=Cyber Cyan
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Settings] Loaded: Bright=50% Timeout=60s Theme=Amber Gold
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+  -> Settings Persistence Tests PASS
+[Test] Running Modular Architecture & HAL Contract Tests...
+  -> Modular Architecture & HAL Tests PASS
+[Test] Running 25 Repeated Lifecycle Entry/Exit Cycles...
+  -> 25 Lifecycle Cycles PASS (host control flow; no physical leak measurement)
+[DesktopStorage] NVS storage reset to empty
+[Security] New PIN hash and salt stored securely.
+[DesktopStorage] NVS storage reset to empty
+[DesktopStorage] NVS storage reset to empty
+
+==================================================
+  ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY!
+==================================================
+
+==================================================
+  NibruOS Desktop Simulator (Windows Target)
+  Resolution: 320x170 (ST7789 landscape simulation)
+  Default Scale: 3x | Headless: YES
+==================================================
+Controls:
+  Mouse: Click/Drag = Touchscreen Tap & Swipes
+  Keyboard:
+    Escape/Backspace/U = Back (GPIO14 User Button)
+    Space/Tab/B/Right  = Select Next (BOOT short press)
+    Enter/O            = Activate / Open (BOOT long press)
+    Arrow Up/Down/Left = Touch gestures
+  Simulator Function Keys:
+    F1 = Cycle Window Scale (1x -> 2x -> 3x -> 4x)
+    F2 = Wi-Fi Scan Mode: Normal
+    F3 = Wi-Fi Scan Mode: Timeout (simulates timeout bug & retry)
+    F4 = Wi-Fi Scan Mode: Scan Error
+    F5 = Device Reboot / Restart
+    F6 = Toggle Diagnostic HUD
+    F9 = Wi-Fi Mode: STA Error
+==================================================
+
+[DesktopStorage] Initialized with runtime directory '.testbuild/auth_runtime'
+
+[NibruOS] Booting system services...
+[Display] size=320x170 expected=320x170 bright=100% sleep=30s
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+[Settings] Loaded: Bright=100% Timeout=30s Theme=Cyber Cyan
+
+[NibruOS] Simulator shutting down cleanly...
+[NibruOS] Goodbye.

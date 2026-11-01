@@ -170,3 +170,11 @@ Existing historical PWM incompatibility report means the opt-in path is not
 accepted on this board without physical verification. No MicroSD pins are
 allocated, and no current/brightness/power measurement is inferred from build.
 See [Settings](SETTINGS.md) and [resource budget](RESOURCE_BUDGET.md).
+
+## Authenticator USB/entropy — 2026-11-01
+No physical GPIO/display/touch/backlight/wiring change. Default Serial/JTAG mode1
+retained; optional HID uses TinyUSB mode0 on reserved GPIO19/20, not physically
+accepted. CryptoService briefly owns SAR entropy when Wi-Fi is disabled and
+releases it afterward. Current firmware has no BLE/ADC service; future ADC/BLE
+integration must coordinate that source. Physical entropy/USB/power NOT VERIFIED.
+See [authenticator](AUTHENTICATOR.md).

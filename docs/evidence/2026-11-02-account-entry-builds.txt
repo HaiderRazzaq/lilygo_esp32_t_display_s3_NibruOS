@@ -1,0 +1,938 @@
+Processing lilygo-t-display-s3 (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 35 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- CST816S @ 1.3.0+sha.11fe1fb
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|-- Wire @ 2.0.0
+|-- WiFi @ 2.0.0
+|-- Preferences @ 2.0.0
+Building in release mode
+Compiling .pio\build\lilygo-t-display-s3\src\apps\TotpApp.cpp.o
+In file included from .pio/libdeps/lilygo-t-display-s3/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Linking .pio\build\lilygo-t-display-s3\firmware.elf
+Retrieving maximum program size .pio\build\lilygo-t-display-s3\firmware.elf
+Checking size .pio\build\lilygo-t-display-s3\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [==        ]  15.3% (used 50056 bytes from 327680 bytes)
+Flash: [=         ]  12.7% (used 831041 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3\firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32s3 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_flash(__env__)} --flash_size 16MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+check_image([".pio\build\lilygo-t-display-s3\firmware.bin"], [".pio\build\lilygo-t-display-s3\firmware.elf"])
+{
+  "binary_bytes": 831408,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5722192,
+  "sha256": "2b43fd32b2d8fbac27263b9bd9226c22c497d331187b384397593e59bb4661f2",
+  "growth_percent": -1.2279267805888727,
+  "warnings": [],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 15.46 seconds =========================
+
+Processing lilygo-t-display-s3-hid (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 35 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- CST816S @ 1.3.0+sha.11fe1fb
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|-- Wire @ 2.0.0
+|-- WiFi @ 2.0.0
+|-- Preferences @ 2.0.0
+|-- USB @ 2.0.0
+Building in release mode
+Compiling .pio\build\lilygo-t-display-s3-hid\src\apps\SettingsApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\apps\SystemInfoApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\apps\TotpApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\apps\TouchTestApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\apps\WiFiApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\apps\WiFiScannerApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\core\AppManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\core\MemoryProfiler.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\core\ResourceManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\hardware\ButtonManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\hardware\DisplayManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\hardware\TouchManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\main.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\services\AccountImportService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\services\CryptoService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\services\SecurityService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\services\SettingsService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\services\TimeService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\services\TotpService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\services\UsbHidService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\services\WiFiService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\src\ui\HomeScreen.cpp.o
+Building .pio\build\lilygo-t-display-s3-hid\bootloader.bin
+Generating partitions .pio\build\lilygo-t-display-s3-hid\partitions.bin
+Compiling .pio\build\lilygo-t-display-s3-hid\libd32\FS\FS.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\libd32\FS\vfs_api.cpp.o
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 1 ELF section
+Successfully created esp32s3 image.
+Compiling .pio\build\lilygo-t-display-s3-hid\lib6e1\SPIFFS\SPIFFS.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\lib676\TFT_eSPI\TFT_eSPI.cpp.o
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/SettingsApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/TouchTestApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/SystemInfoApp.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/SettingsApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/TouchTestApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:8:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiScannerApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/hardware/DisplayManager.cpp:1:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/SystemInfoApp.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/services/SecurityService.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+Compiling .pio\build\lilygo-t-display-s3-hid\lib133\Wire\Wire.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-hid\lib6e1\libSPIFFS.a
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:8:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/ui/HomeScreen.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/hardware/DisplayManager.cpp:1:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiScannerApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/services/SettingsService.cpp:2:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+Compiling .pio\build\lilygo-t-display-s3-hid\libec4\CST816S\CST816S.cpp.o
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/services/SecurityService.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Archiving .pio\build\lilygo-t-display-s3-hid\libd32\libFS.a
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:97,
+                 from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.cpp:16:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/ui/HomeScreen.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/services/SettingsService.cpp:2:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.cpp:16:
+.pio/libdeps/lilygo-t-display-s3-hid/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Compiling .pio\build\lilygo-t-display-s3-hid\libb53\WiFi\WiFi.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\libb53\WiFi\WiFiAP.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\libb53\WiFi\WiFiClient.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-hid\lib133\libWire.a
+Compiling .pio\build\lilygo-t-display-s3-hid\libb53\WiFi\WiFiGeneric.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\libb53\WiFi\WiFiMulti.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\libb53\WiFi\WiFiSTA.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\libb53\WiFi\WiFiScan.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\libb53\WiFi\WiFiServer.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\libb53\WiFi\WiFiUdp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\libfd7\Preferences\Preferences.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\lib0e7\USB\USBHID.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-hid\libec4\libCST816S.a
+Compiling .pio\build\lilygo-t-display-s3-hid\lib0e7\USB\USBHIDConsumerControl.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\lib0e7\USB\USBHIDGamepad.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\lib0e7\USB\USBHIDKeyboard.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\lib0e7\USB\USBHIDMouse.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\lib0e7\USB\USBHIDSystemControl.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\lib0e7\USB\USBHIDVendor.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\lib0e7\USB\USBVendor.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\Esp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\FirmwareMSC.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\FunctionalInterrupt.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\HWCDC.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\HardwareSerial.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-hid\lib676\libTFT_eSPI.a
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\IPAddress.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\IPv6Address.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\MD5Builder.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\Print.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\Stream.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\StreamString.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\Tone.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\USB.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\USBCDC.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\USBMSC.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\WMath.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-hid\lib0e7\libUSB.a
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\WString.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\base64.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\cbuf.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-adc.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-bt.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-cpu.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-dac.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-gpio.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-i2c-slave.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-i2c.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-ledc.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-matrix.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-misc.c.o
+Archiving .pio\build\lilygo-t-display-s3-hid\libb53\libWiFi.a
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-psram.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-rgb-led.c.o
+Archiving .pio\build\lilygo-t-display-s3-hid\libfd7\libPreferences.a
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-rmt.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-sigmadelta.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-spi.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-time.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-timer.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-tinyusb.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-touch.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\esp32-hal-uart.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\firmware_msc_fat.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\libb64\cdecode.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\libb64\cencode.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\main.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\stdlib_noniso.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\wiring_pulse.c.o
+Compiling .pio\build\lilygo-t-display-s3-hid\FrameworkArduino\wiring_shift.c.o
+C:/Users/haide/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-uart.c: In function 'uartSetPins':
+C:/Users/haide/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-uart.c:153:9: warning: 'return' with no value, in function returning non-void
+         return;
+         ^~~~~~
+C:/Users/haide/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-uart.c:149:6: note: declared here
+ bool uartSetPins(uint8_t uart_num, int8_t rxPin, int8_t txPin, int8_t ctsPin, int8_t rtsPin)
+      ^~~~~~~~~~~
+Archiving .pio\build\lilygo-t-display-s3-hid\libFrameworkArduino.a
+Linking .pio\build\lilygo-t-display-s3-hid\firmware.elf
+Retrieving maximum program size .pio\build\lilygo-t-display-s3-hid\firmware.elf
+Checking size .pio\build\lilygo-t-display-s3-hid\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [==        ]  19.0% (used 62184 bytes from 327680 bytes)
+Flash: [=         ]  13.2% (used 866277 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3-hid\firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32s3 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_flash(__env__)} --flash_size 16MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio\build\lilygo-t-display-s3-hid\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+check_image([".pio\build\lilygo-t-display-s3-hid\firmware.bin"], [".pio\build\lilygo-t-display-s3-hid\firmware.elf"])
+{
+  "binary_bytes": 866640,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5686960,
+  "sha256": "44dc9c093d9a312a27ebac1cefdbe4240e70b03f9b6481f2a9abfc5d456d240e",
+  "growth_percent": 2.9576688399323308,
+  "warnings": [],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 37.11 seconds =========================
+
+Processing lilygo-t-display-s3-profile (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 35 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- CST816S @ 1.3.0+sha.11fe1fb
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|-- Wire @ 2.0.0
+|-- WiFi @ 2.0.0
+|-- Preferences @ 2.0.0
+Building in release mode
+Compiling .pio\build\lilygo-t-display-s3-profile\src\apps\SettingsApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\apps\SystemInfoApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\apps\TotpApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\apps\TouchTestApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\apps\WiFiApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\apps\WiFiScannerApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\core\AppManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\core\MemoryProfiler.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\core\ResourceManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\hardware\ButtonManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\hardware\DisplayManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\hardware\TouchManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\main.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\services\AccountImportService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\services\CryptoService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\services\SecurityService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\services\SettingsService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\services\TimeService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\services\TotpService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\services\UsbHidService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\services\WiFiService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\src\ui\HomeScreen.cpp.o
+Building .pio\build\lilygo-t-display-s3-profile\bootloader.bin
+Generating partitions .pio\build\lilygo-t-display-s3-profile\partitions.bin
+Compiling .pio\build\lilygo-t-display-s3-profile\libd32\FS\FS.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\libd32\FS\vfs_api.cpp.o
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 1 ELF section
+Successfully created esp32s3 image.
+Compiling .pio\build\lilygo-t-display-s3-profile\lib6e1\SPIFFS\SPIFFS.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\lib65b\TFT_eSPI\TFT_eSPI.cpp.o
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.cpp:16:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.cpp:16:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/TouchTestApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/SettingsApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/SystemInfoApp.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiScannerApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/hardware/DisplayManager.cpp:1:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/TouchTestApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:8:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/SystemInfoApp.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/SettingsApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/services/SecurityService.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/services/SettingsService.cpp:2:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiScannerApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/hardware/DisplayManager.cpp:1:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Compiling .pio\build\lilygo-t-display-s3-profile\lib133\Wire\Wire.cpp.o
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:8:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Archiving .pio\build\lilygo-t-display-s3-profile\lib65b\libTFT_eSPI.a
+Archiving .pio\build\lilygo-t-display-s3-profile\lib6e1\libSPIFFS.a
+In file included from .pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/ui/HomeScreen.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/services/SecurityService.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/services/SettingsService.cpp:2:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Compiling .pio\build\lilygo-t-display-s3-profile\lib2cb\CST816S\CST816S.cpp.o
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/ui/HomeScreen.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-profile/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Compiling .pio\build\lilygo-t-display-s3-profile\libb53\WiFi\WiFi.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-profile\libd32\libFS.a
+Compiling .pio\build\lilygo-t-display-s3-profile\libb53\WiFi\WiFiAP.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\libb53\WiFi\WiFiClient.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\libb53\WiFi\WiFiGeneric.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\libb53\WiFi\WiFiMulti.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\libb53\WiFi\WiFiSTA.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\libb53\WiFi\WiFiScan.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-profile\lib133\libWire.a
+Compiling .pio\build\lilygo-t-display-s3-profile\libb53\WiFi\WiFiServer.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\libb53\WiFi\WiFiUdp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\libfd7\Preferences\Preferences.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\Esp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\FirmwareMSC.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\FunctionalInterrupt.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\HWCDC.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\HardwareSerial.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\IPAddress.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\IPv6Address.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\MD5Builder.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\Print.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\Stream.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\StreamString.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\Tone.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\USB.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-profile\lib2cb\libCST816S.a
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\USBCDC.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\USBMSC.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\WMath.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\WString.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\base64.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\cbuf.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-adc.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-bt.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-cpu.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-dac.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-gpio.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-i2c-slave.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-i2c.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-ledc.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-matrix.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-misc.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-psram.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-rgb-led.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-rmt.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-sigmadelta.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-spi.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-time.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-timer.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-tinyusb.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-touch.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\esp32-hal-uart.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\firmware_msc_fat.c.o
+Archiving .pio\build\lilygo-t-display-s3-profile\libfd7\libPreferences.a
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\libb64\cdecode.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\libb64\cencode.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\main.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\stdlib_noniso.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\wiring_pulse.c.o
+Compiling .pio\build\lilygo-t-display-s3-profile\FrameworkArduino\wiring_shift.c.o
+C:/Users/haide/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-uart.c: In function 'uartSetPins':
+C:/Users/haide/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-uart.c:153:9: warning: 'return' with no value, in function returning non-void
+         return;
+         ^~~~~~
+C:/Users/haide/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-uart.c:149:6: note: declared here
+ bool uartSetPins(uint8_t uart_num, int8_t rxPin, int8_t txPin, int8_t ctsPin, int8_t rtsPin)
+      ^~~~~~~~~~~
+Archiving .pio\build\lilygo-t-display-s3-profile\libb53\libWiFi.a
+Archiving .pio\build\lilygo-t-display-s3-profile\libFrameworkArduino.a
+Linking .pio\build\lilygo-t-display-s3-profile\firmware.elf
+Retrieving maximum program size .pio\build\lilygo-t-display-s3-profile\firmware.elf
+Checking size .pio\build\lilygo-t-display-s3-profile\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [==        ]  15.3% (used 50064 bytes from 327680 bytes)
+Flash: [=         ]  12.7% (used 831617 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3-profile\firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32s3 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_flash(__env__)} --flash_size 16MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio\build\lilygo-t-display-s3-profile\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+check_image([".pio\build\lilygo-t-display-s3-profile\firmware.bin"], [".pio\build\lilygo-t-display-s3-profile\firmware.elf"])
+{
+  "binary_bytes": 831984,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5721616,
+  "sha256": "0e150328a25e892475c13be8cd6195f92e3ff6641ca6034677d37e3fd11e8b6f",
+  "growth_percent": -1.1594974243950655,
+  "warnings": [],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 32.83 seconds =========================
+
+Processing lilygo-t-display-s3-ledc (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 35 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- CST816S @ 1.3.0+sha.11fe1fb
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|-- Wire @ 2.0.0
+|-- WiFi @ 2.0.0
+|-- Preferences @ 2.0.0
+Building in release mode
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\apps\SettingsApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\apps\SystemInfoApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\apps\TotpApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\apps\TouchTestApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\apps\WiFiApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\apps\WiFiScannerApp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\core\AppManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\core\MemoryProfiler.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\core\ResourceManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\hardware\ButtonManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\hardware\DisplayManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\hardware\TouchManager.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\main.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\services\AccountImportService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\services\CryptoService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\services\SecurityService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\services\SettingsService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\services\TimeService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\services\TotpService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\services\UsbHidService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\services\WiFiService.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\src\ui\HomeScreen.cpp.o
+Building .pio\build\lilygo-t-display-s3-ledc\bootloader.bin
+Generating partitions .pio\build\lilygo-t-display-s3-ledc\partitions.bin
+Compiling .pio\build\lilygo-t-display-s3-ledc\libd32\FS\FS.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\libd32\FS\vfs_api.cpp.o
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 1 ELF section
+Successfully created esp32s3 image.
+Compiling .pio\build\lilygo-t-display-s3-ledc\lib6e1\SPIFFS\SPIFFS.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\lib645\TFT_eSPI\TFT_eSPI.cpp.o
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.cpp:16:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.cpp:16:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/SystemInfoApp.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiScannerApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/TouchTestApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/apps/SettingsApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+Archiving .pio\build\lilygo-t-display-s3-ledc\lib6e1\libSPIFFS.a
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/SystemInfoApp.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/hardware/DisplayManager.cpp:1:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/TotpApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiScannerApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/SettingsApp.cpp:5:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/TouchTestApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/apps/WiFiApp.cpp:3:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Compiling .pio\build\lilygo-t-display-s3-ledc\lib133\Wire\Wire.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-ledc\lib645\libTFT_eSPI.a
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/services/SecurityService.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/services/SettingsService.cpp:2:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:8:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from .pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:97,
+                 from src/hardware/DisplayManager.h:2,
+                 from src/ui/HomeScreen.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/Processors/TFT_eSPI_ESP32_S3.h:111:3: warning: #warning >>>>------>> DMA is not supported in parallel mode [-Wcpp]
+  #warning >>>>------>> DMA is not supported in parallel mode
+   ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/hardware/DisplayManager.cpp:1:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Compiling .pio\build\lilygo-t-display-s3-ledc\lib18e\CST816S\CST816S.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-ledc\libd32\libFS.a
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/services/SecurityService.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/services/SettingsService.cpp:2:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/main.cpp:8:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+In file included from src/hardware/DisplayManager.h:2,
+                 from src/ui/HomeScreen.cpp:4:
+.pio/libdeps/lilygo-t-display-s3-ledc/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Compiling .pio\build\lilygo-t-display-s3-ledc\libb53\WiFi\WiFi.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\libb53\WiFi\WiFiAP.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\libb53\WiFi\WiFiClient.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\libb53\WiFi\WiFiGeneric.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\libb53\WiFi\WiFiMulti.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\libb53\WiFi\WiFiSTA.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-ledc\lib133\libWire.a
+Compiling .pio\build\lilygo-t-display-s3-ledc\libb53\WiFi\WiFiScan.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\libb53\WiFi\WiFiServer.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\libb53\WiFi\WiFiUdp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\libfd7\Preferences\Preferences.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\Esp.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\FirmwareMSC.cpp.o
+Archiving .pio\build\lilygo-t-display-s3-ledc\lib18e\libCST816S.a
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\FunctionalInterrupt.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\HWCDC.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\HardwareSerial.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\IPAddress.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\IPv6Address.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\MD5Builder.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\Print.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\Stream.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\StreamString.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\Tone.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\USB.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\USBCDC.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\USBMSC.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\WMath.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\WString.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\base64.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\cbuf.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-adc.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-bt.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-cpu.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-dac.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-gpio.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-i2c-slave.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-i2c.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-ledc.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-matrix.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-misc.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-psram.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-rgb-led.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-rmt.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-sigmadelta.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-spi.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-time.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-timer.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-tinyusb.c.o
+Archiving .pio\build\lilygo-t-display-s3-ledc\libfd7\libPreferences.a
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-touch.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\esp32-hal-uart.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\firmware_msc_fat.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\libb64\cdecode.c.o
+Archiving .pio\build\lilygo-t-display-s3-ledc\libb53\libWiFi.a
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\libb64\cencode.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\main.cpp.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\stdlib_noniso.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\wiring_pulse.c.o
+Compiling .pio\build\lilygo-t-display-s3-ledc\FrameworkArduino\wiring_shift.c.o
+C:/Users/haide/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-uart.c: In function 'uartSetPins':
+C:/Users/haide/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-uart.c:153:9: warning: 'return' with no value, in function returning non-void
+         return;
+         ^~~~~~
+C:/Users/haide/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-uart.c:149:6: note: declared here
+ bool uartSetPins(uint8_t uart_num, int8_t rxPin, int8_t txPin, int8_t ctsPin, int8_t rtsPin)
+      ^~~~~~~~~~~
+Archiving .pio\build\lilygo-t-display-s3-ledc\libFrameworkArduino.a
+Linking .pio\build\lilygo-t-display-s3-ledc\firmware.elf
+Retrieving maximum program size .pio\build\lilygo-t-display-s3-ledc\firmware.elf
+Checking size .pio\build\lilygo-t-display-s3-ledc\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [==        ]  15.3% (used 50128 bytes from 327680 bytes)
+Flash: [=         ]  12.8% (used 836853 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3-ledc\firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32s3 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_flash(__env__)} --flash_size 16MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio\build\lilygo-t-display-s3-ledc\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+check_image([".pio\build\lilygo-t-display-s3-ledc\firmware.bin"], [".pio\build\lilygo-t-display-s3-ledc\firmware.elf"])
+{
+  "binary_bytes": 837216,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5716384,
+  "sha256": "9ed7069fead384d06d2ce9c0e24b227744e5c5cc9da06822df96e23d0ec8d4b4",
+  "growth_percent": -0.5379307723013173,
+  "warnings": [],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 33.45 seconds =========================
+
+Environment                  Status    Duration
+---------------------------  --------  ------------
+lilygo-t-display-s3          SUCCESS   00:00:15.461
+lilygo-t-display-s3-hid      SUCCESS   00:00:37.115
+lilygo-t-display-s3-profile  SUCCESS   00:00:32.827
+lilygo-t-display-s3-ledc     SUCCESS   00:00:33.448
+========================= 4 succeeded in 00:01:58.851 =========================

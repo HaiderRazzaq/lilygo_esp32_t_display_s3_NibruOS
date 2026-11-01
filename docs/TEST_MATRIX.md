@@ -72,3 +72,31 @@ Use [BUILD_AND_TEST](BUILD_AND_TEST.md) for commands and physical acceptance;
 procedures. Append a new result record after a real test. Keep older failures.
 Future apps/peripherals require a registry entry and matrix row; do not mark
 their verification as passing merely because they share an existing driver.
+
+## Authenticator phase-one coverage — 2026-11-01
+
+| Capability | Software evidence | Physical |
+|---|---|---|
+| Entry/commit/reopen/cancel and >=20 cycles | VER-0033 HOST; VER-0034 SIMULATOR | HWT-0015 NOT RUN |
+| RFC6238 SHA1 and Base32 bounds | VER-0033 real Windows CNG vectors | ESP32 NOT RUN |
+| Legacy U8 migration, wrong key/tag, failed writes/PIN guard | VER-0033; OS disk faults VER-0034 | HWT-0015 NOT RUN |
+| Time loss, USB completion/busy/cancel/disconnect | VER-0033 transport double; VER-0035 compile | Enumeration/delivery/layout NOT RUN |
+| Four image capacities | VER-0035/VER-0036 PASS | Heap/stack/latency/power NOT MEASURED |
+
+Default authenticator image uploaded 2026-11-02: HWT-0016 PASS for write/hash/reset
+only; HWT-0015 runtime acceptance remains NOT RUN. Artifact preflight VER-0040 PASS.
+
+## Easier account entry — 2026-11-02
+
+| Capability | Software evidence | Physical evidence |
+|---|---|---|
+| QWERTY/digit/shift/symbol layout; shared Wi-Fi keyboard | VER-0042 HOST, VER-0043 SIMULATOR | Owner manual-entry difficulty HWT-0017; new layout HWT-0018 NOT RUN |
+| Paired import, crypto bounds, timeout before SAVE, storage retry, sleep/20 cycles | VER-0042 HOST; VER-0043 SIMULATOR injected transport | Native USB/UDP HWT-0018 NOT RUN |
+| Local helper guards, URI validation, WebCrypto/CNG interoperability, USB retry/clear | VER-0044 HOST/browser render | Real browser serial/LAN delivery HWT-0018 NOT RUN |
+| Four ESP32 target builds/capacity | VER-0045 BUILD, VER-0046 STATIC | No runtime inference |
+| Startup/entry/exit/20 cycles/combined workload resources | Host cycles only; resource report | HWT-0018 NOT RUN; heap/PSRAM/stack/latency/power NOT MEASURED |
+
+RED and intermediate setup failures retained in VER-0041. Independent final
+review VER-0048 found no remaining blocker; no device result follows from review.
+
+Current easier-entry default upload HWT-0019 PASS for write/hash/reset only; matched partition/image preflight VER-0049. New native behavior HWT-0018 remains NOT RUN.

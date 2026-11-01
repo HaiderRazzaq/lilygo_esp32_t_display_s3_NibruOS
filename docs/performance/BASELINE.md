@@ -36,3 +36,7 @@ heap and cannot establish the >=150 KiB runtime requirement.
 
 After-change costs are in [Resource Impact Report](SETTINGS_RESOURCE_IMPACT.md).
 Do not replace this pre-change reference merely to suppress regression warnings.
+
+Current session comparison: [authenticator impact](AUTHENTICATOR_RESOURCE_IMPACT.md). Accepted baseline above is unchanged.
+
+Easier account entry comparison: [account-entry impact](ACCOUNT_ENTRY_RESOURCE_IMPACT.md), VER-0046. Accepted baseline is preserved; actual runtime metrics remain NOT MEASURED.

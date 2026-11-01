@@ -7,6 +7,7 @@ class SettingsService;
 class TimeService;
 class TotpService;
 class UsbHidService;
+class AccountImportService;
 
 struct AppContext {
   DisplayManager& display;
@@ -17,4 +18,5 @@ struct AppContext {
   TimeService& time;
   TotpService& totp;
   UsbHidService& usbHid;
+  AccountImportService& accountImport;
 };

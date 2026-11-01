@@ -6,6 +6,38 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 
 ## Unreleased
 
+### Easier account entry — 2026-11-02
+- Added local USB and existing-network Wi-Fi paste of Base32 keys/otpauth links,
+  with a one-use pairing code, encrypted transfer, bounded two-minute session
+  and explicit SAVE on the device. Local launcher: tools/open_account_setup.bat.
+- Changed 2FA and Wi-Fi keyboards to standard number/QWERTY rows with Shift,
+  symbols, Delete and Space. Base32 remains masked and restricted to valid keys.
+- Fixed expired candidate saving before the regular loop tick and companion USB
+  retry/clear behavior. No firmware dependency, GPIO or partition changes.
+- Software/simulator/four build checks PASS; new native USB/UDP and physical
+  resource acceptance remain pending HWT-0018. Default binary831408 B (+1.0324%).
+- Uploaded the new default to COM3: HWT-0019 write/hash/reset PASS; native runtime
+  acceptance still pending HWT-0018. No full-chip erase or NVS-range write.
+
+### Authorized authenticator upload — 2026-11-02
+
+- Flashed default phase-one image822912 B on COM3; write hashes verified and RTS
+  reset sent (HWT-0016). Partition layout matched; no full-chip erase. Interactive
+  runtime and physical resource acceptance remain pending HWT-0015.
+
+### Authenticator phase one — 2026-11-01
+
+- Added manual masked account entry/deletion and optional TinyUSB HID build.
+- Fixed authenticated save/reopen/migration, atomic credentials, Base32 overflow/
+  bounds, valid-time gating, USB completion/cancel and exit/lock/sleep cleanup.
+- Removed public demo accounts, token logs and fresh default PIN.
+- Security: explicit user PIN, credential guard, OS entropy/real Windows crypto
+  and checked fail-closed desktop storage. No safe rekey/backup yet.
+- Preserved default hardware/USB setup, partitions and framework. Four builds,
+  host and simulator checks pass; physical HWT-0015 and runtime resources pending.
+  No upload/commit/push, web cabinet, password manager or BLE added.
+
+
 ### Architecture Audit & Modular Refactoring — 2026-11-01
 
 - Adopted Feature-Based Modular Monolith with Layered Responsibilities and Hardware Abstraction (HAL) ([ADR-0002](docs/decisions/0002-modular-architecture.md)).
@@ -128,3 +160,4 @@ The original [package changelog](docs/CHANGELOG.md) is preserved, including its
 present in the first available commit `d6cf0294f548b64884076e8732e2bf425ee8e773`.
 Their development order and release dates cannot be reconstructed from Git.
 No release tags exist at this baseline; runtime still displays v0.1.
+

@@ -1,3 +1,4 @@
+#include "services/AccountImportService.h"
 #include <Arduino.h>
 #include "core/AppContext.h"
 #include "core/AppManager.h"
@@ -28,7 +29,8 @@ SettingsService settings;
 TimeService timeService;
 TotpService totp;
 UsbHidService usbHid;
-AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid};
+AccountImportService accountImport;
+AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport};
 AppManager launcher(context);
 WiFiApp wifiApp;
 TotpApp totpApp;
@@ -46,6 +48,7 @@ void setup() {
   MemoryProfiler::checkpoint("display-touch-ready");
   buttons.begin();
   wifi.begin(millis());
+  security.setCredentialChangeGuard(TotpService::canChangeCredentials);
   security.begin();
   timeService.begin();
   totp.begin();
@@ -109,6 +112,11 @@ void loop() {
 
   now = millis();
   display.tick(now);
+  if (display.isSleeping() && security.isPinEnabled() && !security.isLocked()) security.lock();
+  if (display.isSleeping() || security.isLocked()) {
+    if (totp.isLoaded()) totpApp.clearSession(context);
+    usbHid.cancel();
+  }
   wifi.tick(now);
   timeService.tick(now, wifi.isConnected());
   if (security.isLocked()) {
@@ -119,6 +127,8 @@ void loop() {
   } else {
     launcher.tick(now);
   }
+  usbHid.tick(now);
+
 #if NIBRU_PROFILE
   MemoryProfiler::observeLoop(micros() - loopStart);
 #endif

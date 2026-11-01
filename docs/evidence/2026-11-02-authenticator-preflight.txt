@@ -1,0 +1,19 @@
+esptool.py v4.5.1
+Serial port COM3
+Connecting...
+Chip is ESP32-S3 (revision v0.2)
+Features: WiFi, BLE
+Crystal is 40MHz
+MAC: [REDACTED]
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+3072 (100 %)
+3072 (100 %)
+Read 3072 bytes at 0x00008000 in 0.8 seconds (31.2 kbit/s)...
+Hard resetting via RTS pin...
+
+Device partition table matches generated table; SHA256 bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce
+Firmware SHA256 00e74d8689773ea90efc9cfb707fa48aeb593c2cc10d2b8d5edfdb5b8cd0ea8b; bytes 822912

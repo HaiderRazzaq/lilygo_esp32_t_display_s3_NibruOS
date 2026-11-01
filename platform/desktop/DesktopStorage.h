@@ -11,6 +11,7 @@ public:
   void init(const std::string& runtimeDir = "simulator/runtime");
   void flush();
   void resetNvs();
+  bool reloadNvs(); // Simulator reboot/recovery; corrupt files remain write-protected.
 
   // NVS Key-Value emulation (backing Preferences)
   bool nvsOpen(const std::string& ns, bool readOnly);
@@ -38,6 +39,7 @@ private:
   std::string sdBasePath_ = "simulator/runtime/sdcard";
 
   bool initialized_ = false;
+  bool writable_ = true;
   bool sdMounted_ = true;
   bool sdIoFail_ = false;
 
@@ -45,7 +47,7 @@ private:
   std::map<std::string, std::map<std::string, std::vector<uint8_t>>> nvsData_;
   std::map<std::string, bool> openNamespaces_;
 
-  void loadNvsFromFile();
-  void saveNvsToFile();
+  bool loadNvsFromFile();
+  bool saveNvsToFile();
   void ensureDirectories();
 };

@@ -30,6 +30,9 @@ Start with [AGENTS](../AGENTS.md), [project context](PROJECT_CONTEXT.md), and
 | [MEMORY_PROFILING](MEMORY_PROFILING.md) | Device scenarios A–E, serial instrumentation and overhead |
 | [Performance baseline](performance/BASELINE.md) | Identified build evidence; pending physical measurements |
 | [Settings](SETTINGS.md) | Essential Settings controls, persistence, reset scope and deferred work |
+| [Authenticator](AUTHENTICATOR.md) | PIN-protected account entry, encrypted persistence, valid time and optional USB HID |
+| [Account setup](ACCOUNT_SETUP.md) | Shared QWERTY keyboard, local USB/Wi-Fi paste helper, encrypted session protocol and device confirmation |
+| [Account entry impact](performance/ACCOUNT_ENTRY_RESOURCE_IMPACT.md) | Image/static SRAM deltas, bounded receive buffers and pending physical resource acceptance |
 | [Touch repair impact](performance/TOUCH_FIX_RESOURCE_IMPACT.md) | Reported touch/flicker regression, software fixes and pending physical acceptance |
 | [Resource impact](performance/SETTINGS_RESOURCE_IMPACT.md) | Before/after build costs and remaining verification |
 | [Desktop simulator](DESKTOP_SIMULATOR.md) | Windows/SDL2 desktop simulator user manual, controls and developer shortcuts |

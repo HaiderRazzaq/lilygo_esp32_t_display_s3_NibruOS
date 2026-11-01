@@ -1,0 +1,46 @@
+{
+  "lilygo-t-display-s3": {
+    "binary_bytes": 822912,
+    "application_partition_bytes": 6553600,
+    "remaining_bytes": 5730688,
+    "sha256": "00e74d8689773ea90efc9cfb707fa48aeb593c2cc10d2b8d5edfdb5b8cd0ea8b",
+    "growth_percent": -2.237259784447528,
+    "warnings": [],
+    "runtime_metrics": "NOT MEASURED",
+    "static_ram": 49248,
+    "linked_flash": 822549
+  },
+  "lilygo-t-display-s3-hid": {
+    "binary_bytes": 858256,
+    "application_partition_bytes": 6553600,
+    "remaining_bytes": 5695344,
+    "sha256": "07beb7ab38c7670e896e8b5c2ea930550a685b42bc2de19cdf266c87a60f0c55",
+    "growth_percent": 1.9616415442224715,
+    "warnings": [],
+    "runtime_metrics": "NOT MEASURED",
+    "static_ram": 61368,
+    "linked_flash": 857897
+  },
+  "lilygo-t-display-s3-profile": {
+    "binary_bytes": 823520,
+    "application_partition_bytes": 6553600,
+    "remaining_bytes": 5730080,
+    "sha256": "5d034a2082a0cc19bc6ddbadc277bef48241fb89e33dcc0f0b136ce36da783a7",
+    "growth_percent": -2.165028797354065,
+    "warnings": [],
+    "runtime_metrics": "NOT MEASURED",
+    "static_ram": 49248,
+    "linked_flash": 823153
+  },
+  "lilygo-t-display-s3-ledc": {
+    "binary_bytes": 828816,
+    "application_partition_bytes": 6553600,
+    "remaining_bytes": 5724784,
+    "sha256": "6b83fa9883b224d5b94bf28141549d039f401b27cba833401a48902b7e879084",
+    "growth_percent": -1.5358588834610047,
+    "warnings": [],
+    "runtime_metrics": "NOT MEASURED",
+    "static_ram": 49320,
+    "linked_flash": 828449
+  }
+}

@@ -3,44 +3,10 @@
 #include "BoardConfig.h"
 #include "core/ResourceManager.h"
 #include "hardware/DisplayManager.h"
+#include "ui/TextKeyboard.h"
 #include <Arduino.h>
 #include <cstdio>
 #include <cstring>
-
-namespace {
-char getRow0Char(int i, KeyboardMode mode) {
-  static const char lower[] = "qwertyuiop";
-  static const char upper[] = "QWERTYUIOP";
-  static const char syms[]  = "1234567890";
-  if (i < 0 || i >= 10) return '\0';
-  if (mode == KeyboardMode::Uppercase) return upper[i];
-  if (mode == KeyboardMode::Symbols) return syms[i];
-  return lower[i];
-}
-
-char getRow1Char(int i, KeyboardMode mode) {
-  static const char lower[] = "asdfghjkl";
-  static const char upper[] = "ASDFGHJKL";
-  static const char syms[]  = "@#$%&*-+_!";
-  if (mode == KeyboardMode::Symbols) {
-    if (i < 0 || i >= 10) return '\0';
-    return syms[i];
-  }
-  if (i < 0 || i >= 9) return '\0';
-  if (mode == KeyboardMode::Uppercase) return upper[i];
-  return lower[i];
-}
-
-char getRow2Char(int i, KeyboardMode mode) {
-  static const char lower[] = "zxcvbnm";
-  static const char upper[] = "ZXCVBNM";
-  static const char syms[]  = "?.,/\\:;";
-  if (i < 0 || i >= 7) return '\0';
-  if (mode == KeyboardMode::Uppercase) return upper[i];
-  if (mode == KeyboardMode::Symbols) return syms[i];
-  return lower[i];
-}
-}
 
 void WiFiScannerApp::setView(WiFiView newView) {
   if (view_ != newView) {
@@ -247,110 +213,22 @@ void WiFiScannerApp::handleKeyboardTouch(AppContext& ctx, const TouchEvent& ev) 
     }
   }
 
-  // Row 0 (Y: 49..75) - 10 keys
-  if (ev.y >= 49 && ev.y <= 75) {
-    const int i = (ev.x - 2) / 32;
-    if (i >= 0 && i < 10) {
-      const char c = getRow0Char(i, kbMode_);
-      if (c && passwordLen_ < sizeof(password_) - 1) {
-        password_[passwordLen_++] = c;
-        password_[passwordLen_] = '\0';
-        renderPasswordBox(ctx); // Differential update: only redraws text box!
-      }
-      return;
-    }
-  }
-
-  // Row 1 (Y: 78..104)
-  if (ev.y >= 78 && ev.y <= 104) {
-    if (kbMode_ == KeyboardMode::Symbols) {
-      const int i = (ev.x - 2) / 32;
-      if (i >= 0 && i < 10) {
-        const char c = getRow1Char(i, kbMode_);
-        if (c && passwordLen_ < sizeof(password_) - 1) {
-          password_[passwordLen_++] = c;
-          password_[passwordLen_] = '\0';
-          renderPasswordBox(ctx);
-        }
-        return;
-      }
-    } else {
-      const int i = (ev.x - 8) / 34;
-      if (i >= 0 && i < 9) {
-        const char c = getRow1Char(i, kbMode_);
-        if (c && passwordLen_ < sizeof(password_) - 1) {
-          password_[passwordLen_++] = c;
-          password_[passwordLen_] = '\0';
-          renderPasswordBox(ctx);
-        }
-        return;
-      }
-    }
-  }
-
-  // Row 2 (Y: 107..133)
-  if (ev.y >= 107 && ev.y <= 133) {
-    if (ev.x >= 2 && ev.x <= 42) {
-      // Left function key: CAPS / ABC
-      if (kbMode_ == KeyboardMode::Symbols) {
-        kbMode_ = KeyboardMode::Lowercase;
-      } else {
-        kbMode_ = (kbMode_ == KeyboardMode::Lowercase) ? KeyboardMode::Uppercase : KeyboardMode::Lowercase;
-      }
-      fullRedraw_ = true; // Redraw keys for new case
-      invalidate();
-      return;
-    }
-    if (ev.x >= 45 && ev.x <= 262) {
-      const int i = (ev.x - 45) / 31;
-      if (i >= 0 && i < 7) {
-        const char c = getRow2Char(i, kbMode_);
-        if (c && passwordLen_ < sizeof(password_) - 1) {
-          password_[passwordLen_++] = c;
-          password_[passwordLen_] = '\0';
-          renderPasswordBox(ctx);
-        }
-        return;
-      }
-    }
-    if (ev.x >= 265 && ev.x <= 318) {
-      // DEL / Backspace
-      if (passwordLen_ > 0) {
-        password_[--passwordLen_] = '\0';
-        renderPasswordBox(ctx); // Differential update!
-      }
-      return;
-    }
-  }
-
-  // Row 3 (Y: 136..166) - Action row
-  if (ev.y >= 136 && ev.y <= 166) {
-    if (ev.x >= 2 && ev.x <= 54) {
-      // Mode toggle (?123 / ABC)
-      kbMode_ = (kbMode_ == KeyboardMode::Symbols) ? KeyboardMode::Lowercase : KeyboardMode::Symbols;
-      fullRedraw_ = true;
-      invalidate();
-      return;
-    }
-    if (ev.x >= 57 && ev.x <= 183) {
-      // SPACE
-      if (passwordLen_ < sizeof(password_) - 1) {
-        password_[passwordLen_++] = ' ';
-        password_[passwordLen_] = '\0';
-        renderPasswordBox(ctx);
-      }
-      return;
-    }
-    if (ev.x >= 186 && ev.x <= 240) {
-      // CANCEL
-      setView(WiFiView::List);
-      return;
-    }
-    if (ev.x >= 243 && ev.x <= 318) {
-      // JOIN / Connect
-      startConnection(ctx);
-      return;
-    }
+  const auto key = TextKeyboard::hit(ev.x, ev.y, kbMode_ == KeyboardMode::Uppercase, kbMode_ == KeyboardMode::Symbols);
+  if (key.action == TextKeyboard::Action::Shift) {
+    kbMode_ = kbMode_ == KeyboardMode::Uppercase ? KeyboardMode::Lowercase : KeyboardMode::Uppercase;
+    fullRedraw_ = true; invalidate();
+  } else if (key.action == TextKeyboard::Action::Symbols) {
+    kbMode_ = kbMode_ == KeyboardMode::Symbols ? KeyboardMode::Lowercase : KeyboardMode::Symbols;
+    fullRedraw_ = true; invalidate();
+  } else if (key.action == TextKeyboard::Action::Delete) {
+    if (passwordLen_) password_[--passwordLen_] = 0;
+    renderPasswordBox(ctx);
+  } else if (key.action == TextKeyboard::Action::Cancel) setView(WiFiView::List);
+  else if (key.action == TextKeyboard::Action::Accept) startConnection(ctx);
+  else if ((key.action == TextKeyboard::Action::Character || key.action == TextKeyboard::Action::Space) &&
+           passwordLen_ + 1 < sizeof(password_)) {
+    password_[passwordLen_++] = key.character; password_[passwordLen_] = 0;
+    renderPasswordBox(ctx);
   }
 }
 
@@ -543,74 +421,7 @@ void WiFiScannerApp::renderKeyboard(AppContext& ctx) {
     t.drawRoundRect(266, 2, 50, 20, 3, Colors::Red);
     screen.label(274, 8, "CLEAR", Colors::Red, 1, Colors::Panel);
 
-    // 2. Virtual Keyboard keys
-    // Row 0 (Y: 49..75)
-    for (int i = 0; i < 10; ++i) {
-      const int kx = 2 + i * 32;
-      t.fillRoundRect(kx, 49, 30, 26, 3, Colors::Panel);
-      t.drawRoundRect(kx, 49, 30, 26, 3, Colors::Border);
-      const char c = getRow0Char(i, kbMode_);
-      char chStr[2] = { c, '\0' };
-      screen.label(kx + 12, 58, chStr, Colors::White, 1, Colors::Panel);
-    }
-
-    // Row 1 (Y: 78..104)
-    if (kbMode_ == KeyboardMode::Symbols) {
-      for (int i = 0; i < 10; ++i) {
-        const int kx = 2 + i * 32;
-        t.fillRoundRect(kx, 78, 30, 26, 3, Colors::Panel);
-        t.drawRoundRect(kx, 78, 30, 26, 3, Colors::Border);
-        const char c = getRow1Char(i, kbMode_);
-        char chStr[2] = { c, '\0' };
-        screen.label(kx + 12, 87, chStr, Colors::White, 1, Colors::Panel);
-      }
-    } else {
-      for (int i = 0; i < 9; ++i) {
-        const int kx = 8 + i * 34;
-        t.fillRoundRect(kx, 78, 32, 26, 3, Colors::Panel);
-        t.drawRoundRect(kx, 78, 32, 26, 3, Colors::Border);
-        const char c = getRow1Char(i, kbMode_);
-        char chStr[2] = { c, '\0' };
-        screen.label(kx + 13, 87, chStr, Colors::White, 1, Colors::Panel);
-      }
-    }
-
-    // Row 2 (Y: 107..133)
-    const uint16_t capsBg = (kbMode_ == KeyboardMode::Uppercase) ? Colors::Cyan : Colors::Panel;
-    const uint16_t capsFg = (kbMode_ == KeyboardMode::Uppercase) ? Colors::Bg : Colors::Cyan;
-    t.fillRoundRect(2, 107, 40, 26, 3, capsBg);
-    t.drawRoundRect(2, 107, 40, 26, 3, Colors::Border);
-    screen.label(6, 116, (kbMode_ == KeyboardMode::Symbols) ? "ABC" : "CAPS", capsFg, 1, capsBg);
-
-    for (int i = 0; i < 7; ++i) {
-      const int kx = 45 + i * 31;
-      t.fillRoundRect(kx, 107, 29, 26, 3, Colors::Panel);
-      t.drawRoundRect(kx, 107, 29, 26, 3, Colors::Border);
-      const char c = getRow2Char(i, kbMode_);
-      char chStr[2] = { c, '\0' };
-      screen.label(kx + 11, 116, chStr, Colors::White, 1, Colors::Panel);
-    }
-
-    t.fillRoundRect(265, 107, 53, 26, 3, Colors::Panel);
-    t.drawRoundRect(265, 107, 53, 26, 3, Colors::Red);
-    screen.label(277, 116, "DEL", Colors::Red, 1, Colors::Panel);
-
-    // Row 3 (Y: 136..166) - Action row
-    t.fillRoundRect(2, 136, 52, 30, 3, Colors::Panel);
-    t.drawRoundRect(2, 136, 52, 30, 3, Colors::Cyan);
-    screen.label(10, 147, (kbMode_ == KeyboardMode::Symbols) ? "ABC" : "?123", Colors::Cyan, 1, Colors::Panel);
-
-    t.fillRoundRect(57, 136, 126, 30, 3, Colors::Panel);
-    t.drawRoundRect(57, 136, 126, 30, 3, Colors::Border);
-    screen.label(98, 147, "SPACE", Colors::Muted, 1, Colors::Panel);
-
-    t.fillRoundRect(186, 136, 54, 30, 3, Colors::Panel);
-    t.drawRoundRect(186, 136, 54, 30, 3, Colors::Border);
-    screen.label(192, 147, "CANCEL", Colors::Muted, 1, Colors::Panel);
-
-    t.fillRoundRect(243, 136, 75, 30, 3, Colors::Green);
-    screen.label(265, 147, "JOIN", Colors::White, 1, Colors::Green);
-
+    TextKeyboard::draw(screen, kbMode_ == KeyboardMode::Uppercase, kbMode_ == KeyboardMode::Symbols, "JOIN");
     fullRedraw_ = false;
   }
 
