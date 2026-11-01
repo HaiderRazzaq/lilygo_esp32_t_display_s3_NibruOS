@@ -86,8 +86,6 @@ int main(int argc, char* argv[]) {
   WiFiApp wifiApp;
   TotpApp totpApp;
   SettingsApp settingsApp;
-  SystemInfoApp sysInfoApp;
-  TouchTestApp touchTestApp;
 
   WakeInputGate wakeInput;
 
@@ -101,12 +99,10 @@ int main(int argc, char* argv[]) {
     totp.begin();
     usbHid.begin();
 
-    // Register primary apps and diagnostics apps
+    // Register applications exactly matching physical device baseline (src/main.cpp)
     launcher.registerApp(wifiApp);
     launcher.registerApp(totpApp);
     launcher.registerApp(settingsApp);
-    launcher.registerApp(sysInfoApp);
-    launcher.registerApp(touchTestApp);
 
     launcher.begin();
     launcher.tick(millis());
