@@ -13,7 +13,7 @@ void DisplayManager::begin() {
 
   // Initialize display controller first
   tft_.init();
-  tft_.setRotation(Board::kRotation);
+  tft_.setRotation(rotation_);
   tft_.setTextWrap(false);
   clear();
 
@@ -115,6 +115,13 @@ void DisplayManager::setBrightness(uint8_t percent) {
     applyBacklight(brightnessPercent_);
   }
   Serial.printf("[Display] Brightness set to %u%%\n", brightnessPercent_);
+}
+
+void DisplayManager::setRotation(uint8_t r) {
+  if (r != 1 && r != 3) r = 1;
+  rotation_ = r;
+  tft_.setRotation(rotation_);
+  Serial.printf("[Display] Rotation set to %u\n", rotation_);
 }
 
 void DisplayManager::setSleepTimeoutSeconds(uint16_t seconds) {

@@ -1,0 +1,12 @@
+[Version Policy & Bump Verification v0.4]
+Documentation checks: PASS (python tools/check_docs.py)
+Mutation unit tests: 17/17 tests PASS (python -m unittest discover -s tests/docs -v)
+Host smoke tests: PASS (python tools/run_host_tests.py)
+Desktop simulator tests: PASS with 0 warnings (cmd /c tools/run_desktop_tests.bat)
+PlatformIO embedded build: SUCCESS (pio run -e lilygo-t-display-s3)
+Memory & flash check: PASS (832,464 B binary, 12.7% flash, 15.3% RAM)
+Single source of truth alignment verified:
+  include/NibruConfig.h: kVersion = "v0.4"
+  include/BoardConfig.h: kVersion = "v0.4"
+  src/main.cpp: [NibruOS] boot v0.4
+  docs/CURRENT_STATE.md: "runtime_version": "v0.4"

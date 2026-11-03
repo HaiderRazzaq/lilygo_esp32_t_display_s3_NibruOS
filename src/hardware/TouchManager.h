@@ -1,5 +1,5 @@
 #pragma once
-#include "core/App.h"
+#include "core/EventTypes.h"
 #include <CST816S.h>
 
 class TouchManager {
@@ -8,8 +8,11 @@ public:
   void begin();
   bool poll(TouchEvent& event);
   bool isPressed() const { return contactActive_; }
+  uint8_t rotation() const { return rotation_; }
+  void setRotation(uint8_t r);
 private:
   CST816S touch_;
+  uint8_t rotation_ = 1;
   TouchEvent pending_{};
   uint32_t downAt_ = 0;
   int16_t startX_ = 0, startY_ = 0;

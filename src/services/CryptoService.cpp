@@ -85,7 +85,7 @@ bool CryptoService::deriveKey(const char* password, size_t passLen,
   ret = mbedtls_pkcs5_pbkdf2_hmac(&ctx,
                                   reinterpret_cast<const unsigned char*>(password), passLen,
                                   salt, saltLen,
-                                  iterations, outKeyLen, outKey);
+                                  iterations, static_cast<uint32_t>(outKeyLen), outKey);
   mbedtls_md_free(&ctx);
   return (ret == 0);
 }
@@ -99,7 +99,7 @@ bool CryptoService::aesGcmEncrypt(const uint8_t* key, size_t keyBits,
   if (!key || !iv || !tag || (inLen > 0 && (!plaintext || !ciphertext))) return false;
   mbedtls_gcm_context ctx;
   mbedtls_gcm_init(&ctx);
-  int ret = mbedtls_gcm_setkey(&ctx, MBEDTLS_CIPHER_ID_AES, key, keyBits);
+  int ret = mbedtls_gcm_setkey(&ctx, MBEDTLS_CIPHER_ID_AES, key, static_cast<unsigned int>(keyBits));
   if (ret != 0) {
     mbedtls_gcm_free(&ctx);
     return false;
@@ -123,7 +123,7 @@ bool CryptoService::aesGcmDecrypt(const uint8_t* key, size_t keyBits,
   if (!key || !iv || !tag || (inLen > 0 && (!ciphertext || !plaintext))) return false;
   mbedtls_gcm_context ctx;
   mbedtls_gcm_init(&ctx);
-  int ret = mbedtls_gcm_setkey(&ctx, MBEDTLS_CIPHER_ID_AES, key, keyBits);
+  int ret = mbedtls_gcm_setkey(&ctx, MBEDTLS_CIPHER_ID_AES, key, static_cast<unsigned int>(keyBits));
   if (ret != 0) {
     mbedtls_gcm_free(&ctx);
     return false;

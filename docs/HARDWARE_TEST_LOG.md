@@ -465,3 +465,52 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Write/hash/reset only; native UI/USB/UDP/persistence and profiling acceptance HWT-0018 NOT RUN."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.3 screen orientation",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Windows / espressif32@6.5.0 / Arduino-ESP32 2.0.14 / esptool 4.5.1",
+  "wiring": "Existing USB-C COM5 and integrated LCD/touch/buttons; no external changes",
+  "id": "HWT-0020",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized full flash erase and firmware re-flash",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "pio run -e lilygo-t-display-s3 -t erase --upload-port COM5 followed by pio run -e lilygo-t-display-s3 -t upload --upload-port COM5 per user explicit instruction",
+  "expected": "Full 16MB flash erase in 34.4s, write bootloader, partition table, boot flags, application image 832,464 B, verify flashed data hashes, and send hard reset via RTS",
+  "actual": "Chip erase completed successfully in 34.4s. Application 832,464 B (538,631 compressed) written to 0x10000 in 7.3s. Bootloader (15,104 B at 0x00000000), partitions (3,072 B at 0x00008000), and boot metadata (8,192 B at 0x0000e000) written and verified. Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-full-erase-flash-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for full erase and upload",
+  "limitations": "Write/hash/reset verification only; physical on-screen interaction and touch verification on real device pending user testing"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.4.1",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Windows / espressif32@6.5.0 / Arduino-ESP32 2.0.14 / esptool 4.5.1",
+  "wiring": "Existing USB-C COM5 and integrated LCD/touch/buttons",
+  "id": "HWT-0021",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.4.1 firmware upload with pairing code broadcast and Web Serial CDC stability fix",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "Write intended v0.4.1 image (832,800 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS in 19.58s. Application 832,800 B (538,964 compressed) written to 0x10000 in 7.3s. Bootloader, partitions, and boot metadata written and verified. Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v041-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.4.1 firmware upload",
+  "limitations": "Flashing and hardware reset verified; end-to-end pairing test with browser companion to be verified by user"
+}
+```
+

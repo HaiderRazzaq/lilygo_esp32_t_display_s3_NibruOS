@@ -50,7 +50,8 @@ public:
   // Hardware emulation hooks
   void writeCommand(uint8_t cmd);
   void setBrightness(uint8_t percent);
-  void setRotation(uint8_t r) { (void)r; } // Device is fixed to Rotation 1 (320x170)
+  void setRotation(uint8_t r) { rotation_ = (r == 3 ? 3 : 1); }
+  uint8_t rotation() const { return rotation_; }
 
   // Buffer presentation to SDL
   void present();
@@ -79,6 +80,7 @@ private:
   uint16_t textBg_ = 0x0000;
   bool hasBg_ = false;
   bool textWrap_ = false;
+  uint8_t rotation_ = 1;
 
   SDL_Window* window_ = nullptr;
   SDL_Renderer* renderer_ = nullptr;

@@ -1,0 +1,39 @@
+[Host Tests]
+PASS: authenticator lifecycle
+PASS: bounded paired account import
+PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests
+
+[Desktop Simulator Tests]
+[Test] Running Core Lifecycle & AppManager Tests...
+  -> Core Lifecycle Tests PASS
+[Test] Running UI & Coordinate Transformation Tests...
+  -> UI & Transformation Tests PASS
+[Test] Running Wi-Fi Service & Fault Injection Tests...
+  -> Wi-Fi Simulation Tests PASS
+[Test] Running Settings Persistence & Desktop NVS Tests...
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+[Display] Rotation set to 1
+[Settings] Loaded: Bright=100% Timeout=30s Theme=Cyber Cyan Rot=1
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Display] Rotation set to 3
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Display] Rotation set to 3
+[Settings] Loaded: Bright=50% Timeout=60s Theme=Amber Gold Rot=3
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+[Display] Rotation set to 1
+  -> Settings Persistence Tests PASS
+[Test] Running Modular Architecture & HAL Contract Tests...
+  -> Modular Architecture & HAL Tests PASS
+[Test] Running 25 Repeated Lifecycle Entry/Exit Cycles...
+  -> 25 Lifecycle Cycles PASS (host control flow; no physical leak measurement)
+ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY!
+
+[Node Helper Tests]
+✔ pasted key canonicalization and URI metadata
+✔ no silent algorithm or counter downgrade
+✔ WebCrypto matches independent Windows CNG envelope
+ℹ tests 3, pass 3, fail 0

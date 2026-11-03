@@ -22,6 +22,7 @@ void TotpApp::clearEditor() {
 void TotpApp::endImport(AppContext& ctx) {
   ctx.accountImport.stop();
   ctx.resources.releaseWiFi(ResourceOwner::AuthenticatorImport);
+  importSent_ = false;
 }
 void TotpApp::clearSession(AppContext& ctx) {
   endImport(ctx);
@@ -71,6 +72,7 @@ void TotpApp::onTick(AppContext& ctx, uint32_t nowMs) {
     const auto state = ctx.accountImport.state();
     if (state == ImportState::Review && view_ != View::ImportReview) {
       ctx.resources.releaseWiFi(ResourceOwner::AuthenticatorImport);
+  importSent_ = false;
       view_ = View::ImportReview; confirmAfterMs_ = nowMs + 350;
       fullRedraw_ = true; status_ = ""; invalidate();
     } else if (state == ImportState::Expired) {
@@ -79,6 +81,10 @@ void TotpApp::onTick(AppContext& ctx, uint32_t nowMs) {
     } else ctx.display.notifyActivity(nowMs); // Explicit session only, max120s.
     const uint32_t seconds = ctx.accountImport.remainingSeconds(nowMs);
     if (seconds != importRemaining_) { importRemaining_ = seconds; invalidate(); }
+    if (view_ == View::ImportUsb && !importSent_ && ctx.accountImport.state() == ImportState::Waiting) {
+      ctx.accountImport.broadcastPairingCode();
+      importSent_ = true;
+    }
   }
   if (sending_ && !ctx.time.getEpoch()) {
     ctx.usbHid.cancel(); sending_ = false;
@@ -109,6 +115,16 @@ bool TotpApp::onBack(AppContext& ctx) {
 }
 
 void TotpApp::onPrimaryAction(AppContext& ctx) {
+  if (view_ == View::ImportUsb && ctx.accountImport.state() == ImportState::Waiting) {
+    ctx.accountImport.broadcastPairingCode();
+    if (ctx.usbHid.isReady()) {
+      ctx.usbHid.typeText(ctx.accountImport.pairingCode(), false);
+    }
+    status_ = "Code sent to PC!";
+    fullRedraw_ = true;
+    invalidate();
+    return;
+  }
   if (view_ == View::Card && ctx.totp.accountCount()) {
     ctx.usbHid.cancel(); sending_ = false; status_ = "";
     accountIndex_ = (accountIndex_ + 1) % ctx.totp.accountCount();
@@ -132,6 +148,7 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
       }
       if (!ctx.accountImport.start(wifi ? ImportMode::Wifi : ImportMode::Usb, millis())) {
         ctx.resources.releaseWiFi(ResourceOwner::AuthenticatorImport);
+  importSent_ = false;
         status_ = "Import unavailable"; invalidate(); return;
       }
       view_ = wifi ? View::ImportWifi : View::ImportUsb;
@@ -139,7 +156,18 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     } else return;
     fullRedraw_ = true; invalidate(); return;
   }
-  if (view_ == View::ImportUsb || view_ == View::ImportWifi) return;
+  if (view_ == View::ImportUsb || view_ == View::ImportWifi) {
+    if (ev.gesture == TouchGesture::Tap && view_ == View::ImportUsb && ctx.accountImport.state() == ImportState::Waiting) {
+      ctx.accountImport.broadcastPairingCode();
+      if (ctx.usbHid.isReady()) {
+        ctx.usbHid.typeText(ctx.accountImport.pairingCode(), false);
+      }
+      status_ = "Code sent to PC!";
+      fullRedraw_ = true;
+      invalidate();
+    }
+    return;
+  }
   if (view_ == View::ImportReview) {
     if (ev.gesture != TouchGesture::Tap || ev.y < 108 || ev.y > 140) return;
     if (ev.x < 155) { onBack(ctx); return; }
@@ -303,7 +331,7 @@ void TotpApp::renderImport(AppContext& ctx) {
     char remaining[40]{};
     snprintf(remaining, sizeof(remaining), "Expires in %lus | Back cancels", static_cast<unsigned long>(importRemaining_));
     screen.label(40, 128, remaining, Colors::Amber, 1);
-    screen.footer("Encrypted transfer. Confirm on device.");
+    screen.footer(status_[0] ? status_ : (view_ == View::ImportUsb ? "Tap code or press BTN to send to PC" : "Encrypted transfer. Confirm on device."));
   }
 }
 

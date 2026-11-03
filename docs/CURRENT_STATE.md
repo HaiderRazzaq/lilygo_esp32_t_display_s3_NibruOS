@@ -1,17 +1,17 @@
 # Current state
 
-Snapshot: 2026-11-02, Asia/Baghdad. Implementation and physical acceptance are
+Snapshot: 2026-11-03, Asia/Baghdad. Implementation and physical acceptance are
 separate; [history](DEVELOPMENT_LOG.md) is append-only.
 
 ```json
 {
   "record_type": "state",
-  "date": "2026-11-02",
-  "runtime_version": "v0.3",
+  "date": "2026-11-03",
+  "runtime_version": "v0.4.1",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
-  "working_tree": "Uncommitted easier account entry plus phase one; default831408 B uploaded COM3 HWT-0019; native runtime acceptance pending",
+  "working_tree": "Screen orientation control (0 deg/180 deg), architecture audit, layer boundary hardening, single-source-of-truth configuration alignment (ADR-0003), zero compiler warnings",
   "implemented_features": [
     "FEAT-0001",
     "FEAT-0002",
@@ -43,10 +43,10 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "BUG-0010",
     "BUG-0011"
   ],
-  "latest_build": "VER-0045",
-  "latest_upload": "HWT-0019",
-  "documentation_verification": "VER-0047",
-  "current_host_attempt": "VER-0042",
+  "latest_build": "VER-0053",
+  "latest_upload": "HWT-0020",
+  "documentation_verification": "VER-0055",
+  "current_host_attempt": "VER-0054",
   "source_constants": {
     "kTouchSda": 18,
     "kTouchScl": 17,
@@ -155,3 +155,8 @@ uploaded COM3, hashes verified and RTS reset sent in26.376s. VER-0049 confirms
 matching partition tables. No full erase or NVS-range write. Interactive native
 USB/UDP/touch/persistence and resources remain pending HWT-0018; this is upload
 evidence only. No commit or push performed.
+
+## Architecture Audit & Screen Orientation Control — 2026-11-03
+Architecture audit completed under ADR-0003: decoupled Touch HAL from App interface, established compile-time static alignment across configuration headers, resolved MSVC 64-bit warnings, and added service-level MemoryProfiler forwarder.
+Runtime screen orientation control is implemented across DisplayManager, TouchManager (with coordinate transform x=319-rawY, y=rawX and inverted swipe gestures), SettingsService (dedicated 'rot' NVS key preserving 5-byte config schema), and SettingsApp UI (Normal 0° vs Invert 180°).
+PlatformIO image build passes with 832,464 B (-1.10% vs baseline, 12.7% flash, 15.3% RAM). Host smoke tests, desktop simulator suite, and documentation checks pass (VER-0053..0055). Physical hardware verification with inverted orientation is pending.

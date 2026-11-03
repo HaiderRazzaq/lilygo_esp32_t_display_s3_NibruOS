@@ -30,11 +30,12 @@ void testSettings(AppContext& ctx) {
   assert(s.setBrightness(100));
   assert(Preferences::writes == initialWrites);
   assert(!s.setBrightness(0) && !s.setBrightness(99));
-  assert(!s.setScreenTimeoutSec(31) && !s.setTheme(4));
-  assert(s.setBrightness(25) && s.setScreenTimeoutSec(0) && s.setTheme(3));
+  assert(!s.setScreenTimeoutSec(31) && !s.setTheme(4) && !s.setRotation(0) && !s.setRotation(2));
+  assert(s.setBrightness(25) && s.setScreenTimeoutSec(0) && s.setTheme(3) && s.setRotation(3));
+  assert(ctx.display.rotation() == 3);
   SettingsService restored;
   restored.begin();
-  assert(restored.brightness() == 25 && restored.screenTimeoutSec() == 0 && restored.theme() == 3);
+  assert(restored.brightness() == 25 && restored.screenTimeoutSec() == 0 && restored.theme() == 3 && restored.rotation() == 3);
   // Failure must be observable, with no runtime configuration change.
   Preferences::failWrite = true;
   assert(!s.setBrightness(50));
@@ -59,7 +60,7 @@ void testSettings(AppContext& ctx) {
     p.begin(ns, true); assert(p.getString("test").length() == 8); p.end();
   }
   restored.load();
-  assert(restored.brightness() == 100 && restored.screenTimeoutSec() == 30 && restored.theme() == 0);
+  assert(restored.brightness() == 100 && restored.screenTimeoutSec() == 30 && restored.theme() == 0 && restored.rotation() == 1);
 
   // Legacy values are validated, imported once, and never removed.
   Preferences::resetMock();
@@ -103,6 +104,10 @@ void testSettings(AppContext& ctx) {
   manager.handleTouch({110, 58, 0, 0, TouchGesture::Tap, 700}); // already 50%
   manager.tick(fakeMs);
   assert(ctx.display.gfx().drawCalls == unchangedDraws); // selecting same value is a no-op
+  manager.handleTouch({180, 120, 0, 0, TouchGesture::Tap, 750}); // Invert (180)
+  assert(ctx.settings.rotation() == 3);
+  manager.handleTouch({50, 120, 0, 0, TouchGesture::Tap, 760}); // Normal (0)
+  assert(ctx.settings.rotation() == 1);
   ctx.security.setPin("4875");
   ctx.security.setPinEnabled(true);
   ctx.security.lock();
@@ -179,6 +184,28 @@ void testSettings(AppContext& ctx) {
   rawFrame(20800, NONE, 1, 0);
   rawFrame(20900, SINGLE_CLICK, 0, 1);
   assert(ctx.settings.brightness() == 100);
+
+  TouchManager rotTouch;
+  rotTouch.begin();
+  assert(rotTouch.rotation() == 1);
+  rotTouch.setRotation(3);
+  assert(rotTouch.rotation() == 3);
+  fakeMs = 30000;
+  fakeTouchData = TouchData{NONE, 1, 0, 59, 200};
+  fakeTouchPending = true;
+  TouchEvent rotEv{};
+  assert(!rotTouch.poll(rotEv)); // Down frame stores contact, withholds semantic event
+  fakeTouchData = TouchData{SINGLE_CLICK, 0, 1, 59, 200};
+  fakeTouchPending = true;
+  assert(rotTouch.poll(rotEv));
+  assert(rotEv.x == 119 && rotEv.y == 59 && rotEv.gesture == TouchGesture::Tap);
+  fakeTouchData = TouchData{NONE, 1, 0, 59, 200};
+  fakeTouchPending = true;
+  assert(!rotTouch.poll(rotEv));
+  fakeTouchData = TouchData{SWIPE_UP, 0, 1, 59, 200};
+  fakeTouchPending = true;
+  assert(rotTouch.poll(rotEv));
+  assert(rotEv.gesture == TouchGesture::SwipeRight);
   manager.goHome(); manager.open(0);
   for (int i = 0; i < 4; ++i) manager.handleButton(ButtonAction::SelectNext);
   manager.handleButton(ButtonAction::Activate); // Device

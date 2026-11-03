@@ -2,7 +2,7 @@
 
 NibruOS is an in-process ESP32-S3 firmware platform and Windows desktop simulation suite structured as a **Feature-Based Modular Monolith with Layered Responsibilities and Hardware Abstraction (HAL)**.
 
-See [ADR-0002](decisions/0002-modular-architecture.md) for architectural decisions, [Desktop Simulator](DESKTOP_SIMULATOR.md) for cross-platform engine details, and [Engineering Workflow](ENGINEERING_WORKFLOW.md) for lifecycle standards.
+See [ADR-0002](decisions/0002-modular-architecture.md) and [ADR-0003](decisions/0003-architecture-audit-modular-standards.md) for architectural decisions, [Desktop Simulator](DESKTOP_SIMULATOR.md) for cross-platform engine details, and [Engineering Workflow](ENGINEERING_WORKFLOW.md) for lifecycle standards.
 
 ## 1. System Layering Overview
 

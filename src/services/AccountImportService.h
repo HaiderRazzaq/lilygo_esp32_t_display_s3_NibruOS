@@ -26,6 +26,7 @@ public:
   void tick(uint32_t now);
   ImportState state() const { return state_; }
   const char* pairingCode() const { return pairing_; }
+  void broadcastPairingCode();
   const ImportedAccount* candidate() const { return state_ == ImportState::Review ? &candidate_ : nullptr; }
   uint32_t remainingSeconds(uint32_t now) const;
 private:

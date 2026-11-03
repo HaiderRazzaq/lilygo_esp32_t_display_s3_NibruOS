@@ -1,0 +1,34 @@
+[Host Unit Tests and Desktop Simulator Test Evidence]
+Date: 2026-11-03
+Environment: Windows / MSVC 19.44.35222 x64 / SDL2 2.30.10 / Node v24.12.0
+
+Command: python tools/run_host_tests.py
+PASS: authenticator lifecycle
+PASS: bounded paired account import
+PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests
+
+Command: tools\run_desktop_tests.bat
+[DesktopStorage] Initialized with runtime directory '.testbuild/auth_runtime_test'
+[Test] Running Core Lifecycle & AppManager Tests...
+  -> Core Lifecycle Tests PASS
+[Test] Running UI & Coordinate Transformation Tests...
+  -> UI & Transformation Tests PASS
+[Test] Running Wi-Fi Service & Fault Injection Tests...
+  -> Wi-Fi Simulation Tests PASS
+[Test] Running Settings Persistence & Desktop NVS Tests...
+  -> Settings Persistence Tests PASS
+[Test] Running Modular Architecture & HAL Contract Tests...
+  -> Modular Architecture & HAL Tests PASS
+[Test] Running 25 Repeated Lifecycle Entry/Exit Cycles...
+  -> 25 Lifecycle Cycles PASS (host control flow; no physical leak measurement)
+==================================================
+  ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY!
+==================================================
+
+Command: node --test tests/tools/account_setup.test.mjs tests/tools/account_setup_ui.test.mjs
+✔ pasted key canonicalization and URI metadata
+✔ no silent algorithm or counter downgrade
+✔ WebCrypto matches independent Windows CNG envelope
+✔ busy USB open can retry without page reload
+✔ clear fields still clears when disconnected close rejects
+ℹ tests 5 | suites 0 | pass 5 | fail 0

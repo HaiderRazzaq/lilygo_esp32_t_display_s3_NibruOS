@@ -18,6 +18,11 @@ void TouchManager::begin() {
   Serial.println("[Touch] CST816S configured SDA=18 SCL=17 RST=21 INT=16");
 }
 
+void TouchManager::setRotation(uint8_t r) {
+  if (r != 1 && r != 3) r = 1;
+  rotation_ = r;
+}
+
 bool TouchManager::poll(TouchEvent& ev) {
   if (!touch_.available()) return false;
   const uint32_t now = millis();
@@ -31,15 +36,22 @@ bool TouchManager::poll(TouchEvent& ev) {
     gestureSent_ = false;
     moved_ = false;
     downAt_ = now;
-    startX_ = touch_.data.x;
-    startY_ = touch_.data.y;
+    startX_ = static_cast<int16_t>(touch_.data.x);
+    startY_ = static_cast<int16_t>(touch_.data.y);
   }
   if (contactActive_) {
-    pending_.rawX = touch_.data.x;
-    pending_.rawY = touch_.data.y;
-    pending_.x = constrain(static_cast<int>(pending_.rawY), 0, Board::kScreenWidth - 1);
-    pending_.y = constrain(Board::kScreenHeight - 1 - static_cast<int>(pending_.rawX),
-                           0, Board::kScreenHeight - 1);
+    pending_.rawX = static_cast<int16_t>(touch_.data.x);
+    pending_.rawY = static_cast<int16_t>(touch_.data.y);
+    if (rotation_ == 3) {
+      pending_.x = static_cast<int16_t>(constrain(Board::kScreenWidth - 1 - static_cast<int>(pending_.rawY), 0, Board::kScreenWidth - 1));
+      pending_.y = static_cast<int16_t>(constrain(static_cast<int>(pending_.rawX), 0, Board::kScreenHeight - 1));
+    } else {
+      pending_.x = static_cast<int16_t>(constrain(static_cast<int>(pending_.rawY), 0, Board::kScreenWidth - 1));
+      pending_.y = static_cast<int16_t>(constrain(Board::kScreenHeight - 1 - static_cast<int>(pending_.rawX), 0, Board::kScreenHeight - 1));
+    }
+
+
+
     const int dx = touch_.data.x - startX_, dy = touch_.data.y - startY_;
     if (dx > 12 || dx < -12 || dy > 12 || dy < -12) moved_ = true;
   }
@@ -47,10 +59,10 @@ bool TouchManager::poll(TouchEvent& ev) {
 
   TouchGesture gesture = TouchGesture::Unknown;
   switch (touch_.data.gestureID) {
-    case SWIPE_UP: gesture = TouchGesture::SwipeLeft; break;
-    case SWIPE_DOWN: gesture = TouchGesture::SwipeRight; break;
-    case SWIPE_LEFT: gesture = TouchGesture::SwipeDown; break;
-    case SWIPE_RIGHT: gesture = TouchGesture::SwipeUp; break;
+    case SWIPE_UP: gesture = (rotation_ == 3) ? TouchGesture::SwipeRight : TouchGesture::SwipeLeft; break;
+    case SWIPE_DOWN: gesture = (rotation_ == 3) ? TouchGesture::SwipeLeft : TouchGesture::SwipeRight; break;
+    case SWIPE_LEFT: gesture = (rotation_ == 3) ? TouchGesture::SwipeUp : TouchGesture::SwipeDown; break;
+    case SWIPE_RIGHT: gesture = (rotation_ == 3) ? TouchGesture::SwipeDown : TouchGesture::SwipeUp; break;
     case DOUBLE_CLICK: gesture = TouchGesture::DoubleTap; break;
     case LONG_PRESS: gesture = TouchGesture::LongPress; break;
     case SINGLE_CLICK: gesture = TouchGesture::Tap; break;

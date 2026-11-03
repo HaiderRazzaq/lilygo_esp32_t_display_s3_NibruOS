@@ -1,0 +1,13 @@
+Uploading .pio\build\lilygo-t-display-s3\firmware.bin
+Serial port COM5
+Connecting...
+Chip is ESP32-S3 (revision v0.2)
+Features: WiFi, BLE
+Crystal is 40MHz
+MAC: 44:1b:f6:d3:aa:bc
+Changing baud rate to 460800
+Wrote 832800 bytes (538964 compressed) at 0x00010000 in 7.3 seconds (effective 910.1 kbit/s)...
+Hash of data verified.
+Leaving...
+Hard resetting via RTS pin...
+========================= [SUCCESS] Took 19.58 seconds =========================

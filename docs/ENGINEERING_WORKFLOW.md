@@ -30,6 +30,8 @@ One change needs one meaningful development record, not a log of every edit.
    failed, successful, skipped, blocked, and not-run verification separately.
 3. Update the feature registry and relevant issues; append a development entry.
    Update current state and user-facing Unreleased changes when applicable.
+   Sequentially increment the firmware runtime version across configuration, code, and documentation
+   per the Mandatory Automatic Sequential Versioning Policy.
    Update pinout/inventory, architecture, dependencies, or ADRs only if affected.
 4. Append physical results only with real device evidence. Otherwise leave
    hardware NOT RUN/BLOCKED and provide reproducible procedures. A build, mock,
@@ -44,7 +46,7 @@ One change needs one meaningful development record, not a log of every edit.
 A task is complete only after implementation, appropriate verification, and
 required documentation are addressed. Where tests cannot run, report
 **IMPLEMENTED, verification incomplete**; never turn that into a test PASS or
-VERIFIED RESOLVED issue. No automatic firmware version bump or Git commit.
+VERIFIED RESOLVED issue. Firmware runtime version must be sequentially incremented on every change per AGENTS.md; no Git commit without authorization.
 
 ## Record conventions
 

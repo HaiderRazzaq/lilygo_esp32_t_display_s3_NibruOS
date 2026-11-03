@@ -1,5 +1,6 @@
 #include "services/SettingsService.h"
 #include "hardware/DisplayManager.h"
+#include "hardware/TouchManager.h"
 #include <Arduino.h>
 #include <Preferences.h>
 #include <cstring>
@@ -9,15 +10,16 @@ constexpr const char* kNvsNamespace = "nibru_settings";
 constexpr const char* kLegacyNamespace = "nibru_cfg";
 }
 
-void SettingsService::begin(DisplayManager* display) {
+void SettingsService::begin(DisplayManager* display, TouchManager* touch) {
   display_ = display;
+  touch_ = touch;
   load();
-  Serial.printf("[Settings] Loaded: Bright=%u%% Timeout=%us Theme=%s\n",
-                brightness_, screenTimeoutSec_, themeName());
+  Serial.printf("[Settings] Loaded: Bright=%u%% Timeout=%us Theme=%s Rot=%u\n",
+                brightness_, screenTimeoutSec_, themeName(), rotation_);
 }
 
 void SettingsService::load() {
-  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0;
+  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; rotation_ = 1;
   writable_ = true; lastSaveOk_ = true;
   Preferences prefs;
   bool migrated = false;
@@ -33,8 +35,8 @@ void SettingsService::load() {
       uint8_t data[5]{};
       const bool valid = prefs.getBytesLength("config") == sizeof(data) &&
                          prefs.getBytes("config", data, sizeof(data)) == sizeof(data);
-      prefs.end();
       if (!valid || data[0] != 1) {
+        prefs.end();
         // Never silently overwrite a corrupt/unknown schema. Explicit reset may.
         writable_ = false; lastSaveOk_ = false;
         applyToDisplay();
@@ -43,10 +45,15 @@ void SettingsService::load() {
       brightness_ = data[1];
       screenTimeoutSec_ = static_cast<uint16_t>(data[2] | (data[3] << 8));
       theme_ = data[4];
-    } else if (prefs.isKey("bright") || prefs.isKey("timeout") || prefs.isKey("theme")) {
+      if (prefs.isKey("rot")) {
+        rotation_ = prefs.getUChar("rot", 1);
+      }
+      prefs.end();
+    } else if (prefs.isKey("bright") || prefs.isKey("timeout") || prefs.isKey("theme") || prefs.isKey("rot")) {
       brightness_ = prefs.getUChar("bright", 100);
       screenTimeoutSec_ = prefs.getUShort("timeout", 30);
       theme_ = prefs.getUChar("theme", 0);
+      rotation_ = prefs.getUChar("rot", 1);
       prefs.end();
       migrated = true;
     } else {
@@ -64,6 +71,7 @@ void SettingsService::load() {
   if (screenTimeoutSec_ != 0 && screenTimeoutSec_ != 30 && screenTimeoutSec_ != 60 &&
       screenTimeoutSec_ != 180 && screenTimeoutSec_ != 300) screenTimeoutSec_ = 30;
   if (theme_ > 3) theme_ = 0;
+  if (rotation_ != 1 && rotation_ != 3) rotation_ = 1;
   if (migrated) save();
   applyToDisplay();
 }
@@ -79,8 +87,17 @@ bool SettingsService::save() {
   const bool unchanged = prefs.getBytesLength("config") == sizeof(data) &&
       prefs.getBytes("config", stored, sizeof(stored)) == sizeof(stored) &&
       memcmp(data, stored, sizeof(data)) == 0;
-  lastSaveOk_ = unchanged || prefs.putBytes("config", data, sizeof(data)) == sizeof(data);
+  bool ok = unchanged || prefs.putBytes("config", data, sizeof(data)) == sizeof(data);
+  if (prefs.isKey("rot")) {
+    const uint8_t storedRot = prefs.getUChar("rot", 1);
+    if (storedRot != rotation_) {
+      if (prefs.putUChar("rot", rotation_) != sizeof(uint8_t)) ok = false;
+    }
+  } else if (rotation_ != 1) {
+    if (prefs.putUChar("rot", rotation_) != sizeof(uint8_t)) ok = false;
+  }
   prefs.end();
+  lastSaveOk_ = ok;
   if (!lastSaveOk_) Serial.println("[Settings] NVS write failed; preferences unchanged");
   return lastSaveOk_;
 }
@@ -89,7 +106,7 @@ bool SettingsService::resetToDefaults() {
   const uint8_t oldB = brightness_, oldT = theme_;
   const uint16_t oldS = screenTimeoutSec_;
   const bool oldWritable = writable_;
-  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; writable_ = true;
+  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; rotation_ = 1; writable_ = true;
   if (!save()) {
     brightness_ = oldB; screenTimeoutSec_ = oldS; theme_ = oldT; writable_ = oldWritable;
     return false;
@@ -146,10 +163,32 @@ const char* SettingsService::themeName() const {
   }
 }
 
+bool SettingsService::setRotation(uint8_t rot) {
+  if (rot != 1 && rot != 3) return false;
+  if (rotation_ == rot) return lastSaveOk_;
+  const uint8_t old = rotation_;
+  rotation_ = rot;
+  if (!save()) { rotation_ = old; return false; }
+  applyToDisplay();
+  return true;
+}
+
+const char* SettingsService::rotationName() const {
+  switch (rotation_) {
+    case 3: return "Inverted (180)";
+    default: return "Landscape (0)";
+  }
+}
+
 void SettingsService::applyToDisplay() {
-  if (!display_) return;
-  display_->setBrightness(brightness_);
-  display_->setSleepTimeoutSeconds(screenTimeoutSec_);
-  display_->setThemeColor(themeColor());
+  if (display_) {
+    display_->setBrightness(brightness_);
+    display_->setSleepTimeoutSeconds(screenTimeoutSec_);
+    display_->setThemeColor(themeColor());
+    display_->setRotation(rotation_);
+  }
+  if (touch_) {
+    touch_->setRotation(rotation_);
+  }
 }
 

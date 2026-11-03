@@ -42,7 +42,7 @@ bool encode(char c, uint8_t& usage, uint8_t& modifiers) {
   }
   const char symbols[] = "!@#$%^&*()";
   for (unsigned i = 0; i < 10; ++i) if (c == symbols[i]) {
-    usage = i == 9 ? 0x27 : 0x1e + i; modifiers = 2; return true;
+    usage = static_cast<uint8_t>(i == 9 ? 0x27 : 0x1e + i); modifiers = 2; return true;
   }
   return false;
 }

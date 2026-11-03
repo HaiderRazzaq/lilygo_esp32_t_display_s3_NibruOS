@@ -3,10 +3,11 @@
 #include <stddef.h>
 
 class DisplayManager;
+class TouchManager;
 
 class SettingsService {
 public:
-  void begin(DisplayManager* display = nullptr);
+  void begin(DisplayManager* display = nullptr, TouchManager* touch = nullptr);
   void load();
   bool save();
   bool resetToDefaults();
@@ -26,13 +27,20 @@ public:
   uint16_t themeColor() const;
   const char* themeName() const;
 
+  // Screen Orientation: 1 = Landscape Normal (0 deg), 3 = Landscape Inverted (180 deg)
+  uint8_t rotation() const { return rotation_; }
+  bool setRotation(uint8_t rot);
+  const char* rotationName() const;
+
 private:
   DisplayManager* display_ = nullptr;
+  TouchManager* touch_ = nullptr;
   bool writable_ = true;
   bool lastSaveOk_ = true;
   uint8_t brightness_ = 100;
   uint16_t screenTimeoutSec_ = 30;
   uint8_t theme_ = 0;
+  uint8_t rotation_ = 1;
 
   void applyToDisplay();
 };

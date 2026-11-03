@@ -39,6 +39,7 @@
 #include <fstream>
 
 void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, TotpApp& totpApp, SettingsApp& settingsApp) {
+  (void)ctx; (void)wifiApp; (void)totpApp; (void)settingsApp;
   std::printf("[Test] Running Core Lifecycle & AppManager Tests...\n");
 
   assert(launcher.isHome());
@@ -231,14 +232,17 @@ void testSettingsPersistence(AppContext& ctx) {
   assert(s.brightness() == 100);
   assert(s.screenTimeoutSec() == 30);
   assert(s.theme() == 0);
+  assert(s.rotation() == 1);
 
   // Valid changes
   assert(s.setBrightness(50));
   assert(s.setScreenTimeoutSec(60));
   assert(s.setTheme(2)); // Amber
+  assert(s.setRotation(3)); // Inverted (180)
   assert(s.brightness() == 50);
   assert(s.screenTimeoutSec() == 60);
   assert(s.theme() == 2);
+  assert(s.rotation() == 3);
 
   // Reload new instance from persistent storage file
   SettingsService reloaded;
@@ -246,20 +250,25 @@ void testSettingsPersistence(AppContext& ctx) {
   assert(reloaded.brightness() == 50);
   assert(reloaded.screenTimeoutSec() == 60);
   assert(reloaded.theme() == 2);
+  assert(reloaded.rotation() == 3);
 
   // Invalid value rejections
   assert(!reloaded.setBrightness(15));
   assert(!reloaded.setBrightness(105));
   assert(!reloaded.setScreenTimeoutSec(45));
   assert(!reloaded.setTheme(5));
+  assert(!reloaded.setRotation(0));
+  assert(!reloaded.setRotation(2));
   // Values remain unchanged
   assert(reloaded.brightness() == 50);
+  assert(reloaded.rotation() == 3);
 
   // Reset to defaults
   assert(reloaded.resetToDefaults());
   assert(reloaded.brightness() == 100);
   assert(reloaded.screenTimeoutSec() == 30);
   assert(reloaded.theme() == 0);
+  assert(reloaded.rotation() == 1);
 
   std::printf("  -> Settings Persistence Tests PASS\n");
 }

@@ -1007,3 +1007,160 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Use launcher tools/open_account_setup.bat and public disposable fixture; complete HWT-0018 with resource scenarios A-E."
 }
 ```
+
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0027",
+  "date": "2026-11-03",
+  "related": [
+    "FEAT-0001",
+    "FEAT-0005",
+    "FEAT-0006",
+    "FEAT-0013",
+    "FEAT-0015",
+    "VER-0050",
+    "VER-0051",
+    "VER-0052"
+  ],
+  "action": "CHANGED / FIXED / REFACTORED",
+  "files": [
+    "include/BoardConfig.h",
+    "include/PinDefinitions.h",
+    "include/NibruConfig.h",
+    "src/core/IApp.h",
+    "src/hardware/TouchManager.h",
+    "src/hardware/TouchManager.cpp",
+    "src/services/CryptoService.cpp",
+    "src/services/UsbHidService.cpp",
+    "src/services/MemoryProfiler.h",
+    "src/apps/SettingsApp.cpp",
+    "tools/run_host_tests.py",
+    "tools/run_desktop_tests.bat",
+    "tests/desktop/test_simulator.cpp",
+    "docs/ARCHITECTURE.md",
+    "docs/CURRENT_STATE.md",
+    "docs/decisions/0003-architecture-audit-modular-standards.md",
+    "docs/decisions/README.md"
+  ],
+  "description": "Completed full architectural audit and modular standards refactoring. Decoupled Touch HAL from App interface, established compile-time static alignment for board pin configuration, added MemoryProfiler service header, resolved all MSVC 64-bit compiler warnings, and enhanced Windows host test tooling.",
+  "reason": "Enforce Feature-Based Modular Monolith with Layered Responsibilities and HAL (ADR-0003), eliminate unnecessary dependencies, and guarantee cross-platform build cleanliness.",
+  "expected": "Strict downward dependencies, single source of truth for pin definitions, zero compiler warnings on MSVC/GCC, 100% test pass rate, and zero flash/RAM regression.",
+  "actual": "VER-0050, VER-0051, and VER-0052 PASS. Embedded binary size unchanged (831,424 B, 0.00% growth, 12.7% of app0). All 17 documentation checks and 17 mutation tests PASS.",
+  "verification": "VER-0050 (PlatformIO target build), VER-0051 (Documentation checks), VER-0052 (Host unit tests, desktop simulator tests, node tests)",
+  "risks": "Host tests and compilation checks do not validate real hardware CST816S touch response or AW9364 backlight pulses on physical board.",
+  "commit": "UNCOMMITTED on main; no commit/push.",
+  "follow_up": "Proceed with device upload and hardware test log verification when physical board is connected."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0028",
+  "date": "2026-11-03",
+  "related": [
+    "FEAT-0010",
+    "FEAT-0012",
+    "FEAT-0013",
+    "FEAT-0015",
+    "VER-0053",
+    "VER-0054",
+    "VER-0055"
+  ],
+  "action": "ADDED / EXTENDED",
+  "files": [
+    "src/hardware/DisplayManager.h",
+    "src/hardware/DisplayManager.cpp",
+    "src/hardware/TouchManager.h",
+    "src/hardware/TouchManager.cpp",
+    "src/services/SettingsService.h",
+    "src/services/SettingsService.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/main.cpp",
+    "platform/desktop/SDLDisplay.h",
+    "tests/host/test_settings.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Implemented runtime screen orientation control supporting Landscape Normal 0° (rotation 1) and Landscape Inverted 180° (rotation 3). Synchronized ST7789 TFT scan direction with CST816S capacitive touch coordinate transformation (x=319-rawY, y=rawX) and inverted swipe gestures, added dedicated non-volatile NVS persistence key 'rot' preserving the 5-byte config schema, exposed UI selection controls in Settings Display subview, and extended host unit tests and desktop simulator suites.",
+  "reason": "Enable users to comfortably use the device when rotated 180° (e.g. USB-C port facing left vs. right) while maintaining the 320x170 landscape geometry across all OS views.",
+  "expected": "Flawless rendering and touch mapping in both 0° and 180° orientations, persistent rotation state across reboots, zero regression on existing settings schema, and zero memory/resource budget violations.",
+  "actual": "VER-0053 (PIO build 832,464 B binary, 12.7% flash, 15.3% RAM), VER-0054 (Host smoke tests, desktop simulator suite, and node tests PASS with 0 warnings), VER-0055 (Documentation checks PASS).",
+  "verification": "VER-0053 (Embedded PlatformIO build), VER-0054 (Host unit & simulator tests), VER-0055 (Documentation consistency checks)",
+  "risks": "Host tests and compilation checks verify driver math, NVS persistence, and layout. Physical verification on real board with inverted USB cable remains pending.",
+  "commit": "UNCOMMITTED on main; no commit/push.",
+  "follow_up": "Perform physical hardware test when user connects the physical board."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0029",
+  "date": "2026-11-03",
+  "related": [
+    "FEAT-0008",
+    "VER-0056"
+  ],
+  "action": "POLICY ADDED / VERSION BUMP",
+  "files": [
+    "AGENTS.md",
+    "docs/ENGINEERING_WORKFLOW.md",
+    "docs/releases/README.md",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md"
+  ],
+  "description": "Formulated and codified the Mandatory Automatic Sequential Versioning Policy across AGENTS.md, docs/ENGINEERING_WORKFLOW.md, and docs/releases/README.md. Sequentially bumped firmware version from v0.3 to v0.4 across all sources of truth (include/NibruConfig.h, include/BoardConfig.h, src/main.cpp, and docs/CURRENT_STATE.md). Verified with check_docs.py and multi-target suites.",
+  "reason": "User explicit requirement: In ANY modification process, whether big or small, the version number must automatically be updated sequentially and monotonically.",
+  "expected": "Zero version divergence across code and documentation, compliance with check_docs.py regex check on src/main.cpp, and automated build/test validation.",
+  "actual": "VER-0056 PASS. Version bumped to v0.4. All documentation checks, host unit tests, simulator suite, and PlatformIO embedded build succeed.",
+  "verification": "VER-0056 (Build, test, and documentation check suite)",
+  "risks": "None; version strings updated in lockstep across all single sources of truth.",
+  "commit": "UNCOMMITTED on main; no commit/push.",
+  "follow_up": "Maintain sequential version bump on every subsequent task or edit."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0030",
+  "date": "2026-11-03",
+  "related": [
+    "FEAT-0008",
+    "VER-0057",
+    "VER-0058",
+    "VER-0059",
+    "VER-0060",
+    "HWT-0021"
+  ],
+  "action": "FEATURE / BUGFIX / VERSION BUMP",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "src/services/AccountImportService.h",
+    "src/services/AccountImportService.cpp",
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "tools/account_setup/account_setup.html",
+    "tools/account_setup/account_setup.css",
+    "tools/account_setup/account_setup.mjs",
+    "tests/host/test_account_import.cpp"
+  ],
+  "description": "Resolved USB CDC reset issue when pairing from browser companion tool by controlling DTR/RTS signals and providing a pre-connection workflow. Added instant automatic pairing code broadcast over Serial and USB HID keyboard emulation upon tapping screen or pressing button during 2FA USB import. Added live Web Serial background listener in companion tool to automatically capture and fill the pairing code. Sequentially bumped firmware version to v0.4.1.",
+  "reason": "Fix device reboot when sending account setup from web companion tool, eliminate manual typing of 16-character one-time pairing code via touch/button trigger, and enforce sequential versioning policy.",
+  "expected": "No device restart upon connection, immediate auto-fill of pairing code in browser tool upon screen tap/button press, seamless encrypted transfer, and clean build/test passes.",
+  "actual": "VER-0057 (Host tests PASS), VER-0058 (Desktop tests PASS), VER-0059 (Node tests PASS), VER-0060 (PIO build PASS, 832,800 B, 12.7% flash, 15.3% RAM, -1.06% growth), HWT-0021 (Uploaded to COM5 successfully).",
+  "verification": "VER-0057, VER-0058, VER-0059, VER-0060, HWT-0021",
+  "risks": "Web Serial requires Chrome or Edge browser. Wi-Fi import path remains completely available and unaffected.",
+  "commit": "UNCOMMITTED on main; no commit/push.",
+  "follow_up": "Verify with user on physical device with companion web tool."
+}
+```
+

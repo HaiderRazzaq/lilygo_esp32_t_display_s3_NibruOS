@@ -1,0 +1,2 @@
+Documentation checks: PASS
+Ran 17 tests in tests/docs: OK

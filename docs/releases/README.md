@@ -8,8 +8,10 @@ tagged release. Do not retroactively manufacture release dates or binary hashes.
 New work stays in [Unreleased](../../CHANGELOG.md) until a deliberate release.
 Use Semantic Versioning for actual release scope: patch for compatible fixes,
 minor for compatible new features, major for incompatible contracts. Before 1.0,
-document interface/partition/data compatibility explicitly. Do not increase the
-firmware version for every documentation or code edit.
+document interface/partition/data compatibility explicitly.
+In accordance with the Mandatory Automatic Sequential Versioning Policy in AGENTS.md,
+every code, feature, or architecture modification (big or small) must sequentially
+increment the firmware runtime version number across all sources of truth.
 
 For an authorized release create `vX.Y.Z.md` here with:
 

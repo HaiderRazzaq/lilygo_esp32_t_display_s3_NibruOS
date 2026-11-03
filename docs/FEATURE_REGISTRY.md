@@ -293,7 +293,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ],
   "history": [
     "DEV-0004",
-    "DEV-0005"
+    "DEV-0005",
+    "DEV-0029"
   ]
 }
 ```
@@ -411,7 +412,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
 {
   "record_type": "feature",
   "id": "FEAT-0012",
-  "name": "Display Controls, Sleep Mode and PIN Security",
+  "name": "Display Controls, Sleep Mode, Screen Orientation and PIN Security",
   "purpose": "Existing display controls, inactivity sleep and PIN security (Security retained, not expanded by Settings completion)",
   "module": "src/hardware/DisplayManager + src/services/SecurityService + src/apps/SettingsApp",
   "files": [
@@ -440,7 +441,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "history": [
     "DEV-0010",
     "DEV-0023",
-    "DEV-0024"
+    "DEV-0024",
+    "DEV-0028"
   ]
 }
 ```
@@ -483,7 +485,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "DEV-0011",
     "DEV-0014",
     "DEV-0015",
-    "DEV-0017"
+    "DEV-0017",
+    "DEV-0028"
   ]
 }
 ```

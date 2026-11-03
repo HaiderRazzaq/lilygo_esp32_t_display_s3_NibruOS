@@ -42,7 +42,7 @@ private:
   bool hasRendered_ = false, drawnSaveOk_ = true;
   SettingsSubView drawnView_ = SettingsSubView::Menu;
   uint8_t drawnFocus_ = 255, drawnMenu_ = 255, drawnScroll_ = 255;
-  uint8_t drawnBrightness_ = 0, drawnTheme_ = 255;
+  uint8_t drawnBrightness_ = 0, drawnTheme_ = 255, drawnRotation_ = 255;
   uint16_t drawnTimeout_ = 65535;
 
   // Confirmation dialog state for Device actions

@@ -56,12 +56,79 @@ if (typeof document !== 'undefined') {
   const element = id => document.getElementById(id);
   const status = element('status');
   let port = null;
+  let reader = null;
+  let keepReading = false;
+
   const clearFields = () => { element('secret').value = element('pairing').value = ''; element('secret').type = 'password'; };
-  element('mode').addEventListener('change', () => { element('wifiFields').hidden = element('mode').value !== 'wifi'; });
+  element('mode').addEventListener('change', () => {
+    const isWifi = element('mode').value === 'wifi';
+    element('wifiFields').hidden = !isWifi;
+    const usbFields = element('usbFields');
+    if (usbFields) usbFields.hidden = isWifi;
+  });
   element('reveal').addEventListener('click', () => { element('secret').type = element('secret').type === 'password' ? 'text' : 'password'; });
+
+  async function connectUsb() {
+    if (!('serial' in navigator)) throw new Error('افتح الصفحة في Chrome أو Edge على الكمبيوتر لاستخدام USB.');
+    if (port && port.readable) return port;
+    const selected = await navigator.serial.requestPort({filters: [{usbVendorId: 0x303a}]});
+    await selected.open({baudRate: 115200});
+    try { await selected.setSignals({dataTerminalReady: true, requestToSend: false}); } catch {}
+    port = selected;
+    const badge = element('usbBadge');
+    if (badge) { badge.textContent = 'متصل'; badge.className = 'badge connected'; }
+    startReader(port);
+    return port;
+  }
+
+  async function startReader(p) {
+    keepReading = true;
+    while (p && p.readable && keepReading) {
+      try {
+        const textDecoder = new TextDecoderStream();
+        p.readable.pipeTo(textDecoder.writable).catch(() => {});
+        reader = textDecoder.readable.getReader();
+        let buffer = '';
+        while (keepReading) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += value;
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+          for (const line of lines) {
+            const m = line.trim().match(/PAIRING:([A-Z2-7]{16})/i);
+            if (m) {
+              element('pairing').value = m[1].toUpperCase();
+              status.textContent = '✓ تم استلام رمز الاقتران تلقائياً من الجهاز (' + m[1].toUpperCase() + ')!';
+              status.style.color = '#5ce3d4';
+            }
+          }
+        }
+      } catch (err) {
+        break;
+      }
+    }
+  }
+
+  const connectBtn = element('connectUsb');
+  if (connectBtn) {
+    connectBtn.addEventListener('click', async () => {
+      try {
+        await connectUsb();
+        status.textContent = 'تم الاتصال بالمنفذ التسلسلي بنجاح. افتح الآن شاشة USB على NibruOS أو المس رمز الاقتران لاستلامه تلقائياً.';
+      } catch (err) {
+        status.textContent = err.message || 'تعذر الاتصال بالمنفذ.';
+      }
+    });
+  }
+
   element('close').addEventListener('click', async () => {
     clearFields();
+    keepReading = false;
+    if (reader) { try { await reader.cancel(); } catch {} reader = null; }
     const closing = port; port = null;
+    const badge = element('usbBadge');
+    if (badge) { badge.textContent = 'غير متصل'; badge.className = 'badge'; }
     try {
       if (closing) await closing.close();
       status.textContent = 'تم إغلاق الاتصال ومسح الحقول. ارجع من شاشة الاستيراد على الجهاز.';
@@ -74,14 +141,9 @@ if (typeof document !== 'undefined') {
       const account = parseAccount(element('name').value, element('secret').value);
       let frame;
       if (element('mode').value === 'usb') {
-        if (!('serial' in navigator)) throw new Error('افتح الصفحة في Chrome أو Edge على الكمبيوتر لاستخدام USB.');
         if (!port) {
-          const selected = await navigator.serial.requestPort({filters: [{usbVendorId: 0x303a}]});
-          await selected.open({baudRate: 115200});
-          port = selected;
+          await connectUsb();
         }
-        // Opening a port can reset some devices. Recheck the pairing screen if
-        // the device resets; a new session deliberately rejects this envelope.
         frame = await makeFrame(account, element('pairing').value);
         const writer = port.writable.getWriter();
         try { await writer.write(encoder.encode(frame)); } finally { writer.releaseLock(); }
@@ -94,10 +156,6 @@ if (typeof document !== 'undefined') {
       clearFields();
       status.textContent = 'أُرسلت البيانات المشفّرة. تحقق من اسم الحساب على شاشة NibruOS واضغط SAVE هناك. الإرسال لا يعني أن الحساب حُفظ.';
     } catch (error) {
-      if (port && element('mode').value === 'usb') {
-        const failed = port; port = null;
-        try { await failed.close(); } catch { /* Clear action remains available. */ }
-      }
       status.textContent = error.message || 'تعذر الإرسال؛ تحقق من الاتصال وأعد المحاولة.';
     }
     finally { element('send').disabled = false; element('close').disabled = false; }

@@ -99,7 +99,7 @@ void SettingsApp::onPrimaryAction(AppContext& ctx) {
     if (menuIndex_ < scrollOffset_ || menuIndex_ >= scrollOffset_ + 3)
       scrollOffset_ = menuIndex_ > 2 ? menuIndex_ - 2 : 0;
   } else if (subView_ == SettingsSubView::Display) {
-    focusedIndex_ = (focusedIndex_ + 1) % 10;
+    focusedIndex_ = (focusedIndex_ + 1) % 12;
   } else if (subView_ == SettingsSubView::Theme) {
     focusedIndex_ = (focusedIndex_ + 1) % 4;
   } else if (subView_ == SettingsSubView::Device) {
@@ -124,7 +124,17 @@ void SettingsApp::onActivate(AppContext& ctx) {
     const uint16_t timeout[] = {30, 60, 180, 300, 0};
     if (focusedIndex_ < 4) ctx.settings.setBrightness(bright[focusedIndex_]);
     else if (focusedIndex_ < 9) ctx.settings.setScreenTimeoutSec(timeout[focusedIndex_ - 4]);
-    else ctx.display.sleep();
+    else if (focusedIndex_ == 9) {
+      if (ctx.settings.rotation() != 1) {
+        ctx.settings.setRotation(1);
+        fullRedraw_ = true;
+      }
+    } else if (focusedIndex_ == 10) {
+      if (ctx.settings.rotation() != 3) {
+        ctx.settings.setRotation(3);
+        fullRedraw_ = true;
+      }
+    } else ctx.display.sleep();
   } else if (subView_ == SettingsSubView::Theme) ctx.settings.setTheme(focusedIndex_);
   else if (subView_ == SettingsSubView::Device) {
     if (confirmAction_ == ConfirmAction::None) {
@@ -198,7 +208,7 @@ void SettingsApp::handleMenuTouch(AppContext& ctx, const TouchEvent& ev) {
   }
   if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
   if (ev.x < 10 || ev.x >= 310 || ev.y < 36 || ev.y >= 144) return;
-  const uint8_t row = (ev.y - 36) / 36;
+  const uint8_t row = static_cast<uint8_t>((ev.y - 36) / 36);
   if ((ev.y - 36) % 36 >= 32) return;
   menuIndex_ = scrollOffset_ + row;
   onActivate(ctx);
@@ -208,16 +218,22 @@ void SettingsApp::handleDisplayTouch(AppContext& ctx, const TouchEvent& ev) {
   if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
   const int bx[] = {14, 88, 162, 236};
   const int sx[] = {10, 70, 130, 190, 250};
-  if (ev.y >= 48 && ev.y < 70) {
+  if (ev.y >= 45 && ev.y < 68) {
     for (uint8_t i = 0; i < 4; ++i) if (ev.x >= bx[i] && ev.x < bx[i] + 66) {
       focusedIndex_ = i; onActivate(ctx); return;
     }
-  } else if (ev.y >= 88 && ev.y < 110) {
+  } else if (ev.y >= 78 && ev.y < 102) {
     for (uint8_t i = 0; i < 5; ++i) if (ev.x >= sx[i] && ev.x < sx[i] + 54) {
       focusedIndex_ = i + 4; onActivate(ctx); return;
     }
-  } else if (ev.y >= 118 && ev.y < 144 && ev.x >= 60 && ev.x < 260) {
-    focusedIndex_ = 9; onActivate(ctx);
+  } else if (ev.y >= 112 && ev.y < 136) {
+    if (ev.x >= 14 && ev.x < 126) {
+      focusedIndex_ = 9; onActivate(ctx); return;
+    } else if (ev.x >= 130 && ev.x < 242) {
+      focusedIndex_ = 10; onActivate(ctx); return;
+    } else if (ev.x >= 246 && ev.x < 312) {
+      focusedIndex_ = 11; onActivate(ctx); return;
+    }
   }
 }
 
@@ -278,6 +294,7 @@ void SettingsApp::render(AppContext& ctx) {
   if (controls && !fullRedraw_ && drawnFocus_ == focusedIndex_ && drawnMenu_ == menuIndex_ &&
       drawnScroll_ == scrollOffset_ && drawnBrightness_ == ctx.settings.brightness() &&
       drawnTheme_ == ctx.settings.theme() && drawnTimeout_ == ctx.settings.screenTimeoutSec() &&
+      drawnRotation_ == ctx.settings.rotation() &&
       drawnSaveOk_ == ctx.settings.lastSaveOk()) return;
   switch (subView_) {
     case SettingsSubView::Menu:      renderMenu(ctx); break;
@@ -294,7 +311,8 @@ void SettingsApp::render(AppContext& ctx) {
   hasRendered_ = true; drawnView_ = subView_; drawnConfirmation_ = confirmAction_;
   drawnFocus_ = focusedIndex_; drawnMenu_ = menuIndex_; drawnScroll_ = scrollOffset_;
   drawnBrightness_ = ctx.settings.brightness(); drawnTheme_ = ctx.settings.theme();
-  drawnTimeout_ = ctx.settings.screenTimeoutSec(); drawnSaveOk_ = ctx.settings.lastSaveOk();
+  drawnTimeout_ = ctx.settings.screenTimeoutSec(); drawnRotation_ = ctx.settings.rotation();
+  drawnSaveOk_ = ctx.settings.lastSaveOk();
   fullRedraw_ = false;
 }
 
@@ -336,8 +354,8 @@ void SettingsApp::renderDisplay(AppContext& ctx) {
   char bStr[32];
   snprintf(bStr, sizeof(bStr), "BRIGHTNESS: %u%%", ctx.settings.brightness());
   if (fullRedraw_ || drawnBrightness_ != ctx.settings.brightness()) {
-    t.fillRect(14, 36, 292, 10, Colors::Bg);
-    screen.label(14, 36, bStr, Colors::Cyan, 1, Colors::Bg);
+    t.fillRect(14, 35, 292, 10, Colors::Bg);
+    screen.label(14, 35, bStr, Colors::Cyan, 1, Colors::Bg);
   }
 
   const uint8_t brightVals[4] = {25, 50, 75, 100};
@@ -351,15 +369,15 @@ void SettingsApp::renderDisplay(AppContext& ctx) {
     const uint16_t tc = active ? Colors::Bg : Colors::White;
     const bool valueChanged = fullRedraw_ || drawnBrightness_ != currentB;
     if (valueChanged) {
-      t.fillRoundRect(bX[i], 48, 66, 22, 4, bg);
+      t.fillRoundRect(bX[i], 47, 66, 20, 4, bg);
       const int tx = bX[i] + (66 - static_cast<int>(strlen(brightLabels[i])) * 6) / 2;
-      screen.label(tx, 55, brightLabels[i], tc, 1, bg);
+      screen.label(tx, 53, brightLabels[i], tc, 1, bg);
     }
     if (valueChanged || focusedIndex_ == i || drawnFocus_ == i)
-      t.drawRoundRect(bX[i], 48, 66, 22, 4, focusedIndex_ == i ? Colors::White : Colors::Border);
+      t.drawRoundRect(bX[i], 47, 66, 20, 4, focusedIndex_ == i ? Colors::White : Colors::Border);
   }
 
-  // Section 2: Screen Timeout (A4: 30s, 1m, 3m, 5m, Never)
+  // Section 2: Screen Timeout (30s, 1m, 3m, 5m, Never)
   char sStr[48];
   const uint16_t sec = ctx.settings.screenTimeoutSec();
   if (sec == 0) {
@@ -370,8 +388,8 @@ void SettingsApp::renderDisplay(AppContext& ctx) {
     snprintf(sStr, sizeof(sStr), "SCREEN TIMEOUT: %u sec", sec);
   }
   if (fullRedraw_ || drawnTimeout_ != sec) {
-    t.fillRect(14, 75, 292, 10, Colors::Bg);
-    screen.label(14, 75, sStr, Colors::Green, 1, Colors::Bg);
+    t.fillRect(14, 71, 292, 10, Colors::Bg);
+    screen.label(14, 71, sStr, Colors::Green, 1, Colors::Bg);
   }
 
   const uint16_t sleepVals[5] = {30, 60, 180, 300, 0};
@@ -384,21 +402,49 @@ void SettingsApp::renderDisplay(AppContext& ctx) {
     const uint16_t tc = active ? Colors::Bg : Colors::White;
     const bool valueChanged = fullRedraw_ || drawnTimeout_ != sec;
     if (valueChanged) {
-      t.fillRoundRect(sX[i], 88, 54, 22, 4, bg);
+      t.fillRoundRect(sX[i], 82, 54, 18, 4, bg);
       const int tx = sX[i] + (54 - static_cast<int>(strlen(sleepLabels[i])) * 6) / 2;
-      screen.label(tx, 95, sleepLabels[i], tc, 1, bg);
+      screen.label(tx, 87, sleepLabels[i], tc, 1, bg);
     }
     if (valueChanged || focusedIndex_ == i + 4 || drawnFocus_ == i + 4)
-      t.drawRoundRect(sX[i], 88, 54, 22, 4, focusedIndex_ == i + 4 ? Colors::White : Colors::Border);
+      t.drawRoundRect(sX[i], 82, 54, 18, 4, focusedIndex_ == i + 4 ? Colors::White : Colors::Border);
   }
 
-  // Sleep now test button
-  if (fullRedraw_) {
-    t.fillRoundRect(60, 118, 200, 26, 6, Colors::Panel);
-    screen.label(78, 126, "[ TEST SLEEP MODE NOW ]", Colors::Amber, 1, Colors::Panel);
+  // Section 3: Screen Orientation & Sleep Test
+  char rStr[48];
+  const uint8_t curRot = ctx.settings.rotation();
+  snprintf(rStr, sizeof(rStr), "ORIENTATION: %s", curRot == 3 ? "Inverted (180)" : "Landscape (0)");
+  if (fullRedraw_ || drawnRotation_ != curRot) {
+    t.fillRect(14, 103, 292, 10, Colors::Bg);
+    screen.label(14, 103, rStr, Colors::Amber, 1, Colors::Bg);
   }
-  if (fullRedraw_ || focusedIndex_ == 9 || drawnFocus_ == 9)
-    t.drawRoundRect(60, 118, 200, 26, 6, focusedIndex_ == 9 ? Colors::White : Colors::Amber);
+
+  const uint8_t rotVals[2] = {1, 3};
+  const char* rotLabels[2] = {"Normal (0)", "Invert (180)"};
+  const int rX[2] = {14, 130};
+  const int rW[2] = {110, 110};
+
+  for (int i = 0; i < 2; ++i) {
+    const bool active = (curRot == rotVals[i]);
+    const uint16_t bg = active ? Colors::Amber : Colors::Panel;
+    const uint16_t tc = active ? Colors::Bg : Colors::White;
+    const bool valueChanged = fullRedraw_ || drawnRotation_ != curRot;
+    if (valueChanged) {
+      t.fillRoundRect(rX[i], 115, rW[i], 18, 4, bg);
+      const int tx = rX[i] + (rW[i] - static_cast<int>(strlen(rotLabels[i])) * 6) / 2;
+      screen.label(tx, 120, rotLabels[i], tc, 1, bg);
+    }
+    if (valueChanged || focusedIndex_ == i + 9 || drawnFocus_ == i + 9)
+      t.drawRoundRect(rX[i], 115, rW[i], 18, 4, focusedIndex_ == i + 9 ? Colors::White : Colors::Border);
+  }
+
+  // Sleep button (Index 11)
+  if (fullRedraw_) {
+    t.fillRoundRect(246, 115, 60, 18, 4, Colors::Panel);
+    screen.label(256, 120, "Sleep", Colors::Amber, 1, Colors::Panel);
+  }
+  if (fullRedraw_ || focusedIndex_ == 11 || drawnFocus_ == 11)
+    t.drawRoundRect(246, 115, 60, 18, 4, focusedIndex_ == 11 ? Colors::White : Colors::Border);
 }
 
 void SettingsApp::renderTheme(AppContext& ctx) {

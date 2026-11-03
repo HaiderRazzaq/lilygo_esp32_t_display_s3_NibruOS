@@ -1286,3 +1286,273 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "No runtime or account-data read; physical heap/stack/PSRAM/timing/power unmeasured."
 }
 ```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.3 architecture audit",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Windows / PlatformIO espressif32@6.5.0 / Arduino-ESP32 2.0.14 / esptool 4.5.1",
+  "wiring": "Integrated ST7789 display, CST816S touch (18/17/21/16), BOOT (0), USER (14)",
+  "id": "VER-0050",
+  "verification_type": "BUILD",
+  "scope": "Target build compilation and post-image resource check after modular architecture audit and pin centralisation",
+  "hardware": "Host toolchain and firmware image compilation",
+  "procedure": "pio run -e lilygo-t-display-s3 && python tools/check_resources.py",
+  "expected": "Clean build producing firmware.bin within app0 partition (6,553,600 B) and resource checks passing",
+  "actual": "PASS: Flash used 831,065 B (12.7%), RAM used 50,056 B (15.3%), binary 831,424 B; partition capacity PASS",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-arch-audit-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build and resource check tool output",
+  "limitations": "Software compile and image check only; physical hardware upload and runtime observation unperformed"
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.3 architecture audit",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Windows / Python 3.14.15 standard library unittest",
+  "wiring": "None (host documentation and metadata validation)",
+  "id": "VER-0051",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Automated repository-wide documentation, cross-link, schema, and mutation checks",
+  "hardware": "None (host file inspection)",
+  "procedure": "python tools/check_docs.py && python -m unittest discover -s tests/docs -v",
+  "expected": "All documentation checks and all 17 mutation tests pass without errors",
+  "actual": "PASS: tools/check_docs.py reported Documentation checks: PASS; 17 unit tests in tests/docs passed",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-arch-audit-docs-check.txt"
+  ],
+  "evidence_kind": "Captured terminal output from check_docs and unittest runner",
+  "limitations": "Structural and link consistency checks only; does not validate physical electrical properties"
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.3 architecture audit",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Windows / MSVC 19.44.35222 x64 / SDL2 2.30.10 / Node v24.12.0",
+  "wiring": "None (desktop host simulation and mock C++ tests)",
+  "id": "VER-0052",
+  "verification_type": "HOST",
+  "scope": "Desktop simulator tests, host mock tests, and helper unit tests",
+  "hardware": "None (desktop CPU emulation)",
+  "procedure": "python tools/run_host_tests.py && tools/run_desktop_tests.bat && node --test tests/tools/account_setup.test.mjs tests/tools/account_setup_ui.test.mjs",
+  "expected": "All host tests, 25 lifecycle iterations, WebCrypto envelope matches, and simulator pass",
+  "actual": "PASS: host smoke tests passed, all desktop simulator tests passed with 0 compiler warnings, 5 node tests passed",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-arch-audit-host-tests.txt"
+  ],
+  "evidence_kind": "Captured output from host test executables and test runners",
+  "limitations": "Host execution does not measure physical ESP32-S3 RF reception, AW9364 backlight pulses, or hardware touch response"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.3 screen orientation",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Windows / PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "wiring": "None (compile-time ELF/binary image analysis and memory sizing)",
+  "id": "VER-0053",
+  "verification_type": "BUILD",
+  "scope": "Embedded build and resource budget verification for screen orientation feature",
+  "hardware": "ESP32-S3R8 / 16MB Flash / 8MB PSRAM (compile-time target)",
+  "procedure": "pio run -e lilygo-t-display-s3 && python tools/check_resources.py",
+  "expected": "Build succeeds; firmware image <= 6,553,600 bytes (app0); flash growth < 5%; internal SRAM usage bounded",
+  "actual": "PASS: Flash: 832,093 B (12.7% of 6.25 MB partition), RAM: 50,064 B (15.3%), binary: 832,464 B (-1.10% vs baseline, 0 warnings)",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-screen-orientation-build.txt"
+  ],
+  "evidence_kind": "Captured terminal output from PlatformIO build and check_resources.py",
+  "limitations": "Compilation and link-time size analysis only; physical flashing not executed"
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.3 screen orientation",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Windows / MSVC 19.44.35222 x64 / SDL2 2.30.10 / Node v24.12.0",
+  "wiring": "None (desktop host simulation and mock C++ tests)",
+  "id": "VER-0054",
+  "verification_type": "HOST",
+  "scope": "Desktop simulator tests, host mock tests, and helper unit tests for screen rotation and CST816S touch mapping",
+  "hardware": "None (desktop CPU emulation)",
+  "procedure": "python tools/run_host_tests.py && cmd /c tools/run_desktop_tests.bat && node tests/tools/account_setup.test.mjs",
+  "expected": "All host tests pass; touch coordinate inversion in rotation 3 verified (x=119, y=59 from rawX=59, rawY=200); swipe gesture inversion verified (SWIPE_UP -> SwipeRight); settings persistence for key 'rot' verified; 25 lifecycle iterations pass",
+  "actual": "PASS: Host smoke tests pass, desktop simulator passes with 0 warnings, node tests pass",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-screen-orientation-host-tests.txt"
+  ],
+  "evidence_kind": "Captured output from host test executables and test runners",
+  "limitations": "Host execution does not measure physical ESP32-S3 RF reception, AW9364 backlight pulses, or hardware touch response"
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.3 screen orientation",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Windows / Python 3.14.15 standard library unittest",
+  "wiring": "None (host documentation and metadata validation)",
+  "id": "VER-0055",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Automated repository-wide documentation, cross-link, schema, and mutation checks",
+  "hardware": "None (host file inspection)",
+  "procedure": "python tools/check_docs.py && python -m unittest discover -s tests/docs -v",
+  "expected": "All documentation checks and all 17 mutation tests pass without errors",
+  "actual": "PASS: tools/check_docs.py reported Documentation checks: PASS; 17 unit tests in tests/docs passed",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-screen-orientation-docs-check.txt"
+  ],
+  "evidence_kind": "Captured terminal output from check_docs and unittest runner",
+  "limitations": "Structural and link consistency checks only; does not validate physical electrical properties"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.4",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Windows / Python 3.14.15 / MSVC 19.44 / PlatformIO 6.1.18",
+  "wiring": "None (version governance, automated documentation, and multi-target compilation check)",
+  "id": "VER-0056",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Verification of Mandatory Automatic Sequential Versioning Policy and v0.4 alignment across all sources of truth",
+  "hardware": "None (multi-target build and doc verification)",
+  "procedure": "python tools/check_docs.py && python -m unittest discover -s tests/docs -v && python tools/run_host_tests.py && cmd /c tools/run_desktop_tests.bat && pio run -e lilygo-t-display-s3 && python tools/check_resources.py",
+  "expected": "All documentation checks pass; runtime version regex matches src/main.cpp; all host, desktop, and embedded builds pass with 0 errors",
+  "actual": "PASS: check_docs reported Documentation checks: PASS; 17 unit tests passed; host and simulator tests passed; PlatformIO build succeeded (832,464 B binary, 0 warnings)",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-version-policy-check.txt"
+  ],
+  "evidence_kind": "Captured terminal output from check_docs, unittest, host tests, simulator, and pio build",
+  "limitations": "Build, doc, and simulator checks only; physical runtime confirmation pending"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.4.1",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Windows / MSVC 19.44 / C++17 host runner",
+  "wiring": "None (host software mock)",
+  "id": "VER-0057",
+  "verification_type": "HOST",
+  "scope": "Host smoke test suite including pairing code touch/button broadcast and account import lifecycle",
+  "hardware": "None (host execution)",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS: authenticator lifecycle, bounded paired account import, and host navigation tests",
+  "actual": "PASS: authenticator lifecycle, PASS: bounded paired account import, PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v041-host-tests.txt"
+  ],
+  "evidence_kind": "Captured terminal output from python tools/run_host_tests.py",
+  "limitations": "Host test execution using MSVC; does not validate physical ESP32-S3 hardware pins"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.4.1",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Windows / CMake 3.31 / MSVC 19.44 / SDL2 desktop simulator",
+  "wiring": "None (desktop SDL2 simulation)",
+  "id": "VER-0058",
+  "verification_type": "HOST",
+  "scope": "Automated desktop test suite with 25 repeated lifecycle cycles and settings persistence",
+  "hardware": "None (host simulated graphics and input)",
+  "procedure": "cmd /c tools/run_desktop_tests.bat",
+  "expected": "All desktop simulator tests pass with 0 warnings",
+  "actual": "PASS: Core Lifecycle, UI & Transformation, Wi-Fi Simulation, Settings Persistence, HAL Contract, and 25 Repeated Lifecycle Entry/Exit Cycles all PASS",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v041-desktop-tests.txt"
+  ],
+  "evidence_kind": "Captured terminal output from tools/run_desktop_tests.bat",
+  "limitations": "Desktop simulation only; does not validate real RF or physical TFT scan"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.4.1",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Node.js v24.12 / WebCrypto",
+  "wiring": "None (companion web tool unit tests)",
+  "id": "VER-0059",
+  "verification_type": "HOST",
+  "scope": "Account setup web tool verification (Base32 parsing, OTP auth URI, and AES-GCM WebCrypto)",
+  "hardware": "None (Node.js runner)",
+  "procedure": "node tests/tools/account_setup.test.mjs",
+  "expected": "All 3 node test suites pass with 0 failures",
+  "actual": "PASS: 3 tests pass (pasted key canonicalization, URI downgrade rejection, WebCrypto matching CNG vector)",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v041-node-tests.txt"
+  ],
+  "evidence_kind": "Captured terminal output from node tests/tools/account_setup.test.mjs",
+  "limitations": "Node.js environment; Web Serial browser UI tested separately"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.4.1",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "PlatformIO 6.1.18 / Arduino-ESP32 2.0.14 / xtensa-esp32s3-elf-gcc 8.4.0",
+  "wiring": "LILYGO T-Display-S3 Touch Glass standard pinout",
+  "id": "VER-0060",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO embedded build and resource budget verification for lilygo-t-display-s3 target",
+  "hardware": "ESP32-S3R8 (16MB Flash, 8MB PSRAM)",
+  "procedure": "pio run -e lilygo-t-display-s3 && python tools/check_resources.py",
+  "expected": "Build succeeds; Flash growth < 5%; free heap >= 150KB",
+  "actual": "SUCCESS: RAM 50,064 B (15.3%), Flash 832,441 B (12.7%), Binary 832,800 B, growth -1.06% vs baseline, check_resources PASS",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v041-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build logs and check_resources JSON output",
+  "limitations": "Compile-time validation and partition geometry check; physical flash verification logged in HWT-0021"
+}
+```
+

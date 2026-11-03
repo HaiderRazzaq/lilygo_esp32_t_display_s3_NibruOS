@@ -63,7 +63,17 @@ bool AccountImportService::start(ImportMode mode, uint32_t now) {
   for (size_t i = 0; i < 16; ++i) pairing_[i] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"[entropy[i] & 31];
   CryptoService::secureZero(entropy, sizeof(entropy));
   if (!CryptoService::sha256(reinterpret_cast<const uint8_t*>(pairing_), 16, key_)) { stop(); return false; }
+  if (mode_ == ImportMode::Usb) broadcastPairingCode();
   return true;
+}
+void AccountImportService::broadcastPairingCode() {
+  if (state_ != ImportState::Waiting || !pairing_[0]) return;
+#if defined(ARDUINO_ARCH_ESP32)
+  if (mode_ == ImportMode::Usb) {
+    Serial.print("PAIRING:");
+    Serial.println(pairing_);
+  }
+#endif
 }
 uint32_t AccountImportService::remainingSeconds(uint32_t now) const {
   if (state_ != ImportState::Waiting && state_ != ImportState::Review) return 0;

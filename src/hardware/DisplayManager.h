@@ -21,6 +21,10 @@ public:
   uint8_t brightness() const { return brightnessPercent_; }
   void setBrightness(uint8_t percent);
 
+  // Screen Orientation: 1 = Landscape Normal (0 deg), 3 = Landscape Inverted (180 deg)
+  uint8_t rotation() const { return rotation_; }
+  void setRotation(uint8_t r);
+
   // Theme Accent
   uint16_t themeColor() const { return themeAccent_; }
   void setThemeColor(uint16_t color) { themeAccent_ = color; }
@@ -37,6 +41,7 @@ public:
 private:
   TFT_eSPI tft_;
   bool sleeping_ = false;
+  uint8_t rotation_ = 1;
   uint8_t brightnessPercent_ = 100;
   uint16_t sleepTimeoutSec_ = 30;
   uint32_t lastActivityMs_ = 0;

@@ -6,6 +6,29 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 
 ## Unreleased
 
+### Pairing Code Auto-Transfer & Web Serial Stability (v0.4.1) — 2026-11-03
+- Resolved USB CDC auto-reset when connecting from companion tool by asserting `{dataTerminalReady: true, requestToSend: false}` and providing a pre-connect flow in `account_setup.html` / `account_setup.mjs`.
+- Added automatic pairing code broadcast over Serial and USB HID keyboard emulation upon entering 2FA USB import, tapping the pairing code on the screen, or pressing the User/BOOT button.
+- Added live Web Serial background listener in the browser companion tool that automatically captures the 16-character one-time pairing code and auto-fills the input field.
+- Implemented sequential monotonic version bump to `v0.4.1` across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, `docs/CURRENT_STATE.md`, and changelogs.
+- Host test suite, desktop simulator suite, documentation verification, PlatformIO build (832,800 B, 12.7% flash, 15.3% RAM, -1.06% growth), and flashing on COM5 all PASS.
+
+### Screen orientation control (Landscape Normal 0° & Inverted 180°) — 2026-11-03
+- Added runtime screen rotation control allowing the user to invert the display 180° so the USB-C port can face left or right without awkward cable strain.
+- Synchronized ST7789 TFT scan direction with CST816S capacitive touch controller coordinate transformation (x = 319 - rawY, y = rawX) and inverted swipe gestures (SWIPE_UP -> SwipeRight, SWIPE_DOWN -> SwipeLeft, etc.).
+- Persisted screen orientation in NVS under key "rot", strictly preserving the existing 5-byte config schema.
+- Added touch and BOOT button navigation controls in Settings -> Display & Screen view.
+- Added unit tests in tests/host/test_settings.cpp and tests/desktop/test_simulator.cpp verifying rotation, touch mapping, and persistence.
+- Verified PlatformIO ESP32-S3 build (832,464 B binary, 12.7% flash, 15.3% RAM, 0 warnings) and all host/desktop tests (VER-0053..VER-0055).
+
+### Architecture audit, layer boundary hardening & engineering standards — 2026-11-03
+- Decoupled `TouchManager.h` from application interface by depending only on `core/EventTypes.h`.
+- Single source of truth for hardware GPIO pins in `include/PinDefinitions.h` and system timing in `include/NibruConfig.h`, backed by compile-time `static_assert` assertions in `include/BoardConfig.h`.
+- Formalized `src/services/MemoryProfiler.h` under the Services layer, retaining `src/core/MemoryProfiler.h` for backward compatibility.
+- Cleaned all 64-bit data conversion warnings on MSVC desktop simulator and host builds (0 warnings).
+- Enhanced `tools/run_host_tests.py` and `tools/run_desktop_tests.bat` with automatic MSVC BuildTools/Community toolchain discovery.
+- All PlatformIO, host, desktop simulator, documentation, and mutation tests PASS (VER-0050, VER-0051, VER-0052); zero flash or RAM growth.
+
 ### Easier account entry — 2026-11-02
 - Added local USB and existing-network Wi-Fi paste of Base32 keys/otpauth links,
   with a one-use pairing code, encrypted transfer, bounded two-minute session

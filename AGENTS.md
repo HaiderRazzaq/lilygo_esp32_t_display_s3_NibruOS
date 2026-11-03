@@ -36,6 +36,7 @@
 3. Make the smallest working modification; keep 320x170 screen constraints, button escape and responsiveness.
 4. Add/update host tests; perform actual PlatformIO build when tools/dependencies are available.
 5. Report unverified behaviors; provide hardware test steps and update project docs.
+6. Automatically increment the firmware version number sequentially across configuration, code, and documentation.
 
 ## Permanent engineering memory and Definition of Done
 
@@ -149,6 +150,27 @@ Every future AI agent modifying or extending NibruOS must:
 12. **Update Engineering Records Permanently**: Record changes in [docs/DEVELOPMENT_LOG.md](docs/DEVELOPMENT_LOG.md), [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md), [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md), [docs/FEATURE_REGISTRY.md](docs/FEATURE_REGISTRY.md), and [CHANGELOG.md](CHANGELOG.md). Major architectural decisions require an ADR in [docs/decisions/](docs/decisions/).
 13. **Report Physical Hardware Outcomes Honestly**: Distinguish between unit tests, host mocks, simulator passes, PlatformIO builds, and actual hardware testing. Mark unverified physical behavior as NOT VERIFIED or NOT RUN.
 14. **Pragmatic Engineering Over Abstraction**: Prefer small, safe, testable, and maintainable changes. Do not introduce heavy enterprise frameworks, dynamic plugin loaders, or complex dependency injection containers.
+
+## Mandatory Automatic Sequential Versioning Policy
+
+**CRITICAL: In ANY modification process, whether big or small (features, bug fixes, refactoring, performance tweaks, or documentation updates), the firmware version number MUST be automatically incremented sequentially and monotonically.**
+
+Every AI agent modifying or extending NibruOS must:
+1. **Increment the Version Number Sequentially on Every Change**:
+   - For patches, bug fixes, refactors, or small adjustments: increment the patch version (e.g. `v0.3` -> `v0.3.1` -> `v0.3.2`).
+   - For new applications, views, drivers, or capabilities: increment the minor version (e.g. `v0.3.x` -> `v0.4.0`).
+   - For breaking architectural changes or major milestones: increment the major version (e.g. `v1.0.0`).
+   - **Never conclude an editing session or task without incrementing the version.**
+2. **Synchronize All Version Definitions Concurrently**:
+   The version number must be updated synchronously in all single sources of truth:
+   - `include/NibruConfig.h`: `constexpr const char* kVersion = "v...";` and `constexpr const char* kSystemTitle = "NibruOS v...";`
+   - `include/BoardConfig.h`: `constexpr const char* kVersion = "v...";` and `constexpr const char* kSystemTitle = "NibruOS v...";`
+   - `src/main.cpp`: `Serial.println("\n[NibruOS] boot v...");`
+   - `docs/CURRENT_STATE.md`: `"runtime_version": "v..."`
+   - `CHANGELOG.md`: document changes under the updated version header.
+   - `docs/DEVELOPMENT_LOG.md` & `docs/VERIFICATION_REPORT.md`: reference the updated version.
+3. **Verify with Tooling**:
+   - Ensure `python tools/check_docs.py` passes without version mismatch errors.
 
 ## Source of truth
 Actual source code > explanatory documents if they diverge; user-verified hardware wiring > contradictory image labels. External validation sources: https://github.com/Xinyuan-LilyGO/T-Display-S3 , https://wiki.lilygo.cc/products/t-display-series/t-display-s3/ , https://docs.espressif.com/projects/arduino-esp32/en/latest/api/wifi.html .

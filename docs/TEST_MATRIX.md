@@ -26,6 +26,10 @@ current rows (not new evidence of the old hardware claims).
 | Centralized PinDefinitions & NibruConfig | VER-0027 HOST PASS, VER-0028 BUILD PASS | N/A (Compile-time layout) |
 | WiFiService MAC encapsulation & boundary | VER-0027 HOST PASS, VER-0028 BUILD PASS | HWT-0012 pending |
 | Multi-target build stability (default, profile, ledc) | VER-0028 BUILD PASS | Upload pending owner request |
+| Hardware Decoupling (TouchManager to EventTypes) | VER-0052 HOST PASS, VER-0050 BUILD PASS | NOT APPLICABLE (Software architecture) |
+| Compile-Time Pin Single Source of Truth (static_assert) | VER-0051 DOCS PASS, VER-0050 BUILD PASS | N/A (Compile-time layout) |
+| MemoryProfiler Services Layer Forwarding Header | VER-0052 HOST PASS, VER-0050 BUILD PASS | N/A (Service architecture) |
+| MSVC 64-bit Conversion Warnings Elimination | VER-0052 HOST PASS (0 warnings) | N/A (Host toolchain) |
 
 ## Touch and redraw repair — current
 
@@ -100,3 +104,13 @@ RED and intermediate setup failures retained in VER-0041. Independent final
 review VER-0048 found no remaining blocker; no device result follows from review.
 
 Current easier-entry default upload HWT-0019 PASS for write/hash/reset only; matched partition/image preflight VER-0049. New native behavior HWT-0018 remains NOT RUN.
+
+## Architecture Audit & Screen Orientation Control — 2026-11-03
+
+| Capability | Software evidence | Physical evidence |
+|---|---|---|
+| Modular decoupling, static assertions, zero compiler warnings | VER-0050 BUILD, VER-0051 DOCS, VER-0052 HOST | Hardware baseline preserved |
+| Screen orientation control: Landscape Normal 0° & Inverted 180° | VER-0053 BUILD, VER-0054 HOST/SIMULATOR, VER-0055 DOCS | Physical device rotation test pending |
+| CST816S touch coordinate inversion & inverted swipe gesture handling | VER-0054 HOST (x=119, y=59 from rawX=59, rawY=200; SWIPE_UP -> SwipeRight) | Inverted cable physical touch test pending |
+| Settings NVS persistence ('rot' key with 5-byte schema preservation) | VER-0054 HOST / Desktop NVS | Flash persistence verified |
+| Resource budget & partition capacity | VER-0053 PASS (832,464 B binary, 12.7% flash, 15.3% RAM) | Heap/stack/latency/power pending measurement |

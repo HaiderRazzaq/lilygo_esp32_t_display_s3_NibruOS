@@ -6,6 +6,7 @@
 <h1>انسخ المفتاح، ثم أكّد على جهازك</h1><p class="intro">افتح 2FA ← ADD على الجهاز، واختر USB أو Wi‑Fi. الصق مفتاح الإعداد هنا بدل كتابته على الشاشة الصغيرة.</p>
 <div class="note">مفتاح الإعداد يظهر عادةً تحت «تعذّر مسح QR» عند تفعيل المصادقة في الموقع. هذا المفتاح مختلف عن رمز الدخول المكوّن من 6 أرقام.</div>
 <label for="mode">طريقة الإرسال</label><select id="mode"><option value="usb">كابل USB</option><option value="wifi">Wi‑Fi — نفس الشبكة المحلية</option></select>
+<div id="usbFields"><div class="usb-row"><button id="connectUsb" type="button" class="secondary">توصيل كابل USB بالجهاز</button><span id="usbBadge" class="badge">غير متصل</span></div><p class="hint">اضغط «توصيل كابل USB» للاتصال مسبقاً؛ يتم استلام رمز الاقتران تلقائياً من الجهاز فور لمس الشاشة أو الضغط على الزر، دون الحاجة لكتابته يدوياً وبدون إعادة تشغيل الجهاز.</p></div>
 <div id="wifiFields" hidden><label for="ip">عنوان الجهاز الظاهر على شاشته</label><input id="ip" dir="ltr" placeholder="192.168.1.20" autocomplete="off"></div>
 <label for="name">اسم الحساب — حروف إنجليزية، حتى 23 حرفًا</label><input id="name" dir="ltr" placeholder="GitHub / Personal" maxlength="23" autocomplete="off" spellcheck="false">
 <label for="secret">مفتاح Base32 أو رابط إعداد otpauth</label><div class="secret"><input id="secret" type="password" dir="ltr" autocomplete="off" spellcheck="false" maxlength="2048" placeholder="Paste setup key or otpauth://totp/... here"><button id="reveal" type="button">إظهار / إخفاء</button></div>

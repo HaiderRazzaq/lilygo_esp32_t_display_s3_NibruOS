@@ -100,6 +100,10 @@ void testAccountImport() {
   assert(service.state() == ImportState::Idle && resources.wifiOwner() == ResourceOwner::None);
   authTap(app, ctx, 160, 88); // USB import
   assert(service.state() == ImportState::Waiting);
+  authTap(app, ctx, 160, 97); // Tap pairing code to send
+  assert(service.state() == ImportState::Waiting);
+  app.onPrimaryAction(ctx); // Primary button to send
+  assert(service.state() == ImportState::Waiting);
   input = frame(service, "Imported\tGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ\t8\t60");
   for (unsigned i = 0; i < 6; ++i) app.onTick(ctx, millis() + i);
   assert(service.state() == ImportState::Review && totp.accountCount() == 0);
