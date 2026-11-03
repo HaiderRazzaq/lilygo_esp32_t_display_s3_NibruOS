@@ -86,6 +86,8 @@ set(NIBRU_SHARED_SOURCES
   src/services/CryptoService.cpp
   src/services/UsbHidService.cpp
   src/services/TimeService.cpp
+  src/services/ArabicReshaper.cpp
+  src/services/LocalizationService.cpp
   src/apps/WiFiApp.cpp
   src/apps/WiFiScannerApp.cpp
   src/apps/TotpApp.cpp

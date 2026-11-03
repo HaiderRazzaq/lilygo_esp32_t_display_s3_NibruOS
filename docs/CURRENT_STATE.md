@@ -7,7 +7,7 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
 {
   "record_type": "state",
   "date": "2026-11-03",
-  "runtime_version": "v0.4.3",
+  "runtime_version": "v0.5.0",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
@@ -26,7 +26,8 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "FEAT-0012",
     "FEAT-0013",
     "FEAT-0014",
-    "FEAT-0015"
+    "FEAT-0015",
+    "FEAT-0016"
   ],
   "planned_features": [
     "FEAT-0007"
@@ -43,10 +44,10 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "BUG-0010",
     "BUG-0011"
   ],
-  "latest_build": "VER-0053",
-  "latest_upload": "HWT-0020",
-  "documentation_verification": "VER-0055",
-  "current_host_attempt": "VER-0054",
+  "latest_build": "VER-0071",
+  "latest_upload": "HWT-0024",
+  "documentation_verification": "VER-0072",
+  "current_host_attempt": "VER-0069",
   "source_constants": {
     "kTouchSda": 18,
     "kTouchScl": 17,

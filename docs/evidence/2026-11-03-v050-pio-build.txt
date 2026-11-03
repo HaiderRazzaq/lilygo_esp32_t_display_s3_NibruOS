@@ -1,0 +1,13 @@
+PlatformIO Build Results for NibruOS v0.5.0
+Date: 2026-11-03
+Environment: espressif32@6.5.0, Arduino-ESP32 2.0.14, TFT_eSPI 2.5.43
+Target: lilygo-t-display-s3 (ESP32-S3, 16MB Flash, 8MB PSRAM)
+
+Build Metrics:
+- RAM: 50,088 bytes (15.3% used of 327,680 bytes)
+- Flash: 843,501 bytes (12.9% used of 6,553,600 bytes)
+- Binary bytes: 843,872 bytes
+- Remaining Flash: 5,709,728 bytes
+- Growth: +0.25% (well below the 5% threshold)
+- SHA-256: 8a371f7264198159c312306d9f78a9966ecd49397f80ba7bce3dae04825c36d6
+- Status: SUCCESS

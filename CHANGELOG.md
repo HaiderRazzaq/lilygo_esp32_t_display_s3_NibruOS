@@ -6,6 +6,17 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 
 ## Unreleased
 
+### System-Wide Arabic & English Localization Engine (v0.5.0) — 2026-11-03
+- Added complete system-wide language localization support with dynamic runtime switching between English and Arabic (العربية) across all apps, system views, menus, cards, and status banners.
+- Created standalone, high-legibility 14px Arabic bitmap font engine (`src/ui/ArabicFont.h`) covering 125 presentation forms-B glyphs rasterized from Segoe UI Bold / Tahoma for sharp, crisp reading on 260 PPI 320x170 display with separated dots and clear baselines.
+- Created `ArabicReshaper` (`src/services/ArabicReshaper.h` / `src/services/ArabicReshaper.cpp`) with Unicode UTF-8 decoding, contextual Arabic cursive shaping (isolated, initial, medial, final), Lam-Alef ligature combining (`لا`, `لإ`, `لأ`, `لآ`), and visual RTL bidirectional reordering with LTR protection for numbers and Latin tokens.
+- Created `LocalizationService` (`src/services/LocalizationService.h` / `src/services/LocalizationService.cpp`) providing unified `TextId` lookup and string tables for English and Arabic.
+- Integrated automatic UTF-8 Arabic detection in `DisplayManager::label()` and `labelPadded()` with `drawArabic()`, rendering connected Arabic glyphs seamlessly on both physical ST7789 TFT and desktop SDL2 simulator without dynamic malloc.
+- Added "Language" (اللغة) card in SettingsApp with bilingual touch selection and button navigation, persisting choice in NVS under `"lang"` key (0 = English, 1 = Arabic).
+- Updated HomeScreen, WiFiApp, TotpApp, SystemInfoApp, TouchTestApp, and SettingsApp to utilize localized labels.
+- Incrementally and monotonically bumped version to v0.5.0 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+- Verified with host unit tests (VER-0069), desktop simulator tests (VER-0070), PlatformIO build (843,872 B binary, 12.9% flash, 15.3% RAM, +0.25% growth vs baseline, VER-0071), and successful flash upload to COM5 (HWT-0024).
+
 ### Flicker-Free PIN Entry & Security Keypad Optimization (v0.4.3) — 2026-11-03
 - Eliminated display flicker across PIN code entry and Security settings views (SettingsApp SetPin, SettingsApp Security, and SecurityService lock screen).
 - Fixed uncontrolled continuous rendering loop in SettingsApp where SetPin and Security views were redrawing on every 12ms tick due to missing dirty guards.

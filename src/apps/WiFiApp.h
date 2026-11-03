@@ -1,3 +1,4 @@
+#include "services/LocalizationService.h"
 #pragma once
 #include "core/App.h"
 #include "apps/WiFiScannerApp.h"
@@ -10,9 +11,9 @@ enum class WiFiSubView : uint8_t {
 
 class WiFiApp final : public App {
 public:
-  const char* title() const override { return "Wi-Fi"; }
+  const char* title() const override { return LocalizationService::instance().get(TextId::AppWiFi); }
   const char* shortTitle() const override { return "WIFI"; }
-  const char* subtitle() const override { return "Networks"; }
+  const char* subtitle() const override { return LocalizationService::instance().get(TextId::SubWiFi); }
 
   void onEnter(AppContext& ctx) override;
   void onExit(AppContext& ctx) override;

@@ -1238,3 +1238,54 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Observe physical screen on device during PIN entry."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0033",
+  "date": "2026-11-03",
+  "related": [
+    "FEAT-0016",
+    "VER-0069",
+    "VER-0070",
+    "VER-0071",
+    "VER-0072",
+    "HWT-0024"
+  ],
+  "action": "ADD / LOCALIZATION / TYPOGRAPHY / VERSION BUMP",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "src/ui/ArabicFont.h",
+    "src/services/ArabicReshaper.h",
+    "src/services/ArabicReshaper.cpp",
+    "src/services/LocalizationService.h",
+    "src/services/LocalizationService.cpp",
+    "src/hardware/DisplayManager.h",
+    "src/hardware/DisplayManager.cpp",
+    "src/services/SettingsService.h",
+    "src/services/SettingsService.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/ui/HomeScreen.cpp",
+    "src/apps/WiFiApp.h",
+    "src/apps/TotpApp.h",
+    "src/apps/SystemInfoApp.h",
+    "src/apps/TouchTestApp.h",
+    "tests/host/test_settings.cpp",
+    "tests/host/stubs/TFT_eSPI.h",
+    "platform/desktop/stubs/TFT_eSPI.h",
+    "CMakeLists.txt"
+  ],
+  "description": "Implemented FEAT-0016 providing comprehensive system-wide Arabic and English localization. Created custom 14px Arabic bitmap font with 125 presentation forms-B glyphs, contextual cursive reshaping engine, bidirectional RTL reordering with LTR token preservation, centralized LocalizationService with TextId lookup, automated UTF-8 Arabic routing in DisplayManager, and bilingual Language setting card in SettingsApp with NVS persistence. Sequentially bumped firmware version to v0.5.0.",
+  "reason": "User requested adding a Language option in Settings with Arabic (العربية) and English choices to switch the entire operating system interface language, while ensuring sharp, clear Arabic typography.",
+  "expected": "Instant runtime language switching across all screens and apps; high-legibility unpixelated Arabic rendering; complete NVS persistence; clean build and verification passes.",
+  "actual": "VER-0069 (host tests PASS), VER-0070 (desktop simulator tests PASS, 25 cycles), VER-0071 (PlatformIO build PASS, 843,872 B binary, 12.9% flash, 15.3% RAM, +0.25% growth vs baseline), HWT-0024 (Uploaded to COM5 successfully).",
+  "verification": "VER-0069, VER-0070, VER-0071, VER-0072, HWT-0024",
+  "risks": "Low risk; Arabic reshaping runs on-the-fly without heap allocations; Latin and English rendering paths are strictly preserved.",
+  "commit": "PENDING",
+  "follow_up": "Verify with user on physical device running v0.5.0."
+}
+```

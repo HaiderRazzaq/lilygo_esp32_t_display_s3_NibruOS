@@ -32,6 +32,11 @@ public:
   bool setRotation(uint8_t rot);
   const char* rotationName() const;
 
+  // System Language: 0 = English, 1 = Arabic
+  uint8_t language() const { return language_; }
+  bool setLanguage(uint8_t lang);
+  const char* languageName() const;
+
 private:
   DisplayManager* display_ = nullptr;
   TouchManager* touch_ = nullptr;
@@ -41,7 +46,7 @@ private:
   uint16_t screenTimeoutSec_ = 30;
   uint8_t theme_ = 0;
   uint8_t rotation_ = 1;
+  uint8_t language_ = 0;
 
   void applyToDisplay();
 };
-

@@ -561,3 +561,27 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Flashing and hardware reset verified; physical PIN entry interaction to be observed on device"
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.0",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "PlatformIO 6.1.18 / Arduino-ESP32 2.0.14 / esptool 4.5.1",
+  "wiring": "Existing USB-C COM5 and integrated LCD/touch/buttons",
+  "id": "HWT-0024",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.5.0 firmware upload with system-wide Arabic & English localization and Arabic typography engine",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "Write intended v0.5.0 image (843,872 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS in 19.69s. Application 843,872 B (544,974 compressed) written to 0x10000 in 7.4s. Bootloader, partitions, and boot metadata written and verified. Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v050-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.5.0 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical observation of Arabic UI rendering to be confirmed by user on device"
+}
+```

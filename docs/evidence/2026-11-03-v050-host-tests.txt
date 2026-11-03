@@ -1,0 +1,39 @@
+Host Test Results for NibruOS v0.5.0
+Date: 2026-11-03
+Command: python tools/run_host_tests.py
+Environment: MSVC x64 C++17 (cl.exe), Windows
+
+Output:
+AppManager.cpp
+MemoryProfiler.cpp
+ResourceManager.cpp
+ButtonManager.cpp
+DisplayManager.cpp
+TouchManager.cpp
+HomeScreen.cpp
+AccountImportService.cpp
+ArabicReshaper.cpp
+CryptoService.cpp
+LocalizationService.cpp
+SecurityService.cpp
+SettingsService.cpp
+TimeService.cpp
+TotpService.cpp
+UsbHidService.cpp
+WiFiService.cpp
+SettingsApp.cpp
+SystemInfoApp.cpp
+TotpApp.cpp
+TouchTestApp.cpp
+WiFiApp.cpp
+WiFiScannerApp.cpp
+test_main.cpp
+test_settings.cpp
+test_authenticator.cpp
+test_account_import.cpp
+main.cpp
+PASS: authenticator lifecycle
+PASS: bounded paired account import
+PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests
+
+Result: PASS (Exit code 0)

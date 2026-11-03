@@ -1,3 +1,4 @@
+#include "services/LocalizationService.h"
 #pragma once
 #include "core/App.h"
 #include <stdint.h>
@@ -9,9 +10,9 @@
  */
 class TotpApp : public App {
 public:
-  const char* title() const override { return "2FA Auth"; }
+  const char* title() const override { return LocalizationService::instance().get(TextId::AppTotp); }
   const char* shortTitle() const override { return "2FA"; }
-  const char* subtitle() const override { return "Tokens"; }
+  const char* subtitle() const override { return LocalizationService::instance().get(TextId::SubTotp); }
 
   void onEnter(AppContext& ctx) override;
   void onExit(AppContext& ctx) override;

@@ -607,3 +607,44 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ]
 }
 ```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0016",
+  "name": "System Localization and Arabic Typography Engine",
+  "purpose": "Provide complete bilingual English and Arabic localization across all apps, system views, cards, and status messages with contextual Arabic cursive shaping, bidirectional reordering, and crisp 14px bitmap typography",
+  "module": "src/services/LocalizationService + src/services/ArabicReshaper + src/ui/ArabicFont",
+  "files": [
+    "src/services/LocalizationService.cpp",
+    "src/services/LocalizationService.h",
+    "src/services/ArabicReshaper.cpp",
+    "src/services/ArabicReshaper.h",
+    "src/ui/ArabicFont.h",
+    "src/hardware/DisplayManager.cpp",
+    "src/hardware/DisplayManager.h",
+    "src/apps/SettingsApp.cpp",
+    "src/apps/SettingsApp.h",
+    "src/services/SettingsService.cpp",
+    "src/services/SettingsService.h"
+  ],
+  "dependencies": [
+    "FEAT-0001",
+    "FEAT-0005",
+    "FEAT-0008"
+  ],
+  "hardware": "Integrated ST7789V parallel LCD, CST816S touch; also simulated in SDLDisplay",
+  "gpio": "No extra GPIO allocation; uses ST7789V parallel bus",
+  "lifecycle": "Stateless on-the-fly reshaping and BiDi reordering; zero dynamic allocations; NVS language configuration loaded on boot and persisted on change",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0071",
+    "host": "VER-0069",
+    "hardware": "HWT-0024"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0033"
+  ]
+}
+```

@@ -1747,3 +1747,99 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Validates JSON structure, ID ordering, version synchronisation, and file paths only"
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.0",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "MSVC 2022 C++20 x64 / Windows 11",
+  "wiring": "None (host unit test runner)",
+  "id": "VER-0069",
+  "verification_type": "HOST",
+  "scope": "Host test suite for Arabic localization, reshaper, language persistence in settings, and system lifecycle",
+  "hardware": "Host (MSVC 2022 C++20 x64)",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "All host tests pass without regressions across authenticator, settings, and import",
+  "actual": "PASS: test_authenticator, test_account_import, test_settings all succeeded",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v050-host-tests.txt"
+  ],
+  "evidence_kind": "Host test runner output log",
+  "limitations": "Host execution only; simulated display memory buffer"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.0",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "MSVC 2022 C++20 x64 / SDL2 desktop harness",
+  "wiring": "None (desktop simulation harness)",
+  "id": "VER-0070",
+  "verification_type": "HOST",
+  "scope": "Desktop simulator automated regression suite for bilingual localization, font rendering, and settings",
+  "hardware": "Host (MSVC 2022 C++20 x64 / SDL2 desktop harness)",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "Builds with 0 warnings, passes all 25 lifecycle tests, verifies settings persistence with language key",
+  "actual": "PASS: 0 warnings, 25/25 tests passed including settings persistence and language switching",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v050-desktop-tests.txt"
+  ],
+  "evidence_kind": "Desktop simulator build and test run logs",
+  "limitations": "Desktop host simulation; does not test physical ST7789 parallel bus timing"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.0",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "PlatformIO 6.1.18 / Arduino-ESP32 2.0.14 / xtensa-esp32s3-elf-gcc 8.4.0",
+  "wiring": "LILYGO T-Display-S3 Touch Glass standard pinout",
+  "id": "VER-0071",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO embedded build and resource budget verification for lilygo-t-display-s3 target",
+  "hardware": "ESP32-S3R8 (16MB Flash, 8MB PSRAM)",
+  "procedure": "pio run -e lilygo-t-display-s3 && python tools/check_resources.py",
+  "expected": "Build succeeds; Flash growth < 5%; free heap >= 150KB",
+  "actual": "SUCCESS: RAM 50,088 B (15.3%), Flash 843,501 B (12.9%), Binary 843,872 B, growth +0.25% vs baseline, check_resources PASS",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v050-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build logs and check_resources JSON output",
+  "limitations": "Compile-time validation and partition geometry check; physical hardware flashing logged separately"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.0",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "Python 3.14 / documentation check script",
+  "wiring": "None",
+  "id": "VER-0072",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation consistency and cross-reference validation for v0.5.0",
+  "hardware": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Documentation checks PASS with zero errors or warnings",
+  "actual": "Documentation checks: PASS",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v050-docs-check.txt"
+  ],
+  "evidence_kind": "check_docs.py output log",
+  "limitations": "Validates JSON structure, ID ordering, version synchronisation, and file paths only"
+}
+```

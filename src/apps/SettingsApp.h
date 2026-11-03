@@ -12,14 +12,15 @@ enum class SettingsSubView : uint8_t {
   WiFiDiag,
   Device,
   TouchTest,
-  SetPin
+  SetPin,
+  Language
 };
 
 class SettingsApp final : public App {
 public:
-  const char* title() const override { return "Settings"; }
+  const char* title() const override;
   const char* shortTitle() const override { return "SET"; }
-  const char* subtitle() const override { return "System"; }
+  const char* subtitle() const override;
 
   void onEnter(AppContext& ctx) override;
   void onExit(AppContext& ctx) override;
@@ -43,6 +44,7 @@ private:
   SettingsSubView drawnView_ = SettingsSubView::Menu;
   uint8_t drawnFocus_ = 255, drawnMenu_ = 255, drawnScroll_ = 255;
   uint8_t drawnBrightness_ = 0, drawnTheme_ = 255, drawnRotation_ = 255;
+  uint8_t drawnLanguage_ = 255;
   uint16_t drawnTimeout_ = 65535;
 
   // Confirmation dialog state for Device actions
@@ -67,6 +69,7 @@ private:
   void renderWiFiDiag(AppContext& ctx);
   void renderDevice(AppContext& ctx);
   void renderSetPin(AppContext& ctx);
+  void renderLanguage(AppContext& ctx);
 
   void handleMenuTouch(AppContext& ctx, const TouchEvent& ev);
   void handleDisplayTouch(AppContext& ctx, const TouchEvent& ev);
@@ -76,4 +79,5 @@ private:
   void handleWiFiDiagTouch(AppContext& ctx, const TouchEvent& ev);
   void handleDeviceTouch(AppContext& ctx, const TouchEvent& ev);
   void handleSetPinTouch(AppContext& ctx, const TouchEvent& ev);
+  void handleLanguageTouch(AppContext& ctx, const TouchEvent& ev);
 };

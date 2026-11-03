@@ -2,6 +2,8 @@
 #include "core/AppContext.h"
 #include "core/App.h"
 #include "hardware/DisplayManager.h"
+#include "services/LocalizationService.h"
+#include "services/ArabicReshaper.h"
 #include "ui/Theme.h"
 #include "BoardConfig.h"
 #include <cstdio>
@@ -35,19 +37,25 @@ void HomeScreen::draw(AppContext& ctx, App* const* apps, uint8_t count, uint8_t 
 
       // Centered title with overflow prevention
       const char* title = apps[i]->title();
-      const int titleLen = static_cast<int>(strlen(title));
-      uint8_t tSize = 2;
-      int titleW = titleLen * 12;
-      if (titleW > 124) {
-        tSize = 1;
-        titleW = titleLen * 6;
+      char safeTitle[32]{};
+      strncpy(safeTitle, title, sizeof(safeTitle) - 1);
+      int titleW = 0;
+      if (ArabicReshaper::hasArabic(safeTitle)) {
+        titleW = static_cast<int>(strlen(safeTitle)) * 4;
+      } else {
+        titleW = static_cast<int>(strlen(safeTitle)) * 6;
       }
       const int titleX = x + (142 - titleW) / 2;
-      screen.label(titleX > x + 4 ? titleX : x + 4, 92, title, Colors::White, tSize, Colors::Panel);
+      screen.label(titleX > x + 4 ? titleX : x + 4, 92, safeTitle, Colors::White, 1, Colors::Panel);
 
       // Centered subtitle
       const char* sub = apps[i]->subtitle();
-      const int subW = static_cast<int>(strlen(sub)) * 6;
+      int subW = 0;
+      if (ArabicReshaper::hasArabic(sub)) {
+        subW = static_cast<int>(strlen(sub)) * 4;
+      } else {
+        subW = static_cast<int>(strlen(sub)) * 6;
+      }
       const int subX = x + (142 - subW) / 2;
       screen.label(subX > x + 4 ? subX : x + 4, 118, sub, Colors::Muted, 1, Colors::Panel);
     }
@@ -63,24 +71,34 @@ void HomeScreen::draw(AppContext& ctx, App* const* apps, uint8_t count, uint8_t 
 
       // Centered badge with overflow guard
       t.fillRoundRect(x + 29, 58, 36, 26, 4, accent);
-      char safeShort[6]{};
+      char safeShort[16]{};
       strncpy(safeShort, apps[i]->shortTitle(), sizeof(safeShort) - 1);
       const int shortW = static_cast<int>(strlen(safeShort)) * 6;
       screen.label(x + 29 + (36 - shortW) / 2, 67, safeShort, Colors::Bg, 1, accent);
 
       // Centered title with overflow guard
-      char safeTitle[15]{};
+      char safeTitle[32]{};
       strncpy(safeTitle, apps[i]->title(), sizeof(safeTitle) - 1);
-      const int titleW = static_cast<int>(strlen(safeTitle)) * 6;
+      int titleW = 0;
+      if (ArabicReshaper::hasArabic(safeTitle)) {
+        titleW = static_cast<int>(strlen(safeTitle)) * 4;
+      } else {
+        titleW = static_cast<int>(strlen(safeTitle)) * 6;
+      }
       const int titleX = x + (94 - titleW) / 2;
       screen.label(titleX > x + 3 ? titleX : x + 3, 94, safeTitle, Colors::White, 1, Colors::Panel);
 
       // Centered subtitle
       const char* sub = apps[i]->subtitle();
-      const int subW = static_cast<int>(strlen(sub)) * 6;
+      int subW = 0;
+      if (ArabicReshaper::hasArabic(sub)) {
+        subW = static_cast<int>(strlen(sub)) * 4;
+      } else {
+        subW = static_cast<int>(strlen(sub)) * 6;
+      }
       const int subX = x + (94 - subW) / 2;
       screen.label(subX > x + 3 ? subX : x + 3, 117, sub, Colors::Muted, 1, Colors::Panel);
     }
   }
-  screen.footer("Tap app | BOOT next/hold open");
+  screen.footer(LocalizationService::instance().isArabic() ? "اضغط للتطبيق | BOOT: التالي" : "Tap app | BOOT next/hold open");
 }

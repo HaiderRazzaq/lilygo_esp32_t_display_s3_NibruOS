@@ -1,4 +1,5 @@
 #include "services/SettingsService.h"
+#include "services/LocalizationService.h"
 #include "hardware/DisplayManager.h"
 #include "hardware/TouchManager.h"
 #include <Arduino.h>
@@ -14,12 +15,12 @@ void SettingsService::begin(DisplayManager* display, TouchManager* touch) {
   display_ = display;
   touch_ = touch;
   load();
-  Serial.printf("[Settings] Loaded: Bright=%u%% Timeout=%us Theme=%s Rot=%u\n",
-                brightness_, screenTimeoutSec_, themeName(), rotation_);
+  Serial.printf("[Settings] Loaded: Bright=%u%% Timeout=%us Theme=%s Rot=%u Lang=%s\n",
+                brightness_, screenTimeoutSec_, themeName(), rotation_, languageName());
 }
 
 void SettingsService::load() {
-  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; rotation_ = 1;
+  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; rotation_ = 1; language_ = 0;
   writable_ = true; lastSaveOk_ = true;
   Preferences prefs;
   bool migrated = false;
@@ -48,12 +49,16 @@ void SettingsService::load() {
       if (prefs.isKey("rot")) {
         rotation_ = prefs.getUChar("rot", 1);
       }
+      if (prefs.isKey("lang")) {
+        language_ = prefs.getUChar("lang", 0);
+      }
       prefs.end();
-    } else if (prefs.isKey("bright") || prefs.isKey("timeout") || prefs.isKey("theme") || prefs.isKey("rot")) {
+    } else if (prefs.isKey("bright") || prefs.isKey("timeout") || prefs.isKey("theme") || prefs.isKey("rot") || prefs.isKey("lang")) {
       brightness_ = prefs.getUChar("bright", 100);
       screenTimeoutSec_ = prefs.getUShort("timeout", 30);
       theme_ = prefs.getUChar("theme", 0);
       rotation_ = prefs.getUChar("rot", 1);
+      language_ = prefs.getUChar("lang", 0);
       prefs.end();
       migrated = true;
     } else {
@@ -72,6 +77,8 @@ void SettingsService::load() {
       screenTimeoutSec_ != 180 && screenTimeoutSec_ != 300) screenTimeoutSec_ = 30;
   if (theme_ > 3) theme_ = 0;
   if (rotation_ != 1 && rotation_ != 3) rotation_ = 1;
+  if (language_ > 1) language_ = 0;
+  LocalizationService::instance().setLanguage(static_cast<Language>(language_));
   if (migrated) save();
   applyToDisplay();
 }
@@ -96,19 +103,28 @@ bool SettingsService::save() {
   } else if (rotation_ != 1) {
     if (prefs.putUChar("rot", rotation_) != sizeof(uint8_t)) ok = false;
   }
+  if (prefs.isKey("lang")) {
+    const uint8_t storedLang = prefs.getUChar("lang", 0);
+    if (storedLang != language_) {
+      if (prefs.putUChar("lang", language_) != sizeof(uint8_t)) ok = false;
+    }
+  } else if (language_ != 0) {
+    if (prefs.putUChar("lang", language_) != sizeof(uint8_t)) ok = false;
+  }
   prefs.end();
   lastSaveOk_ = ok;
   if (!lastSaveOk_) Serial.println("[Settings] NVS write failed; preferences unchanged");
+  else LocalizationService::instance().setLanguage(static_cast<Language>(language_));
   return lastSaveOk_;
 }
 
 bool SettingsService::resetToDefaults() {
-  const uint8_t oldB = brightness_, oldT = theme_;
+  const uint8_t oldB = brightness_, oldT = theme_, oldL = language_;
   const uint16_t oldS = screenTimeoutSec_;
   const bool oldWritable = writable_;
-  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; rotation_ = 1; writable_ = true;
+  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; rotation_ = 1; language_ = 0; writable_ = true;
   if (!save()) {
-    brightness_ = oldB; screenTimeoutSec_ = oldS; theme_ = oldT; writable_ = oldWritable;
+    brightness_ = oldB; screenTimeoutSec_ = oldS; theme_ = oldT; language_ = oldL; writable_ = oldWritable;
     return false;
   }
   applyToDisplay();
@@ -121,7 +137,7 @@ bool SettingsService::setBrightness(uint8_t percent) {
   const uint8_t old = brightness_;
   brightness_ = percent;
   if (!save()) { brightness_ = old; return false; }
-  if (display_) display_->setBrightness(brightness_);
+  applyToDisplay();
   return true;
 }
 
@@ -131,34 +147,34 @@ bool SettingsService::setScreenTimeoutSec(uint16_t sec) {
   const uint16_t old = screenTimeoutSec_;
   screenTimeoutSec_ = sec;
   if (!save()) { screenTimeoutSec_ = old; return false; }
-  if (display_) display_->setSleepTimeoutSeconds(sec);
+  applyToDisplay();
   return true;
 }
 
-bool SettingsService::setTheme(uint8_t index) {
-  if (index > 3) return false;
-  if (theme_ == index) return lastSaveOk_;
+bool SettingsService::setTheme(uint8_t themeIndex) {
+  if (themeIndex > 3) return false;
+  if (theme_ == themeIndex) return lastSaveOk_;
   const uint8_t old = theme_;
-  theme_ = index;
+  theme_ = themeIndex;
   if (!save()) { theme_ = old; return false; }
-  if (display_) display_->setThemeColor(themeColor());
+  applyToDisplay();
   return true;
 }
 
 uint16_t SettingsService::themeColor() const {
   switch (theme_) {
-    case 1: return Colors::Green;
-    case 2: return Colors::Amber;
-    case 3: return Colors::Magenta;
-    default: return Colors::Cyan;
+    case 1:  return 0x07E0; // Matrix Green
+    case 2:  return 0xFD20; // Amber Gold
+    case 3:  return 0xF81F; // Neon Magenta
+    default: return 0x07FF; // Cyber Cyan
   }
 }
 
 const char* SettingsService::themeName() const {
   switch (theme_) {
-    case 1: return "Emerald Green";
-    case 2: return "Amber Gold";
-    case 3: return "Neon Magenta";
+    case 1:  return "Matrix Green";
+    case 2:  return "Amber Gold";
+    case 3:  return "Neon Magenta";
     default: return "Cyber Cyan";
   }
 }
@@ -180,6 +196,22 @@ const char* SettingsService::rotationName() const {
   }
 }
 
+bool SettingsService::setLanguage(uint8_t lang) {
+  if (lang > 1) return false;
+  if (language_ == lang) return lastSaveOk_;
+  const uint8_t old = language_;
+  language_ = lang;
+  if (!save()) { language_ = old; return false; }
+  return true;
+}
+
+const char* SettingsService::languageName() const {
+  switch (language_) {
+    case 1:  return "Arabic";
+    default: return "English";
+  }
+}
+
 void SettingsService::applyToDisplay() {
   if (display_) {
     display_->setBrightness(brightness_);
@@ -191,4 +223,3 @@ void SettingsService::applyToDisplay() {
     touch_->setRotation(rotation_);
   }
 }
-

@@ -13,6 +13,7 @@ struct TFT_eSPI {
   int width() const { return 320; }
   int height() const { return 170; }
   void fillScreen(uint16_t){ ++fullClears; ++drawCalls; }
+  void drawPixel(int,int,uint16_t){ ++drawCalls; }
   void fillRect(int,int,int,int,uint16_t){ ++drawCalls; }
   void drawFastHLine(int,int,int,uint16_t){}
   void drawFastVLine(int,int,int,uint16_t){}

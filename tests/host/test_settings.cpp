@@ -7,6 +7,7 @@
 #include "core/WakeInputGate.h"
 #include "hardware/TouchManager.h"
 #include "services/SecurityService.h"
+#include "services/LocalizationService.h"
 #include <Preferences.h>
 #include <cassert>
 
@@ -30,12 +31,13 @@ void testSettings(AppContext& ctx) {
   assert(s.setBrightness(100));
   assert(Preferences::writes == initialWrites);
   assert(!s.setBrightness(0) && !s.setBrightness(99));
-  assert(!s.setScreenTimeoutSec(31) && !s.setTheme(4) && !s.setRotation(0) && !s.setRotation(2));
-  assert(s.setBrightness(25) && s.setScreenTimeoutSec(0) && s.setTheme(3) && s.setRotation(3));
+  assert(!s.setScreenTimeoutSec(31) && !s.setTheme(4) && !s.setRotation(0) && !s.setRotation(2) && !s.setLanguage(2));
+  assert(s.setBrightness(25) && s.setScreenTimeoutSec(0) && s.setTheme(3) && s.setRotation(3) && s.setLanguage(1));
+  assert(LocalizationService::instance().isArabic());
   assert(ctx.display.rotation() == 3);
   SettingsService restored;
   restored.begin();
-  assert(restored.brightness() == 25 && restored.screenTimeoutSec() == 0 && restored.theme() == 3 && restored.rotation() == 3);
+  assert(restored.brightness() == 25 && restored.screenTimeoutSec() == 0 && restored.theme() == 3 && restored.rotation() == 3 && restored.language() == 1);
   // Failure must be observable, with no runtime configuration change.
   Preferences::failWrite = true;
   assert(!s.setBrightness(50));
@@ -60,7 +62,7 @@ void testSettings(AppContext& ctx) {
     p.begin(ns, true); assert(p.getString("test").length() == 8); p.end();
   }
   restored.load();
-  assert(restored.brightness() == 100 && restored.screenTimeoutSec() == 30 && restored.theme() == 0 && restored.rotation() == 1);
+  assert(restored.brightness() == 100 && restored.screenTimeoutSec() == 30 && restored.theme() == 0 && restored.rotation() == 1 && restored.language() == 0);
 
   // Legacy values are validated, imported once, and never removed.
   Preferences::resetMock();

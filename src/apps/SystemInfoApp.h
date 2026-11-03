@@ -1,11 +1,12 @@
+#include "services/LocalizationService.h"
 #pragma once
 #include "core/App.h"
 
 class SystemInfoApp final : public App {
 public:
-  const char* title() const override { return "System Info"; }
+  const char* title() const override { return LocalizationService::instance().get(TextId::AppSystemInfo); }
   const char* shortTitle() const override { return "SYS"; }
-  const char* subtitle() const override { return "Status"; }
+  const char* subtitle() const override { return LocalizationService::instance().get(TextId::SubSystemInfo); }
   void onEnter(AppContext& ctx) override;
   void onExit(AppContext& ctx) override;
   void onTick(AppContext& ctx, uint32_t nowMs) override;

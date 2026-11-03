@@ -1,41 +1,83 @@
 #include "hardware/DisplayManager.h"
+#include "services/ArabicReshaper.h"
+#include "ui/ArabicFont.h"
 #include "BoardConfig.h"
 #include <Arduino.h>
-#ifndef NIBRU_BACKLIGHT_LEDC
-#define NIBRU_BACKLIGHT_LEDC 0
-#endif
 
 void DisplayManager::begin() {
   pinMode(Board::kDisplayPower, OUTPUT);
-  digitalWrite(Board::kDisplayPower, HIGH);
   pinMode(Board::kDisplayBacklight, OUTPUT);
+  digitalWrite(Board::kDisplayPower, HIGH);
   digitalWrite(Board::kDisplayBacklight, HIGH);
 
-  // Initialize display controller first
   tft_.init();
   tft_.setRotation(rotation_);
-  tft_.setTextWrap(false);
-  clear();
+  tft_.fillScreen(Colors::Bg);
 
-  // Apply backlight AFTER tft_.init() so TFT_eSPI doesn't override pin state
 #if NIBRU_BACKLIGHT_LEDC
-  // Arduino-ESP32 2.0.14 API. Channel 0 reserved here; no other LEDC user.
-  pwmReady_ = ledcSetup(0, 5000, 8) != 0;
-  if (pwmReady_) ledcAttachPin(Board::kDisplayBacklight, 0);
-  else Serial.println("[Display] LEDC unavailable; visible HIGH fallback");
+  ledcSetup(0, 5000, 8);
+  ledcAttachPin(Board::kDisplayBacklight, 0);
+  pwmReady_ = true;
 #endif
+
   applyBacklight(brightnessPercent_);
-
-  Serial.printf("[Display] size=%dx%d expected=320x170 bright=%u%% sleep=%us\n",
-                tft_.width(), tft_.height(), brightnessPercent_, sleepTimeoutSec_);
-
   lastActivityMs_ = millis();
 }
 
-void DisplayManager::clear(uint16_t c) { tft_.fillScreen(c); }
+void DisplayManager::clear(uint16_t color) {
+  tft_.fillScreen(color);
+}
+
+void DisplayManager::drawArabic(int x, int y, const char* text, uint16_t color,
+                                uint8_t size, uint16_t background) {
+  uint16_t glyphs[64];
+  const size_t count = ArabicReshaper::reshape(text, glyphs, 64);
+  int curX = x;
+
+  for (size_t i = 0; i < count; ++i) {
+    uint16_t code = glyphs[i];
+    if (code == ' ') {
+      if (background != 0 && background != Colors::Bg) {
+        tft_.fillRect(curX, y, 5 * size, 14 * size, background);
+      }
+      curX += 5 * size;
+      continue;
+    }
+    const ArabicGlyph* g = ArabicFont::getGlyph(code);
+    if (g) {
+      const uint8_t gw = g->width;
+      for (uint8_t row = 0; row < 14; ++row) {
+        uint16_t rowBits = g->bitmap[row];
+        for (uint8_t col = 0; col < gw; ++col) {
+          const bool on = (rowBits & (1 << (15 - col))) != 0;
+          const int px = curX + col * size;
+          const int py = y + row * size;
+          if (on) {
+            if (size == 1) tft_.drawPixel(px, py, color);
+            else tft_.fillRect(px, py, size, size, color);
+          } else if (background != 0) {
+            if (size == 1) tft_.drawPixel(px, py, background);
+            else tft_.fillRect(px, py, size, size, background);
+          }
+        }
+      }
+      curX += (gw + 1) * size;
+    } else if (code < 128) {
+      tft_.setTextSize(size);
+      tft_.setTextColor(color, background);
+      tft_.setCursor(curX, y + (size == 1 ? 3 : 0));
+      tft_.print(static_cast<char>(code));
+      curX += (size == 1 ? 6 : 12);
+    }
+  }
+}
 
 void DisplayManager::label(int x, int y, const char* text, uint16_t color,
                            uint8_t size, uint16_t background) {
+  if (ArabicReshaper::hasArabic(text)) {
+    drawArabic(x, y, text, color, size, background);
+    return;
+  }
   tft_.setTextSize(size);
   tft_.setTextColor(color, background);
   tft_.setCursor(x, y);
@@ -44,6 +86,10 @@ void DisplayManager::label(int x, int y, const char* text, uint16_t color,
 
 void DisplayManager::labelPadded(int x, int y, const char* text, uint8_t minChars,
                                  uint16_t color, uint8_t size, uint16_t background) {
+  if (ArabicReshaper::hasArabic(text)) {
+    drawArabic(x, y, text, color, size, background);
+    return;
+  }
   char buf[64];
   const size_t len = strlen(text);
   if (minChars >= sizeof(buf)) minChars = sizeof(buf) - 1;

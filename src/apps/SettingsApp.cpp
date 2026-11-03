@@ -9,6 +9,7 @@
 #include "services/SecurityService.h"
 #include "services/TotpService.h"
 #include "services/CryptoService.h"
+#include "services/LocalizationService.h"
 #include "BoardConfig.h"
 #include <Arduino.h>
 #include <cstdio>
@@ -23,6 +24,14 @@ void metricLabel(DisplayManager& screen, int x, int y, const char* text,
   snprintf(padded, sizeof(padded), "%-48.48s", text);
   screen.label(x, y, padded, color, size, bg);
 }
+}
+
+const char* SettingsApp::title() const {
+  return LocalizationService::instance().get(TextId::AppSettings);
+}
+
+const char* SettingsApp::subtitle() const {
+  return LocalizationService::instance().get(TextId::SubSettings);
 }
 
 void SettingsApp::onEnter(AppContext&) {
@@ -95,7 +104,7 @@ bool SettingsApp::onBack(AppContext& ctx) {
 
 void SettingsApp::onPrimaryAction(AppContext& ctx) {
   if (subView_ == SettingsSubView::Menu) {
-    menuIndex_ = static_cast<uint8_t>((menuIndex_ + 1) % 7);
+    menuIndex_ = static_cast<uint8_t>((menuIndex_ + 1) % 8);
     if (menuIndex_ < scrollOffset_ || menuIndex_ >= scrollOffset_ + 3)
       scrollOffset_ = menuIndex_ > 2 ? menuIndex_ - 2 : 0;
   } else if (subView_ == SettingsSubView::Display) {
@@ -103,6 +112,8 @@ void SettingsApp::onPrimaryAction(AppContext& ctx) {
   } else if (subView_ == SettingsSubView::Theme) {
     focusedIndex_ = (focusedIndex_ + 1) % 4;
   } else if (subView_ == SettingsSubView::Device) {
+    focusedIndex_ = (focusedIndex_ + 1) % 2;
+  } else if (subView_ == SettingsSubView::Language) {
     focusedIndex_ = (focusedIndex_ + 1) % 2;
   } else if (subView_ == SettingsSubView::Memory) {
     metricPage_ ^= 1; fullRedraw_ = true;
@@ -114,11 +125,17 @@ void SettingsApp::onPrimaryAction(AppContext& ctx) {
 
 void SettingsApp::onActivate(AppContext& ctx) {
   if (subView_ == SettingsSubView::Menu) {
-    static const SettingsSubView views[] = {SettingsSubView::Display, SettingsSubView::Theme,
+    static const SettingsSubView views[] = {
+      SettingsSubView::Display, SettingsSubView::Theme,
       SettingsSubView::Memory, SettingsSubView::WiFiDiag, SettingsSubView::Device,
-      SettingsSubView::Security, SettingsSubView::TouchTest};
+      SettingsSubView::Security, SettingsSubView::TouchTest, SettingsSubView::Language
+    };
     subView_ = views[menuIndex_]; focusedIndex_ = metricPage_ = 0; fullRedraw_ = true;
     if (subView_ == SettingsSubView::TouchTest) touchTest_.onEnter(ctx);
+  } else if (subView_ == SettingsSubView::Language) {
+    ctx.settings.setLanguage(focusedIndex_);
+    LocalizationService::instance().setLanguage(static_cast<Language>(focusedIndex_));
+    fullRedraw_ = true;
   } else if (subView_ == SettingsSubView::Display) {
     const uint8_t bright[] = {25, 50, 75, 100};
     const uint16_t timeout[] = {30, 60, 180, 300, 0};
@@ -197,12 +214,15 @@ void SettingsApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     case SettingsSubView::SetPin:
       handleSetPinTouch(ctx, ev);
       break;
+    case SettingsSubView::Language:
+      handleLanguageTouch(ctx, ev);
+      break;
   }
 }
 
 void SettingsApp::handleMenuTouch(AppContext& ctx, const TouchEvent& ev) {
   if (ev.gesture == TouchGesture::SwipeUp || ev.gesture == TouchGesture::SwipeDown) {
-    if (ev.gesture == TouchGesture::SwipeUp && scrollOffset_ < 4) ++scrollOffset_;
+    if (ev.gesture == TouchGesture::SwipeUp && scrollOffset_ < 5) ++scrollOffset_;
     if (ev.gesture == TouchGesture::SwipeDown && scrollOffset_ > 0) --scrollOffset_;
     menuIndex_ = scrollOffset_; invalidate(); return;
   }
@@ -290,11 +310,13 @@ void SettingsApp::render(AppContext& ctx) {
       drawnSaveOk_ != ctx.settings.lastSaveOk())
     fullRedraw_ = true;
   const bool controls = subView_ == SettingsSubView::Menu || subView_ == SettingsSubView::Display ||
-                        subView_ == SettingsSubView::Theme || subView_ == SettingsSubView::Device;
+                        subView_ == SettingsSubView::Theme || subView_ == SettingsSubView::Device ||
+                        subView_ == SettingsSubView::Language;
   if (controls && !fullRedraw_ && drawnFocus_ == focusedIndex_ && drawnMenu_ == menuIndex_ &&
       drawnScroll_ == scrollOffset_ && drawnBrightness_ == ctx.settings.brightness() &&
       drawnTheme_ == ctx.settings.theme() && drawnTimeout_ == ctx.settings.screenTimeoutSec() &&
       drawnRotation_ == ctx.settings.rotation() &&
+      drawnLanguage_ == ctx.settings.language() &&
       drawnSaveOk_ == ctx.settings.lastSaveOk()) return;
 
   if (subView_ == SettingsSubView::Security) {
@@ -315,12 +337,13 @@ void SettingsApp::render(AppContext& ctx) {
     case SettingsSubView::Device:    renderDevice(ctx); break;
     case SettingsSubView::TouchTest: touchTest_.render(ctx); break;
     case SettingsSubView::SetPin:    renderSetPin(ctx); break;
+    case SettingsSubView::Language:  renderLanguage(ctx); break;
   }
   if (!ctx.settings.lastSaveOk()) ctx.display.footer("NVS error: preferences were not saved");
   hasRendered_ = true; drawnView_ = subView_; drawnConfirmation_ = confirmAction_;
   drawnFocus_ = focusedIndex_; drawnMenu_ = menuIndex_; drawnScroll_ = scrollOffset_;
   drawnBrightness_ = ctx.settings.brightness(); drawnTheme_ = ctx.settings.theme();
-  drawnTimeout_ = ctx.settings.screenTimeoutSec(); drawnRotation_ = ctx.settings.rotation();
+  drawnTimeout_ = ctx.settings.screenTimeoutSec(); drawnRotation_ = ctx.settings.rotation(); drawnLanguage_ = ctx.settings.language();
   drawnSaveOk_ = ctx.settings.lastSaveOk();
   if (subView_ == SettingsSubView::Security) {
     drawnPinEnabled_ = ctx.security.isPinEnabled();
@@ -335,13 +358,22 @@ void SettingsApp::render(AppContext& ctx) {
 void SettingsApp::renderMenu(AppContext& ctx) {
   auto& screen = ctx.display;
   auto& t = screen.gfx();
+  const auto& loc = LocalizationService::instance();
   if (fullRedraw_) {
-    screen.clear(); screen.header("Settings", true);
-    screen.footer("Swipe | BOOT next/hold open | Back");
+    screen.clear(); screen.header(loc.get(TextId::AppSettings), true);
+    screen.footer(loc.isArabic() ? "اسحب | BOOT: التالي | Back: رجوع" : "Swipe | BOOT next/hold open | Back");
   }
   const bool rowsChanged = fullRedraw_ || drawnScroll_ != scrollOffset_;
-  const char* titles[] = {"Display & timeout", "Accent color", "System & memory",
-    "Wi-Fi diagnostics", "Reboot / reset settings", "Security (existing)", "Touch test"};
+  const char* titles[] = {
+    loc.get(TextId::MenuDisplay),
+    loc.get(TextId::MenuTheme),
+    loc.get(TextId::MenuMemory),
+    loc.get(TextId::MenuWiFiDiag),
+    loc.get(TextId::MenuDevice),
+    loc.get(TextId::MenuSecurity),
+    loc.get(TextId::MenuTouchTest),
+    loc.get(TextId::MenuLanguage)
+  };
   for (uint8_t row = 0; row < 3; ++row) {
     const uint8_t i = scrollOffset_ + row;
     const int y = 36 + row * 36;
@@ -836,5 +868,57 @@ void SettingsApp::handleSetPinTouch(AppContext& ctx, const TouchEvent& ev) {
         }
       }
     }
+  }
+}
+
+void SettingsApp::renderLanguage(AppContext& ctx) {
+  auto& screen = ctx.display;
+  auto& t = screen.gfx();
+  const auto& loc = LocalizationService::instance();
+  if (fullRedraw_) {
+    screen.clear();
+    screen.header(loc.get(TextId::LanguageTitle), true);
+    screen.footer(loc.isArabic() ? "اضغط لاختيار اللغة | Back: رجوع" : "Tap language | Back: return");
+  }
+
+  const uint8_t curLang = ctx.settings.language();
+  const char* labels[] = {
+    loc.get(TextId::LangEnglish),
+    loc.get(TextId::LangArabic)
+  };
+
+  for (uint8_t i = 0; i < 2; ++i) {
+    const int y = 46 + i * 50;
+    const bool active = (curLang == i);
+    const bool focused = (focusedIndex_ == i);
+
+    t.fillRoundRect(16, y, 288, 42, 6, Colors::Panel);
+    t.drawRoundRect(16, y, 288, 42, 6, active ? screen.themeColor() : (focused ? Colors::White : Colors::Border));
+
+    // Radio indicator circle
+    t.fillCircle(38, y + 21, 9, Colors::Bg);
+    t.drawCircle(38, y + 21, 9, active ? screen.themeColor() : Colors::Border);
+    if (active) {
+      t.fillCircle(38, y + 21, 5, screen.themeColor());
+    }
+
+    screen.label(58, y + 14, labels[i], active ? screen.themeColor() : Colors::White, 1, Colors::Panel);
+  }
+}
+
+void SettingsApp::handleLanguageTouch(AppContext& ctx, const TouchEvent& ev) {
+  if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
+  if (ev.x < 16 || ev.x > 304) return;
+
+  if (ev.y >= 46 && ev.y <= 88) {
+    ctx.settings.setLanguage(0);
+    LocalizationService::instance().setLanguage(Language::English);
+    fullRedraw_ = true;
+    invalidate();
+  } else if (ev.y >= 96 && ev.y <= 138) {
+    ctx.settings.setLanguage(1);
+    LocalizationService::instance().setLanguage(Language::Arabic);
+    fullRedraw_ = true;
+    invalidate();
   }
 }

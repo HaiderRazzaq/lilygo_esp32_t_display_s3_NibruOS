@@ -19,6 +19,8 @@ public:
   void labelPadded(int x, int y, const char* text, uint8_t minChars,
                    uint16_t color = Colors::White, uint8_t size = 1,
                    uint16_t background = Colors::Bg);
+  void drawArabic(int x, int y, const char* text, uint16_t color = Colors::White,
+                  uint8_t size = 1, uint16_t background = Colors::Bg);
 
   // Brightness management
   uint8_t brightness() const { return brightnessPercent_; }
@@ -49,9 +51,7 @@ private:
   uint16_t sleepTimeoutSec_ = 30;
   uint32_t lastActivityMs_ = 0;
   uint16_t themeAccent_ = Colors::Cyan;
-#if NIBRU_BACKLIGHT_LEDC
   bool pwmReady_ = false;
-#endif
 
   void applyBacklight(uint8_t percent);
 };

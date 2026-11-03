@@ -7,11 +7,12 @@ public:
   void init() { SDLDisplay::instance().init(); }
   void writecommand(uint8_t cmd) { SDLDisplay::instance().writeCommand(cmd); }
   void setRotation(uint8_t r) { SDLDisplay::instance().setRotation(r); }
-  void setTextWrap(bool w) { SDLDisplay::instance().setTextWrap(w); }
+  void setTextWrap(bool wrap) { SDLDisplay::instance().setTextWrap(wrap); }
   int width() const { return SDLDisplay::instance().width(); }
   int height() const { return SDLDisplay::instance().height(); }
 
   void fillScreen(uint16_t color) { SDLDisplay::instance().fillScreen(color); }
+  void drawPixel(int x, int y, uint16_t color) { SDLDisplay::instance().drawPixel(x, y, color); }
   void fillRect(int x, int y, int w, int h, uint16_t color) {
     SDLDisplay::instance().fillRect(x, y, w, h, color);
   }
