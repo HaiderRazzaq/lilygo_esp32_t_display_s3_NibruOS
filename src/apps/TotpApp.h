@@ -36,6 +36,7 @@ private:
   uint32_t feedbackUntilMs_ = 0;
   uint32_t confirmAfterMs_ = 0;
   bool fullRedraw_ = true;
+  bool cardDirty_ = true;
   bool keyboardDirty_ = true;
   bool capitals_ = true;
   bool symbols_ = false;

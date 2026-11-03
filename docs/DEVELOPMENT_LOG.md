@@ -1164,3 +1164,77 @@ Corrections must be appended with the original ID reference.
 }
 ```
 
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0031",
+  "date": "2026-11-03",
+  "related": [
+    "BUG-0012",
+    "VER-0061",
+    "VER-0062",
+    "VER-0063",
+    "VER-0064",
+    "HWT-0022"
+  ],
+  "action": "BUGFIX / REFACTOR / VERSION BUMP",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "src/hardware/DisplayManager.h",
+    "src/hardware/DisplayManager.cpp",
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "src/apps/SystemInfoApp.h",
+    "src/apps/SystemInfoApp.cpp",
+    "src/apps/WiFiScannerApp.cpp",
+    "src/apps/WiFiApp.cpp"
+  ],
+  "description": "Radically resolved display flickering across all views with timers and counters (TotpApp, SystemInfoApp, WiFiScannerApp, WiFiApp). Replaced fillRect blank-then-draw anti-pattern with single-pass glyph rendering via DisplayManager::labelPadded(). Decoupled static UI elements from dynamic counters. Incrementally bumped version to v0.4.2.",
+  "reason": "User reported that all views with timers or counters flicker on every second or multiple times per second.",
+  "expected": "Zero screen flicker during timer countdowns, live metrics updates, and scanning animations.",
+  "actual": "Host tests PASS; desktop simulator tests PASS (25 cycles, 0 warnings); PlatformIO build PASS (833,056 B binary, 12.7% flash, 15.3% RAM, -1.03% growth vs baseline). check_resources PASS.",
+  "verification": "VER-0061 (host), VER-0062 (desktop), VER-0063 (embedded build), VER-0064 (docs)",
+  "risks": "Text fields must maintain fixed width formatting or use minChars padding to avoid glyph remnants.",
+  "commit": "PENDING",
+  "follow_up": "Firmware uploaded to COM5 successfully (HWT-0022); observe flicker-free display on physical board."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0032",
+  "date": "2026-11-03",
+  "related": [
+    "BUG-0013",
+    "VER-0065",
+    "VER-0066",
+    "VER-0067",
+    "VER-0068",
+    "HWT-0023"
+  ],
+  "action": "BUGFIX / REFACTOR / VERSION BUMP",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/services/SecurityService.h",
+    "src/services/SecurityService.cpp"
+  ],
+  "description": "Eliminated display flickering across PIN entry views (SettingsApp SetPin, SettingsApp Security, and SecurityService lock screen). Fixed idle loop redraw in SettingsApp, decoupled static keypad chrome from dynamic PIN dots, and sequentially bumped firmware version to v0.4.3.",
+  "reason": "User reported that the PIN code entry view also flickers.",
+  "expected": "Completely flicker-free PIN setup and device unlock screens, with instant in-place dot rendering.",
+  "actual": "VER-0065 (host tests PASS), VER-0066 (desktop tests PASS, 25 cycles), VER-0067 (PlatformIO build PASS, 833,280 B binary, 12.7% flash, 15.3% RAM, -1.01% growth), HWT-0023 (Uploaded to COM5 successfully).",
+  "verification": "VER-0065, VER-0066, VER-0067, VER-0068, HWT-0023",
+  "risks": "Low risk; keypad layout and touch coordinate hitboxes are completely unchanged.",
+  "commit": "PENDING",
+  "follow_up": "Observe physical screen on device during PIN entry."
+}
+```

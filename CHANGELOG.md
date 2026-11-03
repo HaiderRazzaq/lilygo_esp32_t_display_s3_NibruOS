@@ -6,6 +6,22 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 
 ## Unreleased
 
+### Flicker-Free PIN Entry & Security Keypad Optimization (v0.4.3) — 2026-11-03
+- Eliminated display flicker across PIN code entry and Security settings views (SettingsApp SetPin, SettingsApp Security, and SecurityService lock screen).
+- Fixed uncontrolled continuous rendering loop in SettingsApp where SetPin and Security views were redrawing on every 12ms tick due to missing dirty guards.
+- Decoupled static keypad buttons, header, and footer from dynamic PIN dots in both SettingsApp::renderSetPin and SecurityService::render.
+- Replaced fillRect blank-then-draw patterns with DisplayManager::labelPadded() for status lines and localized dot bounding box erasure.
+- Incrementally and monotonically bumped version to v0.4.3 across include/NibruConfig.h, include/BoardConfig.h, src/main.cpp, and docs/CURRENT_STATE.md.
+- Verified with host unit tests (VER-0065), desktop simulator tests (VER-0066), PlatformIO build (833,280 B binary, 12.7% flash, 15.3% RAM, -1.01% growth vs baseline, VER-0067), and successful upload to COM5 (HWT-0023).
+
+### Flicker-Free Display Architecture & Live Redraw Optimization (v0.4.2) — 2026-11-03
+- Eliminated display flicker across all views containing live timers, countdowns, and dynamic metrics (TotpApp, SystemInfoApp, WiFiScannerApp, WiFiApp).
+- Identified and eliminated the "Blank-then-Draw" anti-pattern (calling fillRect over screen areas immediately before drawing text), which caused human-visible black frame flickering.
+- Introduced DisplayManager::labelPadded() with atomic background glyph rendering via setTextColor(fg, bg) and fixed-width space padding, rendering text and clearing trailing remnants in a single hardware pass without screen erasing.
+- Decoupled static UI chrome (cards, buttons, headers, borders, footers) from dynamic counters in TotpApp (6-digit code and seconds counter) and SystemInfoApp (uptime, heap, link speed, IP, PSRAM).
+- Sequentially bumped firmware version to v0.4.2 across include/NibruConfig.h, include/BoardConfig.h, src/main.cpp, docs/CURRENT_STATE.md, and engineering logs.
+- Verified with host test suite (run_host_tests.py), desktop simulator (run_desktop_tests.bat), documentation verification (check_docs.py), and PlatformIO build (833,056 B binary, 12.7% flash, 15.3% RAM, -1.03% growth vs baseline).
+
 ### Pairing Code Auto-Transfer & Web Serial Stability (v0.4.1) — 2026-11-03
 - Resolved USB CDC auto-reset when connecting from companion tool by asserting `{dataTerminalReady: true, requestToSend: false}` and providing a pre-connect flow in `account_setup.html` / `account_setup.mjs`.
 - Added automatic pairing code broadcast over Serial and USB HID keyboard emulation upon entering 2FA USB import, tapping the pairing code on the screen, or pressing the User/BOOT button.

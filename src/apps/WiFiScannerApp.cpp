@@ -324,16 +324,15 @@ void WiFiScannerApp::renderList(AppContext& ctx) {
     char line[42];
     snprintf(line, sizeof(line), "Starting radio... %u/%u",
              ctx.wifi.attempt(), Board::kScanMaxAttempts);
-    screen.label(12, 78, line, Colors::Cyan, 2, Colors::Bg);
+    screen.labelPadded(12, 78, line, 26, Colors::Cyan, 2, Colors::Bg);
     screen.label(12, 110, "Preparing Wi-Fi station", Colors::Muted, 1, Colors::Bg);
   } else if (state == ScanState::Scanning) {
-    t.fillRect(10, 75, 300, 50, Colors::Bg);
     char line[42];
     snprintf(line, sizeof(line), "Scanning %u/%u... %lu s",
              ctx.wifi.attempt(), Board::kScanMaxAttempts,
              static_cast<unsigned long>((millis() - ctx.wifi.scanStartedAt()) / 1000UL));
-    screen.label(12, 78, line, Colors::Cyan, 2, Colors::Bg);
-    screen.label(12, 112, "UI remains responsive", Colors::Muted, 1, Colors::Bg);
+    screen.labelPadded(12, 78, line, 26, Colors::Cyan, 2, Colors::Bg);
+    screen.labelPadded(12, 112, "UI remains responsive", 30, Colors::Muted, 1, Colors::Bg);
   } else if (state == ScanState::Failed) {
     t.fillRect(10, 75, 300, 50, Colors::Bg);
     screen.label(12, 77, "Wi-Fi scan failed", Colors::Red, 2, Colors::Bg);

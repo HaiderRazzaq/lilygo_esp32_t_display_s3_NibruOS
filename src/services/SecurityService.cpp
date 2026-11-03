@@ -341,78 +341,90 @@ void SecurityService::render(AppContext& ctx) {
   DisplayManager& screen = ctx.display;
   TFT_eSPI& t = screen.gfx();
   const uint32_t now = millis();
+  const bool lockedOut = isLockedOut(now);
 
-  screen.clear(Colors::Bg);
+  if (fullRedraw_) {
+    screen.clear(Colors::Bg);
 
-  // Top header bar
-  t.fillRect(0, 0, 320, 28, Colors::Panel);
-  t.drawFastHLine(0, 28, 320, Colors::Border);
-  screen.label(86, 6, "NibruOS Locked", Colors::Cyan, 2, Colors::Panel);
+    // Top header bar
+    t.fillRect(0, 0, 320, 28, Colors::Panel);
+    t.drawFastHLine(0, 28, 320, Colors::Border);
+    screen.label(86, 6, "NibruOS Locked", Colors::Cyan, 2, Colors::Panel);
 
-  // Status and subtitle
-  if (isLockedOut(now)) {
+    // Keypad: 3 rows x 4 cols
+    const char* labels[3][4] = {
+      {"1", "2", "3", "4"},
+      {"5", "6", "7", "8"},
+      {"9", "0", "DEL", "ENT"}
+    };
+
+    for (int row = 0; row < 3; ++row) {
+      const int ry = 70 + row * 26;
+      for (int col = 0; col < 4; ++col) {
+        const int rx = 16 + col * 74;
+        const bool isSpecial = (row == 2 && (col == 2 || col == 3));
+
+        uint16_t btnColor = Colors::Panel;
+        if (lockedOut) {
+          btnColor = Colors::Muted;
+        } else if (isSpecial) {
+          btnColor = (col == 2) ? Colors::Red : Colors::Green;
+        }
+
+        t.fillRoundRect(rx, ry, 68, 22, 4, btnColor);
+        t.drawRoundRect(rx, ry, 68, 22, 4, Colors::Border);
+
+        const char* lbl = labels[row][col];
+        const int textW = static_cast<int>(strlen(lbl)) * (isSpecial ? 6 : 12);
+        const int tx = rx + (68 - textW) / 2;
+        const int ty = ry + (isSpecial ? 7 : 4);
+        screen.label(tx, ty, lbl, isSpecial ? (col == 2 ? Colors::White : Colors::Bg) : (lockedOut ? Colors::Bg : Colors::White),
+                     isSpecial ? 1 : 2, btnColor);
+      }
+    }
+
+    t.drawFastHLine(0, 151, 320, Colors::Border);
+    t.fillRect(0, 152, 320, 18, Colors::Bg);
+    if (lockedOut) {
+      screen.label(40, 156, "Anti-Brute-Force Lockout Active", Colors::Amber, 1);
+    } else {
+      screen.label(48, 156, "Protected Device  |  Type PIN to unlock", Colors::Muted, 1);
+    }
+
+    fullRedraw_ = false;
+    drawnInputLen_ = 255;
+    drawnErrorState_ = !errorState_;
+  }
+
+  // Dynamic Status and subtitle (Y: 34) - Padded update without fillRect blanking
+  if (lockedOut) {
     char lockMsg[40];
-    snprintf(lockMsg, sizeof(lockMsg), "Locked out! Wait %u s", getLockoutRemainingSec(now));
-    screen.label(70, 34, lockMsg, Colors::Red, 1, Colors::Bg);
+    snprintf(lockMsg, sizeof(lockMsg), "Locked out! Wait %2u s", getLockoutRemainingSec(now));
+    screen.labelPadded(70, 34, lockMsg, 30, Colors::Red, 1, Colors::Bg);
   } else if (errorState_) {
-    screen.label(64, 34, "Incorrect PIN! Try again.", Colors::Red, 1, Colors::Bg);
+    screen.labelPadded(64, 34, "Incorrect PIN! Try again.", 32, Colors::Red, 1, Colors::Bg);
   } else {
     char subMsg[36];
     snprintf(subMsg, sizeof(subMsg), "Enter %u-Digit Security PIN", pinLength_);
     const int subW = static_cast<int>(strlen(subMsg)) * 6;
-    screen.label((320 - subW) / 2, 34, subMsg, Colors::White, 1, Colors::Bg);
+    const int tx = (320 - subW) / 2;
+    screen.labelPadded(tx, 34, subMsg, static_cast<uint8_t>(strlen(subMsg) + 4), Colors::White, 1, Colors::Bg);
   }
 
-  // Centered PIN circles for dynamic pinLength_
-  const int startX = 160 - (pinLength_ * 26) / 2;
-  for (int i = 0; i < pinLength_; ++i) {
-    const int cx = startX + i * 26 + 13;
-    if (i < inputLen_) {
-      t.fillCircle(cx, 50, 6, errorState_ ? Colors::Red : Colors::Green);
-    } else {
-      t.drawCircle(cx, 50, 6, Colors::Border);
-    }
-  }
-
-  // Keypad: 3 rows x 4 cols
-  const char* labels[3][4] = {
-    {"1", "2", "3", "4"},
-    {"5", "6", "7", "8"},
-    {"9", "0", "DEL", "ENT"}
-  };
-
-  const bool lockedOut = isLockedOut(now);
-
-  for (int row = 0; row < 3; ++row) {
-    const int ry = 70 + row * 26;
-    for (int col = 0; col < 4; ++col) {
-      const int rx = 16 + col * 74;
-      const bool isSpecial = (row == 2 && (col == 2 || col == 3));
-
-      uint16_t btnColor = Colors::Panel;
-      if (lockedOut) {
-        btnColor = Colors::Muted;
-      } else if (isSpecial) {
-        btnColor = (col == 2) ? Colors::Red : Colors::Green;
+  // Centered PIN circles for dynamic pinLength_ (Y: 44..58)
+  if (drawnInputLen_ != inputLen_ || drawnErrorState_ != errorState_) {
+    const int startX = 160 - (pinLength_ * 26) / 2;
+    // Clear only the small circles bounding box
+    t.fillRect(startX, 43, pinLength_ * 26, 15, Colors::Bg);
+    for (int i = 0; i < pinLength_; ++i) {
+      const int cx = startX + i * 26 + 13;
+      if (i < inputLen_) {
+        t.fillCircle(cx, 50, 6, errorState_ ? Colors::Red : Colors::Green);
+      } else {
+        t.drawCircle(cx, 50, 6, Colors::Border);
       }
-
-      t.fillRoundRect(rx, ry, 68, 22, 4, btnColor);
-      t.drawRoundRect(rx, ry, 68, 22, 4, Colors::Border);
-
-      const char* lbl = labels[row][col];
-      const int textW = static_cast<int>(strlen(lbl)) * (isSpecial ? 6 : 12);
-      const int tx = rx + (68 - textW) / 2;
-      const int ty = ry + (isSpecial ? 7 : 4);
-      screen.label(tx, ty, lbl, isSpecial ? (col == 2 ? Colors::White : Colors::Bg) : (lockedOut ? Colors::Bg : Colors::White),
-                   isSpecial ? 1 : 2, btnColor);
     }
-  }
-
-  t.drawFastHLine(0, 151, 320, Colors::Border);
-  t.fillRect(0, 152, 320, 18, Colors::Bg);
-  if (lockedOut) {
-    screen.label(40, 156, "Anti-Brute-Force Lockout Active", Colors::Amber, 1);
-  } else {
-    screen.label(48, 156, "Protected Device  |  Type PIN to unlock", Colors::Muted, 1);
+    drawnInputLen_ = inputLen_;
+    drawnErrorState_ = errorState_;
   }
 }

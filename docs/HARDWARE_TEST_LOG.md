@@ -514,3 +514,50 @@ and [record rules](ENGINEERING_WORKFLOW.md).
 }
 ```
 
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.4.2",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "PlatformIO 6.1.18 / Arduino-ESP32 2.0.14 / esptool 4.5.1",
+  "wiring": "Existing USB-C COM5 and integrated LCD/touch/buttons",
+  "id": "HWT-0022",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.4.2 firmware upload with flicker-free label rendering and live redraw optimization",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "Write intended v0.4.2 image (833,056 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS in 20.47s. Application 833,056 B (539,197 compressed) written to 0x10000 in 7.3s. Bootloader, partitions, and boot metadata written and verified. Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v042-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.4.2 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical screen inspection of flicker-free timers to be observed by user"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.4.3",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "PlatformIO 6.1.18 / Arduino-ESP32 2.0.14 / esptool 4.5.1",
+  "wiring": "Existing USB-C COM5 and integrated LCD/touch/buttons",
+  "id": "HWT-0023",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.4.3 firmware upload with flicker-free PIN entry and security keypad optimization",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "Write intended v0.4.3 image (833,280 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS in 19.59s. Application 833,280 B (539,411 compressed) written to 0x10000 in 7.3s. Bootloader, partitions, and boot metadata written and verified. Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v043-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.4.3 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical PIN entry interaction to be observed on device"
+}
+```

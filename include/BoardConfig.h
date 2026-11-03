@@ -11,8 +11,8 @@
  */
 namespace Board {
 // Firmware runtime versioning
-constexpr const char* kVersion = "v0.4.1";
-constexpr const char* kSystemTitle = "NibruOS v0.4.1";
+constexpr const char* kVersion = "v0.4.3";
+constexpr const char* kSystemTitle = "NibruOS v0.4.2";
 
 // Hardware pin mapping (statically verified against PinDefinitions.h)
 constexpr int kTouchSda = 18;

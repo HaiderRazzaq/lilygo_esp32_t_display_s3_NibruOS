@@ -7,7 +7,7 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
 {
   "record_type": "state",
   "date": "2026-11-03",
-  "runtime_version": "v0.4.1",
+  "runtime_version": "v0.4.3",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",

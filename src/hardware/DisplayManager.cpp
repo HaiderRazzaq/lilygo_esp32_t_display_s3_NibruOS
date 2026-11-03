@@ -42,6 +42,21 @@ void DisplayManager::label(int x, int y, const char* text, uint16_t color,
   tft_.print(text);
 }
 
+void DisplayManager::labelPadded(int x, int y, const char* text, uint8_t minChars,
+                                 uint16_t color, uint8_t size, uint16_t background) {
+  char buf[64];
+  const size_t len = strlen(text);
+  if (minChars >= sizeof(buf)) minChars = sizeof(buf) - 1;
+  memcpy(buf, text, len);
+  if (minChars > len) {
+    memset(buf + len, ' ', minChars - len);
+    buf[minChars] = 0;
+  } else {
+    buf[len] = 0;
+  }
+  label(x, y, buf, color, size, background);
+}
+
 void DisplayManager::header(const char* title, bool showBack) {
   tft_.fillRect(0, 0, 320, 33, Colors::Panel);
   tft_.drawFastHLine(0, 32, 320, Colors::Border);

@@ -1,0 +1,3 @@
+Documentation checks: PASS
+Ran 17 tests in 12.144s
+OK

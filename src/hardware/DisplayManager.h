@@ -16,6 +16,9 @@ public:
   void footer(const char* message);
   void label(int x, int y, const char* text, uint16_t color = Colors::White,
              uint8_t size = 1, uint16_t background = Colors::Bg);
+  void labelPadded(int x, int y, const char* text, uint8_t minChars,
+                   uint16_t color = Colors::White, uint8_t size = 1,
+                   uint16_t background = Colors::Bg);
 
   // Brightness management
   uint8_t brightness() const { return brightnessPercent_; }

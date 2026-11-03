@@ -1,0 +1,14 @@
+RAM:   [==        ]  15.3% (used 50064 bytes from 327680 bytes)
+Flash: [=         ]  12.7% (used 832693 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+{
+  "binary_bytes": 833056,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5720544,
+  "sha256": "b58ce4285936b9724cd93e321719685477b88bb4b99be9daac044f354f139d03",
+  "growth_percent": -1.032142789256591,
+  "warnings": [],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 15.45 seconds =========================

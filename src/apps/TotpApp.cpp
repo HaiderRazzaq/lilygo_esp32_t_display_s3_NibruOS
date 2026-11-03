@@ -35,6 +35,7 @@ void TotpApp::clearSession(AppContext& ctx) {
   feedbackUntilMs_ = 0;
   view_ = View::Card;
   fullRedraw_ = true;
+  cardDirty_ = true;
   invalidate();
 }
 
@@ -44,6 +45,7 @@ void TotpApp::ensureSession(AppContext& ctx) {
     attemptedLoad_ = true;
     if (!ctx.totp.loadVault(ctx.security.getActiveVaultKey())) status_ = "Vault unreadable";
     fullRedraw_ = true;
+  cardDirty_ = true;
     invalidate();
   }
 }
@@ -66,7 +68,8 @@ void TotpApp::onTick(AppContext& ctx, uint32_t nowMs) {
   if (view_ == View::ImportUsb || view_ == View::ImportWifi || view_ == View::ImportReview) {
     if (view_ == View::ImportWifi && !ctx.wifi.isConnected()) {
       endImport(ctx); view_ = View::Methods; status_ = "Wi-Fi disconnected";
-      fullRedraw_ = true; invalidate();
+      fullRedraw_ = true;
+  cardDirty_ = true; invalidate();
     }
     ctx.accountImport.tick(nowMs);
     const auto state = ctx.accountImport.state();
@@ -74,10 +77,12 @@ void TotpApp::onTick(AppContext& ctx, uint32_t nowMs) {
       ctx.resources.releaseWiFi(ResourceOwner::AuthenticatorImport);
   importSent_ = false;
       view_ = View::ImportReview; confirmAfterMs_ = nowMs + 350;
-      fullRedraw_ = true; status_ = ""; invalidate();
+      fullRedraw_ = true;
+  cardDirty_ = true; status_ = ""; invalidate();
     } else if (state == ImportState::Expired) {
       endImport(ctx); view_ = View::Methods; status_ = "Import expired - retry";
-      fullRedraw_ = true; invalidate();
+      fullRedraw_ = true;
+  cardDirty_ = true; invalidate();
     } else ctx.display.notifyActivity(nowMs); // Explicit session only, max120s.
     const uint32_t seconds = ctx.accountImport.remainingSeconds(nowMs);
     if (seconds != importRemaining_) { importRemaining_ = seconds; invalidate(); }
@@ -122,12 +127,14 @@ void TotpApp::onPrimaryAction(AppContext& ctx) {
     }
     status_ = "Code sent to PC!";
     fullRedraw_ = true;
+  cardDirty_ = true;
     invalidate();
     return;
   }
   if (view_ == View::Card && ctx.totp.accountCount()) {
     ctx.usbHid.cancel(); sending_ = false; status_ = "";
     accountIndex_ = (accountIndex_ + 1) % ctx.totp.accountCount();
+    cardDirty_ = true;
     invalidate();
   }
 }
@@ -154,7 +161,8 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
       view_ = wifi ? View::ImportWifi : View::ImportUsb;
       importRemaining_ = 120; status_ = ""; ctx.display.notifyActivity(millis());
     } else return;
-    fullRedraw_ = true; invalidate(); return;
+    fullRedraw_ = true;
+  cardDirty_ = true; invalidate(); return;
   }
   if (view_ == View::ImportUsb || view_ == View::ImportWifi) {
     if (ev.gesture == TouchGesture::Tap && view_ == View::ImportUsb && ctx.accountImport.state() == ImportState::Waiting) {
@@ -164,6 +172,7 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
       }
       status_ = "Code sent to PC!";
       fullRedraw_ = true;
+  cardDirty_ = true;
       invalidate();
     }
     return;
@@ -178,7 +187,8 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     ctx.accountImport.tick(millis());
     if (ctx.accountImport.state() != ImportState::Review) {
       endImport(ctx); view_ = View::Methods; status_ = "Import expired - retry";
-      fullRedraw_ = true; invalidate(); return;
+      fullRedraw_ = true;
+  cardDirty_ = true; invalidate(); return;
     }
     const ImportedAccount* account = ctx.accountImport.candidate();
     if (account && ctx.totp.addAccount(ctx.security.getActiveVaultKey(), account->name, "", account->secret, account->digits, account->period)) {
@@ -238,9 +248,9 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
   if (sending_) return;
   const uint8_t count = ctx.totp.accountCount();
   if (ev.gesture == TouchGesture::SwipeLeft || (ev.gesture == TouchGesture::Tap && ev.x >= 266 && ev.y >= 28 && ev.y < 144)) {
-    if (accountIndex_ + 1 < count) ++accountIndex_;
+    if (accountIndex_ + 1 < count) { ++accountIndex_; cardDirty_ = true; }
   } else if (ev.gesture == TouchGesture::SwipeRight || (ev.gesture == TouchGesture::Tap && ev.x <= 54 && ev.y >= 28 && ev.y < 144)) {
-    if (accountIndex_) --accountIndex_;
+    if (accountIndex_) { --accountIndex_; cardDirty_ = true; }
   } else if (ev.gesture == TouchGesture::Tap && ev.y >= 146) {
     if (ev.x >= 80 && ev.x < 160 && count < kMaxTotpAccounts) {
       clearEditor(); view_ = View::Methods; status_ = ""; fullRedraw_ = true;
@@ -258,6 +268,7 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     else if (ctx.usbHid.typeCode(code)) { sending_ = true; status_ = "Sending..."; }
     else status_ = "USB send failed";
     CryptoService::secureZero(code, sizeof(code));
+    cardDirty_ = true;
   }
   invalidate();
 }
@@ -294,6 +305,7 @@ void TotpApp::renderEditor(AppContext& ctx) {
 void TotpApp::renderImport(AppContext& ctx) {
   auto& screen = ctx.display;
   auto& t = screen.gfx();
+  const bool initialDraw = fullRedraw_;
   if (fullRedraw_) {
     screen.clear();
     screen.header(view_ == View::Methods ? "Add account" : view_ == View::ImportReview ? "Review account" :
@@ -318,20 +330,22 @@ void TotpApp::renderImport(AppContext& ctx) {
     TextKeyboard::button(screen, 175, 108, 120, 32, "SAVE", Colors::Cyan);
     screen.footer("Nothing is saved until you confirm");
   } else {
-    t.fillRect(0, 33, 320, 118, Colors::Bg);
-    char address[48]{};
-    if (view_ == View::ImportWifi) {
-      char ip[24]{}; ctx.wifi.getLocalIP(ip, sizeof(ip));
-      snprintf(address, sizeof(address), "Device IP: %s", ip);
-    } else snprintf(address, sizeof(address), "Connect the data cable to computer");
-    screen.label(10, 43, address, Colors::White, 1);
-    screen.label(10, 61, "Open Account Setup. Paste the key.", Colors::Muted, 1);
-    screen.label(10, 80, "One-time pairing code:", Colors::Cyan, 1);
-    screen.label(42, 97, ctx.accountImport.pairingCode(), Colors::White, 2);
+    if (initialDraw) {
+      t.fillRect(0, 33, 320, 118, Colors::Bg);
+      char address[48]{};
+      if (view_ == View::ImportWifi) {
+        char ip[24]{}; ctx.wifi.getLocalIP(ip, sizeof(ip));
+        snprintf(address, sizeof(address), "Device IP: %s", ip);
+      } else snprintf(address, sizeof(address), "Connect the data cable to computer");
+      screen.label(10, 43, address, Colors::White, 1);
+      screen.label(10, 61, "Open Account Setup. Paste the key.", Colors::Muted, 1);
+      screen.label(10, 80, "One-time pairing code:", Colors::Cyan, 1);
+      screen.label(42, 97, ctx.accountImport.pairingCode(), Colors::White, 2);
+      screen.footer(status_[0] ? status_ : (view_ == View::ImportUsb ? "Tap code or press BTN to send to PC" : "Encrypted transfer. Confirm on device."));
+    }
     char remaining[40]{};
     snprintf(remaining, sizeof(remaining), "Expires in %lus | Back cancels", static_cast<unsigned long>(importRemaining_));
-    screen.label(40, 128, remaining, Colors::Amber, 1);
-    screen.footer(status_[0] ? status_ : (view_ == View::ImportUsb ? "Tap code or press BTN to send to PC" : "Encrypted transfer. Confirm on device."));
+    screen.labelPadded(40, 128, remaining, 36, Colors::Amber, 1, Colors::Bg);
   }
 }
 
@@ -354,33 +368,42 @@ void TotpApp::render(AppContext& ctx) {
   const uint8_t count = ctx.totp.accountCount();
   const bool unlocked = ctx.security.isPinEnabled() && ctx.security.hasActiveKey() && ctx.totp.isLoaded();
   const uint32_t epoch = ctx.time.getEpoch();
-  t.fillRect(0, 33, 320, 112, Colors::Bg);
-  if (!unlocked) {
-    screen.label(30, 65, ctx.totp.hasStorageError() ? "Vault unreadable" : "Enable PIN in Settings", Colors::Amber, 2);
-    screen.label(30, 95, ctx.totp.hasStorageError() ? "Back and retry. Data preserved." : "Unlock with your PIN to continue.", Colors::Muted, 1);
-  } else if (!count) {
-    screen.label(85, 65, "Vault empty", Colors::White, 2);
-    screen.label(40, 98, "Tap ADD to enter an account.", Colors::Muted, 1);
-  } else {
+
+  if (cardDirty_) {
+    cardDirty_ = false;
+    t.fillRect(0, 33, 320, 112, Colors::Bg);
+    if (!unlocked) {
+      screen.label(30, 65, ctx.totp.hasStorageError() ? "Vault unreadable" : "Enable PIN in Settings", Colors::Amber, 2);
+      screen.label(30, 95, ctx.totp.hasStorageError() ? "Back and retry. Data preserved." : "Unlock with your PIN to continue.", Colors::Muted, 1);
+    } else if (!count) {
+      screen.label(85, 65, "Vault empty", Colors::White, 2);
+      screen.label(40, 98, "Tap ADD to enter an account.", Colors::Muted, 1);
+    } else {
+      if (accountIndex_ >= count) accountIndex_ = count - 1;
+      const TotpAccount* account = ctx.totp.getAccount(accountIndex_);
+      screen.label(60, 39, account->name, Colors::Cyan, strlen(account->name) > 16 ? 1 : 2);
+      t.fillRoundRect(58, 102, 204, 32, 5, epoch && ctx.usbHid.isReady() ? Colors::Cyan : Colors::Panel);
+      screen.label(76, 114, status_[0] ? status_ : "TYPE CODE (USB)", Colors::White, 1, Colors::Panel);
+      screen.label(12, 75, "<", Colors::Cyan, 2);
+      screen.label(290, 75, ">", Colors::Cyan, 2);
+    }
+    t.fillRect(0, 146, 320, 24, Colors::Panel);
+    char counter[12]{}; snprintf(counter, sizeof(counter), "%u/%u", count ? accountIndex_ + 1 : 0, count);
+    screen.label(12, 154, counter, Colors::Muted, 1, Colors::Panel);
+    screen.label(100, 154, "ADD", unlocked && count < kMaxTotpAccounts ? Colors::Cyan : Colors::Muted, 1, Colors::Panel);
+    screen.label(175, 154, "DELETE", unlocked && count ? Colors::Red : Colors::Muted, 1, Colors::Panel);
+  }
+
+  // Live dynamic update on every tick - ZERO fillRect, ZERO flicker!
+  if (unlocked && count) {
     if (accountIndex_ >= count) accountIndex_ = count - 1;
-    const TotpAccount* account = ctx.totp.getAccount(accountIndex_);
-    screen.label(60, 39, account->name, Colors::Cyan, strlen(account->name) > 16 ? 1 : 2);
     char code[10] = "------"; uint8_t remaining = 0;
     if (epoch) ctx.totp.getAccountCode(accountIndex_, epoch, code, sizeof(code), remaining);
-    screen.label(105, 69, code, Colors::White, 2);
+    screen.label(105, 69, code, Colors::White, 2, Colors::Bg);
     CryptoService::secureZero(code, sizeof(code));
     char timer[24]{};
-    if (epoch) snprintf(timer, sizeof(timer), "%u sec", remaining);
+    if (epoch) snprintf(timer, sizeof(timer), "%2u sec", remaining);
     else snprintf(timer, sizeof(timer), "Waiting for time");
-    screen.label(100, 90, timer, epoch ? Colors::Green : Colors::Amber, 1);
-    t.fillRoundRect(58, 102, 204, 32, 5, epoch && ctx.usbHid.isReady() ? Colors::Cyan : Colors::Panel);
-    screen.label(76, 114, status_[0] ? status_ : "TYPE CODE (USB)", Colors::White, 1, Colors::Panel);
-    screen.label(12, 75, "<", Colors::Cyan, 2);
-    screen.label(290, 75, ">", Colors::Cyan, 2);
+    screen.label(100, 90, timer, epoch ? Colors::Green : Colors::Amber, 1, Colors::Bg);
   }
-  t.fillRect(0, 146, 320, 24, Colors::Panel);
-  char counter[12]{}; snprintf(counter, sizeof(counter), "%u/%u", count ? accountIndex_ + 1 : 0, count);
-  screen.label(12, 154, counter, Colors::Muted, 1, Colors::Panel);
-  screen.label(100, 154, "ADD", unlocked && count < kMaxTotpAccounts ? Colors::Cyan : Colors::Muted, 1, Colors::Panel);
-  screen.label(175, 154, "DELETE", unlocked && count ? Colors::Red : Colors::Muted, 1, Colors::Panel);
 }

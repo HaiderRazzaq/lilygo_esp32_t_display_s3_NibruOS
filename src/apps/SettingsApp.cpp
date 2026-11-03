@@ -296,6 +296,15 @@ void SettingsApp::render(AppContext& ctx) {
       drawnTheme_ == ctx.settings.theme() && drawnTimeout_ == ctx.settings.screenTimeoutSec() &&
       drawnRotation_ == ctx.settings.rotation() &&
       drawnSaveOk_ == ctx.settings.lastSaveOk()) return;
+
+  if (subView_ == SettingsSubView::Security) {
+    const bool pinEn = ctx.security.isPinEnabled();
+    if (!fullRedraw_ && drawnPinEnabled_ == pinEn && drawnPinError_ == pinError_) return;
+  }
+
+  if (subView_ == SettingsSubView::SetPin) {
+    if (!fullRedraw_ && drawnPinLen_ == pinInputLen_ && drawnPinError_ == pinError_) return;
+  }
   switch (subView_) {
     case SettingsSubView::Menu:      renderMenu(ctx); break;
     case SettingsSubView::Display:   renderDisplay(ctx); break;
@@ -313,6 +322,13 @@ void SettingsApp::render(AppContext& ctx) {
   drawnBrightness_ = ctx.settings.brightness(); drawnTheme_ = ctx.settings.theme();
   drawnTimeout_ = ctx.settings.screenTimeoutSec(); drawnRotation_ = ctx.settings.rotation();
   drawnSaveOk_ = ctx.settings.lastSaveOk();
+  if (subView_ == SettingsSubView::Security) {
+    drawnPinEnabled_ = ctx.security.isPinEnabled();
+    drawnPinError_ = pinError_;
+  } else if (subView_ == SettingsSubView::SetPin) {
+    drawnPinLen_ = pinInputLen_;
+    drawnPinError_ = pinError_;
+  }
   fullRedraw_ = false;
 }
 
@@ -713,15 +729,47 @@ void SettingsApp::renderSetPin(AppContext& ctx) {
   DisplayManager& screen = ctx.display;
   TFT_eSPI& t = screen.gfx();
   if (fullRedraw_) {
-    screen.clear(); screen.header("Set Security PIN", true);
-  }
-  t.fillRect(10, 34, 300, 12, Colors::Bg);
+    screen.clear();
+    screen.header("Set Security PIN", true);
 
-  // Status & Guidance (Y: 30..44)
+    // Keypad: 3 rows x 4 cols (Y: 68..144)
+    const char* labels[3][4] = {
+      {"1", "2", "3", "4"},
+      {"5", "6", "7", "8"},
+      {"9", "0", "DEL", "SAVE"}
+    };
+
+    for (int row = 0; row < 3; ++row) {
+      const int ry = 68 + row * 26;
+      for (int col = 0; col < 4; ++col) {
+        const int rx = 16 + col * 74;
+        const bool isSpecial = (row == 2 && (col == 2 || col == 3));
+
+        uint16_t btnColor = Colors::Panel;
+        if (isSpecial) {
+          btnColor = (col == 2) ? Colors::Red : Colors::Green;
+        }
+
+        t.fillRoundRect(rx, ry, 68, 22, 4, btnColor);
+        t.drawRoundRect(rx, ry, 68, 22, 4, Colors::Border);
+
+        const char* lbl = labels[row][col];
+        const int textW = static_cast<int>(strlen(lbl)) * (isSpecial ? 6 : 12);
+        const int tx = rx + (68 - textW) / 2;
+        const int ty = ry + (isSpecial ? 7 : 4);
+        screen.label(tx, ty, lbl, isSpecial ? (col == 2 ? Colors::White : Colors::Bg) : Colors::White,
+                     isSpecial ? 1 : 2, btnColor);
+      }
+    }
+
+    screen.footer("Tap Back to discard | PIN hidden");
+  }
+
+  // Status & Guidance (Y: 36) - Padded atomic render without fillRect blanking
   if (pinError_) {
-    screen.label(12, 36, "PIN invalid, vault active or save failed", Colors::Red, 1, Colors::Bg);
+    screen.labelPadded(10, 36, "PIN invalid, vault active or save failed", 40, Colors::Red, 1, Colors::Bg);
   } else {
-    screen.label(60, 36, "Enter 4 to 8 digits, then tap SAVE", Colors::White, 1, Colors::Bg);
+    screen.labelPadded(10, 36, "     Enter 4 to 8 digits, then tap SAVE", 40, Colors::White, 1, Colors::Bg);
   }
 
   // PIN Display Box (Y: 46..64)
@@ -736,38 +784,6 @@ void SettingsApp::renderSetPin(AppContext& ctx) {
       t.fillCircle(startX + i * 16 + 8, 56, 4, Colors::Green);
     }
   }
-
-  // Keypad: 3 rows x 4 cols (Y: 68..144)
-  const char* labels[3][4] = {
-    {"1", "2", "3", "4"},
-    {"5", "6", "7", "8"},
-    {"9", "0", "DEL", "SAVE"}
-  };
-
-  if (fullRedraw_) for (int row = 0; row < 3; ++row) {
-    const int ry = 68 + row * 26;
-    for (int col = 0; col < 4; ++col) {
-      const int rx = 16 + col * 74;
-      const bool isSpecial = (row == 2 && (col == 2 || col == 3));
-
-      uint16_t btnColor = Colors::Panel;
-      if (isSpecial) {
-        btnColor = (col == 2) ? Colors::Red : Colors::Green;
-      }
-
-      t.fillRoundRect(rx, ry, 68, 22, 4, btnColor);
-      t.drawRoundRect(rx, ry, 68, 22, 4, Colors::Border);
-
-      const char* lbl = labels[row][col];
-      const int textW = static_cast<int>(strlen(lbl)) * (isSpecial ? 6 : 12);
-      const int tx = rx + (68 - textW) / 2;
-      const int ty = ry + (isSpecial ? 7 : 4);
-      screen.label(tx, ty, lbl, isSpecial ? (col == 2 ? Colors::White : Colors::Bg) : Colors::White,
-                   isSpecial ? 1 : 2, btnColor);
-    }
-  }
-
-  if (fullRedraw_) screen.footer("Tap Back to discard | PIN hidden");
 }
 
 void SettingsApp::handleSetPinTouch(AppContext& ctx, const TouchEvent& ev) {

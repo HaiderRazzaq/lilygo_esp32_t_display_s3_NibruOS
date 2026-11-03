@@ -14,4 +14,6 @@ public:
 private:
   uint32_t lastUpdateMs_ = 0;
   bool fullRedraw_ = true;
+  bool lastOnline_ = false;
+  bool lastOnlineSet_ = false;
 };

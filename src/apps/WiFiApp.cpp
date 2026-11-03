@@ -177,7 +177,7 @@ void WiFiApp::renderMenu(AppContext& ctx) {
   }
 
   // Differential live status bar update at Y: 36..50
-  t.fillRect(10, 36, 300, 16, Colors::Bg);
+
   const bool isConn = (ctx.wifi.connectState() == ConnectState::Connected);
   const bool isConnecting = (ctx.wifi.connectState() == ConnectState::Connecting);
   t.fillCircle(16, 43, 4, isConn ? Colors::Green : (isConnecting ? Colors::Amber : Colors::Muted));
@@ -185,13 +185,13 @@ void WiFiApp::renderMenu(AppContext& ctx) {
     char statusBuf[48];
     snprintf(statusBuf, sizeof(statusBuf), "Connected: %s (%d dBm)",
              ctx.wifi.connectedSSID(), ctx.wifi.currentRSSI());
-    screen.label(26, 39, statusBuf, Colors::Green, 1, Colors::Bg);
+    screen.labelPadded(26, 39, statusBuf, 36, Colors::Green, 1, Colors::Bg);
   } else if (isConnecting) {
     char statusBuf[48];
     snprintf(statusBuf, sizeof(statusBuf), "Connecting to %s...", ctx.wifi.targetSSID());
-    screen.label(26, 39, statusBuf, Colors::Amber, 1, Colors::Bg);
+    screen.labelPadded(26, 39, statusBuf, 36, Colors::Amber, 1, Colors::Bg);
   } else {
-    screen.label(26, 39, "Disconnected", Colors::Muted, 1, Colors::Bg);
+    screen.labelPadded(26, 39, "Disconnected", 36, Colors::Muted, 1, Colors::Bg);
   }
 }
 

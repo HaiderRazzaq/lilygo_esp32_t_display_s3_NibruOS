@@ -366,3 +366,75 @@ Status vocabulary and resolution rules: [workflow](ENGINEERING_WORKFLOW.md).
   "risks": "Native serial/UDP and touch/resource acceptance NOT RUN; no QR camera/export."
 }
 ```
+
+```json
+{
+  "record_type": "issue",
+  "id": "BUG-0012",
+  "title": "Display flicker during periodic timer and counter redraws",
+  "status": "FIXED — UNVERIFIED",
+  "description": "Views with periodic counters or timers (TotpApp countdown, SystemInfoApp heap/uptime, WiFiScanner scanning animation, WiFiApp status) exhibited rapid screen flickering every second.",
+  "symptoms": "Full screen or card-level black flash every second as counters and timers update.",
+  "reproduction": "Open 2FA view with an active account; observe the 30-second timer countdown and code. Observe screen flash on every second.",
+  "affected_versions": "v0.1.0 through v0.4.1",
+  "suspected_cause": "Blank-then-draw anti-pattern using fillRect over entire cards/sections before drawing updated text.",
+  "root_cause": "fillRect() clears pixels to background color before text is rendered, causing the LCD controller to scan out a blank frame. Additionally, TotpApp rendered the entire card (buttons, borders, account name, footer) on every second tick instead of only updating dynamic digits.",
+  "files": [
+    "src/hardware/DisplayManager.h",
+    "src/hardware/DisplayManager.cpp",
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "src/apps/SystemInfoApp.h",
+    "src/apps/SystemInfoApp.cpp",
+    "src/apps/WiFiScannerApp.cpp",
+    "src/apps/WiFiApp.cpp"
+  ],
+  "attempts": [
+    "VER-0061 HOST PASS",
+    "VER-0062 SIMULATOR PASS",
+    "VER-0063 BUILD PASS"
+  ],
+  "fix": "Introduced DisplayManager::labelPadded() which uses setTextColor(fg, bg) with space padding to atomically overwrite text and background in a single pass without fillRect. Decoupled static card/footer rendering from dynamic counter updates in TotpApp and SystemInfoApp.",
+  "verification": [
+    "VER-0061",
+    "VER-0062",
+    "VER-0063"
+  ],
+  "risks": "Padded labels must match or exceed previous string lengths to fully erase remnants."
+}
+```
+
+```json
+{
+  "record_type": "issue",
+  "id": "BUG-0013",
+  "title": "Display flicker during PIN entry and security configuration views",
+  "status": "FIXED — UNVERIFIED",
+  "description": "PIN entry screens (Set Security PIN in Settings and Device Lock screen in SecurityService) exhibited intense screen flickering either continuously or on every digit press.",
+  "symptoms": "Screen continuously flashing black 60-80 times per second in Settings SetPin view; full screen black blanking on each keypad press on device lock screen.",
+  "reproduction": "Open Settings -> Security -> Set PIN, observe screen flickering continuously. On lock screen, tap digits 1-2-3-4 and observe full screen wipe on each tap.",
+  "affected_versions": "v0.1.0 through v0.4.2",
+  "suspected_cause": "Missing dirty guard in SettingsApp::render causing unconditional 12ms tick redrawing, and full screen clear in SecurityService::render on every digit press.",
+  "root_cause": "SettingsSubView::SetPin and Security were omitted from the controls dirty-check guard, triggering fillRect and fillRoundRect on every loop iteration. SecurityService::render called screen.clear(Colors::Bg) and redrew all 12 keypad buttons on every digit pressed.",
+  "files": [
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/services/SecurityService.h",
+    "src/services/SecurityService.cpp"
+  ],
+  "attempts": [
+    "VER-0065 HOST PASS",
+    "VER-0066 SIMULATOR PASS",
+    "VER-0067 BUILD PASS",
+    "HWT-0023 COM5 PASS"
+  ],
+  "fix": "Added dirty guards for SetPin and Security in SettingsApp::render. Decoupled static keypad buttons, headers, and footers from dynamic PIN dot indicators. Replaced status line fillRect with labelPadded and restricted circle erasure to localized bounding box.",
+  "verification": [
+    "VER-0065",
+    "VER-0066",
+    "VER-0067",
+    "HWT-0023"
+  ],
+  "risks": "Local circle clearing must accurately bound the pin dot coordinates."
+}
+```

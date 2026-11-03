@@ -55,6 +55,9 @@ private:
   char pinInputBuffer_[10]{};
   uint8_t pinInputLen_ = 0;
   bool pinError_ = false;
+  uint8_t drawnPinLen_ = 255;
+  bool drawnPinError_ = false;
+  bool drawnPinEnabled_ = false;
 
   void renderMenu(AppContext& ctx);
   void renderDisplay(AppContext& ctx);

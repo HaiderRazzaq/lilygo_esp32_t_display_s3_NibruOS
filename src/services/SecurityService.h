@@ -42,11 +42,16 @@ public:
   void render(AppContext& ctx);
   bool consumeDirty() { bool d = dirty_; dirty_ = false; return d; }
   void invalidate() { dirty_ = true; }
+  void invalidateFull() { fullRedraw_ = true; dirty_ = true; }
 
 private:
   bool pinEnabled_ = false;
   bool locked_ = false;
   bool dirty_ = true;
+  bool fullRedraw_ = true;
+  uint8_t drawnInputLen_ = 255;
+  bool drawnErrorState_ = false;
+  uint32_t lastLockoutSec_ = 0;
   uint8_t pinLength_ = 4;
 
   // Salt & PBKDF2 hash (32 bytes derived from PIN + salt)
