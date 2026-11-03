@@ -13,7 +13,8 @@ enum class SettingsSubView : uint8_t {
   Device,
   TouchTest,
   SetPin,
-  Language
+  Language,
+  WebPortal
 };
 
 class SettingsApp final : public App {
@@ -46,6 +47,9 @@ private:
   uint8_t drawnBrightness_ = 0, drawnTheme_ = 255, drawnRotation_ = 255;
   uint8_t drawnLanguage_ = 255;
   uint16_t drawnTimeout_ = 65535;
+  uint8_t armedMenuIndex_ = 255;
+  uint8_t drawnArmedMenu_ = 255;
+  uint32_t armedMenuContactId_ = 0;
 
   // Confirmation dialog state for Device actions
   enum class ConfirmAction : uint8_t { None, Reboot, ResetSettings };
@@ -70,6 +74,7 @@ private:
   void renderDevice(AppContext& ctx);
   void renderSetPin(AppContext& ctx);
   void renderLanguage(AppContext& ctx);
+  void renderWebPortal(AppContext& ctx);
 
   void handleMenuTouch(AppContext& ctx, const TouchEvent& ev);
   void handleDisplayTouch(AppContext& ctx, const TouchEvent& ev);
@@ -80,4 +85,8 @@ private:
   void handleDeviceTouch(AppContext& ctx, const TouchEvent& ev);
   void handleSetPinTouch(AppContext& ctx, const TouchEvent& ev);
   void handleLanguageTouch(AppContext& ctx, const TouchEvent& ev);
+  void handleWebPortalTouch(AppContext& ctx, const TouchEvent& ev);
+
+  uint32_t drawnWebPortalSec_ = 9999;
+  bool webPortalTyped_ = false;
 };

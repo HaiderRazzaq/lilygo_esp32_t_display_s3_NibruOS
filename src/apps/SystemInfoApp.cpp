@@ -1,3 +1,4 @@
+#include "services/TimeService.h"
 #include "apps/SystemInfoApp.h"
 #include "core/AppContext.h"
 #include "services/WiFiService.h"

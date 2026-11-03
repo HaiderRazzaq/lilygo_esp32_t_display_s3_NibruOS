@@ -20,9 +20,11 @@
 #include "services/CryptoService.h"
 #include "services/SecurityService.h"
 #include "services/SettingsService.h"
+#include "services/VaultService.h"
 #include "services/TimeService.h"
 #include "services/TotpService.h"
 #include "services/UsbHidService.h"
+#include "services/WebPortalService.h"
 #include <Arduino.h>
 #include <WiFi.h>
 #include <cassert>
@@ -162,7 +164,9 @@ int main() {
   TotpService totpService;
   UsbHidService usbHid;
   AccountImportService accountImport;
-  AppContext context{display, resources, wifi, security, settings, timeService, totpService, usbHid, accountImport};
+  VaultService vault;
+  WebPortalService webPortal;
+  AppContext context{display, resources, wifi, security, settings, timeService, totpService, usbHid, accountImport, vault, webPortal};
   AppManager mgr(context);
   SystemInfoApp info;
   TouchTestApp touch;
@@ -183,8 +187,30 @@ int main() {
   mgr.tick(fakeMs);
   mgr.handleButton(ButtonAction::Back);
   assert(mgr.isHome());
-  // Touch tap opens the Wi-Fi tile (third tile in landscape).
-  mgr.handleTouch(TouchEvent{255,88,81,255,TouchGesture::Tap});
+  // Select-then-Confirm: tap 1 selects and arms tile 2 (Wi-Fi).
+  mgr.handleTouch(TouchEvent{255, 88, 81, 255, TouchGesture::Tap, 10});
+  assert(mgr.isHome());
+  assert(mgr.selectedIndex() == 2);
+  assert(mgr.isArmed(2));
+
+  // Same contact does NOT confirm (user did not lift finger).
+  mgr.handleTouch(TouchEvent{255, 88, 81, 255, TouchGesture::Tap, 10});
+  assert(mgr.isHome());
+
+  // Touching tile 0 shifts selection without opening.
+  mgr.handleTouch(TouchEvent{50, 88, 81, 50, TouchGesture::Tap, 11});
+  assert(mgr.isHome());
+  assert(mgr.selectedIndex() == 0);
+  assert(mgr.isArmed(0));
+
+  // Tap 1 on tile 2 arms tile 2 again.
+  mgr.handleTouch(TouchEvent{255, 88, 81, 255, TouchGesture::Tap, 12});
+  assert(mgr.isHome());
+  assert(mgr.selectedIndex() == 2);
+  assert(mgr.isArmed(2));
+
+  // Tap 2 on tile 2 with separate contact confirms and opens!
+  mgr.handleTouch(TouchEvent{255, 88, 81, 255, TouchGesture::Tap, 13});
   assert(!mgr.isHome());
   assert(resources.ownsWiFi(ResourceOwner::WiFiScanner));
   assert(wifi.state()==ScanState::Preparing);
@@ -289,7 +315,10 @@ int main() {
   assert(mgr.registerApp(dummy));
   mgr.handleTouch(TouchEvent{200, 90, 0, 0, TouchGesture::SwipeLeft});
   assert(mgr.selectedIndex()==3);
-  mgr.handleTouch(TouchEvent{20, 90, 0, 0, TouchGesture::Tap});
+  // Select-then-Confirm: first tap arms, second tap confirms open
+  mgr.handleTouch(TouchEvent{20, 90, 0, 0, TouchGesture::Tap, 20});
+  assert(mgr.isHome() && mgr.selectedIndex()==3 && mgr.isArmed(3));
+  mgr.handleTouch(TouchEvent{20, 90, 0, 0, TouchGesture::Tap, 21});
   assert(!mgr.isHome() && mgr.selectedIndex()==3);
   mgr.goHome();
   assert(mgr.isHome());
@@ -319,26 +348,43 @@ int main() {
   assert(std::strncmp(wifi.connectError(), "Timed out", 9) == 0);
   wifi.shutdown();
 
-  // SettingsApp sub-navigation test
+  // SettingsApp sub-navigation test with Select-then-Confirm
   SettingsApp settingsApp;
   settingsApp.onEnter(context);
-  // Tap System Info card in Settings menu
-  settingsApp.onTouch(context, TouchEvent{100, 60, 0, 0, TouchGesture::Tap});
+  // Tap 1 selects and arms row
+  settingsApp.onTouch(context, TouchEvent{100, 60, 0, 0, TouchGesture::Tap, 30});
+  // Not entered yet: onBack at menu returns false
+  assert(settingsApp.onBack(context) == false);
+  // Tap 1 arms again
+  settingsApp.onTouch(context, TouchEvent{100, 60, 0, 0, TouchGesture::Tap, 31});
+  // Tap 2 confirms and enters subview
+  settingsApp.onTouch(context, TouchEvent{100, 60, 0, 0, TouchGesture::Tap, 32});
   // Back returns to Settings Menu
   assert(settingsApp.onBack(context) == true);
   // At menu, Back returns false so AppManager shell can return Home
   assert(settingsApp.onBack(context) == false);
   settingsApp.onExit(context);
 
-  // WiFiApp sub-navigation test
+  // WiFiApp sub-navigation test with Select-then-Confirm
   WiFiApp wifiApp;
   wifiApp.onEnter(context);
-  // Tap Scan Networks card in WiFi menu
-  wifiApp.onTouch(context, TouchEvent{100, 70, 0, 0, TouchGesture::Tap});
+  // Tap 1 arms Scan Networks card
+  wifiApp.onTouch(context, TouchEvent{100, 70, 0, 0, TouchGesture::Tap, 40});
+  assert(wifiApp.onBack(context) == false); // still at menu
+  // Tap 1 arms again
+  wifiApp.onTouch(context, TouchEvent{100, 70, 0, 0, TouchGesture::Tap, 41});
+  // Tap 2 confirms Scan Networks
+  wifiApp.onTouch(context, TouchEvent{100, 70, 0, 0, TouchGesture::Tap, 42});
   // Back returns to WiFi Menu
   assert(wifiApp.onBack(context) == true);
-  // Tap Saved Networks card in WiFi menu
-  wifiApp.onTouch(context, TouchEvent{100, 120, 0, 0, TouchGesture::Tap});
+
+  // Tap 1 arms Saved Networks card
+  wifiApp.onTouch(context, TouchEvent{100, 120, 0, 0, TouchGesture::Tap, 43});
+  assert(wifiApp.onBack(context) == false); // still at menu
+  // Tap 1 arms again
+  wifiApp.onTouch(context, TouchEvent{100, 120, 0, 0, TouchGesture::Tap, 44});
+  // Tap 2 confirms Saved Networks
+  wifiApp.onTouch(context, TouchEvent{100, 120, 0, 0, TouchGesture::Tap, 45});
   // Back returns to WiFi Menu
   assert(wifiApp.onBack(context) == true);
   // At menu, Back returns false so shell returns Home
@@ -422,5 +468,9 @@ int main() {
   testAuthenticator();
   extern void testAccountImport();
   testAccountImport();
+  extern void runVaultTests();
+  runVaultTests();
+  extern void runWebPortalHostTests();
+  runWebPortalHostTests();
   puts("PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests");
 }

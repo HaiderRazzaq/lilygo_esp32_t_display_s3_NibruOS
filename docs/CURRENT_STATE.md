@@ -6,8 +6,8 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
 ```json
 {
   "record_type": "state",
-  "date": "2026-11-03",
-  "runtime_version": "v0.5.0",
+  "date": "2026-11-04",
+  "runtime_version": "v0.9.0",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
@@ -27,7 +27,10 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "FEAT-0013",
     "FEAT-0014",
     "FEAT-0015",
-    "FEAT-0016"
+    "FEAT-0016",
+    "FEAT-0017",
+    "FEAT-0018",
+    "FEAT-0019"
   ],
   "planned_features": [
     "FEAT-0007"
@@ -42,12 +45,13 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "BUG-0008",
     "BUG-0009",
     "BUG-0010",
-    "BUG-0011"
+    "BUG-0011",
+    "BUG-0015"
   ],
-  "latest_build": "VER-0071",
-  "latest_upload": "HWT-0024",
-  "documentation_verification": "VER-0072",
-  "current_host_attempt": "VER-0069",
+  "latest_build": "VER-0103",
+  "latest_upload": "HWT-0032",
+  "documentation_verification": "VER-0104",
+  "current_host_attempt": "VER-0101",
   "source_constants": {
     "kTouchSda": 18,
     "kTouchScl": 17,
@@ -161,3 +165,6 @@ evidence only. No commit or push performed.
 Architecture audit completed under ADR-0003: decoupled Touch HAL from App interface, established compile-time static alignment across configuration headers, resolved MSVC 64-bit warnings, and added service-level MemoryProfiler forwarder.
 Runtime screen orientation control is implemented across DisplayManager, TouchManager (with coordinate transform x=319-rawY, y=rawX and inverted swipe gestures), SettingsService (dedicated 'rot' NVS key preserving 5-byte config schema), and SettingsApp UI (Normal 0° vs Invert 180°).
 PlatformIO image build passes with 832,464 B (-1.10% vs baseline, 12.7% flash, 15.3% RAM). Host smoke tests, desktop simulator suite, and documentation checks pass (VER-0053..0055). Physical hardware verification with inverted orientation is pending.
+
+## Lock Screen Wake Freeze and Display Restoration Fix — 2026-11-03
+Fixed lock screen freeze on wake: removed ST7789 DISPOFF (0x28) / DISPON (0x29) command hazards from DisplayManager (which caused 120ms hardware stabilization drops and bus desynchronization), suppressed rendering while display.isSleeping() is active so dirty/fullRedraw flags are preserved until wake, enforced invalidateFull() upon display wake, and added onDisplayRestored overrides to WiFiApp and WiFiScannerApp to ensure full UI redraw upon unlock.

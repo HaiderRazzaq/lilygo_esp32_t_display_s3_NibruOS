@@ -11,10 +11,13 @@
 #include "services/SecurityService.h"
 #include "services/SettingsService.h"
 #include "services/TimeService.h"
+#include "services/VaultService.h"
 #include "services/TotpService.h"
 #include "services/UsbHidService.h"
+#include "services/WebPortalService.h"
 #include "apps/WiFiApp.h"
 #include "apps/TotpApp.h"
+#include "apps/VaultApp.h"
 #include "apps/SettingsApp.h"
 #include "apps/SystemInfoApp.h"
 #include "apps/TouchTestApp.h"
@@ -85,12 +88,15 @@ int main(int argc, char* argv[]) {
   UsbHidService usbHid;
 
   AccountImportService accountImport;
+  VaultService vault;
+  WebPortalService webPortal;
 
-  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport};
+  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal};
   AppManager launcher(context);
 
   WiFiApp wifiApp;
   TotpApp totpApp;
+  VaultApp vaultApp;
   SettingsApp settingsApp;
 
   WakeInputGate wakeInput;
@@ -104,11 +110,13 @@ int main(int argc, char* argv[]) {
     security.begin();
     timeService.begin();
     totp.begin();
+    vault.begin();
     usbHid.begin();
 
     // Register applications exactly matching physical device baseline (src/main.cpp)
     launcher.registerApp(wifiApp);
     launcher.registerApp(totpApp);
+    launcher.registerApp(vaultApp);
     launcher.registerApp(settingsApp);
 
     launcher.begin();
@@ -135,6 +143,7 @@ int main(int argc, char* argv[]) {
     if (DesktopInput::instance().consumeRebootRequest()) {
       wifi.shutdown();
       launcher.goHome();
+  vault.lock();
       DesktopStorage::instance().reloadNvs();
       bootSystem();
       continue;
@@ -150,6 +159,9 @@ int main(int argc, char* argv[]) {
         wakeInput.arm(now);
         if (security.isPinEnabled()) {
           security.lock();
+          security.invalidateFull();
+        } else {
+          launcher.invalidate();
         }
       }
     } else if (wakeInput.consume(hasTouch, action != ButtonAction::None,
@@ -185,21 +197,26 @@ int main(int argc, char* argv[]) {
     if (display.isSleeping() && security.isPinEnabled() && !security.isLocked()) security.lock();
     if (display.isSleeping() || security.isLocked()) {
       if (totp.isLoaded()) totpApp.clearSession(context);
+      if (vault.isLoaded()) vaultApp.clearSession(context);
+      webPortal.stop(context);
       usbHid.cancel();
     }
     wifi.tick(tickNow);
     timeService.tick(tickNow, wifi.isConnected());
 
-    if (security.isLocked()) {
-      security.tick(tickNow);
-      if (security.consumeDirty()) {
-        security.render(context);
+    if (!display.isSleeping()) {
+      if (security.isLocked()) {
+        security.tick(tickNow);
+        if (security.consumeDirty()) {
+          security.render(context);
+        }
+      } else {
+        launcher.tick(tickNow);
       }
-    } else {
-      launcher.tick(tickNow);
     }
 
     usbHid.tick(tickNow);
+    webPortal.tick(tickNow, context);
 
     DesktopDiagnostics::instance().tick(tickNow, launcher, resources, wifi);
     DesktopDiagnostics::instance().renderOverlay();

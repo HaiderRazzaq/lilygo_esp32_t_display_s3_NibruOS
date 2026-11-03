@@ -1,0 +1,18 @@
+NibruOS PlatformIO Build - 2026-11-03 v0.7.0
+Environment: lilygo-t-display-s3
+Status: SUCCESS (Took 57.66s)
+
+RAM:   [==        ]  15.9% (used 52224 bytes from 327680 bytes)
+Flash: [=         ]  12.9% (used 845993 bytes from 6553600 bytes)
+
+check_image([".pio\build\lilygo-t-display-s3\firmware.bin"], [".pio\build\lilygo-t-display-s3\firmware.elf"])
+{
+  "binary_bytes": 846352,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5707248,
+  "sha256": "af531429fe68862e421cf8267546c65e2d56a42830fc5f364ffc20cbcb96b13a",
+  "growth_percent": 0.5474348495504572,
+  "warnings": [],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)

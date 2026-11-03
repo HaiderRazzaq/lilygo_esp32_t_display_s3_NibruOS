@@ -1,0 +1,23 @@
+NibruOS Desktop Automated Test Runner Output (v0.5.1)
+Date: 2026-11-03
+Environment: Windows 11, MSVC x64, CMake, Ninja, SDL2
+
+[DesktopStorage] Initialized with runtime directory '.testbuild/auth_runtime_test'
+[Test] Running Core Lifecycle & AppManager Tests...
+  -> Select-then-Confirm touch tests PASS
+  -> Core Lifecycle Tests PASS
+[Test] Running UI & Coordinate Transformation Tests...
+  -> UI & Transformation Tests PASS
+[Test] Running Wi-Fi Service & Fault Injection Tests...
+  -> Wi-Fi Simulation Tests PASS
+[Test] Running Settings Persistence & Desktop NVS Tests...
+  -> Settings Persistence Tests PASS
+[Test] Running Modular Architecture & HAL Contract Tests...
+  -> Modular Architecture & HAL Tests PASS
+[Test] Running 25 Repeated Lifecycle Entry/Exit Cycles...
+  -> 25 Lifecycle Cycles PASS (host control flow; no physical leak measurement)
+[Security] New PIN hash and salt stored securely.
+
+==================================================
+  ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY!
+==================================================

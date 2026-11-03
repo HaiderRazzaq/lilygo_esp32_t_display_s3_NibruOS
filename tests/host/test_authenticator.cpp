@@ -4,6 +4,8 @@
 #include "services/CryptoService.h"
 #include "services/UsbHidService.h"
 #include "services/TimeService.h"
+#include "services/VaultService.h"
+#include "services/WebPortalService.h"
 #include "services/SettingsService.h"
 #include "services/WiFiService.h"
 #include "hardware/DisplayManager.h"
@@ -37,15 +39,15 @@ void testAuthenticator() {
   assert(TextKeyboard::hit(20, 120).action == TextKeyboard::Action::Shift);
   assert(TextKeyboard::hit(280, 120).action == TextKeyboard::Action::Delete);
   assert(TextKeyboard::hit(-1, 80).action == TextKeyboard::Action::None);
-  TotpService vault;
-  vault.begin();
+  TotpService totpSvc;
+  totpSvc.begin();
   // Boot must not provision public demo secrets as if they were user accounts.
-  assert(vault.accountCount() == 0);
+  assert(totpSvc.accountCount() == 0);
   Preferences::resetMock();
   uint8_t key[32]{}; key[0] = 73;
-  assert(vault.loadVault(key)); // An absent vault is writable empty, not an error.
-  assert(vault.addAccount(key, "Test only", "fixture", kTestSecret));
-  assert(vault.accountCount() == 1);
+  assert(totpSvc.loadVault(key)); // An absent vault is writable empty, not an error.
+  assert(totpSvc.addAccount(key, "Test only", "fixture", kTestSecret));
+  assert(totpSvc.accountCount() == 1);
   TotpService reopened;
   reopened.begin();
   assert(reopened.loadVault(key));
@@ -147,6 +149,32 @@ void testAuthenticator() {
   clock.tick(2000, false);
   assert(clock.getEpoch() == 0 && !clock.isSynced());
 
+  // Test USB Serial time sync and timezone formatting
+  TimeService usbClock;
+  assert(usbClock.processSerialCommand("TIME:1730648400"));
+  assert(usbClock.isSynced());
+  assert(usbClock.source() == TimeSource::UsbSerial);
+  assert(std::strcmp(usbClock.sourceName(), "USB") == 0);
+  assert(usbClock.lastSyncEpoch() == 1730648400);
+
+  // Timezone formatting test (UTC+3)
+  usbClock.setTimezoneOffset(3);
+  char tBuf[16]{};
+  char dBuf[16]{};
+  usbClock.formatTime(tBuf, sizeof(tBuf));
+  usbClock.formatDate(dBuf, sizeof(dBuf));
+    assert(std::strcmp(tBuf, "18:40:00") == 0);
+  assert(std::strcmp(dBuf, "2024-11-03") == 0);
+
+  // Character-by-character serial input test
+  const char* cmd = "TIME:1730650000\n";
+  bool gotSync = false;
+  for (const char* p = cmd; *p; ++p) {
+    if (usbClock.processSerialInput(*p)) gotSync = true;
+  }
+  assert(gotSync);
+  assert(usbClock.lastSyncEpoch() == 1730650000);
+
   UsbHidTransport transport{usbReady, usbReport, usbConnected};
   UsbHidService usb(&transport);
   usb.begin();
@@ -194,7 +222,9 @@ void testAuthenticator() {
   SettingsService settings;
   TotpService accounts; accounts.begin();
   AccountImportService accountImport;
-  AppContext ctx{display, resources, wifi, session, settings, clock, accounts, usb, accountImport};
+  VaultService vault;
+  WebPortalService webPortal;
+  AppContext ctx{display, resources, wifi, session, settings, clock, accounts, usb, accountImport, vault, webPortal};
   TotpApp app;
   testAuthenticatorEntryFlow(ctx, app);
   app.onEnter(ctx);

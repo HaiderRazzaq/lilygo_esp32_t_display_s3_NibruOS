@@ -27,6 +27,10 @@ public:
   void render(AppContext& ctx) override;
   void onPrimaryAction(AppContext& ctx) override;
   bool onBack(AppContext& ctx) override;
+  void onDisplayRestored(AppContext&) override {
+    fullRedraw_ = true;
+    invalidate();
+  }
 
 private:
   bool acquired_ = false;

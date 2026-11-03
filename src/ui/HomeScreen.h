@@ -12,5 +12,5 @@ class App;
  */
 class HomeScreen {
 public:
-  static void draw(AppContext& ctx, App* const* apps, uint8_t count, uint8_t selected);
+  static void draw(AppContext& ctx, App* const* apps, uint8_t count, uint8_t selected, bool armed = false);
 };

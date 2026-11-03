@@ -17,10 +17,13 @@
 #include "services/SecurityService.h"
 #include "services/SettingsService.h"
 #include "services/TimeService.h"
+#include "services/VaultService.h"
 #include "services/TotpService.h"
 #include "services/UsbHidService.h"
+#include "services/WebPortalService.h"
 #include "apps/WiFiApp.h"
 #include "apps/TotpApp.h"
+#include "apps/VaultApp.h"
 #include "apps/SettingsApp.h"
 #include "apps/SystemInfoApp.h"
 #include "apps/TouchTestApp.h"
@@ -43,7 +46,7 @@ void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, 
   std::printf("[Test] Running Core Lifecycle & AppManager Tests...\n");
 
   assert(launcher.isHome());
-  assert(launcher.appCount() == 5);
+  assert(launcher.appCount() == 6);
   assert(launcher.selectedIndex() == 0);
 
   // Open App 0 (WiFiApp)
@@ -51,15 +54,15 @@ void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, 
   assert(!launcher.isHome());
   assert(launcher.selectedIndex() == 0);
 
-  // Switch directly to App 2 (SettingsApp) - ensures onExit runs on App 0
-  assert(launcher.open(2));
+  // Switch directly to App 3 (SettingsApp) - ensures onExit runs on App 0
+  assert(launcher.open(3));
   assert(!launcher.isHome());
-  assert(launcher.selectedIndex() == 2);
+  assert(launcher.selectedIndex() == 3);
 
   // Return home via Back button action
   launcher.handleButton(ButtonAction::Back);
   assert(launcher.isHome());
-  assert(launcher.selectedIndex() == 2); // Preserves selection on return
+  assert(launcher.selectedIndex() == 3); // Preserves selection on return
 
   // Out of bounds open
   assert(!launcher.open(99));
@@ -67,9 +70,9 @@ void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, 
 
   // Navigation: BOOT short press cycles selection on Home
   launcher.handleButton(ButtonAction::SelectNext);
-  assert(launcher.selectedIndex() == 3);
-  launcher.handleButton(ButtonAction::SelectNext);
   assert(launcher.selectedIndex() == 4);
+  launcher.handleButton(ButtonAction::SelectNext);
+  assert(launcher.selectedIndex() == 5);
   launcher.handleButton(ButtonAction::SelectNext);
   assert(launcher.selectedIndex() == 0);
 
@@ -79,6 +82,34 @@ void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, 
   assert(launcher.selectedIndex() == 0);
 
   // Back returns Home
+  launcher.handleButton(ButtonAction::Back);
+  assert(launcher.isHome());
+
+  // Test Select-then-Confirm touch behavior on Home:
+  // Tap 1 on card 1 (x=160, y=85, contactId=1) selects card 1 without opening
+  TouchEvent evSelect{160, 85, 84, 160, TouchGesture::Tap, 1};
+  launcher.handleTouch(evSelect);
+  assert(launcher.isHome());
+  assert(launcher.selectedIndex() == 1);
+  assert(launcher.isArmed(1));
+
+  // Repeated event with same contactId does NOT open
+  launcher.handleTouch(evSelect);
+  assert(launcher.isHome());
+
+  // Tap on card 2 shifts selection without opening
+  TouchEvent evShift{260, 85, 84, 260, TouchGesture::Tap, 2};
+  launcher.handleTouch(evShift);
+  assert(launcher.isHome());
+  assert(launcher.selectedIndex() == 2);
+  assert(launcher.isArmed(2));
+
+  // Second separate tap on card 2 (contactId=3) confirms and opens!
+  TouchEvent evConfirm{260, 85, 84, 260, TouchGesture::Tap, 3};
+  launcher.handleTouch(evConfirm);
+  assert(!launcher.isHome());
+  assert(launcher.selectedIndex() == 2);
+
   launcher.handleButton(ButtonAction::Back);
   assert(launcher.isHome());
 
@@ -321,6 +352,227 @@ void testModularArchitecture(AppContext& ctx) {
   std::printf("  -> Modular Architecture & HAL Tests PASS\n");
 }
 
+void testSleepLockWakeFlow(AppContext& ctx, WiFiApp& wifiApp, AppManager& launcher) {
+  std::printf("[TEST] Sleep / Lock / Wake and Display Restoration Flow...\n");
+
+  // 1. Enter WiFiApp
+  wifiApp.onEnter(ctx);
+  assert(wifiApp.consumeDirty());
+  wifiApp.render(ctx);
+
+  // 2. Put display into sleep mode
+  ctx.display.sleep();
+  assert(ctx.display.isSleeping());
+
+  // 3. When display is sleeping, lock must engage if PIN enabled
+  assert(ctx.security.setPin("1234"));
+  assert(ctx.security.setPinEnabled(true));
+  ctx.security.lock();
+  assert(ctx.security.isLocked());
+
+  // While sleeping, display is inactive
+  assert(ctx.display.isSleeping());
+
+  // 4. Wake display up
+  ctx.display.wake();
+  assert(!ctx.display.isSleeping());
+
+  // On wake, invalidateFull is called to guarantee clean frame redraw
+  ctx.security.invalidateFull();
+  assert(ctx.security.consumeDirty());
+  ctx.security.render(ctx);
+
+  // 5. Unlock and test display restoration for WiFiApp
+  ctx.security.unlock();
+  assert(!ctx.security.isLocked());
+
+  // AppManager / wasLocked notifies active app that display was restored
+  wifiApp.onDisplayRestored(ctx);
+  assert(wifiApp.consumeDirty());
+  wifiApp.render(ctx);
+
+  ctx.security.setPinEnabled(false);
+  wifiApp.onExit(ctx);
+  launcher.goHome();
+  std::printf("  -> PASS: Sleep/Lock/Wake and Display Restoration verified.\n");
+}
+
+
+void testEncryptedVaultStorage(AppContext& ctx) {
+  std::printf("[TEST] Running Encrypted Password Vault Desktop Simulation Tests...\n");
+  ctx.vault.begin();
+  assert(!ctx.vault.isLoaded());
+
+  uint8_t testKey[32]{};
+  for (int i = 0; i < 32; ++i) testKey[i] = static_cast<uint8_t>(i + 0x20);
+
+  assert(ctx.vault.loadVault(testKey));
+  assert(ctx.vault.isLoaded() && ctx.vault.count() == 0);
+
+  assert(ctx.vault.addEntry(testKey, "Email", "user@proton.me", "V3ry$ecureP@ss", "Main email"));
+  assert(ctx.vault.addEntry(testKey, "AWS", "dev-admin", "AKIAIOSFODNN7EXAMPLE", "Cloud"));
+  assert(ctx.vault.count() == 2);
+
+  const VaultEntry* e = ctx.vault.getEntry(0);
+  assert(e && std::strcmp(e->title, "Email") == 0);
+  assert(std::strcmp(e->username, "user@proton.me") == 0);
+  assert(std::strcmp(e->password, "V3ry$ecureP@ss") == 0);
+
+  // Backup and restore simulation
+  uint8_t backup[1024]{};
+  size_t backupLen = 0;
+  assert(ctx.vault.exportBackup("BackupSecret123", backup, sizeof(backup), backupLen));
+  assert(backupLen > 48);
+
+  ctx.vault.lock();
+  assert(!ctx.vault.isLoaded() && ctx.vault.count() == 0);
+
+  // Restore with wrong password must fail
+  assert(!ctx.vault.importBackup("BadPass", backup, backupLen, testKey));
+
+  // Reload valid vault from disk
+  assert(ctx.vault.loadVault(testKey));
+  assert(ctx.vault.count() == 2);
+
+  // Clean up
+  assert(ctx.vault.removeEntry(testKey, 0));
+  assert(ctx.vault.removeEntry(testKey, 0));
+  assert(ctx.vault.count() == 0);
+  ctx.vault.lock();
+  CryptoService::secureZero(testKey, sizeof(testKey));
+  std::printf("  -> PASS: Encrypted Password Vault Desktop Storage & Backup verified.\n");
+}
+
+void testVaultAppUI(AppContext& ctx, VaultApp& vaultApp, AppManager& launcher) {
+  std::printf("[TEST] Running Password Vault Application UI & Confirmed USB HID Tests...\n");
+  (void)launcher;
+  ctx.security.begin();
+  assert(ctx.security.setPin("739126"));
+  assert(ctx.security.setPinEnabled(true));
+  assert(ctx.security.verifyPin("739126"));
+  ctx.security.unlock();
+  assert(ctx.security.hasActiveKey());
+
+  ctx.vault.loadVault(ctx.security.getActiveVaultKey());
+  ctx.vault.addEntry(ctx.security.getActiveVaultKey(), "GitHub", "octocat", "SecretPassword456", "Dev account");
+  assert(ctx.vault.count() == 1);
+
+  vaultApp.onEnter(ctx);
+  vaultApp.render(ctx);
+
+  // 1. First tap on 'Type Password' arms the button (does not type yet)
+  TouchEvent tap1{200, 100, 200, 100, TouchGesture::Tap, 101, 1000};
+  vaultApp.onTouch(ctx, tap1);
+  assert(ctx.usbHid.transferState() == UsbTransferState::Idle);
+
+  // 2. Second tap with same finger without lifting (same contactId) does NOT confirm
+  TouchEvent tap1Repeat{200, 100, 200, 100, TouchGesture::Tap, 101, 1050};
+  vaultApp.onTouch(ctx, tap1Repeat);
+  assert(ctx.usbHid.transferState() == UsbTransferState::Idle);
+
+  // 3. Second separate tap with lifted finger (different contactId) confirms and transmits
+  TouchEvent tap2{200, 100, 200, 100, TouchGesture::Tap, 102, 1200};
+  vaultApp.onTouch(ctx, tap2);
+  assert(ctx.usbHid.transferState() == UsbTransferState::Sending || ctx.usbHid.transferState() == UsbTransferState::Sent);
+
+  // 4. Test Show/Hide password toggle
+  TouchEvent showTap{250, 75, 250, 75, TouchGesture::Tap, 103, 1300};
+  vaultApp.onTouch(ctx, showTap);
+  vaultApp.render(ctx);
+  vaultApp.onTouch(ctx, showTap);
+  vaultApp.render(ctx);
+
+  // 5. Test Sleep/Lock Session Clearing & Automatic Wake-up Reload
+  vaultApp.clearSession(ctx);
+  assert(!ctx.vault.isLoaded()); // Decrypted vault memory zeroized on lock
+
+  // Re-unlock device with PIN
+  assert(ctx.security.verifyPin("739126"));
+  ctx.security.unlock();
+  assert(ctx.security.hasActiveKey());
+
+  // Waking up / onTick should reload vault into memory cleanly
+  vaultApp.onDisplayRestored(ctx);
+  assert(ctx.vault.isLoaded());
+  assert(ctx.vault.count() == 1);
+
+  // 6. Clean up entry
+  ctx.vault.removeEntry(ctx.security.getActiveVaultKey(), 0);
+  assert(ctx.vault.count() == 0);
+
+  vaultApp.onExit(ctx);
+  std::printf("  -> PASS: Password Vault Application UI & Confirmed USB HID verified.\n");
+}
+
+void testWebPortalSimulation(AppContext& ctx) {
+  std::printf("[Test] Running Web Portal Service & Simulation Tests...\n");
+  assert(!ctx.webPortal.isActive());
+  assert(ctx.webPortal.start(1000, ctx));
+  assert(ctx.webPortal.isActive());
+  assert(strncmp(ctx.webPortal.ssid(), "NibruOS-", 8) == 0);
+  assert(strlen(ctx.webPortal.password()) == 8);
+  assert(strlen(ctx.webPortal.webPin()) == 4);
+
+  // Status check
+  char resp[256];
+  int code = ctx.webPortal.simulateRequest(ctx, "GET", "/api/status", "", resp, sizeof(resp));
+  assert(code == 200);
+  assert(strstr(resp, "\"ok\":true") != nullptr);
+
+  // Invalid PIN check
+  code = ctx.webPortal.simulateRequest(ctx, "POST", "/api/vault/add", "{\"pin\":\"0000\",\"title\":\"Test\"}", resp, sizeof(resp));
+  assert(code == 401);
+
+  // Locked check: with valid PIN, but device locked -> 403
+  ctx.security.lock();
+  assert(!ctx.security.hasActiveKey());
+  char validWrongLock[128];
+  snprintf(validWrongLock, sizeof(validWrongLock), "{\"pin\":\"%s\",\"title\":\"Test\"}", ctx.webPortal.webPin());
+  code = ctx.webPortal.simulateRequest(ctx, "POST", "/api/vault/add", validWrongLock, resp, sizeof(resp));
+  assert(code == 403);
+
+  // Now unlock device security
+  assert(ctx.security.verifyPin("739126"));
+  ctx.security.unlock();
+  assert(ctx.security.hasActiveKey());
+
+  // Valid Vault addition
+  char validVault[256];
+  snprintf(validVault, sizeof(validVault),
+           "{\"pin\":\"%s\",\"title\":\"WebMail\",\"username\":\"haider\",\"password\":\"Pass123\",\"notes\":\"Work\"}",
+           ctx.webPortal.webPin());
+  code = ctx.webPortal.simulateRequest(ctx, "POST", "/api/vault/add", validVault, resp, sizeof(resp));
+  assert(code == 200);
+  assert(strstr(resp, "\"success\":true") != nullptr);
+  assert(ctx.vault.count() == 1);
+
+  // Valid TOTP addition
+  char validTotp[256];
+  snprintf(validTotp, sizeof(validTotp),
+           "{\"pin\":\"%s\",\"name\":\"Cloud\",\"secret\":\"JBSWY3DPEHPK3PXP\"}",
+           ctx.webPortal.webPin());
+  code = ctx.webPortal.simulateRequest(ctx, "POST", "/api/totp/add", validTotp, resp, sizeof(resp));
+  assert(code == 200);
+  assert(strstr(resp, "\"success\":true") != nullptr);
+
+  // Cleanup vault entry
+  ctx.vault.removeEntry(ctx.security.getActiveVaultKey(), 0);
+  assert(ctx.vault.count() == 0);
+
+  // Timeout test
+  ctx.webPortal.tick(1000 + 181 * 1000, ctx);
+  assert(!ctx.webPortal.isActive());
+  assert(ctx.resources.wifiOwner() == ResourceOwner::None);
+
+  std::printf("  -> PASS: Web Portal Service & REST Simulation verified.\n");
+}
+namespace {
+bool simUsbReady() { return true; }
+bool simUsbSend(uint8_t, uint8_t) { return true; }
+bool simUsbConnected() { return true; }
+UsbHidTransport simUsbTransport{simUsbReady, simUsbSend, simUsbConnected};
+}
+
 int main() {
   std::printf("\n==================================================\n");
   std::printf("  NibruOS Automated Desktop & Shared Logic Tests\n");
@@ -337,21 +589,26 @@ int main() {
   SettingsService settings;
   TimeService timeService;
   TotpService totp;
-  UsbHidService usbHid;
+  UsbHidService usbHid{&simUsbTransport};
+  usbHid.begin();
 
   AccountImportService accountImport;
+  VaultService vault;
+  WebPortalService webPortal;
 
-  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport};
+  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal};
   AppManager launcher(context);
 
   WiFiApp wifiApp;
   TotpApp totpApp;
+  VaultApp vaultApp;
   SettingsApp settingsApp;
   SystemInfoApp sysInfoApp;
   TouchTestApp touchTestApp;
 
   launcher.registerApp(wifiApp);
   launcher.registerApp(totpApp);
+  launcher.registerApp(vaultApp);
   launcher.registerApp(settingsApp);
   launcher.registerApp(sysInfoApp);
   launcher.registerApp(touchTestApp);
@@ -362,6 +619,10 @@ int main() {
   testWiFiSimulation(context);
   testSettingsPersistence(context);
   testModularArchitecture(context);
+  testSleepLockWakeFlow(context, wifiApp, launcher);
+  testEncryptedVaultStorage(context);
+  testVaultAppUI(context, vaultApp, launcher);
+  testWebPortalSimulation(context);
   testRepeatedLifecycleCycles(launcher);
   // Shared application UI, real Windows crypto, disk-backed test-only NVS.
   Preferences::resetMock();
@@ -405,7 +666,7 @@ int main() {
   totpApp.onExit(context);
   AccountImportTransport io(ImportFixture::openImport, ImportFixture::closeImport, ImportFixture::readImport);
   AccountImportService paired(&io);
-  AppContext pairedContext{display, resources, wifi, security, settings, timeService, totp, usbHid, paired};
+  AppContext pairedContext{display, resources, wifi, security, settings, timeService, totp, usbHid, paired, vault, webPortal};
   totpApp.onEnter(pairedContext);
   authTap(totpApp, pairedContext, 110, 158);
   authTap(totpApp, pairedContext, 160, 88);

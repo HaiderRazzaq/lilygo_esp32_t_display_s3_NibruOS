@@ -22,6 +22,13 @@ public:
   void onPrimaryAction(AppContext& ctx) override;
   bool onBack(AppContext& ctx) override;
   void render(AppContext& ctx) override;
+  void onDisplayRestored(AppContext& ctx) override {
+    menuFullRedraw_ = true;
+    if (subView_ == WiFiSubView::Scanner) {
+      scannerApp_.onDisplayRestored(ctx);
+    }
+    invalidate();
+  }
 
 private:
   WiFiSubView subView_ = WiFiSubView::Menu;
@@ -29,6 +36,8 @@ private:
   uint8_t savedOffset_ = 0;
   ConnectState lastConnState_ = ConnectState::Disconnected;
   bool menuFullRedraw_ = true;
+  uint8_t armedCard_ = 255;
+  uint32_t armedCardContactId_ = 0;
 
   void renderMenu(AppContext& ctx);
   void renderSaved(AppContext& ctx);

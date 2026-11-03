@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <cstring>
 
-void HomeScreen::draw(AppContext& ctx, App* const* apps, uint8_t count, uint8_t selected) {
+void HomeScreen::draw(AppContext& ctx, App* const* apps, uint8_t count, uint8_t selected, bool armed) {
   DisplayManager& screen = ctx.display;
   TFT_eSPI& t = screen.gfx();
   screen.clear();
@@ -28,6 +28,9 @@ void HomeScreen::draw(AppContext& ctx, App* const* apps, uint8_t count, uint8_t 
       const uint16_t accent = accents[i % 3];
       t.fillRoundRect(x, 46, 142, 96, 8, Colors::Panel);
       t.drawRoundRect(x, 46, 142, 96, 8, i == selected ? accent : Colors::Border);
+      if (i == selected && armed) {
+        t.drawRoundRect(x + 1, 47, 140, 94, 7, accent);
+      }
 
       // Centered short icon badge
       t.fillRoundRect(x + 51, 56, 40, 26, 4, accent);
@@ -68,6 +71,9 @@ void HomeScreen::draw(AppContext& ctx, App* const* apps, uint8_t count, uint8_t 
       const uint16_t accent = i == selected ? screen.themeColor() : accents[col % 3];
       t.fillRoundRect(x, 48, 94, 93, 9, Colors::Panel);
       t.drawRoundRect(x, 48, 94, 93, 9, i == selected ? accent : Colors::Border);
+      if (i == selected && armed) {
+        t.drawRoundRect(x + 1, 49, 92, 91, 8, accent);
+      }
 
       // Centered badge with overflow guard
       t.fillRoundRect(x + 29, 58, 36, 26, 4, accent);
@@ -100,5 +106,9 @@ void HomeScreen::draw(AppContext& ctx, App* const* apps, uint8_t count, uint8_t 
       screen.label(subX > x + 3 ? subX : x + 3, 117, sub, Colors::Muted, 1, Colors::Panel);
     }
   }
-  screen.footer(LocalizationService::instance().isArabic() ? "اضغط للتطبيق | BOOT: التالي" : "Tap app | BOOT next/hold open");
+  if (armed) {
+    screen.footer(LocalizationService::instance().isArabic() ? "المس مجدداً للتأكيد | BOOT: فتح" : "Tap again to open | BOOT: open");
+  } else {
+    screen.footer(LocalizationService::instance().isArabic() ? "المس للاختيار | BOOT: التالي" : "Tap to select | BOOT: next");
+  }
 }

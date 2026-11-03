@@ -12,10 +12,13 @@
 #include "services/SecurityService.h"
 #include "services/SettingsService.h"
 #include "services/TimeService.h"
+#include "services/VaultService.h"
 #include "services/TotpService.h"
 #include "services/UsbHidService.h"
+#include "services/WebPortalService.h"
 #include "apps/WiFiApp.h"
 #include "apps/TotpApp.h"
+#include "apps/VaultApp.h"
 #include "apps/SettingsApp.h"
 
 namespace {
@@ -30,17 +33,20 @@ TimeService timeService;
 TotpService totp;
 UsbHidService usbHid;
 AccountImportService accountImport;
-AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport};
+VaultService vault;
+WebPortalService webPortal;
+AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal};
 AppManager launcher(context);
 WiFiApp wifiApp;
 TotpApp totpApp;
+VaultApp vaultApp;
 SettingsApp settingsApp;
 WakeInputGate wakeInput;
 }
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n[NibruOS] boot v0.5.0");
+  Serial.println("\n[NibruOS] boot v0.9.0");
   MemoryProfiler::checkpoint("startup-basic");
   display.begin();
   touch.begin();
@@ -51,10 +57,13 @@ void setup() {
   security.setCredentialChangeGuard(TotpService::canChangeCredentials);
   security.begin();
   timeService.begin();
+  timeService.setTimezoneOffset(settings.timezoneOffset());
   totp.begin();
+  vault.begin();
   usbHid.begin();
   launcher.registerApp(wifiApp);
   launcher.registerApp(totpApp);
+  launcher.registerApp(vaultApp);
   launcher.registerApp(settingsApp);
   launcher.begin();
   launcher.tick(millis());
@@ -80,6 +89,9 @@ void loop() {
       wakeInput.arm(now);
       if (security.isPinEnabled()) {
         security.lock();
+        security.invalidateFull();
+      } else {
+        launcher.invalidate();
       }
     }
   } else if (wakeInput.consume(hasTouch, action != ButtonAction::None,
@@ -115,19 +127,30 @@ void loop() {
   if (display.isSleeping() && security.isPinEnabled() && !security.isLocked()) security.lock();
   if (display.isSleeping() || security.isLocked()) {
     if (totp.isLoaded()) totpApp.clearSession(context);
+    if (vault.isLoaded()) vaultApp.clearSession(context);
+    webPortal.stop(context);
     usbHid.cancel();
   }
   wifi.tick(now);
-  timeService.tick(now, wifi.isConnected());
-  if (security.isLocked()) {
-    security.tick(now);
-    if (security.consumeDirty()) {
-      security.render(context);
+  while (Serial.available() > 0) {
+    char c = static_cast<char>(Serial.read());
+    if (timeService.processSerialInput(c)) {
+      launcher.invalidate();
     }
-  } else {
-    launcher.tick(now);
+  }
+  timeService.tick(now, wifi.isConnected());
+  if (!display.isSleeping()) {
+    if (security.isLocked()) {
+      security.tick(now);
+      if (security.consumeDirty()) {
+        security.render(context);
+      }
+    } else {
+      launcher.tick(now);
+    }
   }
   usbHid.tick(now);
+  webPortal.tick(now, context);
 
 #if NIBRU_PROFILE
   MemoryProfiler::observeLoop(micros() - loopStart);

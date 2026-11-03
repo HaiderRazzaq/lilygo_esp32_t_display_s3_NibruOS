@@ -20,6 +20,8 @@ void AppManager::goHome() {
     active_ = nullptr;
     MemoryProfiler::checkpoint("after-exit");
   }
+  armedIndex_ = 0xFF;
+  armedContactId_ = 0;
   homeDirty_ = true;
 }
 bool AppManager::open(uint8_t index) {
@@ -28,6 +30,8 @@ bool AppManager::open(uint8_t index) {
   MemoryProfiler::checkpoint("before-entry");
   active_ = apps_[index];
   selected_ = index;
+  armedIndex_ = 0xFF;
+  armedContactId_ = 0;
   {
     ProfileScope timer("app-entry");
     active_->onEnter(ctx_);
@@ -37,9 +41,13 @@ bool AppManager::open(uint8_t index) {
 }
 void AppManager::selectNext() {
   if (count_) selected_ = static_cast<uint8_t>((selected_ + 1) % count_);
+  armedIndex_ = 0xFF;
+  armedContactId_ = 0;
   homeDirty_ = true;
 }
 void AppManager::handleButton(ButtonAction action) {
+  armedIndex_ = 0xFF;
+  armedContactId_ = 0;
   switch (action) {
     case ButtonAction::Back:
       if (active_ && active_->onBack(ctx_)) return;
@@ -73,6 +81,8 @@ void AppManager::handleTouch(const TouchEvent& ev) {
       const uint8_t pages = static_cast<uint8_t>((count_ + 2) / 3);
       selected_ = static_cast<uint8_t>(((selected_ / 3 + 1) % pages) * 3);
     }
+    armedIndex_ = 0xFF;
+    armedContactId_ = 0;
     homeDirty_ = true; return;
   }
   if (ev.gesture == TouchGesture::SwipeRight) {
@@ -80,23 +90,43 @@ void AppManager::handleTouch(const TouchEvent& ev) {
       const uint8_t pages = static_cast<uint8_t>((count_ + 2) / 3);
       selected_ = static_cast<uint8_t>(((selected_ / 3 + pages - 1) % pages) * 3);
     }
+    armedIndex_ = 0xFF;
+    armedContactId_ = 0;
     homeDirty_ = true; return;
   }
   if (ev.gesture == TouchGesture::SwipeUp) { selectNext(); return; }
   if (ev.gesture == TouchGesture::SwipeDown) {
     if (count_) selected_ = static_cast<uint8_t>((selected_ + count_ - 1) % count_);
+    armedIndex_ = 0xFF;
+    armedContactId_ = 0;
     homeDirty_ = true; return;
   }
   if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
   if (ev.y >= 44 && ev.y < 146 && ev.x >= 8 && ev.x < 316) {
+    int target = -1;
     if (count_ == 2) {
-      if (ev.x < 158) open(0);
-      else open(1);
-      return;
+      target = (ev.x < 158) ? 0 : 1;
+    } else {
+      const int col = (ev.x - 8) / 102;
+      const int idx = (selected_ / 3) * 3 + col;
+      if (col >= 0 && col < 3 && idx < count_) target = idx;
     }
-    const int col = (ev.x - 8) / 102;
-    const int index = (selected_ / 3) * 3 + col;
-    if (col >= 0 && col < 3 && index < count_) open(static_cast<uint8_t>(index));
+    if (target >= 0) {
+      const uint8_t targetIdx = static_cast<uint8_t>(target);
+      // Select-then-Confirm:
+      // Touch 1: If card not armed, select and arm it, show prominent highlight.
+      // Touch 2: If card already armed and contact is separate, confirm & open.
+      if (armedIndex_ == targetIdx && ev.contactId != armedContactId_ && ev.contactId != 0) {
+        armedIndex_ = 0xFF;
+        armedContactId_ = 0;
+        open(targetIdx);
+      } else {
+        selected_ = targetIdx;
+        armedIndex_ = targetIdx;
+        armedContactId_ = ev.contactId;
+        homeDirty_ = true;
+      }
+    }
   }
 }
 void AppManager::tick(uint32_t nowMs) {
@@ -109,5 +139,5 @@ void AppManager::tick(uint32_t nowMs) {
   }
 }
 void AppManager::drawHome() {
-  HomeScreen::draw(ctx_, apps_, count_, selected_);
+  HomeScreen::draw(ctx_, apps_, count_, selected_, armedIndex_ == selected_);
 }

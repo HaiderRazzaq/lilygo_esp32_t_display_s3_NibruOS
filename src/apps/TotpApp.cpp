@@ -258,10 +258,18 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
       view_ = View::ConfirmDelete; confirmAfterMs_ = millis() + 350;
       status_ = ""; fullRedraw_ = true;
     }
+  } else if (ev.gesture == TouchGesture::Tap && count && ev.x >= 58 && ev.x <= 262 && ev.y >= 65 && ev.y <= 98 && !ctx.time.getEpoch()) {
+    if (ctx.wifi.isConnected()) {
+      ctx.time.requestNtpSync();
+      status_ = "NTP sync requested...";
+    } else {
+      status_ = "Connect Wi-Fi or USB";
+    }
+    cardDirty_ = true;
   } else if (ev.gesture == TouchGesture::Tap && count && ev.x >= 58 && ev.x <= 262 && ev.y >= 102 && ev.y <= 134) {
     const uint32_t epoch = ctx.time.getEpoch();
     char code[10]{}; uint8_t remaining = 0;
-    if (!epoch) status_ = "Sync time via Wi-Fi";
+    if (!epoch) status_ = "Sync: USB (TIME:x) or WiFi";
     else if (!ctx.usbHid.isReady()) status_ = "USB unavailable";
     else if (!ctx.totp.getAccountCode(accountIndex_, epoch, code, sizeof(code), remaining))
       status_ = "Code unavailable";
@@ -401,9 +409,13 @@ void TotpApp::render(AppContext& ctx) {
     if (epoch) ctx.totp.getAccountCode(accountIndex_, epoch, code, sizeof(code), remaining);
     screen.label(105, 69, code, Colors::White, 2, Colors::Bg);
     CryptoService::secureZero(code, sizeof(code));
-    char timer[24]{};
-    if (epoch) snprintf(timer, sizeof(timer), "%2u sec", remaining);
-    else snprintf(timer, sizeof(timer), "Waiting for time");
-    screen.label(100, 90, timer, epoch ? Colors::Green : Colors::Amber, 1, Colors::Bg);
+    char timer[32]{};
+    if (epoch) {
+      snprintf(timer, sizeof(timer), "%2u sec  [%s]", remaining, ctx.time.sourceName());
+      screen.labelPadded(85, 90, timer, 20, ctx.time.source() == TimeSource::Ntp ? Colors::Green : Colors::Cyan, 1, Colors::Bg);
+    } else {
+      snprintf(timer, sizeof(timer), "Waiting for time (Sync)");
+      screen.labelPadded(65, 90, timer, 26, Colors::Amber, 1, Colors::Bg);
+    }
   }
 }

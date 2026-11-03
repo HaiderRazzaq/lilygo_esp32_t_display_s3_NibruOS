@@ -19,13 +19,13 @@ if not cxx_env and os.name == 'nt' and not shutil.which('c++'):
     if vcvars.exists():
         # Compile using MSVC cl.exe
         sources = [str(p) for d in ('core', 'hardware', 'ui', 'services', 'apps') for p in (ROOT / 'src' / d).glob('*.cpp')]
-        test_sources = ['tests/host/test_main.cpp', 'tests/host/test_settings.cpp', 'tests/host/test_authenticator.cpp', 'tests/host/test_account_import.cpp']
+        test_sources = ['tests/host/test_main.cpp', 'tests/host/test_settings.cpp', 'tests/host/test_authenticator.cpp', 'tests/host/test_account_import.cpp', 'tests/host/test_vault.cpp', 'tests/host/test_web_portal.cpp']
         exe = str(out / 'nibru_smoke.exe')
-        cl_cmd = f'call "{vcvars}" x64 >nul 2>&1 && cl /nologo /std:c++17 /EHsc /W4 /wd4996 /wd4267 /wd4244 /wd4100 /I. /Itests/host/stubs /Iinclude /Isrc {" ".join(sources)} {" ".join(test_sources)} bcrypt.lib /Fe"{exe}" /Fo"{out}/"'
+        cl_cmd = f'call "{vcvars}" x64 >nul 2>&1 && cl /nologo /std:c++17 /EHsc /utf-8 /W4 /wd4996 /wd4267 /wd4244 /wd4100 /I. /Itests/host/stubs /Iinclude /Isrc {" ".join(sources)} {" ".join(test_sources)} bcrypt.lib /Fe"{exe}" /Fo"{out}/"'
         subprocess.run(cl_cmd, shell=True, check=True)
         # Verify compile-only on main.cpp
         main_obj = str(out / 'main.obj')
-        cl_main = f'call "{vcvars}" x64 >nul 2>&1 && cl /nologo /std:c++17 /EHsc /W4 /wd4996 /wd4267 /wd4244 /wd4100 /I. /Itests/host/stubs /Iinclude /Isrc /c src/main.cpp /Fo"{main_obj}"'
+        cl_main = f'call "{vcvars}" x64 >nul 2>&1 && cl /nologo /std:c++17 /EHsc /utf-8 /W4 /wd4996 /wd4267 /wd4244 /wd4100 /I. /Itests/host/stubs /Iinclude /Isrc /c src/main.cpp /Fo"{main_obj}"'
         subprocess.run(cl_main, shell=True, check=True)
         subprocess.run([exe], check=True)
         sys.exit(0)

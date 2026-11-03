@@ -246,7 +246,10 @@ void SecurityService::lock() {
   inputLen_ = 0;
   inputPin_[0] = '\0';
   errorState_ = false;
+  fullRedraw_ = true;
   dirty_ = true;
+  drawnInputLen_ = 255;
+  drawnErrorState_ = false;
 }
 
 void SecurityService::unlock() {

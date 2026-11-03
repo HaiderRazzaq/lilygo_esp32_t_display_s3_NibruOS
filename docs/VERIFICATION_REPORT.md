@@ -1843,3 +1843,771 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Validates JSON structure, ID ordering, version synchronisation, and file paths only"
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0073",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host unit tests for v0.5.1 Arabic localization",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v051-host-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0074",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulator tests for v0.5.1",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v051-desktop-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0075",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO build for v0.5.1",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v051-pio-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0076",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.5.1",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v051-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0077",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host unit tests for v0.5.2 lock screen redraw",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v052-host-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0078",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulator tests for v0.5.2",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v052-desktop-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0079",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO build for v0.5.2",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v052-pio-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0080",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.5.2",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v052-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0081",
+  "date": "2026-11-03",
+  "firmware_version": "v0.6.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host unit tests for v0.6.0 TimeService & USB sync",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v060-host-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0082",
+  "date": "2026-11-03",
+  "firmware_version": "v0.6.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulator tests for v0.6.0",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v060-desktop-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0083",
+  "date": "2026-11-03",
+  "firmware_version": "v0.6.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO build for v0.6.0",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v060-pio-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0084",
+  "date": "2026-11-03",
+  "firmware_version": "v0.6.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.6.0",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v060-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0085",
+  "date": "2026-11-03",
+  "firmware_version": "v0.6.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host unit tests for v0.6.1 display wake timing",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v061-host-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0086",
+  "date": "2026-11-03",
+  "firmware_version": "v0.6.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulator tests for v0.6.1",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v061-desktop-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0087",
+  "date": "2026-11-03",
+  "firmware_version": "v0.6.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO build for v0.6.1",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v061-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0088",
+  "date": "2026-11-03",
+  "firmware_version": "v0.6.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.6.1",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v061-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0089",
+  "date": "2026-11-03",
+  "firmware_version": "v0.7.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host unit tests for v0.7.0 Encrypted Vault Storage",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v070-host-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0090",
+  "date": "2026-11-03",
+  "firmware_version": "v0.7.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulator tests for v0.7.0",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v070-desktop-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0091",
+  "date": "2026-11-03",
+  "firmware_version": "v0.7.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO build for v0.7.0",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v070-pio-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0092",
+  "date": "2026-11-03",
+  "firmware_version": "v0.7.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.7.0",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v070-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0093",
+  "date": "2026-11-04",
+  "firmware_version": "v0.8.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host unit tests for v0.8.0 VaultApp UI",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v080-host-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0094",
+  "date": "2026-11-04",
+  "firmware_version": "v0.8.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulator tests for v0.8.0",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v080-desktop-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0095",
+  "date": "2026-11-04",
+  "firmware_version": "v0.8.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO build for v0.8.0",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v080-pio-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0096",
+  "date": "2026-11-04",
+  "firmware_version": "v0.8.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.8.0",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v080-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0097",
+  "date": "2026-11-04",
+  "firmware_version": "v0.8.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host unit tests for v0.8.1 USB HID & Vault reload",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v081-host-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0098",
+  "date": "2026-11-04",
+  "firmware_version": "v0.8.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulator tests for v0.8.1",
+  "hardware": "Host x64 architecture",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v081-desktop-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0099",
+  "date": "2026-11-04",
+  "firmware_version": "v0.8.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO build for v0.8.1",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v081-pio-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0100",
+  "date": "2026-11-04",
+  "firmware_version": "v0.8.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.8.1",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v081-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to specific test harness execution"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0101",
+  "date": "2026-11-04",
+  "firmware_version": "v0.9.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host tests for Web Portal Service (SoftAP credential generation, PIN rejection, device lock gating, REST API for Vault & TOTP)",
+  "hardware": "None (Host Mock)",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: Web Portal Service Host Tests verified successfully with zero errors",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v090-host-tests.txt"
+  ],
+  "evidence_kind": "Host test execution log",
+  "environment": "MSVC 2022 x64 / Python 3.14",
+  "limitations": "Desktop execution does not test real RF Wi-Fi radiation"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0102",
+  "date": "2026-11-04",
+  "firmware_version": "v0.9.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Automated desktop simulator tests including WebPortalService simulation and settings integration",
+  "hardware": "None (Desktop Simulator)",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY",
+  "actual": "PASS: All tests including testWebPortalSimulation passed with zero errors",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v090-desktop-tests.txt"
+  ],
+  "evidence_kind": "Desktop simulator log",
+  "environment": "MSVC 2022 / SDL2",
+  "limitations": "Simulated environment"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0103",
+  "date": "2026-11-04",
+  "firmware_version": "v0.9.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO release build for lilygo-t-display-s3",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: Flash: 942,441 B (14.4% of 6.25 MB partition), RAM: 65,096 B (19.9%), binary: 942,800 B",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v090-pio-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Scope limited to compile-time analysis"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0104",
+  "date": "2026-11-04",
+  "firmware_version": "v0.9.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.9.0",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v090-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to documentation schema"
+}
+```

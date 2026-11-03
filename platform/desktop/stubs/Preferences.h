@@ -71,11 +71,13 @@ public:
     return (getBytesLength(k) == sizeof(T) && getBytes(k, &v, sizeof(T)) == sizeof(T)) ? v : d;
   }
 
+  int8_t getChar(const char* k, int8_t d = 0) { return get(k, d); }
   uint8_t getUChar(const char* k, uint8_t d = 0) { return get(k, d); }
   uint16_t getUShort(const char* k, uint16_t d = 0) { return get(k, d); }
   uint32_t getUInt(const char* k, uint32_t d = 0) { return get(k, d); }
   bool getBool(const char* k, bool d = false) { return get(k, d); }
 
+  size_t putChar(const char* k, int8_t v) { return putBytes(k, &v, sizeof(v)); }
   size_t putUChar(const char* k, uint8_t v) { return putBytes(k, &v, sizeof(v)); }
   size_t putUShort(const char* k, uint16_t v) { return putBytes(k, &v, sizeof(v)); }
   size_t putUInt(const char* k, uint32_t v) { return putBytes(k, &v, sizeof(v)); }

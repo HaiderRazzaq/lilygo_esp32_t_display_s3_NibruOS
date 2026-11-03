@@ -10,6 +10,8 @@
 #include "services/TotpService.h"
 #include "services/CryptoService.h"
 #include "services/LocalizationService.h"
+#include "services/WebPortalService.h"
+#include "services/UsbHidService.h"
 #include "BoardConfig.h"
 #include <Arduino.h>
 #include <cstdio>
@@ -51,6 +53,9 @@ void SettingsApp::onExit(AppContext& ctx) {
   if (subView_ == SettingsSubView::TouchTest) {
     touchTest_.onExit(ctx);
   }
+  if (ctx.webPortal.isActive()) {
+    ctx.webPortal.stop(ctx);
+  }
   CryptoService::secureZero(pinInputBuffer_, sizeof(pinInputBuffer_));
   pinInputLen_ = 0;
   subView_ = SettingsSubView::Menu;
@@ -71,6 +76,18 @@ void SettingsApp::onTick(AppContext& ctx, uint32_t nowMs) {
     if (nowMs - lastMetricTickMs_ >= 1000) {
       lastMetricTickMs_ = nowMs;
       invalidate();
+    }
+  } else if (subView_ == SettingsSubView::WebPortal) {
+    ctx.webPortal.tick(nowMs, ctx);
+    if (!ctx.webPortal.isActive()) {
+      subView_ = SettingsSubView::Menu;
+      fullRedraw_ = true;
+      invalidate();
+    } else {
+      const uint32_t rem = ctx.webPortal.remainingSeconds(nowMs);
+      if (rem != drawnWebPortalSec_) {
+        invalidate();
+      }
     }
   }
 }
@@ -93,6 +110,9 @@ bool SettingsApp::onBack(AppContext& ctx) {
   if (subView_ != SettingsSubView::Menu) {
     if (subView_ == SettingsSubView::TouchTest) {
       touchTest_.onExit(ctx);
+  }
+  if (ctx.webPortal.isActive()) {
+    ctx.webPortal.stop(ctx);
     }
     subView_ = SettingsSubView::Menu;
     fullRedraw_ = true;
@@ -104,7 +124,7 @@ bool SettingsApp::onBack(AppContext& ctx) {
 
 void SettingsApp::onPrimaryAction(AppContext& ctx) {
   if (subView_ == SettingsSubView::Menu) {
-    menuIndex_ = static_cast<uint8_t>((menuIndex_ + 1) % 8);
+    menuIndex_ = static_cast<uint8_t>((menuIndex_ + 1) % 9);
     if (menuIndex_ < scrollOffset_ || menuIndex_ >= scrollOffset_ + 3)
       scrollOffset_ = menuIndex_ > 2 ? menuIndex_ - 2 : 0;
   } else if (subView_ == SettingsSubView::Display) {
@@ -128,10 +148,16 @@ void SettingsApp::onActivate(AppContext& ctx) {
     static const SettingsSubView views[] = {
       SettingsSubView::Display, SettingsSubView::Theme,
       SettingsSubView::Memory, SettingsSubView::WiFiDiag, SettingsSubView::Device,
-      SettingsSubView::Security, SettingsSubView::TouchTest, SettingsSubView::Language
+      SettingsSubView::Security, SettingsSubView::TouchTest, SettingsSubView::Language,
+      SettingsSubView::WebPortal
     };
     subView_ = views[menuIndex_]; focusedIndex_ = metricPage_ = 0; fullRedraw_ = true;
     if (subView_ == SettingsSubView::TouchTest) touchTest_.onEnter(ctx);
+    else if (subView_ == SettingsSubView::WebPortal) {
+      ctx.webPortal.start(millis(), ctx);
+      webPortalTyped_ = false;
+      drawnWebPortalSec_ = 9999;
+    }
   } else if (subView_ == SettingsSubView::Language) {
     ctx.settings.setLanguage(focusedIndex_);
     LocalizationService::instance().setLanguage(static_cast<Language>(focusedIndex_));
@@ -217,21 +243,38 @@ void SettingsApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     case SettingsSubView::Language:
       handleLanguageTouch(ctx, ev);
       break;
+    case SettingsSubView::WebPortal:
+      handleWebPortalTouch(ctx, ev);
+      break;
   }
 }
 
 void SettingsApp::handleMenuTouch(AppContext& ctx, const TouchEvent& ev) {
   if (ev.gesture == TouchGesture::SwipeUp || ev.gesture == TouchGesture::SwipeDown) {
-    if (ev.gesture == TouchGesture::SwipeUp && scrollOffset_ < 5) ++scrollOffset_;
+    if (ev.gesture == TouchGesture::SwipeUp && scrollOffset_ < 6) ++scrollOffset_;
     if (ev.gesture == TouchGesture::SwipeDown && scrollOffset_ > 0) --scrollOffset_;
-    menuIndex_ = scrollOffset_; invalidate(); return;
+    menuIndex_ = scrollOffset_;
+    armedMenuIndex_ = 255;
+    invalidate();
+    return;
   }
   if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
   if (ev.x < 10 || ev.x >= 310 || ev.y < 36 || ev.y >= 144) return;
   const uint8_t row = static_cast<uint8_t>((ev.y - 36) / 36);
   if ((ev.y - 36) % 36 >= 32) return;
-  menuIndex_ = scrollOffset_ + row;
-  onActivate(ctx);
+  const uint8_t target = scrollOffset_ + row;
+
+  if (armedMenuIndex_ == target && ev.contactId != armedMenuContactId_ && ev.contactId != 0) {
+    armedMenuIndex_ = 255;
+    armedMenuContactId_ = 0;
+    menuIndex_ = target;
+    onActivate(ctx);
+  } else {
+    menuIndex_ = target;
+    armedMenuIndex_ = target;
+    armedMenuContactId_ = ev.contactId;
+    invalidate();
+  }
 }
 
 void SettingsApp::handleDisplayTouch(AppContext& ctx, const TouchEvent& ev) {
@@ -313,7 +356,8 @@ void SettingsApp::render(AppContext& ctx) {
                         subView_ == SettingsSubView::Theme || subView_ == SettingsSubView::Device ||
                         subView_ == SettingsSubView::Language;
   if (controls && !fullRedraw_ && drawnFocus_ == focusedIndex_ && drawnMenu_ == menuIndex_ &&
-      drawnScroll_ == scrollOffset_ && drawnBrightness_ == ctx.settings.brightness() &&
+      drawnScroll_ == scrollOffset_ && drawnArmedMenu_ == armedMenuIndex_ &&
+      drawnBrightness_ == ctx.settings.brightness() &&
       drawnTheme_ == ctx.settings.theme() && drawnTimeout_ == ctx.settings.screenTimeoutSec() &&
       drawnRotation_ == ctx.settings.rotation() &&
       drawnLanguage_ == ctx.settings.language() &&
@@ -338,13 +382,14 @@ void SettingsApp::render(AppContext& ctx) {
     case SettingsSubView::TouchTest: touchTest_.render(ctx); break;
     case SettingsSubView::SetPin:    renderSetPin(ctx); break;
     case SettingsSubView::Language:  renderLanguage(ctx); break;
+    case SettingsSubView::WebPortal: renderWebPortal(ctx); break;
   }
   if (!ctx.settings.lastSaveOk()) ctx.display.footer("NVS error: preferences were not saved");
   hasRendered_ = true; drawnView_ = subView_; drawnConfirmation_ = confirmAction_;
   drawnFocus_ = focusedIndex_; drawnMenu_ = menuIndex_; drawnScroll_ = scrollOffset_;
   drawnBrightness_ = ctx.settings.brightness(); drawnTheme_ = ctx.settings.theme();
   drawnTimeout_ = ctx.settings.screenTimeoutSec(); drawnRotation_ = ctx.settings.rotation(); drawnLanguage_ = ctx.settings.language();
-  drawnSaveOk_ = ctx.settings.lastSaveOk();
+  drawnSaveOk_ = ctx.settings.lastSaveOk(); drawnArmedMenu_ = armedMenuIndex_;
   if (subView_ == SettingsSubView::Security) {
     drawnPinEnabled_ = ctx.security.isPinEnabled();
     drawnPinError_ = pinError_;
@@ -361,7 +406,13 @@ void SettingsApp::renderMenu(AppContext& ctx) {
   const auto& loc = LocalizationService::instance();
   if (fullRedraw_) {
     screen.clear(); screen.header(loc.get(TextId::AppSettings), true);
-    screen.footer(loc.isArabic() ? "اسحب | BOOT: التالي | Back: رجوع" : "Swipe | BOOT next/hold open | Back");
+  }
+  if (fullRedraw_ || drawnArmedMenu_ != armedMenuIndex_) {
+    if (armedMenuIndex_ != 255) {
+      screen.footer(loc.isArabic() ? "المس مجدداً للتأكيد | Back: رجوع" : "Tap again to open | Back: return");
+    } else {
+      screen.footer(loc.isArabic() ? "المس للاختيار | اسحب | Back: رجوع" : "Tap to select | Swipe | Back");
+    }
   }
   const bool rowsChanged = fullRedraw_ || drawnScroll_ != scrollOffset_;
   const char* titles[] = {
@@ -372,7 +423,8 @@ void SettingsApp::renderMenu(AppContext& ctx) {
     loc.get(TextId::MenuDevice),
     loc.get(TextId::MenuSecurity),
     loc.get(TextId::MenuTouchTest),
-    loc.get(TextId::MenuLanguage)
+    loc.get(TextId::MenuLanguage),
+    loc.get(TextId::MenuWebPortal)
   };
   for (uint8_t row = 0; row < 3; ++row) {
     const uint8_t i = scrollOffset_ + row;
@@ -381,12 +433,14 @@ void SettingsApp::renderMenu(AppContext& ctx) {
       t.fillRoundRect(10, y, 294, 32, 5, Colors::Panel);
       screen.label(20, y + 10, titles[i], Colors::White, 1, Colors::Panel);
     }
-    if (rowsChanged || i == menuIndex_ || i == drawnMenu_)
-      t.drawRoundRect(10, y, 294, 32, 5, i == menuIndex_ ? screen.themeColor() : Colors::Border);
+    const bool isSelected = (i == menuIndex_);
+    const bool isArmed = (isSelected && i == armedMenuIndex_);
+    t.drawRoundRect(10, y, 294, 32, 5, isSelected ? screen.themeColor() : Colors::Border);
+    t.drawRoundRect(11, y + 1, 292, 30, 4, isArmed ? screen.themeColor() : Colors::Panel);
   }
   if (rowsChanged) {
     t.fillRect(312, 36, 3, 108, Colors::Bg);
-    t.fillRect(312, 36 + scrollOffset_ * 12, 3, 40, screen.themeColor());
+    t.fillRect(312, 36 + scrollOffset_ * 10, 3, 30, screen.themeColor());
   }
 }
 
@@ -920,5 +974,79 @@ void SettingsApp::handleLanguageTouch(AppContext& ctx, const TouchEvent& ev) {
     LocalizationService::instance().setLanguage(Language::Arabic);
     fullRedraw_ = true;
     invalidate();
+  }
+}
+
+
+void SettingsApp::renderWebPortal(AppContext& ctx) {
+  DisplayManager& screen = ctx.display;
+  TFT_eSPI& t = screen.gfx();
+  const auto& loc = LocalizationService::instance();
+  const uint32_t rem = ctx.webPortal.remainingSeconds(millis());
+
+  if (fullRedraw_) {
+    screen.clear();
+    screen.header(loc.isArabic() ? "\u0628\u0648\u0627\u0628\u0629 \u0627\u0644\u0648\u064a\u0628 (AP Mode)" : "Web Portal (AP Mode)", true);
+    drawnWebPortalSec_ = 9999;
+  }
+
+  // Row 1: Wi-Fi SoftAP SSID & Server IP
+  if (fullRedraw_) {
+    // SSID Card
+    t.fillRoundRect(10, 34, 185, 24, 4, Colors::Panel);
+    t.drawRoundRect(10, 34, 185, 24, 4, Colors::Border);
+    screen.label(16, 40, "AP:", Colors::Muted, 1, Colors::Panel);
+    screen.label(38, 40, ctx.webPortal.ssid(), Colors::Cyan, 1, Colors::Panel);
+
+    // IP Card
+    t.fillRoundRect(200, 34, 110, 24, 4, Colors::Panel);
+    t.drawRoundRect(200, 34, 110, 24, 4, Colors::Border);
+    screen.label(208, 40, ctx.webPortal.serverIp(), Colors::Green, 1, Colors::Panel);
+
+    // Row 2: Wi-Fi Password and USB HID Type Button
+    t.fillRoundRect(10, 62, 185, 30, 4, Colors::Panel);
+    t.drawRoundRect(10, 62, 185, 30, 4, Colors::Border);
+    screen.label(16, 71, "PWD:", Colors::Muted, 1, Colors::Panel);
+    screen.label(48, 71, ctx.webPortal.password(), Colors::White, 1, Colors::Panel);
+
+    // USB HID Type Button
+    const uint16_t btnBg = webPortalTyped_ ? Colors::Green : screen.themeColor();
+    t.fillRoundRect(200, 62, 110, 30, 4, btnBg);
+    t.drawRoundRect(200, 62, 110, 30, 4, Colors::White);
+    const char* btnTxt = webPortalTyped_ ? "TYPED!" : "TYPE USB";
+    const int bx = 200 + (110 - static_cast<int>(strlen(btnTxt)) * 6) / 2;
+    screen.label(bx, 71, btnTxt, Colors::Bg, 1, btnBg);
+
+    // Row 3: Web Session PIN Box
+    t.fillRoundRect(10, 96, 300, 38, 5, Colors::Panel);
+    t.drawRoundRect(10, 96, 300, 38, 5, Colors::Border);
+    screen.label(18, 102, loc.isArabic() ? "\u0631\u0645\u0632 \u0627\u0644\u062f\u062e\u0648\u0644 \u0644\u0644\u0645\u0648\u0642\u0639:" : "Web PIN:", Colors::Muted, 1, Colors::Panel);
+
+    // PIN displayed prominently in large font
+    screen.label(18, 115, ctx.webPortal.webPin(), screen.themeColor(), 2, Colors::Panel);
+    screen.label(110, 118, loc.isArabic() ? "\u0627\u0641\u062a\u062d \u0627\u0644\u0645\u0648\u0642\u0639 \u0648\u0623\u062f\u062e\u0644 \u0627\u0644\u0631\u0645\u0632" : "Enter in browser to unlock", Colors::Muted, 1, Colors::Panel);
+  }
+
+  // Footer / Countdown Timer
+  if (fullRedraw_ || rem != drawnWebPortalSec_) {
+    drawnWebPortalSec_ = rem;
+    char ftr[64];
+    snprintf(ftr, sizeof(ftr), loc.isArabic() ? "\u0627\u0644\u0645\u062a\u0628\u0642\u064a: %u \u062b\u0627\u0646\u064a\u0629 | Back: \u0625\u063a\u0644\u0627\u0642" : "Expires in: %u s | Back: Close",
+             static_cast<unsigned int>(rem));
+    screen.footer(ftr);
+  }
+}
+
+void SettingsApp::handleWebPortalTouch(AppContext& ctx, const TouchEvent& ev) {
+  if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
+
+  // Touch on "TYPE USB" button (x: 200..310, y: 62..92)
+  if (ev.x >= 200 && ev.x < 310 && ev.y >= 62 && ev.y < 92) {
+    if (ctx.usbHid.isReady()) {
+      ctx.usbHid.typeText(ctx.webPortal.password());
+      webPortalTyped_ = true;
+      fullRedraw_ = true;
+      invalidate();
+    }
   }
 }

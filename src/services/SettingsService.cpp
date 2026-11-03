@@ -52,6 +52,9 @@ void SettingsService::load() {
       if (prefs.isKey("lang")) {
         language_ = prefs.getUChar("lang", 0);
       }
+      if (prefs.isKey("tz")) {
+        timezoneOffset_ = static_cast<int8_t>(prefs.getChar("tz", 3));
+      }
       prefs.end();
     } else if (prefs.isKey("bright") || prefs.isKey("timeout") || prefs.isKey("theme") || prefs.isKey("rot") || prefs.isKey("lang")) {
       brightness_ = prefs.getUChar("bright", 100);
@@ -78,6 +81,7 @@ void SettingsService::load() {
   if (theme_ > 3) theme_ = 0;
   if (rotation_ != 1 && rotation_ != 3) rotation_ = 1;
   if (language_ > 1) language_ = 0;
+  if (timezoneOffset_ < -12 || timezoneOffset_ > 14) timezoneOffset_ = 3;
   LocalizationService::instance().setLanguage(static_cast<Language>(language_));
   if (migrated) save();
   applyToDisplay();
@@ -111,6 +115,14 @@ bool SettingsService::save() {
   } else if (language_ != 0) {
     if (prefs.putUChar("lang", language_) != sizeof(uint8_t)) ok = false;
   }
+  if (prefs.isKey("tz")) {
+    const int8_t storedTz = static_cast<int8_t>(prefs.getChar("tz", 3));
+    if (storedTz != timezoneOffset_) {
+      if (prefs.putChar("tz", timezoneOffset_) != sizeof(int8_t)) ok = false;
+    }
+  } else if (timezoneOffset_ != 3) {
+    if (prefs.putChar("tz", timezoneOffset_) != sizeof(int8_t)) ok = false;
+  }
   prefs.end();
   lastSaveOk_ = ok;
   if (!lastSaveOk_) Serial.println("[Settings] NVS write failed; preferences unchanged");
@@ -120,11 +132,12 @@ bool SettingsService::save() {
 
 bool SettingsService::resetToDefaults() {
   const uint8_t oldB = brightness_, oldT = theme_, oldL = language_;
+  const int8_t oldTz = timezoneOffset_;
   const uint16_t oldS = screenTimeoutSec_;
   const bool oldWritable = writable_;
-  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; rotation_ = 1; language_ = 0; writable_ = true;
+  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; rotation_ = 1; language_ = 0; timezoneOffset_ = 3; writable_ = true;
   if (!save()) {
-    brightness_ = oldB; screenTimeoutSec_ = oldS; theme_ = oldT; language_ = oldL; writable_ = oldWritable;
+    brightness_ = oldB; screenTimeoutSec_ = oldS; theme_ = oldT; language_ = oldL; timezoneOffset_ = oldTz; writable_ = oldWritable;
     return false;
   }
   applyToDisplay();
@@ -222,4 +235,13 @@ void SettingsService::applyToDisplay() {
   if (touch_) {
     touch_->setRotation(rotation_);
   }
+}
+
+bool SettingsService::setTimezoneOffset(int8_t offsetHours) {
+  if (offsetHours < -12 || offsetHours > 14) return false;
+  if (timezoneOffset_ == offsetHours) return lastSaveOk_;
+  const int8_t old = timezoneOffset_;
+  timezoneOffset_ = offsetHours;
+  if (!save()) { timezoneOffset_ = old; return false; }
+  return true;
 }

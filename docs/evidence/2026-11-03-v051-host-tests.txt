@@ -1,0 +1,11 @@
+Host Test Results for NibruOS v0.5.1
+Date: 2026-11-03
+Command: python tools/run_host_tests.py
+Environment: MSVC x64 C++17 (cl.exe), Windows
+
+PASS: authenticator lifecycle
+PASS: bounded paired account import
+PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests
+PASS: Select-then-Confirm touch verification (test_main, test_settings)
+
+Result: PASS (Exit code 0)

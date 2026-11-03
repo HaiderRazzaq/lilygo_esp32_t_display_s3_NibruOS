@@ -199,13 +199,11 @@ void DisplayManager::sleep() {
   if (sleeping_) return;
   sleeping_ = true;
   applyBacklight(0);
-  tft_.writecommand(0x28); // ST7789 DISPOFF
   Serial.println("[Display] Sleep mode entered (backlight OFF)");
 }
 
 void DisplayManager::wake() {
   if (!sleeping_) return;
-  tft_.writecommand(0x29); // ST7789 DISPON
   applyBacklight(brightnessPercent_);
   sleeping_ = false;
   lastActivityMs_ = millis();

@@ -1,0 +1,27 @@
+NibruOS Desktop Automated Test Runner - 2026-11-03 v0.7.0
+Command: tools\run_desktop_tests.bat
+Status: PASS (Exit code 0)
+
+[Test] Running Core Lifecycle & AppManager Tests...
+  -> Core Lifecycle Tests PASS
+[Test] Running UI & Coordinate Transformation Tests...
+  -> UI & Transformation Tests PASS
+[Test] Running Wi-Fi Service & Fault Injection Tests...
+  -> Wi-Fi Simulation Tests PASS
+[Test] Running Settings Persistence & Desktop NVS Tests...
+  -> Settings Persistence Tests PASS
+[Test] Running Modular Architecture & HAL Contract Tests...
+  -> Modular Architecture & HAL Tests PASS
+[TEST] Sleep / Lock / Wake and Display Restoration Flow...
+  -> PASS: Sleep/Lock/Wake and Display Restoration verified.
+[TEST] Running Encrypted Password Vault Desktop Simulation Tests...
+[VaultService] Added entry 'Email', total: 1
+[VaultService] Added entry 'AWS', total: 2
+[VaultService] Exported authenticated backup (2 entries, 304 bytes)
+[VaultService] Loaded 2 encrypted entries successfully.
+[VaultService] Removed entry at 0, remaining: 1
+[VaultService] Removed entry at 0, remaining: 0
+  -> PASS: Encrypted Password Vault Desktop Storage & Backup verified.
+[Test] Running 25 Repeated Lifecycle Entry/Exit Cycles...
+  -> 25 Lifecycle Cycles PASS
+ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY!

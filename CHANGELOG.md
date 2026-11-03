@@ -6,6 +6,101 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 
 ## Unreleased
 
+### Local Web Portal & Device Control Center (v0.9.0) — 2026-11-04
+- Implemented FEAT-0019: Local Web Portal and Device Control Center:
+  - Added `WebPortalService` broadcasting an ephemeral SoftAP with random SSID (`NibruOS-XXXX`) and 8-character WPA2 passphrase.
+  - Embedded responsive HTML5/CSS3 single-page web app in `PROGMEM` served at `http://192.168.4.1`, with tabs for adding Vault credentials (including built-in random password generator) and adding TOTP 2FA accounts.
+  - Implemented authenticated REST API (`/api/status`, `/api/vault/add`, `/api/totp/add`) gated by a random 4-digit Web PIN shown on the device screen and requiring the active master key to be unlocked.
+  - Added dedicated `WebPortal` subview in `SettingsApp` displaying SSID, IP, Password, prominent Web PIN, live 180s countdown timer, and a one-touch `[TYPE USB]` button to type the Wi-Fi password over USB HID to the connected host.
+  - Added automatic shutdown after 180s timeout or on lock/sleep/exit to conserve battery and preserve security.
+  - Sequentially bumped firmware version to v0.9.0 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+  - Verified with host tests (VER-0101), desktop simulator suite (VER-0102), PlatformIO release build (942,800 B, 14.4% flash, 19.9% RAM, VER-0103), documentation verification (VER-0104), and flash upload to physical device on COM5 (HWT-0032).
+
+### Native USB HID Keyboard Composite Stack & Vault Wake Reload (v0.8.1) — 2026-11-04
+- Fixed USB HID keyboard transmission and session lifecycle after wake (BUG-0015):
+  - Enabled native TinyUSB composite mode (`-DARDUINO_USB_MODE=0`, `build_unflags = -DARDUINO_USB_MODE=1`) in the default `lilygo-t-display-s3` environment, restoring hardware USB HID keyboard scancode injection alongside CDC Serial on physical hardware.
+  - Implemented `VaultApp::clearSession(AppContext& ctx)` resetting editor buffers, cancelling active USB transmissions, zeroing decrypted memory, and unlatching the session load gate upon device sleep or lock.
+  - Updated `VaultApp::ensureSession(AppContext& ctx)` to automatically reload and decrypt credentials from NVS as soon as the device is unlocked with PIN upon waking, resolving the stuck 'Vault Locked' screen.
+  - Added session clearing calls in `src/main.cpp` and `platform/desktop/DesktopMain.cpp` upon sleep and lock events.
+  - Added automated desktop test in `tests/desktop/test_simulator.cpp` verifying session clearing on sleep and automatic reload upon waking and unlocking.
+- Sequentially bumped firmware version to v0.8.1 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+- Verified with host unit tests (VER-0097), desktop automated test suite (VER-0098), PlatformIO release build (888,352 B binary, 13.5% flash, 19.7% RAM, VER-0099), documentation verification (VER-0100), and upload to physical device on COM5 (HWT-0031).
+
+### Password Vault Application UI & Confirmed USB HID Credential Transmission (v0.8.0) — 2026-11-04
+- Implemented Phase 3 Step 2: Password Vault UI Application (`VaultApp`) and confirmed USB HID credential transmission:
+  - Added new on-device application `VaultApp` registered in the Home Launcher with bilingual support ("Passwords" / "خزنة كلمات المرور").
+  - Designed card-based credential view with masked password display (`••••••••`) and instantaneous `[SHOW]` / `[HIDE]` toggle.
+  - Implemented confirmed two-step USB HID transmission for both username and password:
+    - First touch arms the target credential button with prominent highlight and status banner.
+    - Second separate touch with lifted finger confirms and injects the text via native USB HID keyboard emulation.
+    - Touching any other area or navigating immediately disarms transmission, eliminating accidental keystroke injection.
+  - Added on-device 4-step credential creation wizard (Title -> Username -> Password -> Notes) using `TextKeyboard`.
+  - Added confirmed deletion view with fail-safe Cancel / Delete options.
+  - Enforced fail-closed memory security: sensitive editor buffers and credential states are zeroed out via `CryptoService::secureZero` upon exit, cancel, or commit.
+- Registered in `src/main.cpp`, `platform/desktop/DesktopMain.cpp`, and `tests/desktop/test_simulator.cpp`.
+- Extended automated desktop test suite (`testVaultAppUI`) verifying arming, confirmation, finger lifting enforcement, show/hide toggle, and deletion.
+- Sequentially bumped firmware version to v0.8.0 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+- Verified with host unit tests (VER-0093), desktop automated test suite (VER-0094), PlatformIO release build (852,864 B binary, 13.0% flash, 16.0% RAM, +1.32% growth, VER-0095), and successful upload to physical device on COM5 (HWT-0030, VER-0096).
+
+### Encrypted Password Vault Storage Engine & Authenticated Backup (v0.7.0) — 2026-11-03
+- Implemented Phase 3 Step 1: Encrypted Password Vault Storage & Backup Engine (`VaultService`):
+  - Added authenticated AES-256-GCM encrypted persistence in NVS (`"vlt_rec"` namespace) for account credentials (title [24B], username [32B], password [48B], notes [24B]; up to 16 accounts).
+  - Designed strict security governance: active encryption key (`SecurityService::getActiveVaultKey()`) is derived upon PIN entry and held exclusively in volatile RAM.
+  - Immediate fail-closed memory sanitization: `VaultService::lock()` securely zeroes out all plaintext credentials in RAM using `CryptoService::secureZero` upon device lock or display sleep.
+  - Implemented standalone authenticated backup export (`VaultService::exportBackup`): uses PBKDF2-HMAC-SHA256 (2048 iterations) with a fresh 16-byte cryptographic Salt, 12-byte random IV, and 16-byte AES-GCM Tag.
+  - Implemented tamper-evident backup restore (`VaultService::importBackup`): validates the 16-byte AES-GCM authentication tag; any bit-flip or wrong passphrase immediately rejects the import with zero memory corruption.
+- Cross-platform dual-target support:
+  - ESP32-S3 hardware crypto via `mbedtls` for AES-256-GCM.
+  - Host/Desktop simulation via Windows CNG `BCrypt` for AES-GCM and PBKDF2.
+- Integrated into `AppContext`, `src/main.cpp`, and `platform/desktop/DesktopMain.cpp`.
+- Added comprehensive test suites:
+  - Host unit tests (`tests/host/test_vault.cpp`) verifying add/update/delete, memory zeroing on lock, wrong session key rejection, backup export, bit-flip tamper rejection, wrong passphrase rejection, and restore.
+  - Desktop simulator regression suite (`tests/desktop/test_simulator.cpp`) verifying end-to-end NVS disk persistence and backup flow.
+- Sequentially bumped firmware version to v0.7.0 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+- Verified with host unit tests (VER-0089), desktop automated test suite (VER-0090), PlatformIO release build (846,352 B binary, 12.9% flash, 15.9% RAM, +0.55% growth, VER-0091), and successful upload to physical device on COM5 (HWT-0029, VER-0092).
+
+### Lock Screen Wake Freeze and Display Restoration Fix (v0.6.1) — 2026-11-03
+- Resolved root causes of lock screen freeze and visual stalling upon waking from sleep mode:
+  - Eliminated hardware command hazards in `DisplayManager`: removed ST7789 `DISPOFF` (0x28) from `sleep()` and `DISPON` (0x29) from `wake()`. This removes the 120ms internal stabilization delay that caused subsequent memory write (`RAMWR`) commands to be dropped by the parallel controller. The AW9364 LED backlight on GPIO 38 provides 100% black level when off, keeping ST7789 parallel bus synchronized and ready at all times.
+  - Suppressed all UI rendering while `display.isSleeping()` is active in `main.cpp` and `DesktopMain.cpp`. This prevents `dirty_` and `fullRedraw_` flags from being prematurely consumed in the dark, preserving them for a clean full redraw on wake.
+  - Enforced `security.invalidateFull()` upon display wake to guarantee immediate, full redraw of the lock screen interface (header, keypad, status, footer, circles).
+  - Added `onDisplayRestored(ctx)` overrides to `WiFiApp` and `WiFiScannerApp`, ensuring that when the device is unlocked or returns from an overlay screen, all subviews cleanly set `fullRedraw_ = true` / `menuFullRedraw_ = true` without residual visual artifacts or frozen keyboard boxes.
+- Sequentially bumped firmware version to v0.6.1 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+- Verified with host unit test suite, desktop automated test suite (including sleep/lock/wake flow test), PlatformIO build (845,952 B binary, 12.9% flash, 15.3% RAM, +0.50% growth vs baseline), and documentation consistency check.
+
+### Time Management Engine, USB Serial Sync & TOTP Time Validity (v0.6.0) — 2026-11-03
+- Introduced comprehensive Time Management & Validation subsystem (Phase 2):
+  - Added programmatic time-setting API `TimeService::setTime(epoch, source)` updating hardware RTC via `settimeofday()` on ESP32-S3 and maintaining sub-second accuracy.
+  - Implemented non-blocking USB Serial instant time synchronization protocol (`TIME:<epoch>` or `T:<epoch>`), allowing offline 1-second host computer time sync without requiring Wi-Fi.
+  - Added time source and validity state tracking (`TimeSource::None`, `Ntp`, `UsbSerial`, `Manual`) with sync timestamp recording (`lastSyncEpoch()`).
+  - Added configurable Timezone Offset (-12 to +14 hours, default UTC+3) in `SettingsService` and NVS (`"tz"` key), ensuring local display while preserving strict RFC 6238 UTC epoch for TOTP token calculation.
+  - Enhanced `TotpApp` UI with clear time validity feedback: displays live countdown with sync source badge (`NTP` in green, `USB` in cyan) when valid, or prominent "Waiting for time (Sync)" guidance when unset, with tap-to-sync shortcut.
+  - Enhanced `SystemInfoApp` to display live formatted local time and status banner in addition to uptime.
+- Sequentially bumped firmware version to v0.6.0 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+- Verified with host unit test suite (VER-0081), desktop automated test suite (VER-0082), PlatformIO build (845,936 B binary, 12.9% flash, 15.3% RAM, +0.50% growth vs baseline, VER-0083), and successful upload to physical device on COM5 (HWT-0027).
+
+### Wake Display Refresh & Menu Multi-Selection Fix (v0.5.2) — 2026-11-03
+- Fixed lock screen visual freeze upon waking from sleep:
+  - Addressed root cause in SecurityService::lock() where ullRedraw_ remained alse, preventing SecurityService::render() from clearing the previous app's screen content from ST7789 display controller RAM.
+  - On wake/lock, explicitly set ullRedraw_ = true, dirty_ = true, drawnInputLen_ = 255, and drawnErrorState_ = false, ensuring the full PIN lock keypad is immediately cleared and redrawn on screen.
+- Fixed multiple border selection ghosting in SettingsApp menus:
+  - Addressed issue where touching multiple options or dragging across menu rows left lingering accent border highlights.
+  - Added drawnArmedMenu_ state tracking and explicitly cleared non-armed row inner borders with Colors::Panel on every rendering frame.
+- Sequentially bumped firmware version to v0.5.2 across include/NibruConfig.h, include/BoardConfig.h, src/main.cpp, and docs/CURRENT_STATE.md.
+- Verified with host test suite (VER-0077), desktop simulator test suite (VER-0078), PlatformIO build (844,512 B binary, 12.9% flash, 15.3% RAM, +0.33% growth vs baseline, VER-0079), and successful upload to physical device on COM5 (HWT-0026).
+
+### Touch Stability & Confirmed Two-Step Navigation (v0.5.1) — 2026-11-03
+- Implemented the deterministic Select-then-Confirm touch interaction paradigm across Home Launcher, SettingsApp menus, and WiFiApp cards:
+  - First touch selects the target item, arming it for execution and displaying prominent visual feedback (bold accent highlight border and dynamic footer instruction).
+  - Second separate touch on the exact same item confirms and executes the action (opens the app or subview).
+  - Finger MUST be lifted between touches (`contactId` differs); holding or dragging continuously never triggers confirmation.
+  - Touching a different item immediately shifts selection without launching, disarming the previous item and arming the new one.
+  - Physical button interactions (BOOT / USER) and swipe gestures immediately reset the armed touch confirmation state.
+- Audited CST816S touch coordinate transformations across Landscape Normal (0°) and Inverted (180°) orientations, ensuring zero edge coordinate offset.
+- Added comprehensive unit test coverage in `tests/host/test_main.cpp`, `tests/host/test_settings.cpp`, and `tests/desktop/test_simulator.cpp`.
+- Sequentially bumped firmware version to v0.5.1 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+- Verified with host unit tests (VER-0073), desktop simulator regression suite (VER-0074), PlatformIO build (844,416 B binary, 12.9% flash, 15.3% RAM, +0.31% growth vs baseline, VER-0075), and successful upload to physical device on COM5 (HWT-0025).
+
 ### System-Wide Arabic & English Localization Engine (v0.5.0) — 2026-11-03
 - Added complete system-wide language localization support with dynamic runtime switching between English and Arabic (العربية) across all apps, system views, menus, cards, and status banners.
 - Created standalone, high-legibility 14px Arabic bitmap font engine (`src/ui/ArabicFont.h`) covering 125 presentation forms-B glyphs rasterized from Segoe UI Bold / Tahoma for sharp, crisp reading on 260 PPI 320x170 display with separated dots and clear baselines.

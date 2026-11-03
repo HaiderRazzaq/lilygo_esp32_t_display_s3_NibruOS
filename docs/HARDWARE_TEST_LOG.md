@@ -585,3 +585,196 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Flashing and hardware reset verified; physical observation of Arabic UI rendering to be confirmed by user on device"
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.1",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "PlatformIO 6.1.18 / Arduino-ESP32 2.0.14 / esptool 4.5.1",
+  "wiring": "Existing USB-C COM5 and integrated LCD/touch/buttons",
+  "id": "HWT-0025",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.5.1 firmware upload with Select-then-Confirm touch stability navigation",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "Write intended v0.5.1 image (844,416 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS in 19.69s. Application 844,416 B (545,229 compressed) written to 0x10000 in 7.4s. Bootloader, partitions, and boot metadata written and verified. Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v051-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.5.1 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical touch selection and confirmation to be experienced by user on device"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.5.2",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "PlatformIO 6.1.18 / Arduino-ESP32 2.0.14 / esptool 4.5.1",
+  "wiring": "Existing USB-C COM5 and integrated LCD/touch/buttons",
+  "id": "HWT-0026",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.5.2 firmware upload with wake lock screen redraw fix and settings menu border ghosting fix",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "Write intended v0.5.2 image (844,512 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS in 19.74s. Application 844,512 B (545,283 compressed) written to 0x10000 in 7.4s. Bootloader, partitions, and boot metadata written and verified. Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v052-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.5.2 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical lock screen appearance on wake and single menu border to be verified by user on physical screen"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.6.0",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "PlatformIO 6.1.18 / Arduino-ESP32 2.0.14 / esptool 4.5.1",
+  "wiring": "Existing USB-C COM5 and integrated LCD/touch/buttons",
+  "id": "HWT-0027",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.6.0 firmware upload with Time Management Engine, USB Serial time sync, and TOTP validity display",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "Pre-erase app0 region via esptool and flash complete v0.6.0 binary segments (845,936 B) plus bootloader and partition table",
+  "expected": "Write intended v0.6.0 image (845,936 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS. Application 845,936 B (544,177 compressed) written to 0x10000 in segments. Bootloader, partitions, and boot metadata written and verified. Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v060-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.6.0 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical observation of time sync, USB time command, and TOTP code generation to be confirmed by user on device"
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-03",
+  "firmware_version": "v0.6.1",
+  "commit": "8239bb6 + uncommitted changes",
+  "environment": "PlatformIO 6.1.18 / Arduino-ESP32 2.0.14 / esptool 4.5.1",
+  "wiring": "Existing USB-C COM5 and integrated LCD/touch/buttons",
+  "id": "HWT-0028",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.6.1 firmware upload with lock screen wake freeze and display restoration fix",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "Upload complete v0.6.1 binary (845,952 B) via PlatformIO esptool directly to COM5 at 460800 baud",
+  "expected": "Write intended v0.6.1 image (845,952 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS. Application 845,952 B (546,103 compressed) written to 0x10000 in 7.4 seconds (908.5 kbit/s). Bootloader and partition tables written. Hash of data verified. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v061-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.6.1 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical observation of lock screen wake redraw and display restoration to be verified by user on device"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0029",
+  "date": "2026-11-03",
+  "firmware_version": "v0.7.0",
+  "commit": "WORKING_TREE",
+  "environment": "Physical LILYGO T-Display-S3 on COM5 via esptool.py",
+  "wiring": "Factory ST7789V 8-bit parallel, CST816S capacitive touch, AW9364 backlight",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.7.0 firmware upload with Encrypted Password Vault Storage and Backup Engine",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "Upload complete v0.7.0 binary (846,352 B) via PlatformIO esptool directly to COM5 at 460800 baud",
+  "expected": "Write intended v0.7.0 image (846,352 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS. Application 846,352 B (546,219 compressed) written to 0x10000 in 7.5 seconds (903.4 kbit/s). Bootloader and partition tables written. Hash of data verified. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-03-v070-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.7.0 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical user interaction with upcoming VaultApp UI to follow in Phase 3 Step 2"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0030",
+  "date": "2026-11-04",
+  "firmware_version": "v0.8.0",
+  "commit": "WORKING_TREE",
+  "environment": "Physical LILYGO T-Display-S3 on COM5 via esptool.py",
+  "wiring": "Factory ST7789V 8-bit parallel, CST816S capacitive touch, AW9364 backlight",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.8.0 firmware upload with Password Vault UI (VaultApp) and Confirmed USB HID Credential Transmission",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "Upload complete v0.8.0 binary (852,864 B) via PlatformIO esptool directly to COM5 at 460800 baud",
+  "expected": "Write intended v0.8.0 image (852,864 B), verify data hashes, reset device via RTS pin, observe boot v0.8.0 banner",
+  "actual": "SUCCESS. Application 852,864 B (550,346 compressed) written to 0x10000 in 7.4 seconds (922.0 kbit/s). Hash of data verified. Hard reset via RTS sent. Serial monitor confirms '[NibruOS] boot v0.8.0'.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v080-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output and serial boot banner for v0.8.0 firmware upload",
+  "limitations": "Flashing and clean serial boot verified; interactive user validation of password unmasking and USB typing in progress"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0031",
+  "date": "2026-11-04",
+  "firmware_version": "v0.8.1",
+  "commit": "WORKING_TREE",
+  "environment": "Physical LILYGO T-Display-S3 on COM5 via esptool.py",
+  "wiring": "Factory ST7789V 8-bit parallel, CST816S capacitive touch, AW9364 backlight",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.8.1 firmware upload with native TinyUSB composite HID keyboard and VaultApp wake session reloading",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "Upload complete v0.8.1 binary (888,352 B) with native TinyUSB composite enabled via PlatformIO esptool directly to COM5 at 460800 baud",
+  "expected": "Write intended v0.8.1 image (888,352 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS in 34.52s. Application 888,352 B (574,589 compressed) written to 0x10000 in 7.7 seconds (919.1 kbit/s). Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v081-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.8.1 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical observation of USB typing into PC Notepad and VaultApp PIN re-unlocking requested from user"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0032",
+  "date": "2026-11-04",
+  "firmware_version": "v0.9.0",
+  "commit": "WORKING_TREE",
+  "environment": "Physical LILYGO T-Display-S3 on COM5 via esptool.py",
+  "wiring": "Factory ST7789V 8-bit parallel, CST816S capacitive touch, AW9364 backlight",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.9.0 firmware upload with Web Portal Service and on-device Web Portal UI",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "Upload complete v0.9.0 binary (942,800 B) via PlatformIO esptool directly to COM5 at 460800 baud",
+  "expected": "Write intended v0.9.0 image (942,800 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS in 22.72s. Application 942,800 B (604,776 compressed) written to 0x10000 in 8.2 seconds (921.0 kbit/s). Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v090-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.9.0 firmware upload",
+  "limitations": "Flashing and hardware reset verified; interactive validation of SoftAP connection, Web Portal UI, and [TYPE USB] requested from user"
+}
+```

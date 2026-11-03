@@ -57,6 +57,11 @@ inline tm* localtime_r(const time_t* t, tm* out) {
   *out = *std::localtime(t);
   return out;
 }
+inline tm* gmtime_r(const time_t* t, tm* out) {
+  if (!t || !out) return nullptr;
+  *out = *std::gmtime(t);
+  return out;
+}
 #endif
 
 inline int s_fakePins[64]{};
@@ -105,6 +110,8 @@ struct DesktopSerial {
     std::fflush(stdout);
   }
   void flush() { std::fflush(stdout); }
+  int available() { return 0; }
+  int read() { return -1; }
   template<class... Args>
   void printf(const char* fmt, Args... args) {
     std::printf(fmt, args...);

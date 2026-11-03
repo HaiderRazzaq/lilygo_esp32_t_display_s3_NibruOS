@@ -438,3 +438,74 @@ Status vocabulary and resolution rules: [workflow](ENGINEERING_WORKFLOW.md).
   "risks": "Local circle clearing must accurately bound the pin dot coordinates."
 }
 ```
+
+```json
+{
+  "record_type": "issue",
+  "id": "BUG-0014",
+  "title": "Lock screen visual freeze and stalled display upon waking from sleep",
+  "status": "FIXED — UNVERIFIED",
+  "description": "When the device enters sleep mode (e.g. while entering a Wi-Fi password or in an app view) and is subsequently woken by touch, the screen remained frozen showing the previous application screen instead of the lock screen keypad.",
+  "symptoms": "Upon waking, the screen continues to show the previous application UI (e.g. Wi-Fi keyboard); touching buttons does not respond as the app, but random touches cause green PIN indicator circles to appear superimposed on the old screen.",
+  "reproduction": "With PIN enabled, navigate to Wi-Fi -> Scan Networks -> select network -> enter password view. Allow device to timeout into sleep. Tap screen to wake. Observe screen content.",
+  "affected_versions": "v0.5.0 through v0.6.0",
+  "suspected_cause": "Premature consumption of fullRedraw_ while sleeping combined with ST7789 DISPOFF/DISPON stabilization timing drops.",
+  "root_cause": "DisplayManager::sleep() issued ST7789 DISPOFF (0x28) and wake() issued DISPON (0x29). ST7789 requires up to 120ms after DISPON to stabilize before accepting memory writes; initial full redraws sent immediately on wake were dropped by the controller. Additionally, SecurityService::render() was called while display was sleeping, prematurely consuming fullRedraw_ and dirty_ in the dark.",
+  "files": [
+    "src/hardware/DisplayManager.cpp",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "src/apps/WiFiApp.h",
+    "src/apps/WiFiScannerApp.h"
+  ],
+  "attempts": [
+    "VER-0085 HOST PASS",
+    "VER-0086 SIMULATOR PASS",
+    "VER-0087 BUILD PASS"
+  ],
+  "fix": "Removed 0x28 and 0x29 commands from DisplayManager (AW9364 backlight OFF provides 100% black level without parallel bus disruption), suppressed UI rendering while display.isSleeping() is true, enforced invalidateFull() upon wake, and added onDisplayRestored overrides to WiFiApp and WiFiScannerApp.",
+  "verification": [
+    "VER-0085",
+    "VER-0086",
+    "VER-0087"
+  ],
+  "risks": "Hardware-specific AW9364 backlight timing must be verified on physical board."
+}
+```
+
+```json
+{
+  "record_type": "issue",
+  "id": "BUG-0015",
+  "title": "VaultApp session lockup after sleep and USB HID keyboard unavailable in default build",
+  "status": "FIXED — UNVERIFIED",
+  "description": "After sleep timeout and unlocking with PIN, VaultApp remained stuck displaying 'Vault Locked'. Additionally, USB HID keystroke injection ('Type User' and 'Type Pass') failed to send credentials to the connected PC.",
+  "symptoms": "VaultApp shows 'Vault Locked' after unlocking; USB typing buttons display 'USB unavailable' or fail to type on the host computer.",
+  "reproduction": "1. With PIN enabled, open VaultApp, let device sleep, wake and enter PIN. Observe VaultApp stays locked. 2. Plug device into PC, open Notepad, tap 'Type User' or 'Type Pass' with 2-touch confirmation. Observe nothing types.",
+  "affected_versions": "v0.8.0",
+  "suspected_cause": "attemptedLoad_ boolean latch in VaultApp prevented re-evaluating loadVault() after sleep/lock memory wipe; platformio.ini default environment had ARDUINO_USB_MODE=1 disabling TinyUSB keyboard.",
+  "root_cause": "1. VaultApp::ensureSession only attempted to load the vault once using attemptedLoad_ without resetting upon lock/sleep; main.cpp called vault.lock() directly without notifying VaultApp via clearSession(). 2. Default PlatformIO environment lilygo-t-display-s3 had ARDUINO_USB_MODE=1 (Hardware Serial/JTAG mode) which bypassed TinyUSB HID stack entirely, making UsbHidService::isReady() always return false.",
+  "files": [
+    "platformio.ini",
+    "src/apps/VaultApp.h",
+    "src/apps/VaultApp.cpp",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "attempts": [
+    "VER-0097 HOST PASS",
+    "VER-0098 SIMULATOR PASS",
+    "VER-0099 BUILD PASS",
+    "HWT-0031 COM5 PASS"
+  ],
+  "fix": "1. Enabled native TinyUSB composite mode (-DARDUINO_USB_MODE=0, build_unflags = -DARDUINO_USB_MODE=1) in default environment lilygo-t-display-s3. 2. Implemented VaultApp::clearSession(ctx) to reset attemptedLoad_, zero buffers, and cancel USB transfers on lock/sleep. 3. Updated ensureSession() to load whenever !ctx.vault.isLoaded() and active key is available. 4. Updated main.cpp and DesktopMain.cpp to call vaultApp.clearSession(context) on lock/sleep.",
+  "verification": [
+    "VER-0097",
+    "VER-0098",
+    "VER-0099",
+    "HWT-0031"
+  ],
+  "risks": "Host OS must accept ESP32-S3 composite CDC + HID Keyboard device driver."
+}
+```

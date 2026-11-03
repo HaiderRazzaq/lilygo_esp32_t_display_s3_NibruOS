@@ -88,9 +88,12 @@ set(NIBRU_SHARED_SOURCES
   src/services/TimeService.cpp
   src/services/ArabicReshaper.cpp
   src/services/LocalizationService.cpp
+  src/services/VaultService.cpp
+  src/services/WebPortalService.cpp
   src/apps/WiFiApp.cpp
   src/apps/WiFiScannerApp.cpp
   src/apps/TotpApp.cpp
+  src/apps/VaultApp.cpp
   src/apps/SettingsApp.cpp
   src/apps/SystemInfoApp.cpp
   src/apps/TouchTestApp.cpp

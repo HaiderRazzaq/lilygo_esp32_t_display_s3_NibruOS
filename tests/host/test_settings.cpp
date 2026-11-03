@@ -31,13 +31,13 @@ void testSettings(AppContext& ctx) {
   assert(s.setBrightness(100));
   assert(Preferences::writes == initialWrites);
   assert(!s.setBrightness(0) && !s.setBrightness(99));
-  assert(!s.setScreenTimeoutSec(31) && !s.setTheme(4) && !s.setRotation(0) && !s.setRotation(2) && !s.setLanguage(2));
-  assert(s.setBrightness(25) && s.setScreenTimeoutSec(0) && s.setTheme(3) && s.setRotation(3) && s.setLanguage(1));
+  assert(!s.setScreenTimeoutSec(31) && !s.setTheme(4) && !s.setRotation(0) && !s.setRotation(2) && !s.setLanguage(2) && !s.setTimezoneOffset(15) && !s.setTimezoneOffset(-13));
+  assert(s.setBrightness(25) && s.setScreenTimeoutSec(0) && s.setTheme(3) && s.setRotation(3) && s.setLanguage(1) && s.setTimezoneOffset(4));
   assert(LocalizationService::instance().isArabic());
   assert(ctx.display.rotation() == 3);
   SettingsService restored;
   restored.begin();
-  assert(restored.brightness() == 25 && restored.screenTimeoutSec() == 0 && restored.theme() == 3 && restored.rotation() == 3 && restored.language() == 1);
+  assert(restored.brightness() == 25 && restored.screenTimeoutSec() == 0 && restored.theme() == 3 && restored.rotation() == 3 && restored.language() == 1 && restored.timezoneOffset() == 4);
   // Failure must be observable, with no runtime configuration change.
   Preferences::failWrite = true;
   assert(!s.setBrightness(50));
@@ -152,7 +152,8 @@ void testSettings(AppContext& ctx) {
   // Real touch path may emit initial NONE as Tap, before DoubleTap classification.
   manager.open(0);
   for (int i = 0; i < 4; ++i) manager.handleTouch({200, 80, 0, 0, TouchGesture::SwipeUp});
-  manager.handleTouch({100, 45, 0, 0, TouchGesture::Tap}); // Device
+  manager.handleTouch({100, 45, 0, 0, TouchGesture::Tap, 51}); // Device (tap 1 arms)
+  manager.handleTouch({100, 45, 0, 0, TouchGesture::Tap, 52}); // Device (tap 2 confirms and opens)
   ctx.settings.setBrightness(25);
   fakeMs = 10000;
   manager.handleTouch({200, 110, 0, 0, TouchGesture::Tap, 55, 10000}); // opens reset

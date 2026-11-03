@@ -1,0 +1,7 @@
+python tools/run_host_tests.py
+PASS: authenticator lifecycle
+PASS: bounded paired account import
+[TEST] Running Encrypted Password Vault Storage & Backup Tests...
+  -> PASS: Encrypted Password Vault Storage & Backup verified.
+PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests
+All host tests PASS

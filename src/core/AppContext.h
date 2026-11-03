@@ -8,6 +8,8 @@ class TimeService;
 class TotpService;
 class UsbHidService;
 class AccountImportService;
+class VaultService;
+class WebPortalService;
 
 struct AppContext {
   DisplayManager& display;
@@ -19,4 +21,6 @@ struct AppContext {
   TotpService& totp;
   UsbHidService& usbHid;
   AccountImportService& accountImport;
+  VaultService& vault;
+  WebPortalService& webPortal;
 };

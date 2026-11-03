@@ -16,6 +16,7 @@ enum class TextId : uint16_t {
   AppSettings,
   AppWiFi,
   AppTotp,
+  AppVault,
   AppSystemInfo,
   AppTouchTest,
 
@@ -24,6 +25,7 @@ enum class TextId : uint16_t {
   SubSettings,
   SubWiFi,
   SubTotp,
+  SubVault,
   SubSystemInfo,
   SubTouchTest,
 
@@ -36,6 +38,7 @@ enum class TextId : uint16_t {
   MenuSecurity,
   MenuLanguage,
   MenuTouchTest,
+  MenuWebPortal,
 
   // Display Settings
   DisplayTitle,
@@ -80,6 +83,13 @@ enum class TextId : uint16_t {
   StatusConnected,
   StatusDisconnected,
   StatusScanning,
+
+  // Password Vault UI
+  VaultTypeUser,
+  VaultTypePass,
+  VaultConfirmSend,
+  VaultShowPass,
+  VaultHidePass,
 
   // Language Menu
   LanguageTitle,

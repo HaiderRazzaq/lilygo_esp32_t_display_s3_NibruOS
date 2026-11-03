@@ -4,6 +4,8 @@
 #include "services/TotpService.h"
 #include "services/SettingsService.h"
 #include "services/TimeService.h"
+#include "services/VaultService.h"
+#include "services/WebPortalService.h"
 #include "services/UsbHidService.h"
 #include "services/WiFiService.h"
 #include "hardware/DisplayManager.h"
@@ -76,7 +78,9 @@ void testAccountImport() {
   TimeService time;
   TotpService totp; totp.begin();
   UsbHidService usb;
-  AppContext ctx{display, resources, wifi, security, settings, time, totp, usb, service};
+  VaultService vault;
+  WebPortalService webPortal;
+  AppContext ctx{display, resources, wifi, security, settings, time, totp, usb, service, vault, webPortal};
   TotpApp app;
   app.onEnter(ctx);
   authTap(app, ctx, 110, 158); // ADD > methods

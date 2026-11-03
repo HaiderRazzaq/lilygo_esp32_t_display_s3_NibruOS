@@ -1289,3 +1289,306 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Verify with user on physical device running v0.5.0."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0034",
+  "date": "2026-11-03",
+  "related": [
+    "FEAT-0005",
+    "VER-0073",
+    "VER-0074",
+    "VER-0075",
+    "VER-0076",
+    "HWT-0025"
+  ],
+  "action": "ENHANCE / TOUCH STABILITY / TWO-STEP CONFIRMATION / VERSION BUMP",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "src/core/AppManager.h",
+    "src/core/AppManager.cpp",
+    "src/ui/HomeScreen.h",
+    "src/ui/HomeScreen.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/apps/WiFiApp.h",
+    "src/apps/WiFiApp.cpp",
+    "tests/host/test_main.cpp",
+    "tests/host/test_settings.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Implemented Select-then-Confirm touch interaction pattern across Home Launcher, SettingsApp menus, and WiFiApp cards. First touch highlights and arms target item; second distinct touch (separate contactId with finger lifted) confirms execution. Holding or dragging does not confirm. Touching another item transfers selection. Physical buttons and swipe gestures reset confirmation arming. Sequentially bumped firmware version to v0.5.1.",
+  "reason": "Prevent accidental app launches and false triggers on small 170x320 touch screen; ensure explicit visual feedback and confirmation before launching apps or changing views.",
+  "expected": "Touch 1 highlights card with bold border and shows confirmation hint in footer; Touch 2 on same card launches it; touch elsewhere transfers selection.",
+  "actual": "VER-0073 (host tests PASS), VER-0074 (desktop simulator tests PASS, 25 cycles), VER-0075 (PlatformIO build PASS, 844,416 B binary, 12.9% flash, 15.3% RAM, +0.31% growth vs baseline), HWT-0025 (Uploaded to COM5 successfully).",
+  "verification": "VER-0073, VER-0074, VER-0075, VER-0076, HWT-0025",
+  "risks": "Low risk; physical buttons (BOOT / USER) continue to function identically as secondary navigation path.",
+  "commit": "PENDING",
+  "follow_up": "Physically test on board: touch card once to select, observe highlight and footer, touch again to open."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0035",
+  "date": "2026-11-03",
+  "related": [
+    "FEAT-0005",
+    "VER-0077",
+    "VER-0078",
+    "VER-0079",
+    "VER-0080",
+    "HWT-0026"
+  ],
+  "action": "BUGFIX / LOCK SCREEN REDRAW / SETTINGS MULTI-SELECTION BORDER CLEAR / VERSION BUMP",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "src/services/SecurityService.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp"
+  ],
+  "description": "Fixed two physical UX issues reported on LILYGO T-Display-S3 Touch: 1) Screen frozen on wake from sleep showing previous app while touches entered PIN on invisible keypad. Root cause: SecurityService::lock() left fullRedraw_ = false, rendering PIN dots incrementally over previous app pixels in ST7789 display RAM. Fixed by explicitly setting fullRedraw_ = true, dirty_ = true, drawnInputLen_ = 255, drawnErrorState_ = false in lock(). 2) Multi-finger touch in Settings menu caused multiple inner borders to remain highlighted simultaneously. Root cause: SettingsApp inner accent border was drawn when armed but never cleared to Colors::Panel when un-armed. Fixed by adding drawnArmedMenu_ tracking and redrawing inactive row borders with Colors::Panel on every frame. Monotonically bumped firmware version to v0.5.2.",
+  "reason": "Ensure screen cleanly transitions to PIN lock screen upon wake/sleep and prevent ghost accent borders in settings menus.",
+  "expected": "On wake from sleep, lock screen clears ST7789 and draws PIN keypad immediately. Touching settings menu options cleanly moves highlight border without leaving ghost borders.",
+  "actual": "VER-0077 (host tests PASS), VER-0078 (desktop simulator tests PASS, 25 cycles), VER-0079 (PlatformIO build PASS, 844,512 B binary, 12.9% flash, 15.3% RAM, +0.33% growth vs baseline), HWT-0026 (Uploaded to COM5 successfully).",
+  "verification": "VER-0077, VER-0078, VER-0079, VER-0080, HWT-0026",
+  "risks": "Low risk; lock screen redraw and menu border rendering strictly within standard drawing routines.",
+  "commit": "PENDING",
+  "follow_up": "User to test wake from sleep (screen shows PIN keypad immediately) and multi-touch in settings menu (only active option is bordered)."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0036",
+  "date": "2026-11-03",
+  "related": [
+    "FEAT-0005",
+    "VER-0081",
+    "VER-0082",
+    "VER-0083",
+    "VER-0084",
+    "HWT-0027"
+  ],
+  "action": "FEAT / TIME MANAGEMENT / USB SERIAL SYNC / TOTP VALIDITY / VERSION BUMP",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "src/services/TimeService.h",
+    "src/services/TimeService.cpp",
+    "src/services/SettingsService.h",
+    "src/services/SettingsService.cpp",
+    "src/apps/TotpApp.cpp",
+    "src/apps/SystemInfoApp.cpp",
+    "tests/host/test_authenticator.cpp",
+    "tests/host/test_settings.cpp"
+  ],
+  "description": "Implemented Phase 2 Step 1: Time Management & TOTP Time Validity Engine. Added TimeService::setTime() with settimeofday hardware RTC update on ESP32-S3 and simulated time on host/desktop. Added non-blocking USB Serial sync protocol (TIME:<epoch>) for 1-second offline host computer sync. Added sync source tracking (Ntp, UsbSerial, Manual, None) and lastSyncEpoch recording. Added timezone offset support (-12 to +14, default UTC+3) in SettingsService and NVS, keeping RFC 6238 UTC intact for TOTP while localizing formatted display. Updated TotpApp UI with live sync badge (NTP/USB) and tap-to-sync shortcut. Updated SystemInfoApp with formatted local clock. Monotonically bumped firmware version to v0.6.0.",
+  "reason": "Allow offline TOTP generation, verify time accuracy and freshness, and provide instant USB time sync without requiring active Wi-Fi.",
+  "expected": "Device accepts TIME:<epoch> over USB Serial; TotpApp immediately shows countdown and source badge; SystemInfoApp displays local time.",
+  "actual": "VER-0081 (host tests PASS), VER-0082 (desktop tests PASS, 25 cycles), VER-0083 (PlatformIO build PASS, 845,936 B binary, 12.9% flash, 15.3% RAM, +0.50% growth vs baseline), HWT-0027 (uploaded to COM5 successfully).",
+  "verification": "VER-0081, VER-0082, VER-0083, VER-0084, HWT-0027",
+  "risks": "Low risk; time setting preserves UTC for cryptographic TOTP RFC 6238 while applying timezone purely to presentation strings.",
+  "commit": "PENDING",
+  "follow_up": "User to verify on physical device: send TIME:<epoch> or test TOTP display with sync source indicator."
+}
+```
+
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0037",
+  "date": "2026-11-03",
+  "related": [
+    "FEAT-0005",
+    "BUG-0014",
+    "VER-0085",
+    "VER-0086",
+    "VER-0087",
+    "HWT-0028"
+  ],
+  "action": "BUGFIX / DISPLAY SLEEP-WAKE / LOCK SCREEN REFRESH / VERSION BUMP",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "src/hardware/DisplayManager.cpp",
+    "src/apps/WiFiApp.h",
+    "src/apps/WiFiScannerApp.h",
+    "platform/desktop/DesktopMain.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Resolved lock screen freeze upon waking from sleep mode: removed ST7789 DISPOFF (0x28) and DISPON (0x29) hardware commands from DisplayManager (avoiding 120ms stabilization drops on parallel bus), prevented UI rendering while display.isSleeping() is active so fullRedraw_ is preserved for the wake event, enforced security.invalidateFull() on display wake, and added onDisplayRestored overrides to WiFiApp and WiFiScannerApp.",
+  "reason": "User reported that after entering sleep while typing a Wi-Fi password (or in an app), waking up showed the frozen old app screen with no response to button presses except for green PIN circles appearing over the old image.",
+  "expected": "Waking from sleep immediately displays the clean, crisp, fully drawn lock screen with responsive keypad and zero visual artifacts from previous apps.",
+  "actual": "Host tests PASS (VER-0085), desktop simulator test suite PASS including new sleep/lock/wake flow test (VER-0086), PlatformIO release build PASS (845,952 B binary, 12.9% flash, 15.3% RAM, VER-0087).",
+  "verification": "VER-0085, VER-0086, VER-0087",
+  "risks": "Hardware-specific AW9364 backlight timing must be verified on physical board.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Flash to COM5 and perform physical sleep/wake test on hardware."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0038",
+  "date": "2026-11-03",
+  "related": [
+    "FEAT-0017",
+    "VER-0089",
+    "VER-0090",
+    "VER-0091",
+    "VER-0092",
+    "HWT-0029"
+  ],
+  "action": "FEATURE / ENCRYPTED PASSWORD VAULT STORAGE ENGINE / AUTHENTICATED BACKUP / VERSION BUMP v0.7.0",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/services/VaultService.h",
+    "src/services/VaultService.cpp",
+    "src/core/AppContext.h",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "tests/host/test_vault.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Implemented VaultService providing AES-256-GCM authenticated encrypted persistence for account credentials (title, username, password, notes) in NVS with fail-closed tamper detection, secure memory wiping upon lock/sleep, and authenticated standalone PBKDF2/AES-GCM backup export and restore.",
+  "reason": "Phase 3 Step 1 required establishing a secure, authenticated, tamper-evident storage engine for the password vault before developing the UI and USB HID transmission capabilities.",
+  "expected": "Vault entries are stored encrypted in NVS with AES-256-GCM using session key, zeroed out from RAM immediately upon lock or sleep, and can be exported/imported as authenticated backups with tamper resistance.",
+  "actual": "Host tests PASS with bit-flip and wrong passphrase rejection (VER-0089). Desktop simulator tests PASS (VER-0090). PlatformIO build PASS with 846,352 bytes flash (0.55% growth, VER-0091). Flashed to COM5 (HWT-0029, VER-0092).",
+  "verification": "VER-0089, VER-0090, VER-0091, VER-0092, HWT-0029",
+  "risks": "Session key depends on SecurityService unlock state; locking clears active keys from RAM.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Proceed to Phase 3 Step 2: Password Vault UI (VaultApp) and confirmed USB HID typing integration."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0039",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0018",
+    "VER-0093",
+    "VER-0094",
+    "VER-0095",
+    "VER-0096",
+    "HWT-0030"
+  ],
+  "action": "FEATURE / PASSWORD VAULT UI / CONFIRMED USB HID TYPING / VERSION BUMP v0.8.0",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/apps/VaultApp.h",
+    "src/apps/VaultApp.cpp",
+    "src/services/LocalizationService.h",
+    "src/services/LocalizationService.cpp",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Implemented Phase 3 Step 2: Password Vault UI (VaultApp) and confirmed two-step USB HID credential transmission. Built card-based credential browsing with dynamic masked password display and Show/Hide toggle, on-device account addition via 4-step wizard using TextKeyboard, and confirmed deletion. Built two-touch confirmed USB transmission: first touch arms the button and highlights it visually; second separate touch with lifted finger confirms and types username or password to the connected computer.",
+  "reason": "Provide daily encrypted password vault access on device with secure, accidental-keystroke-proof USB HID credential typing.",
+  "expected": "VaultApp renders card views; arming requires two distinct taps to type credentials via USB; memory zeroed upon exit; passes host and desktop tests; flashes and boots on COM5.",
+  "actual": "Host tests PASS (VER-0093). Desktop simulator regression suite PASS including confirmed USB typing and mask toggle tests (VER-0094). PlatformIO build PASS with 852,864 bytes flash (+1.32% growth, VER-0095). Uploaded and verified boot on COM5 (HWT-0030, VER-0096).",
+  "verification": "VER-0093, VER-0094, VER-0095, VER-0096, HWT-0030",
+  "risks": "Requires active PIN unlock before viewing or typing credentials; wiping RAM on lock/sleep preserves security.",
+  "commit": "WORKING_TREE",
+  "follow_up": "User hardware validation: test on-screen password unmasking and two-step USB HID typing into PC text editor."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0040",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0018",
+    "BUG-0015",
+    "VER-0097",
+    "VER-0098",
+    "VER-0099",
+    "VER-0100",
+    "HWT-0031"
+  ],
+  "action": "BUGFIX / NATIVE USB HID MODE / VAULT SESSION RELOAD / VERSION BUMP v0.8.1",
+  "files": [
+    "platformio.ini",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/apps/VaultApp.h",
+    "src/apps/VaultApp.cpp",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "tests/desktop/test_simulator.cpp",
+    "docs/CURRENT_STATE.md"
+  ],
+  "description": "Fixed BUG-0015: 1) Enabled native TinyUSB composite mode (-DARDUINO_USB_MODE=0, build_unflags = -DARDUINO_USB_MODE=1) in default environment lilygo-t-display-s3, restoring hardware USB HID keyboard emulation alongside CDC Serial so 'Type User' and 'Type Pass' keystrokes are successfully received by connected PC. 2) Implemented VaultApp::clearSession(ctx) to zero memory, cancel active USB tasks, and reset attemptedLoad_ upon lock/sleep. 3) Updated VaultApp::ensureSession(ctx) to automatically load and decrypt credentials as soon as device is unlocked with PIN upon wake. Monotonically bumped firmware version to v0.8.1.",
+  "reason": "Resolve reported issues where USB typing was not sending keystrokes to PC and Vault remained locked after waking from sleep.",
+  "expected": "Vault automatically reloads credentials when waking and unlocking with PIN; PC detects USB keyboard and receives keystrokes when confirmed with two touches; host, desktop, and PlatformIO builds PASS; uploaded to COM5.",
+  "actual": "Host tests PASS (VER-0097). Desktop simulator tests PASS including Vault session clear and wake reload test (VER-0098). PlatformIO release build PASS with 888,352 bytes flash (VER-0099). Successfully uploaded and verified flash write/reset on COM5 (HWT-0031). Documentation check PASS (VER-0100).",
+  "verification": "VER-0097, VER-0098, VER-0099, VER-0100, HWT-0031",
+  "risks": "Low risk; TinyUSB composite mode maintains CDC serial monitor on COM5 while registering standard USB HID keyboard with host OS.",
+  "commit": "WORKING_TREE",
+  "follow_up": "User hardware validation: test wake from sleep with PIN (confirming vault unlocks cleanly) and two-touch USB credential typing into Notepad."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0041",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0019",
+    "VER-0101",
+    "VER-0102",
+    "VER-0103",
+    "VER-0104",
+    "HWT-0032"
+  ],
+  "action": "FEATURE IMPLEMENTATION / WEB PORTAL & DEVICE CONTROL CENTER / VERSION BUMP v0.9.0",
+  "files": [
+    "src/services/WebPortalService.h",
+    "src/services/WebPortalService.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/services/LocalizationService.h",
+    "src/services/LocalizationService.cpp",
+    "src/core/ResourceManager.h",
+    "src/core/AppContext.h",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "tests/host/test_web_portal.cpp",
+    "tests/desktop/test_simulator.cpp",
+    "docs/CURRENT_STATE.md"
+  ],
+  "description": "Implemented FEAT-0019: Local Web Portal and Device Control Center for NibruOS. 1) Created WebPortalService managing an ephemeral SoftAP with random SSID (NibruOS-XXXX) and WPA2 passphrase, serving an embedded responsive single-page web app in PROGMEM with tabs for Vault credentials (including random password generator) and TOTP 2FA accounts. 2) Provided authenticated REST API (/api/status, /api/vault/add, /api/totp/add) gated by a random 4-digit Web PIN displayed on the LCD and requiring active device master key unlock. 3) Added Web Portal UI into SettingsApp with live countdown timer, prominent Web PIN, and single-touch [TYPE USB] button typing the Wi-Fi password over USB HID to connected host. 4) Added cross-platform host and desktop test suites. Monotonically bumped firmware version to v0.9.0.",
+  "reason": "Empower users to easily and securely populate Vault passwords and 2FA accounts from a PC or smartphone browser without external software.",
+  "expected": "SoftAP broadcast with random credentials, web portal serving responsive dark UI, authenticated credential encryption into active vault, USB typing of Wi-Fi pass on screen tap, all host, desktop, and PlatformIO builds passing, flash uploaded to device.",
+  "actual": "Host tests PASS (VER-0101). Desktop simulator tests PASS (VER-0102). PlatformIO build PASS with 942,800 bytes (VER-0103). Uploaded to physical device via COM5 (HWT-0032). Documentation checks PASS (VER-0104).",
+  "verification": "VER-0101, VER-0102, VER-0103, VER-0104, HWT-0032",
+  "risks": "SoftAP shuts down after 180s timeout or on lock/sleep/exit to preserve power; credential addition requires both matching Web PIN and active PIN session.",
+  "commit": "WORKING_TREE",
+  "follow_up": "User tests Web Portal on physical device: connects to SoftAP, loads http://192.168.4.1, adds Vault and TOTP credentials, and tests [TYPE USB] button."
+}
+```

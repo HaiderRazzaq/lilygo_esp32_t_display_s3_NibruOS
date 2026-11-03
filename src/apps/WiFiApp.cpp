@@ -76,19 +76,31 @@ void WiFiApp::handleMenuTouch(AppContext& ctx, const TouchEvent& ev) {
     return;
   }
 
-  // Card 0: Scan Networks (Y: 52..96, X: 10..310)
+  uint8_t target = 255;
   if (ev.y >= 52 && ev.y <= 96 && ev.x >= 10 && ev.x <= 310) {
-    subView_ = WiFiSubView::Scanner;
-    scannerApp_.onEnter(ctx);
-    return;
+    target = 0;
+  } else if (ev.y >= 98 && ev.y <= 144 && ev.x >= 10 && ev.x <= 310) {
+    target = 1;
   }
 
-  // Card 1: Saved Networks (Y: 98..144, X: 10..310)
-  if (ev.y >= 98 && ev.y <= 144 && ev.x >= 10 && ev.x <= 310) {
-    subView_ = WiFiSubView::Saved;
-    savedOffset_ = 0;
-    invalidate();
-    return;
+  if (target != 255) {
+    if (armedCard_ == target && ev.contactId != armedCardContactId_ && ev.contactId != 0) {
+      armedCard_ = 255;
+      armedCardContactId_ = 0;
+      if (target == 0) {
+        subView_ = WiFiSubView::Scanner;
+        scannerApp_.onEnter(ctx);
+      } else {
+        subView_ = WiFiSubView::Saved;
+        savedOffset_ = 0;
+        invalidate();
+      }
+    } else {
+      armedCard_ = target;
+      armedCardContactId_ = ev.contactId;
+      menuFullRedraw_ = true;
+      invalidate();
+    }
   }
 }
 

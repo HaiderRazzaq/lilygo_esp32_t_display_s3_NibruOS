@@ -14,6 +14,7 @@ const char* LocalizationService::get(TextId id) const {
     case TextId::AppSettings:     return ar ? "الإعدادات" : "Settings";
     case TextId::AppWiFi:         return ar ? "الواي فاي" : "Wi-Fi";
     case TextId::AppTotp:         return ar ? "المصادقة" : "2FA Vault";
+    case TextId::AppVault:        return ar ? "الخزنة" : "Passwords";
     case TextId::AppSystemInfo:   return ar ? "النظام" : "System Info";
     case TextId::AppTouchTest:    return ar ? "اللمس" : "Touch Test";
 
@@ -22,6 +23,7 @@ const char* LocalizationService::get(TextId id) const {
     case TextId::SubSettings:     return ar ? "إعدادات النظام" : "System";
     case TextId::SubWiFi:         return ar ? "الشبكات" : "Networks";
     case TextId::SubTotp:         return ar ? "رموز التحقق" : "Authenticator";
+    case TextId::SubVault:        return ar ? "خزنة كلمات المرور" : "Password Vault";
     case TextId::SubSystemInfo:   return ar ? "المعلومات" : "Telemetry";
     case TextId::SubTouchTest:    return ar ? "فحص الشاشة" : "Diagnostics";
 
@@ -34,6 +36,7 @@ const char* LocalizationService::get(TextId id) const {
     case TextId::MenuSecurity:    return ar ? "الأمان ورمز PIN" : "Security & PIN";
     case TextId::MenuLanguage:    return ar ? "لغة الجهاز (Language)" : "Language / اللغة";
     case TextId::MenuTouchTest:   return ar ? "اختبار اللمس" : "Touch test";
+    case TextId::MenuWebPortal:   return ar ? "بوابة الويب والتحكم" : "Web Portal (AP Mode)";
 
     // Display Settings
     case TextId::DisplayTitle:       return ar ? "الشاشة والعرض" : "Display & Screen";
@@ -78,6 +81,13 @@ const char* LocalizationService::get(TextId id) const {
     case TextId::StatusConnected: return ar ? "متصل" : "Connected";
     case TextId::StatusDisconnected: return ar ? "غير متصل" : "Disconnected";
     case TextId::StatusScanning:  return ar ? "جاري البحث..." : "Scanning...";
+
+    // Password Vault Actions
+    case TextId::VaultTypeUser:   return ar ? "إرسال المستخدم" : "TYPE USER";
+    case TextId::VaultTypePass:   return ar ? "إرسال الرمز" : "TYPE PASS";
+    case TextId::VaultConfirmSend:return ar ? "تأكيد الإرسال؟" : "CONFIRM SEND";
+    case TextId::VaultShowPass:   return "[SHOW]";
+    case TextId::VaultHidePass:   return "[HIDE]";
 
     // Language Menu
     case TextId::LanguageTitle:   return ar ? "لغة النظام" : "System Language";

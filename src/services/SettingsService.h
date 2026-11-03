@@ -37,6 +37,10 @@ public:
   bool setLanguage(uint8_t lang);
   const char* languageName() const;
 
+  // Timezone Offset: -12 to +14 hours (default 3 = UTC+3)
+  int8_t timezoneOffset() const { return timezoneOffset_; }
+  bool setTimezoneOffset(int8_t offsetHours);
+
 private:
   DisplayManager* display_ = nullptr;
   TouchManager* touch_ = nullptr;
@@ -47,6 +51,7 @@ private:
   uint8_t theme_ = 0;
   uint8_t rotation_ = 1;
   uint8_t language_ = 0;
+  int8_t timezoneOffset_ = 3;
 
   void applyToDisplay();
 };

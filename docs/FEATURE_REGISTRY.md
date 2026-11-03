@@ -648,3 +648,119 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ]
 }
 ```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0017",
+  "name": "Encrypted Password Vault Storage and Backup Engine",
+  "purpose": "Provide authenticated AES-256-GCM encrypted persistence for account credentials in NVS with secure zeroing on lock/sleep and standalone PBKDF2/AES-GCM backup export and restore",
+  "module": "src/services/VaultService",
+  "files": [
+    "src/services/VaultService.cpp",
+    "src/services/VaultService.h",
+    "src/services/CryptoService.cpp",
+    "src/services/CryptoService.h",
+    "src/core/AppContext.h",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp"
+  ],
+  "dependencies": [
+    "FEAT-0008",
+    "FEAT-0012"
+  ],
+  "hardware": "ESP32-S3 hardware crypto / mbedtls AES-GCM; simulated on desktop via Windows BCrypt",
+  "gpio": "No extra GPIO allocation; internal flash storage via Preferences (NVS)",
+  "lifecycle": "Unlocks on valid session key; wipes all plaintext in memory immediately on lock/sleep via CryptoService::secureZero; fails closed on authentication tag mismatch",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0089",
+    "host": "VER-0090",
+    "hardware": "HWT-0029"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0038"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0018",
+  "name": "Password Vault Application and Confirmed USB HID Credential Transmission",
+  "purpose": "Provide card-based on-device browsing of encrypted account credentials, password masking/unmasking, and two-step confirmed USB HID keystroke transmission with strict zero-touch arming",
+  "module": "src/apps/VaultApp",
+  "files": [
+    "src/apps/VaultApp.h",
+    "src/apps/VaultApp.cpp",
+    "src/services/VaultService.h",
+    "src/services/UsbHidService.h",
+    "src/services/LocalizationService.h",
+    "src/services/LocalizationService.cpp",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp"
+  ],
+  "dependencies": [
+    "FEAT-0001",
+    "FEAT-0008",
+    "FEAT-0010",
+    "FEAT-0017"
+  ],
+  "hardware": "Integrated ST7789V display, CST816S touch, native USB HID controller",
+  "gpio": "No extra GPIO allocation; uses standard display, touch, and USB pins",
+  "lifecycle": "Requires active PIN session; arming requires two distinct taps with finger lift to trigger USB typing; memory zeroed on exit",
+  "registration": "vaultApp",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0095",
+    "host": "VER-0094",
+    "hardware": "HWT-0030"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0039"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0019",
+  "name": "NibruOS Local Web Portal & Control Center",
+  "purpose": "Provide high-security browser-based device management via an ephemeral SoftAP, allowing users to import encrypted Vault credentials and 2FA accounts directly from PC or mobile without software installation, plus USB HID typing of the Wi-Fi password",
+  "module": "src/services/WebPortalService + src/apps/SettingsApp",
+  "files": [
+    "src/services/WebPortalService.h",
+    "src/services/WebPortalService.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/core/ResourceManager.h",
+    "src/core/AppContext.h",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp"
+  ],
+  "dependencies": [
+    "FEAT-0001",
+    "FEAT-0008",
+    "FEAT-0010",
+    "FEAT-0017",
+    "FEAT-0018"
+  ],
+  "hardware": "Integrated 2.4GHz radio (SoftAP), ST7789V display, native USB HID controller",
+  "gpio": "No extra GPIO allocation; uses standard display, touch, and radio",
+  "lifecycle": "Leases ResourceOwner::WebPortal via ResourceManager; stopped automatically after 180s timeout or on lock/sleep/exit; requires Web PIN shown on LCD and active master key to accept POST requests",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0103",
+    "host": "VER-0101",
+    "hardware": "HWT-0032"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0041"
+  ]
+}
+```
