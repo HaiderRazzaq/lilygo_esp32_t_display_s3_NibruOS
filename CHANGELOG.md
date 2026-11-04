@@ -6,6 +6,16 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 
 ## Unreleased
 
+### Web Portal & Account Setup LinkedIn Integration (v0.9.2) — 2026-11-04
+- Added official LinkedIn profiles and responsive badges to all web pages:
+  - Embedded Web Portal (`src/services/WebPortalService.cpp` & `tools/account_setup/test_portal_preview.html`).
+  - Standalone Account Setup application (`tools/account_setup/account_setup.html` & `tools/account_setup/account_setup.css`).
+  - Added Nibru official LinkedIn link: `https://www.linkedin.com/company/nibruiq/`
+  - Added Haider Razaq LinkedIn link: `https://www.linkedin.com/in/haiderrazaq/`
+  - Styled with glowing neon hover effects and embedded vector SVG LinkedIn icons.
+- Sequentially bumped firmware version to v0.9.2 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+- Verified with host unit tests (VER-0109), desktop automated test suite (VER-0110), PlatformIO release build (958,896 B binary, 14.6% flash, 19.9% RAM, VER-0111), documentation verification (VER-0112), and physical upload to device on COM5 (HWT-0034).
+
 ### Web Portal Visual Identity & Haider Razaq Brand Alignment (v0.9.1) — 2026-11-04
 - Redesigned the embedded Web Portal (`src/services/WebPortalService.cpp`) to match the official NibruOS visual identity in `tools/account_setup`:
   - Dark navy/cyan neon theme (`--brand-navy: #0f1954`, `--brand-aqua: #38ffe1`, `--bg: #080f2c`).

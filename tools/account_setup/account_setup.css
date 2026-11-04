@@ -154,6 +154,13 @@ select option { color: #fff; background: #101b42; }
 .footer-contact a:hover { text-decoration: underline; text-decoration-color: var(--brand-aqua); }
 .developer-credit { color: #a1b8d0; font: 12px/1.6 "Segoe UI", Arial, sans-serif; }
 .developer-credit strong { color: #e8f5f7; font-weight: 700; }
+.footer-links { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.footer-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: #b8cde6; padding: 4px 10px; border-radius: 8px; background: rgba(56, 255, 225, .06); border: 1px solid rgba(56, 255, 225, .18); text-decoration: none; transition: 0.2s; }
+.footer-link:hover { color: var(--brand-aqua); border-color: var(--brand-aqua); background: rgba(56, 255, 225, .14); }
+.footer-link svg { flex-shrink: 0; fill: currentColor; }
+.developer-credit a { color: #e8f5f7; font-weight: 700; text-decoration: underline; text-decoration-color: rgba(56, 255, 225, .4); }
+.developer-credit a:hover { color: var(--brand-aqua); text-decoration-color: var(--brand-aqua); }
+
 
 @media (max-width: 1060px) {
   .layout { grid-template-columns: minmax(0, 1fr) 270px; gap: 22px; }

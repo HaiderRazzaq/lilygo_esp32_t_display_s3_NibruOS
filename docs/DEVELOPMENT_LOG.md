@@ -1629,3 +1629,42 @@ Corrections must be appended with the original ID reference.
   "follow_up": "User tests the redesigned Web Portal from phone/PC browser to verify visual identity, branding, and credential additions."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0043",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0019",
+    "VER-0109",
+    "VER-0110",
+    "VER-0111",
+    "VER-0112",
+    "HWT-0034"
+  ],
+  "action": "WEB PORTAL & ACCOUNT SETUP LINKEDIN INTEGRATION / VERSION BUMP v0.9.2",
+  "files": [
+    "src/services/WebPortalService.cpp",
+    "tools/account_setup/test_portal_preview.html",
+    "tools/account_setup/account_setup.html",
+    "tools/account_setup/account_setup.css",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/HARDWARE_TEST_LOG.md"
+  ],
+  "description": "Added official LinkedIn profile links for Haider Razaq (https://www.linkedin.com/in/haiderrazaq/) and Nibru (https://www.linkedin.com/company/nibruiq/) to the embedded Web Portal (src/services/WebPortalService.cpp), test preview (tools/account_setup/test_portal_preview.html), and standalone web setup tool (tools/account_setup/account_setup.html, tools/account_setup/account_setup.css). Integrated vector SVG LinkedIn icons, responsive button pills, and interactive hover animations. Monotonically bumped firmware version to v0.9.2.",
+  "reason": "Direct user request to add Haider Razaq and Nibru LinkedIn links to the web pages.",
+  "expected": "Clickable, styled LinkedIn badges on all web pages, zero regression on existing endpoints, passes host and desktop tests, compiles and uploads cleanly to device.",
+  "actual": "Host tests PASS (VER-0109). Desktop tests PASS (VER-0110). PlatformIO build PASS with 958,896 bytes (14.6% flash, 19.9% RAM, VER-0111). Uploaded to physical device via COM5 (HWT-0034). Documentation checks PASS (VER-0112).",
+  "verification": "VER-0109, VER-0110, VER-0111, VER-0112, HWT-0034",
+  "risks": "Minimal; flash usage grew by 1,920 B for vector icons and URLs, well within app0 partition capacity.",
+  "commit": "WORKING_TREE",
+  "follow_up": "User tests the updated Web Portal in browser and confirms LinkedIn links open correctly."
+}
+```

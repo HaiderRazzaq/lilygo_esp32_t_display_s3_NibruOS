@@ -802,3 +802,27 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Flashing and hardware reset verified; interactive validation of redesigned Web Portal visual identity and browser interaction requested from user"
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0034",
+  "date": "2026-11-04",
+  "firmware_version": "v0.9.2",
+  "commit": "WORKING_TREE",
+  "environment": "Physical LILYGO T-Display-S3 on COM5 via esptool.py",
+  "wiring": "Factory ST7789V 8-bit parallel, CST816S capacitive touch, AW9364 backlight",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.9.2 firmware upload with LinkedIn links integrated into Web Portal",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "Upload complete v0.9.2 binary (958,896 B) via PlatformIO esptool directly to COM5 at 460800 baud",
+  "expected": "Write intended v0.9.2 image (958,896 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS in 35.15s. Application 958,896 B (609,720 compressed) written to 0x10000 in 8.3 seconds (924.5 kbit/s). Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v092-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.9.2 firmware upload",
+  "limitations": "Flashing and hardware reset verified; interactive validation of Web Portal in browser requested from user"
+}
+```
