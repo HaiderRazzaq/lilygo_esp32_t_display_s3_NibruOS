@@ -114,3 +114,24 @@ Current easier-entry default upload HWT-0019 PASS for write/hash/reset only; mat
 | CST816S touch coordinate inversion & inverted swipe gesture handling | VER-0054 HOST (x=119, y=59 from rawX=59, rawY=200; SWIPE_UP -> SwipeRight) | Inverted cable physical touch test pending |
 | Settings NVS persistence ('rot' key with 5-byte schema preservation) | VER-0054 HOST / Desktop NVS | Flash persistence verified |
 | Resource budget & partition capacity | VER-0053 PASS (832,464 B binary, 12.7% flash, 15.3% RAM) | Heap/stack/latency/power pending measurement |
+
+## BLE startup interruption — 2026-11-04
+
+| Capability | Software evidence | Physical evidence |
+|---|---|---|
+| Controller/host failure, lease release, retry | VER-0145 RED, VER-0146 GREEN (fault injection) | HWT-0044 FAIL on prior image; HWT-0045 pending |
+| Settings BLE control and busy radio | VER-0149 simulator PASS | HWT-0045 pending |
+| Image size and runtime resources | VER-0150 BUILD, VER-0151 capacity PASS | Heap, PSRAM, stacks, latency, power and A–E NOT MEASURED |
+
+| Wi-Fi/BLE coexistence | VER-0153 RED, VER-0155 HOST, VER-0156 simulator, VER-0158 BUILD, VER-0159 capacity | HWT-0048 v0.10.6 panic, HWT-0051 v0.10.7 activation PASS, HWT-0049 extended acceptance |
+| Windows BLE link and Generator typing | VER-0161 HOST, VER-0162 simulator, VER-0163 diagnostic build | HWT-0052 typing failed; HWT-0055 captures termination and authentication failure |
+| Bluetooth Home card, Settings access and keyboard readiness | VER-0166/VER-0167 RED; VER-0168/VER-0169 GREEN; VER-0171 desktop launch; VER-0172 ESP32 build | HWT-0056 pending |
+| Windows HID enumeration and authenticated report sending | VER-0175 RED; VER-0177/VER-0178 GREEN; VER-0179 BUILD | HWT-0058 reproduction; HWT-0059 pending |
+| Display-assisted BLE authentication | VER-0182 RED; VER-0183/VER-0184 GREEN; VER-0185 BUILD | HWT-0065 Windows authentication without subscription; HWT-0066 phone rejected pairing before code entry |
+| BLE PnP ID serialization (v0.12.1) | VER-0188 HOST, VER-0189 SIMULATOR, VER-0190 BUILD | NOT RUN. Check Windows PnP fields and HID subscription, then type test text. |
+
+| Beacon Lab selector, radio exclusion, timeout and cleanup | VER-0192 HOST/SIMULATOR, VER-0193 BUILD | NOT RUN. Capture synthetic beacons and confirm stop and radio recovery. |
+
+| Beacon Lab names, open/secured counts and duration | VER-0195 HOST/SIMULATOR, VER-0196 BUILD | NOT RUN. Verify unique names, WPA2 flags, and transmission stop on a second receiver. |
+
+| Beacon Lab batch scheduling and accepted-name count | VER-0197 HOST/SIMULATOR, VER-0198 BUILD | NOT RUN. Compare on-device accepted count with a capture on the transmit channel. |

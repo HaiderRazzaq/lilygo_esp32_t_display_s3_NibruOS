@@ -1,0 +1,4 @@
+Listening on COM6
+Listening on COM6
+[BLE] Initializing BLE Device...
+Listening on COM6

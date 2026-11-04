@@ -1,0 +1,11 @@
+NibruOS v0.10.4 Host Unit Tests Output
+Date: 2026-11-04
+Platform: Windows 11 / MSVC 2022 / Python 3.14
+
+PASS: authenticator lifecycle
+PASS: bounded paired account import
+[TEST] Running Encrypted Password Vault Storage & Backup Tests...
+  -> PASS: Encrypted Password Vault Storage & Backup verified.
+[TEST] Running Web Portal Service Host Tests...
+  -> PASS: Web Portal Service Host Tests verified successfully.
+PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests

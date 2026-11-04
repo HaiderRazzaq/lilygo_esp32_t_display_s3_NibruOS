@@ -996,3 +996,723 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Flashing and hardware reset verified; physical pairing and typing over BLE requested from user"
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0042",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.4",
+  "commit": "WORKING_TREE",
+  "environment": "Physical LILYGO T-Display-S3 on COM5 via esptool.py",
+  "wiring": "Factory ST7789V 8-bit parallel, CST816S capacitive touch, AW9364 backlight, ESP32-S3 BLE radio",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.10.4 firmware upload with BLE HID null pointer initialization crash fix",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "Upload complete v0.10.4 binary (1,565,488 B) via PlatformIO esptool directly to COM5 at 460800 baud",
+  "expected": "Write intended v0.10.4 image (1,565,488 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS in 42.21s. Application 1,565,488 B (979,039 compressed) written to 0x10000 in 13.6 seconds (923.1 kbit/s). Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0104-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.10.4 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical pairing and typing over BLE requested from user"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0043",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.5",
+  "commit": "WORKING_TREE",
+  "environment": "Physical LILYGO T-Display-S3 on COM5/COM6 via esptool.py",
+  "wiring": "Factory ST7789V 8-bit parallel, CST816S capacitive touch, AW9364 backlight, ESP32-S3 BLE radio",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.10.5 firmware upload with standardized BLE HID stack and watchdog recovery",
+  "hardware": "ESP32-S3 revision v0.2, COM5/COM6 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "Upload complete v0.10.5 binary via PlatformIO esptool directly to device port at 460800 baud and issue watchdog reset",
+  "expected": "Write intended v0.10.5 image, verify data hashes, reset device into active runtime mode (COM6)",
+  "actual": "SUCCESS in 45.37s. Application 1,565,408 B (978,880 compressed) written to 0x10000 in 13.6s (921.8 kbit/s). Hash verified on all segments. Watchdog reset recovered board into active runtime mode (COM6).",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0105-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.10.5 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical pairing and typing over BLE requested from user"
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0044",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.5",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Reproduce reported BLE activation interruption",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Factory touch/display and native USB connection",
+  "procedure": "Listen on COM6 while owner taps Settings > Bluetooth > ENABLE BLE KEYBOARD.",
+  "expected": "Board stays active and shows BLE advertising.",
+  "actual": "Owner reported the device turned off. Serial reached [BLE] Initializing BLE Device..., then the port reopened before the next BLE startup message.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0105-ble-repro.txt"
+  ],
+  "evidence_kind": "Captured output or identified transcript",
+  "environment": "Physical board, Windows native USB CDC",
+  "limitations": "No reset reason, timing measurement, or panic trace captured. The installed version is identified by the preceding upload record and the local artifact, not a captured boot banner."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0045",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.6",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "BLE startup and resource acceptance",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Factory touch/display and native USB connection",
+  "procedure": "After authorized upload, attach CDC at 115200. Enable BLE and capture controller/host logs and any reset reason. If advertising starts, pair with a phone/PC and use TEST KEYBOARD in a blank editor. Check Back, repeat enable/disable at least 20 times, and repeat with background Wi-Fi active. Run profiling scenarios A–E and measure headroom, stack, latency and current.",
+  "expected": "No interruption; startup errors are visible and leave Settings usable. Successful startup supports pairing and typing. Maintain resource budgets.",
+  "actual": "Pending upload and physical interaction.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending procedure",
+  "environment": "Physical board",
+  "limitations": "Build and fault injection cannot verify the physical reset or pairing."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0046",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.6",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Initial authorized upload attempt using runtime COM6",
+  "hardware": "LILYGO T-Display-S3 Touch Glass / ESP32-S3 revision v0.2",
+  "wiring": "Factory touch/display and native USB connection",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM6",
+  "expected": "Write the identified application and return to runtime USB mode.",
+  "actual": "Exit 1 during connection. ClearCommError while the board changed from runtime COM6 to ROM COM5. Flash writing did not start.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0106-upload-com6-attempt.txt"
+  ],
+  "evidence_kind": "Captured esptool output and observed USB port enumeration",
+  "environment": "Windows / PlatformIO / native USB",
+  "limitations": "Retried on the enumerated ROM port."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0047",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.6",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.10.6 firmware upload",
+  "hardware": "LILYGO T-Display-S3 Touch Glass / ESP32-S3 revision v0.2",
+  "wiring": "Factory touch/display and native USB connection",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5; after RTS left COM5 present, request esptool 5.6.0 watchdog reset on the ROM port.",
+  "expected": "Write the identified application and return to runtime USB mode.",
+  "actual": "Exit 0 for upload. Image 1,565,824 B at 0x10000; all written segments hash-verified. No NVS-range write or full-chip erase. The watchdog command lost COM5 after issuing reset and exited 1; runtime COM6 appeared and accepted the serial monitor.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0106-upload.txt",
+    "docs/evidence/2026-11-04-v0106-reset.txt"
+  ],
+  "evidence_kind": "Captured esptool output and observed USB port enumeration",
+  "environment": "Windows / PlatformIO / native USB",
+  "limitations": "PASS is for flash write/hash verification and observed return of runtime port. BLE behavior is recorded separately."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0048",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.6",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Reproduction and crash localization after firmware upload",
+  "hardware": "LILYGO T-Display-S3 Touch Glass / ESP32-S3 revision v0.2",
+  "wiring": "Factory touch/display and native USB",
+  "procedure": "Tap ENABLE BLE KEYBOARD while monitoring COM6. Read the reset reason from System info and decode the dedicated crash partition using the matching application ELF.",
+  "expected": "Remain responsive through BLE enable/disable, coexist with Wi-Fi, and advertise and type after pairing.",
+  "actual": "Owner confirmed the same interruption and System info showed Software Crash/Panic. COM6 dropped after controller initialization. Sanitized backtrace identifies abort in coex_core_enable via esp_bt_controller_enable. Internal heap before initialization was 232,972 B, largest block 221,172 B.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0106-ble-runtime.txt",
+    "docs/evidence/2026-11-04-v0106-coredump-backtrace.txt"
+  ],
+  "evidence_kind": "Owner report, timestamped native USB log and sanitized crash backtrace",
+  "environment": "Physical board / native USB",
+  "limitations": "Heap snapshot before BLE controller startup only. No complete memory, latency, or power profiling. Raw task snapshots were removed after local decoding."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0049",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.7",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Wi-Fi/BLE coexistence physical acceptance",
+  "hardware": "LILYGO T-Display-S3 Touch Glass / ESP32-S3 revision v0.2",
+  "wiring": "Factory touch/display and native USB",
+  "procedure": "After upload, enable BLE while Wi-Fi STA is connected. Pair with a phone/PC, use TEST KEYBOARD in a blank editor, then disable BLE and check Wi-Fi remains connected. Repeat with BLE enabled before Wi-Fi and perform at least 20 activation cycles and resource profiling.",
+  "expected": "Remain responsive through BLE enable/disable, coexist with Wi-Fi, and advertise and type after pairing.",
+  "actual": "Pending v0.10.7 retest.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending procedure",
+  "environment": "Physical board / native USB",
+  "limitations": "Track immediate smoke verification separately from complete pairing and lifecycle profiling."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0050",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.7",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized application-only upload",
+  "hardware": "LILYGO T-Display-S3 Touch Glass / ESP32-S3 revision v0.2",
+  "wiring": "Factory touch/display and native USB",
+  "procedure": "Check image SHA-256. Use native USB 1200 baud transition from COM6 to ROM COM5, then esptool 5.6.0 write-flash 0x10000 with watchdog reset.",
+  "expected": "Write and verify the identified app0 image, then observe runtime port.",
+  "actual": "Wrote 1,566,096 B to app0 and verified data hash. COM5 disappeared after watchdog reset, causing a serial exception and exit 1 after successful verification. Runtime COM6 returned and accepted the serial monitor.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0107-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and runtime USB enumeration",
+  "environment": "Windows / native USB / esptool 5.6.0",
+  "limitations": "PASS applies to application write, hash verification and observed runtime USB return. BLE behavior has separate evidence."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0051",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.7",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Original BLE activation restart regression",
+  "hardware": "LILYGO T-Display-S3 Touch Glass / ESP32-S3 revision v0.2",
+  "wiring": "Factory touch/display and native USB",
+  "procedure": "Press ENABLE BLE KEYBOARD with runtime COM6 monitor attached after installing HWT-0050.",
+  "expected": "Controller and host start, HID startup reaches advertising, and USB remains enumerated.",
+  "actual": "BLE initialization completed through the advertising and battery setup log at 21:40:21+03:00. COM6 remained connected. Controller pre-init internal heap was 232,988 B with a 221,172 B largest block.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0107-ble-runtime.txt"
+  ],
+  "evidence_kind": "Timestamped native USB serial capture",
+  "environment": "Physical board / native USB",
+  "limitations": "Single activation smoke test. The log shows firmware advertising calls. RF discovery, pairing, typing, Wi-Fi link state and full lifecycle acceptance are tracked separately in HWT-0049."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-04",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and Windows PC",
+  "wiring": "Factory wiring and native USB",
+  "environment": "Physical board / Windows",
+  "procedure": "Capture Bluetooth connection, auth, and disconnect while moving from Settings to Generator and testing BLE typing in a blank local editor.",
+  "expected": "Windows remains connected and receives HID input.",
+  "id": "HWT-0052",
+  "firmware_version": "v0.10.7",
+  "scope": "Windows BLE pairing and Generator typing",
+  "actual": "Owner reported the board stayed on, paired with Windows, and Generator showed BLE not connected. Windows BTHUSB event 8 and SecureConnectionPaired confirm pairing succeeded.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0107-windows-ble.txt"
+  ],
+  "evidence_kind": "Owner report and Windows pairing event/property",
+  "limitations": "No controller disconnect reason was logged by v0.10.7."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-04",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and Windows PC",
+  "wiring": "Factory wiring and native USB",
+  "environment": "Physical board / Windows",
+  "procedure": "Capture Bluetooth connection, auth, and disconnect while moving from Settings to Generator and testing BLE typing in a blank local editor.",
+  "expected": "Windows remains connected and receives HID input.",
+  "id": "HWT-0053",
+  "firmware_version": "v0.10.8",
+  "scope": "Capture post-pairing BLE link loss on Windows",
+  "actual": "Pending authorized upload and owner reproduction.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending procedure",
+  "limitations": "Requires the paired Windows host, board and USB serial monitor."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0054",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.8",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app-only diagnostic upload",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Factory wiring and native USB",
+  "procedure": "Verify local image hash and write app0 via esptool 5.6.0 on COM5.",
+  "expected": "Verify written image and see runtime COM6.",
+  "actual": "Wrote 1,566,464 bytes at 0x10000 and verified the data hash. COM5 disappeared during watchdog reset, producing a serial error after verified write. COM6 returned and serial monitoring opened.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0108-upload.txt",
+    "docs/evidence/2026-11-04-v0108-ble-runtime.txt"
+  ],
+  "evidence_kind": "esptool output and USB CDC observation",
+  "environment": "Windows / esptool 5.6.0",
+  "limitations": "Upload result covers flash write and runtime enumeration. BLE results tracked separately."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0055",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.8",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Windows BLE disconnect and reported connected state",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and Windows PC",
+  "wiring": "Factory wiring and native USB",
+  "procedure": "Capture v0.10.8 BLE events during existing Windows pairing and after a Windows re-pair attempt. Compare Windows connected endpoints.",
+  "expected": "Windows maintains the authenticated HID link and Generator can deliver to the intended host.",
+  "actual": "Multiple remote disconnects 0x13 with advertising restarted successfully. The re-pair interval included authentication failure 0x55 and another remote disconnect. A later GATT Connected event lacked a logged authentication result and was shown green on the board. No matching connected Windows endpoint was returned by the subsequent query.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0108-ble-runtime.txt"
+  ],
+  "evidence_kind": "Timestamped USB serial trace and owner report, with Windows connection-selector observation",
+  "environment": "Physical board / Windows",
+  "limitations": "No peer identity captured. Missing Windows endpoint does not identify another device. The serial log does not prove key delivery or the underlying authentication cause."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0056",
+  "date": "2026-11-04",
+  "firmware_version": "v0.11.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Bluetooth Home, Windows pairing and HID stability",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and Windows PC",
+  "wiring": "Factory wiring and native USB",
+  "procedure": "Open Bluetooth from Home, enable it with Wi-Fi active, re-pair from Windows as needed and monitor encryption, CCCD and disconnect. Test TEST KEYBOARD in an empty local editor, return Home and test Generator only with a disposable value. Repeat reconnect and at least 20 cycles for resource acceptance.",
+  "expected": "Pairing and ready states reflect the link, test input arrives, and connection remains usable across app navigation.",
+  "actual": "Pending physical test.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending procedure",
+  "environment": "Physical board / Windows / native USB",
+  "limitations": "Host mocks cannot confirm encryption, Windows HID behavior or runtime resources."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0057",
+  "date": "2026-11-04",
+  "firmware_version": "v0.11.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app-only upload",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Factory wiring and native USB",
+  "procedure": "Check local image SHA-256 and write app0 at 0x10000 using esptool 5.6.0 on COM5.",
+  "expected": "Hash verification and return to runtime COM6.",
+  "actual": "Wrote 1,567,296 B and verified data hash. Serial exception after watchdog reset as COM5 disappeared. Runtime COM6 returned and monitor opened.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0110-upload.txt",
+    "docs/evidence/2026-11-04-v0110-ble-runtime.txt"
+  ],
+  "evidence_kind": "esptool transcript and native USB capture",
+  "environment": "Windows / esptool / USB CDC",
+  "limitations": "Write and runtime enumeration only. Pairing and HID results recorded separately."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-04",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and Windows PC",
+  "wiring": "Factory hardware and USB CDC",
+  "environment": "Physical board / Windows / native USB",
+  "id": "HWT-0058",
+  "firmware_version": "v0.11.0",
+  "scope": "Reproduce Windows HID enumeration failure",
+  "procedure": "Restart BLE on the board and then remove and pair the Windows device again while monitoring USB. Inspect Windows PnP child service UUIDs.",
+  "expected": "Windows enumerates the HID service and subscribes after connecting.",
+  "actual": "Fresh pairing authenticated successfully without a keyboard subscription. Board stayed at SETTING UP KEYBOARD. Windows enumerated 0x1800, 0x1801, 0x180A and 0x180F children and no 0x1812 child.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0110-retest-ble-runtime.txt",
+    "docs/evidence/2026-11-04-v0110-windows-services.txt"
+  ],
+  "evidence_kind": "Timestamped serial capture, Windows PnP metadata and owner report",
+  "limitations": "Windows PnP children are host enumeration evidence, not a raw GATT database dump. Startup heap checkpoints at 192,832 and 179,604 B differ by 13,228 B after a toggle; full repeat-cycle profile needed."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-04",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and Windows PC",
+  "wiring": "Factory hardware and USB CDC",
+  "environment": "Physical board / Windows / native USB",
+  "id": "HWT-0059",
+  "firmware_version": "v0.11.1",
+  "scope": "Test Windows enumeration and encrypted BLE typing",
+  "procedure": "Enable Bluetooth and add the keyboard in Windows after removing its existing Windows pairing if present. Confirm HID service start, GATT connection, authentication, CCCD on, and receipt of TEST KEYBOARD text in an empty local editor. Retest a reconnect and the 20-cycle resource scenarios.",
+  "expected": "Windows enumerates HID, authenticates, subscribes and receives test text; unready links cannot send.",
+  "actual": "Pending authorized device test.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending procedure",
+  "limitations": "Software validation cannot establish HID delivery or Windows bonded reconnect."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0060",
+  "date": "2026-11-04",
+  "firmware_version": "v0.11.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app0 upload",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Factory wiring and USB CDC",
+  "procedure": "Verify SHA-256 and flash app0 at 0x10000 from COM5 using esptool.",
+  "expected": "Verify flash write and recover runtime COM6.",
+  "actual": "1,572,160 B written and data hash verified. COM5 disappeared on watchdog reset and esptool returned a post-write serial error. Runtime COM6 returned and BLE connection events were captured.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0111-upload.txt",
+    "docs/evidence/2026-11-04-v0111-ble-runtime.txt"
+  ],
+  "evidence_kind": "esptool transcript and runtime serial capture",
+  "environment": "Windows / esptool 5.6.0 / USB",
+  "limitations": "Flash and runtime-port evidence only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0061",
+  "date": "2026-11-04",
+  "firmware_version": "v0.11.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Windows BLE keyboard startup and reconnect",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and Windows PC",
+  "wiring": "Factory wiring and USB CDC",
+  "procedure": "Observe Windows re-pairing and BLE disable/enable with serial capture.",
+  "expected": "HID starts, Windows subscribes and test keys can be sent.",
+  "actual": "HID service start result 0 and advertising result 0. User observed SETTING UP KEYBOARD and WAITING alternating. Multiple 0x13 disconnects before subscription. Authentication success occurred on initial link, with failures 0x55 and 0x66 on subsequent attempts. No keyboard notifications on event. USB remained connected.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0111-ble-runtime.txt"
+  ],
+  "evidence_kind": "Owner report and timestamped serial capture",
+  "environment": "Physical board / Windows / native USB",
+  "limitations": "The status confirms service registration and peer termination; the underlying reason for Windows terminating and HID delivery remain unverified."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0062",
+  "date": "2026-11-04",
+  "firmware_version": "v0.11.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Second-host isolation after Windows failure",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and user's phone",
+  "wiring": "Factory hardware and USB CDC",
+  "procedure": "Owner isolated Windows Bluetooth and tried a phone connection while serial monitoring remained active.",
+  "expected": "HID starts, the phone authenticates, subscribes and NibruOS shows KEYBOARD READY.",
+  "actual": "Owner reported the phone stayed connected and the board remained at SETTING UP KEYBOARD. Serial capture recorded HID start 0, authentication failure 0x55, then keyboard notifications on. Test input was unavailable.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0111-ble-runtime.txt"
+  ],
+  "evidence_kind": "Owner report and timestamped serial capture",
+  "environment": "Physical board / phone / USB CDC",
+  "limitations": "Phone platform was not reported. The trace shows subscription with failed authentication. It does not establish the precise SMP rejection cause."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0063",
+  "date": "2026-11-04",
+  "firmware_version": "v0.12.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Display-assisted authentication on Windows and phone",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and user's phone",
+  "wiring": "Factory hardware and USB CDC",
+  "procedure": "With only the test host's Bluetooth on, remove the prior host-side NibruOS pairing if present. Pair while the Bluetooth card is visible and enter the displayed code on the host. Verify authentication, subscription, TEST KEYBOARD in an empty editor, then reconnect.",
+  "expected": "A one-time code is visible only during pairing, the authenticated and subscribed link becomes ready, and test text arrives.",
+  "actual": "Pending authorized device test.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending procedure",
+  "environment": "Physical board / phone / USB CDC",
+  "limitations": "Test Windows and phone separately; 20-cycle resource acceptance remains a separate requirement."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0064",
+  "date": "2026-11-04",
+  "firmware_version": "v0.12.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app0 upload",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Factory wiring and native USB",
+  "procedure": "Verify local image SHA-256 and write app0 at 0x10000 with esptool.",
+  "expected": "Verify written data and recover runtime COM6.",
+  "actual": "1,572,800 B written and hash verified. COM5 disappeared after watchdog reset, causing an esptool serial error after verification. Runtime COM6 returned and serial monitoring opened.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0120-upload.txt",
+    "docs/evidence/2026-11-04-v0120-ble-runtime.txt"
+  ],
+  "evidence_kind": "Captured esptool output and USB serial observation",
+  "environment": "Windows / esptool / USB CDC",
+  "limitations": "Flash write and runtime-port evidence only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-04",
+  "firmware_version": "v0.12.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Factory wiring and native USB",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0120-ble-runtime.txt"
+  ],
+  "environment": "Physical ESP32-S3 / USB CDC",
+  "id": "HWT-0065",
+  "scope": "Windows passkey and HID subscription",
+  "procedure": "Monitor display-assisted pairing and compare the USB serial result with Windows BTHUSB event 8.",
+  "expected": "Successful authentication followed by keyboard subscription and test text delivery.",
+  "actual": "Passkey notification, then successful authentication at 22:39:14 +03:00, coinciding with the NibruOS pairing event on Windows. No keyboard subscription event followed. The link closed with reason 0x13.",
+  "result": "FAIL",
+  "evidence_kind": "Timestamped USB serial and Windows event match",
+  "limitations": "PASS for the individual authentication attempt only. Windows HID typing remains unverified."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "date": "2026-11-04",
+  "firmware_version": "v0.12.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Factory wiring and native USB",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0120-ble-runtime.txt"
+  ],
+  "environment": "Physical ESP32-S3 / USB CDC",
+  "id": "HWT-0066",
+  "scope": "Phone passkey prompt and keyboard acceptance",
+  "procedure": "Owner attempted pairing on the phone while monitoring the NibruOS BLE events.",
+  "expected": "The phone prompts for the displayed code, then enables the input report and receives test text.",
+  "actual": "Owner observed the incorrect PIN or passkey error immediately, before an entry field. The capture had passkey notifications, repeated 0x51/0x55 authentication failures and no subscription. Windows Bluetooth was still on at host status checks.",
+  "result": "FAIL",
+  "evidence_kind": "Owner report and timestamped USB serial",
+  "limitations": "The trace omits peer addresses and Windows was not confirmed off throughout. A specific failure line cannot be attributed to the phone. No PIN or passkey value was recorded."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0067",
+  "date": "2026-11-04",
+  "firmware_version": "v0.12.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app0 upload and runtime USB enumeration",
+  "hardware": "LILYGO T-Display-S3 Touch Glass ESP32-S3",
+  "wiring": "Native USB",
+  "procedure": "Verify the build hash, write only app0 at 0x10000 via ROM COM5, reset and open runtime COM6.",
+  "expected": "The image verifies and runtime USB returns.",
+  "actual": "Wrote 1,572,864 B and verified the flash hash. esptool exited 1 after the reset detached COM5. Runtime COM6 returned and opened at 115200.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0121-upload.txt",
+    "docs/evidence/2026-11-04-v0121-runtime.txt"
+  ],
+  "evidence_kind": "Captured esptool output and USB serial observation",
+  "environment": "Windows / esptool 5.6.0",
+  "limitations": "The boot banner was not captured. Pairing, typing and physical resource metrics were not tested."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0068",
+  "date": "2026-11-04",
+  "firmware_version": "v0.12.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Windows reconnect with existing pairing",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and Windows Bluetooth host",
+  "wiring": "USB for serial capture",
+  "procedure": "Toggle BLE on NibruOS with the existing Windows pairing. Inspect COM6 logs and present Windows Keyboard devices.",
+  "expected": "Authenticated peer subscribes to HID input and keyboard becomes ready.",
+  "actual": "HID service started and authentication succeeded. No input subscription appeared in the capture. Owner confirmed SETTING UP KEYBOARD. Windows listed NibruOS under Bluetooth but no Bluetooth keyboard input device.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0121-ble-runtime.txt"
+  ],
+  "evidence_kind": "Serial output, Windows PnP inspection and owner report",
+  "environment": "Windows and ESP32-S3",
+  "limitations": "Existing pairing only. Fresh pairing and typing not verified by this record."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0069",
+  "date": "2026-11-04",
+  "firmware_version": "v0.12.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Windows pairing retry and HID enumeration",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and Windows Bluetooth host",
+  "wiring": "Native USB for serial",
+  "procedure": "Owner retries pairing after removing the Windows entry. Inspect serial and present PnP children of NibruOS Keyboard.",
+  "expected": "Windows exposes a HID keyboard, enables notifications and NibruOS shows KEYBOARD READY.",
+  "actual": "Owner reported no readiness. Present Windows children included 1800, 1801, 180A and 180F; none showed HID service 1812. The serial capture showed repeated disconnects and authentication failures and no keyboard subscription.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0121-ble-runtime.txt"
+  ],
+  "evidence_kind": "Serial output, live Windows PnP inspection and owner report",
+  "environment": "Windows and ESP32-S3",
+  "limitations": "PnP children do not show raw GATT transactions. Individual serial events were not correlated to the exact pairing click."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0070",
+  "date": "2026-11-04",
+  "firmware_version": "v0.13.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app0 upload",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB",
+  "procedure": "Verify image SHA-256, write app0 at 0x10000 via COM5, then check runtime COM6.",
+  "expected": "Written data verifies and runtime port opens.",
+  "actual": "1,575,856 bytes written and hash verified. COM5 detached during watchdog reset and esptool returned a post-write serial error. Runtime COM6 returned and opened at 115200.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0130-upload.txt",
+    "docs/evidence/2026-11-04-v0130-runtime.txt"
+  ],
+  "evidence_kind": "esptool output and runtime USB observation",
+  "environment": "Windows / native USB",
+  "limitations": "Boot banner, UI, RF transmission and resource metrics were not captured."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0071",
+  "date": "2026-11-04",
+  "firmware_version": "v0.14.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app0 upload",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB",
+  "procedure": "Verify image SHA-256, write app0 at 0x10000 via COM5, then check runtime COM6.",
+  "expected": "Written data verifies and runtime port opens.",
+  "actual": "1,577,744 bytes written and hash verified. COM5 detached during watchdog reset and esptool returned a post-write serial error. Runtime COM6 returned and opened at 115200.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0140-upload.txt",
+    "docs/evidence/2026-11-04-v0140-runtime.txt"
+  ],
+  "evidence_kind": "esptool output and runtime USB observation",
+  "environment": "Windows / native USB",
+  "limitations": "Boot banner, UI, RF transmission and resource metrics were not captured."
+}
+```

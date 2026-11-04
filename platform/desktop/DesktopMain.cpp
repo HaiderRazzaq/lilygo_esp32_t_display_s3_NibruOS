@@ -16,6 +16,8 @@
 #include "services/UsbHidService.h"
 #include "services/WebPortalService.h"
 #include "apps/WiFiApp.h"
+#include "apps/BluetoothApp.h"
+#include "apps/BeaconLabApp.h"
 #include "apps/TotpApp.h"
 #include "apps/VaultApp.h"
 #include "apps/SettingsApp.h"
@@ -99,6 +101,8 @@ int main(int argc, char* argv[]) {
   AppManager launcher(context);
 
   WiFiApp wifiApp;
+  BluetoothApp bluetoothApp;
+  BeaconLabApp beaconLabApp;
   TotpApp totpApp;
   VaultApp vaultApp;
   GeneratorApp generatorApp;
@@ -122,11 +126,13 @@ int main(int argc, char* argv[]) {
 
     // Register applications exactly matching physical device baseline (src/main.cpp)
     launcher.registerApp(wifiApp);
+    launcher.registerApp(bluetoothApp);
     launcher.registerApp(totpApp);
     launcher.registerApp(vaultApp);
     launcher.registerApp(generatorApp);
     launcher.registerApp(clockApp);
     launcher.registerApp(settingsApp);
+    launcher.registerApp(beaconLabApp);
 
     launcher.begin();
     launcher.tick(millis());
@@ -182,9 +188,6 @@ int main(int argc, char* argv[]) {
           security.invalidateFull();
         } else {
           launcher.invalidate();
-          if (launcher.activeApp()) {
-            launcher.activeApp()->onDisplayRestored(context);
-          }
         }
       } else {
         clockApp.renderScreensaver(context, now);
@@ -225,6 +228,9 @@ int main(int argc, char* argv[]) {
       if (vault.isLoaded()) vaultApp.clearSession(context);
       webPortal.stop(context);
       usbHid.cancel();
+    }
+    if (display.isSleeping() || display.isScreensaverActive() || security.isLocked()) {
+      beaconLabApp.onExit(context);
     }
     wifi.tick(tickNow);
     timeService.tick(tickNow, wifi.isConnected());

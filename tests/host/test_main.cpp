@@ -336,6 +336,52 @@ int main() {
   char ipBuf[24]{};
   wifi.getLocalIP(ipBuf, sizeof(ipBuf));
   assert(std::strcmp(ipBuf, "192.168.1.100") == 0);
+
+  // Wi-Fi starts first with modem sleep disabled. BLE needs it throughout its lease.
+  assert(!WiFi.sleepEnabled);
+  WiFi.canSetSleep = false;
+  assert(!bleHid.setEnabled(true, context));
+  assert(!bleHid.isEnabled());
+  assert(resources.wifiOwner() == ResourceOwner::None);
+  WiFi.canSetSleep = true;
+  assert(bleHid.setEnabled(true, context));
+  assert(WiFi.sleepEnabled);
+  bleHid.onClientConnected();
+  assert(!bleHid.isConnected());
+  assert(!bleHid.typeText("test"));
+  bleHid.onPairingCode(12345);
+  assert(bleHid.pairingCode() == 12345);
+  bleHid.onInputSubscription(true);
+  assert(!bleHid.isConnected());
+  assert(!bleHid.typeText("test"));
+  bleHid.onLinkAuthenticated(true);
+  assert(bleHid.pairingCode() == BleHidService::kNoPairingCode);
+  assert(bleHid.typeText("test"));
+  bleHid.onLinkAuthenticated(false);
+  assert(!bleHid.typeText("test"));
+  bleHid.onLinkAuthenticated(true);
+  assert(bleHid.typeText("test"));
+  bleHid.onInputSubscription(false);
+  assert(!bleHid.typeText("test"));
+  bleHid.onPairingCode(654321);
+  bleHid.onClientDisconnected();
+  assert(bleHid.pairingCode() == BleHidService::kNoPairingCode);
+  bleHid.onInputSubscription(true);
+  assert(!bleHid.typeText("test"));
+  bleHid.onClientConnected();
+  bleHid.onPairingCode(1000000);
+  assert(bleHid.pairingCode() == BleHidService::kNoPairingCode);
+  bleHid.onLinkAuthenticated(true);
+  assert(!bleHid.typeText("test"));
+  bleHid.onInputSubscription(true);
+  assert(bleHid.typeText("test"));
+  assert(wifi.connect("TestNet", "MyPass1234", fakeMs));
+  assert(WiFi.sleepEnabled);
+  assert(bleHid.setEnabled(false, context));
+  assert(!WiFi.sleepEnabled);
+  bleHid.onClientDisconnected();
+  assert(!bleHid.isEnabled());
+
   wifi.disconnect();
   assert(wifi.connectState() == ConnectState::Disconnected);
 

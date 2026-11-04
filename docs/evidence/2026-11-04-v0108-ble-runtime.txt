@@ -1,0 +1,140 @@
+2026-11-04T21:47:41.933+03:00 Listening on COM6
+2026-11-04T21:47:46.729+03:00 [BLE] Starting controller (internal heap=232956, largest=221172 bytes)
+2026-11-04T21:47:46.729+03:00 [BLE] Starting Bluedroid host...
+2026-11-04T21:47:46.946+03:00 [BLE] Creating BLE Server...
+2026-11-04T21:47:46.946+03:00 [BLE] Creating BLE HID Device...
+2026-11-04T21:47:46.949+03:00 [BLE] Setting HID Metadata...
+2026-11-04T21:47:46.950+03:00 [BLE] Setting Security...
+2026-11-04T21:47:46.950+03:00 [BLE] Setting Report Map & Services...
+2026-11-04T21:47:46.956+03:00 [BLE] Starting Advertising...
+2026-11-04T21:47:46.957+03:00 [BLE] Setting Battery Level...
+2026-11-04T21:47:46.957+03:00 [BLE] BLE Advertising started successfully!
+2026-11-04T21:47:46.960+03:00 [BLE] Advertising result=0
+2026-11-04T21:47:57.846+03:00 [BLE] Connected (id=0)
+2026-11-04T21:47:57.847+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:47:57.849+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:01.658+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:01.659+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:01.662+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:06.906+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:06.906+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:06.909+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:11.717+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:11.717+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:11.720+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:13.824+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:13.825+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:13.828+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:18.699+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:18.700+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:18.702+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:28.728+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:28.729+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:28.732+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:33.070+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:33.071+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:33.073+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:35.452+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:35.452+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:35.455+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:36.212+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:36.212+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:36.214+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:42.229+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:42.230+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:42.232+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:43.022+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:43.022+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:43.025+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:54.887+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:54.888+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:54.891+03:00 [BLE] Advertising result=0
+2026-11-04T21:48:56.927+03:00 [BLE] Connected (id=0)
+2026-11-04T21:48:56.928+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:48:56.931+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:00.251+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:00.252+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:00.254+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:01.676+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:01.677+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:01.679+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:02.703+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:02.704+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:02.706+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:04.420+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:04.421+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:04.424+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:07.068+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:07.068+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:07.072+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:09.272+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:09.812+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:09.815+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:11.291+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:11.291+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:11.294+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:14.966+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:14.967+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:14.969+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:17.627+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:18.048+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:18.050+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:18.941+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:18.942+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:18.945+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:19.706+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:19.707+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:19.709+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:23.541+03:00 [BLE] Starting controller (internal heap=219212, largest=147444 bytes)
+2026-11-04T21:49:23.541+03:00 [BLE] Starting Bluedroid host...
+2026-11-04T21:49:23.757+03:00 [BLE] Creating BLE Server...
+2026-11-04T21:49:23.757+03:00 [BLE] Creating BLE HID Device...
+2026-11-04T21:49:23.761+03:00 [BLE] Setting HID Metadata...
+2026-11-04T21:49:23.761+03:00 [BLE] Setting Security...
+2026-11-04T21:49:23.762+03:00 [BLE] Setting Report Map & Services...
+2026-11-04T21:49:23.767+03:00 [BLE] Starting Advertising...
+2026-11-04T21:49:23.768+03:00 [BLE] Setting Battery Level...
+2026-11-04T21:49:23.768+03:00 [BLE] BLE Advertising started successfully!
+2026-11-04T21:49:23.771+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:24.296+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:24.296+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:24.299+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:25.142+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:25.502+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:25.505+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:26.336+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:26.337+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:26.339+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:27.776+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:27.776+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:27.779+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:28.623+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:28.624+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:28.626+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:33.085+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:33.086+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:33.089+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:35.156+03:00 [BLE] Connected (id=0)
+2026-11-04T21:49:35.157+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:49:35.159+03:00 [BLE] Advertising result=0
+2026-11-04T21:49:36.446+03:00 [BLE] Connected (id=0)
+2026-11-04T21:50:56.177+03:00 [BLE] Disconnected (id=0, reason=0x16)
+2026-11-04T21:50:58.021+03:00 [BLE] Starting controller (internal heap=205984, largest=131060 bytes)
+2026-11-04T21:50:58.021+03:00 [BLE] Starting Bluedroid host...
+2026-11-04T21:50:58.237+03:00 [BLE] Creating BLE Server...
+2026-11-04T21:50:58.238+03:00 [BLE] Creating BLE HID Device...
+2026-11-04T21:50:58.242+03:00 [BLE] Setting HID Metadata...
+2026-11-04T21:50:58.243+03:00 [BLE] Setting Security...
+2026-11-04T21:50:58.244+03:00 [BLE] Setting Report Map & Services...
+2026-11-04T21:50:58.248+03:00 [BLE] Starting Advertising...
+2026-11-04T21:50:58.249+03:00 [BLE] Setting Battery Level...
+2026-11-04T21:50:58.250+03:00 [BLE] BLE Advertising started successfully!
+2026-11-04T21:50:58.252+03:00 [BLE] Advertising result=0
+2026-11-04T21:51:00.857+03:00 [BLE] Connected (id=0)
+2026-11-04T21:51:02.500+03:00 [BLE] Authentication failed (reason=0x55)
+2026-11-04T21:51:02.598+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:51:02.601+03:00 [BLE] Advertising result=0
+2026-11-04T21:51:08.342+03:00 [BLE] Connected (id=0)
+2026-11-04T21:51:08.402+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T21:51:08.406+03:00 [BLE] Advertising result=0
+2026-11-04T21:51:13.150+03:00 [BLE] Connected (id=0)

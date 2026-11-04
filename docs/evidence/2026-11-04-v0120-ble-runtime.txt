@@ -1,0 +1,92 @@
+2026-11-04T22:37:16.465+03:00 Listening on COM6
+2026-11-04T22:37:49.026+03:00 [BLE] Starting controller (internal heap=232820, largest=221172 bytes)
+2026-11-04T22:37:49.026+03:00 [BLE] Starting Bluedroid host...
+2026-11-04T22:37:49.243+03:00 [BLE] Creating BLE Server...
+2026-11-04T22:37:49.244+03:00 [BLE] Creating BLE HID Device...
+2026-11-04T22:37:49.248+03:00 [BLE] Setting HID Metadata...
+2026-11-04T22:37:49.249+03:00 [BLE] Setting Security...
+2026-11-04T22:37:49.249+03:00 [BLE] Setting Report Map & Services...
+2026-11-04T22:37:49.253+03:00 [BLE] HID service start result=0
+2026-11-04T22:37:49.255+03:00 [BLE] Starting Advertising...
+2026-11-04T22:37:49.255+03:00 [BLE] Setting Battery Level...
+2026-11-04T22:37:49.256+03:00 [BLE] BLE Advertising started successfully!
+2026-11-04T22:37:49.259+03:00 [BLE] Advertising result=0
+2026-11-04T22:37:50.246+03:00 [BLE] Connected (id=0)
+2026-11-04T22:37:50.443+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T22:37:50.445+03:00 [BLE] Authentication failed (reason=0x66)
+2026-11-04T22:37:50.447+03:00 [BLE] Advertising result=0
+2026-11-04T22:38:01.508+03:00 [BLE] Connected (id=0)
+2026-11-04T22:38:01.696+03:00 [BLE] Pairing code shown on device
+2026-11-04T22:38:01.997+03:00 [BLE] Authentication failed (reason=0x51)
+2026-11-04T22:38:04.996+03:00 [BLE] Disconnected (id=0, reason=0x16)
+2026-11-04T22:38:04.999+03:00 [BLE] Advertising result=0
+2026-11-04T22:38:10.917+03:00 [BLE] Connected (id=0)
+2026-11-04T22:38:11.200+03:00 [BLE] Pairing code shown on device
+2026-11-04T22:38:11.552+03:00 [BLE] Authentication failed (reason=0x51)
+2026-11-04T22:38:14.552+03:00 [BLE] Disconnected (id=0, reason=0x16)
+2026-11-04T22:38:14.554+03:00 [BLE] Advertising result=0
+2026-11-04T22:38:16.522+03:00 [BLE] Connected (id=0)
+2026-11-04T22:38:16.808+03:00 [BLE] Pairing code shown on device
+2026-11-04T22:38:17.353+03:00 [BLE] Authentication failed (reason=0x55)
+2026-11-04T22:38:20.353+03:00 [BLE] Disconnected (id=0, reason=0x16)
+2026-11-04T22:38:20.356+03:00 [BLE] Advertising result=0
+2026-11-04T22:38:21.397+03:00 [BLE] Connected (id=0)
+2026-11-04T22:38:21.585+03:00 [BLE] Pairing code shown on device
+2026-11-04T22:38:22.471+03:00 [BLE] Authentication failed (reason=0x55)
+2026-11-04T22:38:25.471+03:00 [BLE] Disconnected (id=0, reason=0x16)
+2026-11-04T22:38:25.473+03:00 [BLE] Advertising result=0
+2026-11-04T22:38:27.101+03:00 [BLE] Connected (id=0)
+2026-11-04T22:38:27.290+03:00 [BLE] Pairing code shown on device
+2026-11-04T22:38:28.079+03:00 [BLE] Authentication failed (reason=0x51)
+2026-11-04T22:38:31.054+03:00 [BLE] Disconnected (id=0, reason=0x16)
+2026-11-04T22:38:32.866+03:00 [BLE] Starting controller (internal heap=218964, largest=147444 bytes)
+2026-11-04T22:38:32.866+03:00 [BLE] Starting Bluedroid host...
+2026-11-04T22:38:33.083+03:00 [BLE] Creating BLE Server...
+2026-11-04T22:38:33.084+03:00 [BLE] Creating BLE HID Device...
+2026-11-04T22:38:33.087+03:00 [BLE] Setting HID Metadata...
+2026-11-04T22:38:33.087+03:00 [BLE] Setting Security...
+2026-11-04T22:38:33.088+03:00 [BLE] Setting Report Map & Services...
+2026-11-04T22:38:33.092+03:00 [BLE] HID service start result=0
+2026-11-04T22:38:33.094+03:00 [BLE] Starting Advertising...
+2026-11-04T22:38:33.094+03:00 [BLE] Setting Battery Level...
+2026-11-04T22:38:33.095+03:00 [BLE] BLE Advertising started successfully!
+2026-11-04T22:38:33.098+03:00 [BLE] Advertising result=0
+2026-11-04T22:38:36.803+03:00 [BLE] Connected (id=0)
+2026-11-04T22:38:37.088+03:00 [BLE] Pairing code shown on device
+2026-11-04T22:38:37.341+03:00 [BLE] Authentication failed (reason=0x51)
+2026-11-04T22:38:40.340+03:00 [BLE] Disconnected (id=0, reason=0x16)
+2026-11-04T22:38:40.342+03:00 [BLE] Advertising result=0
+2026-11-04T22:38:53.051+03:00 [BLE] Connected (id=0)
+2026-11-04T22:38:53.334+03:00 [BLE] Pairing code shown on device
+2026-11-04T22:39:14.918+03:00 [BLE] Authentication succeeded (reason=0x00)
+2026-11-04T22:39:37.631+03:00 [BLE] Disconnected (id=0, reason=0x13)
+2026-11-04T22:39:37.634+03:00 [BLE] Advertising result=0
+2026-11-04T22:39:39.108+03:00 Serial unavailable on COM6
+2026-11-04T22:39:42.020+03:00 Listening on COM6
+2026-11-04T22:39:50.586+03:00 [BLE] Starting controller (internal heap=232828, largest=221172 bytes)
+2026-11-04T22:39:50.587+03:00 [BLE] Starting Bluedroid host...
+2026-11-04T22:39:50.808+03:00 [BLE] Creating BLE Server...
+2026-11-04T22:39:50.809+03:00 [BLE] Creating BLE HID Device...
+2026-11-04T22:39:50.813+03:00 [BLE] Setting HID Metadata...
+2026-11-04T22:39:50.813+03:00 [BLE] Setting Security...
+2026-11-04T22:39:50.814+03:00 [BLE] Setting Report Map & Services...
+2026-11-04T22:39:50.818+03:00 [BLE] HID service start result=0
+2026-11-04T22:39:50.820+03:00 [BLE] Starting Advertising...
+2026-11-04T22:39:50.821+03:00 [BLE] Setting Battery Level...
+2026-11-04T22:39:50.821+03:00 [BLE] BLE Advertising started successfully!
+2026-11-04T22:39:50.824+03:00 [BLE] Advertising result=0
+2026-11-04T22:40:01.723+03:00 [BLE] Connected (id=0)
+2026-11-04T22:40:02.007+03:00 [BLE] Pairing code shown on device
+2026-11-04T22:40:02.701+03:00 [BLE] Authentication failed (reason=0x51)
+2026-11-04T22:40:05.699+03:00 [BLE] Disconnected (id=0, reason=0x16)
+2026-11-04T22:40:05.701+03:00 [BLE] Advertising result=0
+2026-11-04T22:40:07.815+03:00 [BLE] Connected (id=0)
+2026-11-04T22:40:08.003+03:00 [BLE] Pairing code shown on device
+2026-11-04T22:40:08.209+03:00 [BLE] Authentication failed (reason=0x51)
+2026-11-04T22:40:11.207+03:00 [BLE] Disconnected (id=0, reason=0x16)
+2026-11-04T22:40:11.209+03:00 [BLE] Advertising result=0
+2026-11-04T22:40:14.592+03:00 [BLE] Connected (id=0)
+2026-11-04T22:40:14.974+03:00 [BLE] Pairing code shown on device
+2026-11-04T22:40:15.375+03:00 [BLE] Authentication failed (reason=0x51)
+2026-11-04T22:40:18.374+03:00 [BLE] Disconnected (id=0, reason=0x16)
+2026-11-04T22:40:18.376+03:00 [BLE] Advertising result=0

@@ -852,6 +852,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "purpose": "Provide a modular Bluetooth LE HID service architecture strictly mediated through ResourceManager mutual exclusion, coexisting safely with Wi-Fi without degrading internal heap headroom",
   "module": "src/services/BleHidService",
   "files": [
+    "src/apps/BluetoothApp.h",
+    "src/apps/BluetoothApp.cpp",
     "src/services/BleHidService.h",
     "src/services/BleHidService.cpp",
     "src/core/ResourceManager.h",
@@ -873,20 +875,31 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ],
   "hardware": "ESP32-S3 BLE radio",
   "gpio": "No extra GPIO allocation",
-  "lifecycle": "Leases ResourceOwner::BleKeyboard; released on exit; safely unadvertised by default to maintain internal heap",
+  "lifecycle": "Explicit enable acquires ResourceOwner::BleKeyboard and enables Wi-Fi modem sleep for coexistence. Startup failure or explicit disable releases the lease. Wi-Fi restores its usual policy after the controller stops. Keyboard operation can continue across app navigation.",
   "implementation": "IMPLEMENTED",
   "verification": {
-    "build": "VER-0131",
-    "host": "VER-0129",
-    "hardware": "HWT-0040"
+    "build": "VER-0185, VER-0190",
+    "host": "VER-0183, VER-0184, VER-0188, VER-0189",
+    "hardware": "HWT-0064 upload PASS; HWT-0065 Windows and HWT-0066 phone keyboard acceptance failed"
   },
-  "issues": [],
+  "issues": ["BUG-0017", "BUG-0018"],
   "history": [
     "DEV-0046",
     "DEV-0047",
     "DEV-0048",
-    "DEV-0049"
-  ]
+    "DEV-0049",
+    "DEV-0050",
+    "DEV-0051",
+    "DEV-0052",
+    "DEV-0053",
+    "DEV-0054",
+    "DEV-0055",
+    "DEV-0056",
+    "DEV-0057",
+    "DEV-0058",
+    "DEV-0059"
+  ],
+  "registration": "bluetoothApp"
 }
 ```
 
@@ -922,5 +935,40 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "DEV-0046",
     "DEV-0047"
   ]
+}
+```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0024",
+  "name": "Beacon Lab",
+  "purpose": "Advertise up to 40 of 48 fictional SSIDs, with separate open and WPA2-advertised counts and five- to sixty-second sessions.",
+  "module": "src/apps/BeaconLabApp",
+  "files": [
+    "src/apps/BeaconLabApp.cpp",
+    "src/apps/BeaconLabApp.h",
+    "src/services/WiFiService.cpp",
+    "src/services/WiFiService.h"
+  ],
+  "dependencies": [
+    "FEAT-0004"
+  ],
+  "hardware": "Integrated ESP32-S3 2.4 GHz Wi-Fi",
+  "gpio": "No extra GPIO",
+  "lifecycle": "Explicit Start acquires BeaconLab lease. Timeout, Stop, Back, lock and sleep release it. Connected Wi-Fi and existing radio owners block entry.",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0193, VER-0198",
+    "host": "VER-0192, VER-0197",
+    "hardware": "NOT RUN"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0061",
+    "DEV-0062",
+    "DEV-0063"
+  ],
+  "registration": "beaconLabApp"
 }
 ```

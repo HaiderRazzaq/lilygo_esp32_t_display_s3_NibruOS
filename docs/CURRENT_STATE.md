@@ -1,18 +1,19 @@
 # Current state
 
-Snapshot: 2026-11-03, Asia/Baghdad. Implementation and physical acceptance are
+Snapshot: 2026-11-04, Asia/Baghdad. Implementation and physical acceptance are
 separate; [history](DEVELOPMENT_LOG.md) is append-only.
 
 ```json
 {
   "record_type": "state",
   "date": "2026-11-04",
-  "runtime_version": "v0.10.3",
+  "runtime_version": "v0.14.1",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
   "working_tree": "Screen orientation control (0 deg/180 deg), architecture audit, layer boundary hardening, single-source-of-truth configuration alignment (ADR-0003), zero compiler warnings",
   "implemented_features": [
+    "FEAT-0024",
     "FEAT-0001",
     "FEAT-0002",
     "FEAT-0003",
@@ -51,12 +52,13 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "BUG-0010",
     "BUG-0011",
     "BUG-0015",
-    "BUG-0016"
+    "BUG-0016",
+    "BUG-0018"
   ],
-  "latest_build": "VER-0119",
-  "latest_upload": "HWT-0036",
-  "documentation_verification": "VER-0120",
-  "current_host_attempt": "VER-0117",
+  "latest_build": "VER-0185",
+  "latest_upload": "HWT-0064",
+  "documentation_verification": "VER-0187",
+  "current_host_attempt": "VER-0183",
   "source_constants": {
     "kTouchSda": 18,
     "kTouchScl": 17,
@@ -176,3 +178,60 @@ Fixed lock screen freeze on wake: removed ST7789 DISPOFF (0x28) / DISPON (0x29) 
 
 ## 2FA USB Long-Press & Hardware Button Trigger — 2026-11-04
 Redesigned the 2FA Authenticator USB button with a modern Cyber USB Action Capsule (Cyan border, USB badge, instructional prompt, and status feedback). Added touch hold (long press) gating so short taps guide the user without accidental keystroke injection, and wired the physical BOOT hardware button (GPIO 0) via onPrimaryAction and onActivate to directly trigger USB HID OTP typing. Built and uploaded v0.9.4 to COM5 (HWT-0036); owner confirmed physical test PASS on device (HWT-0037).
+
+## BLE keyboard startup interruption — 2026-11-04
+
+The owner reproduced the interruption during BLE startup on v0.10.5 and
+v0.10.6 (HWT-0044, HWT-0048). The v0.10.6 trace identified an ESP-IDF
+coexistence panic in `coex_core_enable`. v0.10.7 enables Wi-Fi modem sleep
+for the BLE lifecycle and retains the controller error handling from v0.10.6.
+The authorized app0 upload passed (HWT-0050). A physical activation reached
+BLE advertising with native USB still connected (HWT-0051). Pairing, typing
+and extended resource acceptance are tracked in HWT-0049. See the
+[resource impact report](performance/BLE_STARTUP_RESOURCE_IMPACT.md).
+
+## Windows BLE link after pairing — 2026-11-04
+
+Windows successfully paired with v0.10.7. The owner then reported
+`BLE not connected` in Generator while the board remained on (HWT-0052).
+v0.10.8 adds Serial connection, authentication, disconnect reason and
+advertising completion messages. The uploaded image (HWT-0054) captured
+remote termination and an unspecified authentication failure (HWT-0055).
+Peer identity and Generator typing remain unverified.
+
+v0.11.0 adds Bluetooth beside Wi-Fi on the first Home page, with the
+same view reachable from Settings. BLE requests link encryption and shows
+keyboard readiness after the host subscribes to the encrypted input report.
+Home, Settings and readiness tests passed in software. The application
+image was flashed and verified (HWT-0057). Native USB returned, and the
+capture session contained no BLE activation. Windows reconnect, typing
+and resource acceptance are pending HWT-0056.
+
+HWT-0058 then reproduced successful v0.11.0 authentication without an HID
+subscription. Windows showed the Battery Service but no HID child. v0.11.1
+makes HID report metadata and the CCCD available during enumeration, while
+keystrokes require the authenticated and subscribed link. Device acceptance
+was attempted on the authorized image (HWT-0060). HID started on v0.11.1,
+but Windows disconnected before subscription (HWT-0061). A phone stayed
+connected and subscribed, with failed authentication (HWT-0062).
+v0.12.0 supplies DisplayOnly pairing and shows the one-time code on the
+Bluetooth screen. HWT-0064 verified the upload. Windows authenticated
+once but did not subscribe (HWT-0065). The phone reported incorrect
+PIN/passkey before offering a code entry field (HWT-0066). Keyboard
+delivery and extended resource acceptance are unverified.
+
+### BLE PnP ID correction in v0.12.1
+
+The Device Information PnP ID now uses little-endian fields, matching the NimBLE HID implementation used by Bruce. Display-assisted pairing and the authentication and subscription gates are unchanged. This corrects a known metadata error. Its effect on Windows HID subscription and the phone pairing failure is unverified. The v0.12.1 image was written and hash-verified. Runtime COM6 returned after reset (HWT-0067).
+
+### Beacon Lab in v0.13.0
+
+Beacon Lab is a Home app on ESP32 and desktop. Select 10, 15, 20, 25, 30, 35 or 40 synthetic Orchid SSIDs. Start requires an idle radio. A session stays on the current radio channel and ends after ten seconds or on Stop, Back, lock, screen sleep or screensaver. Hardware reception and resource scenarios are pending. The v0.13.0 image was written and hash-verified, and runtime COM6 returned (HWT-0070).
+
+### Beacon Lab controls in v0.14.0
+
+Open and Secured are separate counts, with a combined range of 1 to 40. Seconds selects a 5 to 60 second broadcast window in steps of 5 seconds. Each session selects distinct names from a pool of 48 fictional SSIDs. Secured adds WPA2-PSK metadata to the beacon. All entries are advertisements only. Receivers may retain them in their Wi-Fi list after the transmission ends. Physical receiver validation is pending. The v0.14.0 image was written and hash-verified, and runtime COM6 returned (HWT-0071).
+
+### Beacon Lab scan visibility in v0.14.1
+
+Beacon Lab sends at most three different names per scheduled tick, with at least 25 ms between batches. TX accepted shows distinct names accepted by the driver. It is not a receiver count. A failed raw TX request stops the session and logs its error and progress. The board remains on v0.14.0 pending upload.

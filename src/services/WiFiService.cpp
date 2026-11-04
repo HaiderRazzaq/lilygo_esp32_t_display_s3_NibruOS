@@ -5,6 +5,7 @@
 #include <Preferences.h>
 #ifndef UNIT_TEST
 #include <esp_wifi.h>
+#include <esp_random.h>
 
 namespace {
 uint8_t s_lastDisconnectReason = 0;
@@ -163,6 +164,22 @@ bool WiFiService::connectSaved(uint8_t idx, uint32_t nowMs) {
   return connect(saved_[idx].ssid, saved_[idx].password, nowMs);
 }
 
+bool WiFiService::setBleCoexistence(bool required) {
+  // ESP-IDF aborts when Wi-Fi and BLE coexist with WIFI_PS_NONE.
+  WiFi.setSleep(required);
+#ifndef UNIT_TEST
+  if (required && (WiFi.getMode() & WIFI_STA)) {
+    wifi_ps_type_t mode = WIFI_PS_NONE;
+    if (esp_wifi_get_ps(&mode) != ESP_OK || mode == WIFI_PS_NONE) {
+      WiFi.setSleep(bleCoexistence_);
+      return false;
+    }
+  }
+#endif
+  bleCoexistence_ = required;
+  return true;
+}
+
 bool WiFiService::prepareStation(uint32_t nowMs) {
   WiFi.persistent(false);
   if (!WiFi.mode(WIFI_STA)) {
@@ -171,7 +188,7 @@ bool WiFiService::prepareStation(uint32_t nowMs) {
     Serial.println("[WiFi] STA initialization failed");
     return false;
   }
-  WiFi.setSleep(false);
+  WiFi.setSleep(bleCoexistence_);
   if (connectState_ != ConnectState::Connected && connectState_ != ConnectState::Connecting) {
     WiFi.disconnect(false, false);
   }
@@ -288,7 +305,7 @@ bool WiFiService::connect(const char* ssid, const char* password, uint32_t nowMs
     Serial.println("[WiFi] STA initialization failed for connect");
     return false;
   }
-  WiFi.setSleep(false);
+  WiFi.setSleep(bleCoexistence_);
 
 #ifndef UNIT_TEST
   WiFi.setAutoReconnect(true);
@@ -543,6 +560,131 @@ void WiFiService::tick(uint32_t nowMs) {
       }
     }
   }
+}
+
+bool WiFiService::startBeaconLab(uint8_t openCount, uint8_t securedCount, uint8_t seconds,
+                               uint32_t nowMs) {
+  const unsigned count = openCount + securedCount;
+  if (beaconActive() || count == 0 || count > kBeaconMaxCount ||
+      seconds < kBeaconMinSeconds || seconds > kBeaconMaxSeconds ||
+      connectState_ == ConnectState::Connecting || isConnected() ||
+      state_ == ScanState::Preparing || state_ == ScanState::Scanning) return false;
+#if defined(ARDUINO_ARCH_ESP32) && !defined(UNIT_TEST)
+  const auto mode = WiFi.getMode();
+  if ((mode != WIFI_OFF && mode != WIFI_STA) || WiFi.status() == WL_CONNECTED) return false;
+  beaconOwnsStation_ = mode == WIFI_OFF;
+  if (beaconOwnsStation_) {
+    WiFi.persistent(false);
+    if (!WiFi.mode(WIFI_STA)) {
+      stopBeaconLab();
+      return false;
+    }
+  }
+  wifi_second_chan_t secondary;
+  if (esp_wifi_get_channel(&beaconChannel_, &secondary) != ESP_OK) {
+    stopBeaconLab();
+    return false;
+  }
+  beaconSeed_ = esp_random();
+#endif
+  beaconStarted_ = nextBeacon_ = nowMs;
+  beaconIndex_ = 0;
+  beaconAcceptedNames_ = 0;
+  beaconOpenCount_ = openCount;
+  beaconCount_ = static_cast<uint8_t>(count);
+  beaconDurationMs_ = seconds * 1000UL;
+  return true;
+}
+
+void WiFiService::tickBeaconLab(uint32_t nowMs) {
+  if (!beaconActive()) return;
+  if (nowMs - beaconStarted_ >= beaconDurationMs_) {
+    stopBeaconLab();
+    return;
+  }
+  if (static_cast<int32_t>(nowMs - nextBeacon_) < 0) return;
+  nextBeacon_ = nowMs + 25;
+#if defined(ARDUINO_ARCH_ESP32) && !defined(UNIT_TEST)
+  if (WiFi.status() == WL_CONNECTED) {
+    stopBeaconLab();
+    return;
+  }
+#endif
+  constexpr uint8_t kBeaconsPerTick = 3;
+  const uint8_t batch = beaconCount_ < kBeaconsPerTick ? beaconCount_ : kBeaconsPerTick;
+  for (uint8_t i = 0; i < batch; ++i) {
+    if (!transmitBeacon()) {
+      stopBeaconLab();
+      return;
+    }
+    // Indices are visited in order, so only the first pass adds unique names.
+    if (beaconAcceptedNames_ < beaconCount_) ++beaconAcceptedNames_;
+    beaconIndex_ = static_cast<uint8_t>((beaconIndex_ + 1) % beaconCount_);
+  }
+}
+
+bool WiFiService::transmitBeacon() {
+#if defined(ARDUINO_ARCH_ESP32) && !defined(UNIT_TEST)
+  static constexpr char names[][33] = {
+    "The Buffering Bakery", "Council of Ducks", "Wi-Fried Potatoes", "The Silent Toaster",
+    "Router With Feelings", "Panic at the Router", "The LAN Before Time", "Modem in Pajamas",
+    "Quantum Cupcake", "Spreadsheet Pirates", "The Packet Pickles", "Cloud of Confetti",
+    "Definitely a Lamp", "The Polite Gremlins", "The Couch Has Wi-Fi", "Office of Naps",
+    "Bureau of Left Socks", "Cactus Help Desk", "Suspicious Waffle", "The Flying Teapot",
+    "Bandwidth Burrito", "The Fridge Is Thinking", "House of Lost Remotes", "Internet on a Stick",
+    "Toast Administration", "Department of Hiccups", "Pigeon Logistics", "Moon Cheese Hotline",
+    "My Cat Is the Admin", "Keyboard Sandwich", "Seven Lazy Robots", "The Noodle Protocol",
+    "Emergency Pancakes", "Penguin Tech Support", "The Disconnected Donut", "The Curious Potato",
+    "Anxious Pineapple", "Ants With Laptops", "The Pizza Has Landed", "Muffin Research Lab",
+    "Dragon on Hold", "The Crooked Pretzel", "Cookies in the Cache", "The Tiny Tinfoil Hat",
+    "Hamster Network Team", "Disco in the Basement", "No Signal Just Vibes", "Biscuit Control Room"
+  };
+  static_assert(sizeof(names) / sizeof(names[0]) >= kBeaconMaxCount, "Need unique names");
+  const char* name = names[(beaconSeed_ % (sizeof(names) / sizeof(names[0])) + beaconIndex_) %
+                           (sizeof(names) / sizeof(names[0]))];
+  const size_t nameLength = strlen(name);
+  const bool secured = beaconIndex_ >= beaconOpenCount_;
+  // RSN v1: CCMP group/pairwise cipher, PSK authentication, no RSN capabilities.
+  static constexpr uint8_t rsn[] = {
+    48, 20, 1, 0, 0, 15, 172, 4, 1, 0, 0, 15, 172, 4, 1, 0, 0, 15, 172, 2, 0, 0
+  };
+  const uint8_t ratesAndChannel[] = {1, 4, 0x82, 0x84, 0x8b, 0x96, 3, 1, beaconChannel_};
+  uint8_t frame[38 + 32 + sizeof(ratesAndChannel) + sizeof(rsn)] = {
+    0x80, 0x00, 0x00, 0x00,
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+    0x02, 0, 0, 0, 0, 0,
+    0x02, 0, 0, 0, 0, 0,
+    0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0x00, 0x04, static_cast<uint8_t>(secured ? 0x11 : 0x01), 0x00,
+    0, static_cast<uint8_t>(nameLength)
+  };
+  for (uint8_t i = 0; i < 4; ++i) frame[11 + i] = static_cast<uint8_t>(beaconSeed_ >> (i * 8));
+  frame[15] = beaconIndex_;
+  memcpy(frame + 16, frame + 10, 6);
+  memcpy(frame + 38, name, nameLength);
+  memcpy(frame + 38 + nameLength, ratesAndChannel, sizeof(ratesAndChannel));
+  size_t frameLength = 38 + nameLength + sizeof(ratesAndChannel);
+  if (secured) {
+    memcpy(frame + frameLength, rsn, sizeof(rsn));
+    frameLength += sizeof(rsn);
+  }
+  const auto result = esp_wifi_80211_tx(WIFI_IF_STA, frame, frameLength, true);
+  if (result == ESP_OK) return true;
+  Serial.printf("[BeaconLab] TX failed on channel %u after %u/%u names: %s\n",
+                beaconChannel_, beaconAcceptedNames_, beaconCount_, esp_err_to_name(result));
+  return false;
+#else
+  return true;
+#endif
+}
+
+void WiFiService::stopBeaconLab() {
+  beaconCount_ = 0;
+#if defined(ARDUINO_ARCH_ESP32) && !defined(UNIT_TEST)
+  if (beaconOwnsStation_) WiFi.mode(WIFI_OFF);
+#endif
+  beaconOwnsStation_ = false;
 }
 
 void WiFiService::shutdown() {

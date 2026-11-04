@@ -1,0 +1,5 @@
+2026-11-04T21:29:19.925+03:00 Listening on COM6
+2026-11-04T21:29:37.196+03:00 [BLE] Starting controller (internal heap=232972, largest=221172 bytes)
+2026-11-04T21:29:37.196+03:00 [BLE] Starting Bluedroid host...
+2026-11-04T21:29:37.914+03:00 Serial unavailable on COM6
+2026-11-04T21:29:39.061+03:00 Listening on COM6

@@ -37,9 +37,10 @@ struct MockWiFi {
   int stopped = 0;
   bool persistentSetting = true;
   bool sleepEnabled = true;
+  bool canSetSleep = true;
   bool autoReconnectSetting = true;
   void persistent(bool value) { persistentSetting = value; }
-  void setSleep(bool value) { sleepEnabled = value; }
+  void setSleep(bool value) { if (canSetSleep) sleepEnabled = value; }
   void setMinSecurity(int) {}
   void setScanMethod(int) {}
   void setSortMethod(int) {}
@@ -81,6 +82,7 @@ struct MockWiFi {
     modeValue = value;
     return true;
   }
+  int getMode() const { return modeValue; }
   void scanDelete() { ++deleted; }
   int scanNetworks(bool async, bool = false, bool = false, uint32_t = 300) {
     if (async) ++started;

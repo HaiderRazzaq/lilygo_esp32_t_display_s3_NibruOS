@@ -27,6 +27,15 @@ public:
   void stopScan();
   void tick(uint32_t nowMs);
   void shutdown();
+  bool setBleCoexistence(bool required);
+  static constexpr uint8_t kBeaconMaxCount = 40;
+  static constexpr uint8_t kBeaconMinSeconds = 5;
+  static constexpr uint8_t kBeaconMaxSeconds = 60;
+  bool startBeaconLab(uint8_t openCount, uint8_t securedCount, uint8_t seconds, uint32_t nowMs);
+  void tickBeaconLab(uint32_t nowMs);
+  void stopBeaconLab();
+  bool beaconActive() const { return beaconCount_ != 0; }
+  uint8_t beaconAcceptedNames() const { return beaconAcceptedNames_; }
   ScanState state() const { return state_; }
   uint8_t count() const { return count_; }
   const NetworkRecord* network(uint8_t idx) const {
@@ -76,6 +85,17 @@ private:
   uint32_t stageStartedAt_ = 0;
   uint32_t lastScanDurationMs_ = 0;
   const char* error_ = "";
+  bool bleCoexistence_ = false;
+  uint32_t beaconStarted_ = 0;
+  uint32_t nextBeacon_ = 0;
+  uint32_t beaconSeed_ = 0;
+  uint32_t beaconDurationMs_ = 0;
+  uint8_t beaconCount_ = 0;
+  uint8_t beaconOpenCount_ = 0;
+  uint8_t beaconAcceptedNames_ = 0;
+  uint8_t beaconIndex_ = 0;
+  uint8_t beaconChannel_ = 0;
+  bool beaconOwnsStation_ = false;
 
   // Connect state
   ConnectState connectState_ = ConnectState::Disconnected;
@@ -96,4 +116,5 @@ private:
   void onFailure(uint32_t nowMs, const char* why);
   void stopHardwareScan();
   void collectResults(int n);
+  bool transmitBeacon();
 };

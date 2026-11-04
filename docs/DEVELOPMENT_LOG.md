@@ -1932,3 +1932,424 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Flash v0.10.3 to ESP32-S3 on COM5, verify touch response on ENABLE button and test Bluetooth pairing."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0050",
+  "date": "2026-11-04T20:35:00+03:00",
+  "related": [
+    "FEAT-0022",
+    "VER-0137",
+    "VER-0138",
+    "VER-0139",
+    "VER-0140",
+    "HWT-0042"
+  ],
+  "action": "FIX BLE HID NULL POINTER CRASH / OUTPUT REPORT & BATTERY ORDER / VERSION BUMP v0.10.4",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/services/BleHidService.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/FEATURE_REGISTRY.md"
+  ],
+  "description": "Fixed critical ESP32 restart caused by null pointer dereference on BLE initialization: pHid->manufacturer(\"NibruOS\") was called directly, but in ESP32 Arduino BLEHIDDevice m_manufacturerCharacteristic is created lazily in BLECharacteristic* manufacturer(). Fixed to pHid->manufacturer()->setValue(\"NibruOS\"). Added outputReport(1), setBatteryLevel before service start, stack-allocated BLESecurity, and diagnostic serial logging.",
+  "reason": "User reported device restarts upon pressing ENABLE BLE KEYBOARD.",
+  "expected": "BLE HID stack initializes without crashing or panicking, starts advertising, and awaits connection.",
+  "actual": "Desktop tests PASS (VER-0137). Host tests PASS (VER-0138). PlatformIO release build PASS: 1,565,488 B binary, 23.9% Flash, 26.2% RAM (VER-0139). Documentation check PASS (VER-0140). Hardware upload pending device connection (HWT-0042).",
+  "verification": "VER-0137, VER-0138, VER-0139, VER-0140, HWT-0042",
+  "risks": "Low; eliminated null pointer dereference in BLEHIDDevice setup.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Connect device to USB, upload v0.10.4 firmware, and verify ENABLE BLE KEYBOARD does not reboot."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0051",
+  "date": "2026-11-04T20:58:00+03:00",
+  "related": [
+    "FEAT-0022",
+    "VER-0141",
+    "VER-0142",
+    "VER-0143",
+    "VER-0144",
+    "HWT-0043"
+  ],
+  "action": "FIX BLE ADVERTISING & BATTERY GATTS ORDER / BOOTLOADER RECOVERY / VERSION BUMP v0.10.5",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/services/BleHidService.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/FEATURE_REGISTRY.md"
+  ],
+  "description": "Standardized BLE HID keyboard initialization against proven T-vK implementation: setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM_BOND), setScanResponse(false) to prevent adv buffer overflows, and deferred setBatteryLevel(100) until after startServices and advertising start to eliminate invalid unstarted GATTS notify calls. Resolved native USB bootloader latch via watchdog reset recovery bringing device into active runtime mode (COM6).",
+  "reason": "User reported device rebooted or appeared unupdated because esptool left board in ROM bootloader mode and BLE battery notification preceded service startup.",
+  "expected": "Board boots cleanly into runtime mode, BLE stack advertises without fault, and user can pair and type over Bluetooth.",
+  "actual": "Host tests PASS, desktop tests PASS, PlatformIO build pending, watchdog reset verified to revive runtime COM6.",
+  "verification": "VER-0141, VER-0142, VER-0143, VER-0144, HWT-0043",
+  "risks": "Low; follows official and field-proven ESP32 BLE HID initialization standard.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Flash v0.10.5 firmware to device, verify boot into COM6, and verify BLE keyboard pairing and typing."
+}
+```
+
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0052",
+  "date": "2026-11-04T21:26:00+03:00",
+  "related": [
+    "FEAT-0022",
+    "BUG-0017",
+    "HWT-0044",
+    "HWT-0045"
+  ],
+  "action": "Handle BLE controller startup failures in v0.10.6",
+  "files": [
+    "src/services/BleHidService.cpp",
+    "src/apps/SettingsApp.cpp",
+    "tests/desktop/test_simulator.cpp",
+    "include/BoardConfig.h",
+    "include/NibruConfig.h",
+    "src/main.cpp",
+    "docs/performance/BLE_STARTUP_RESOURCE_IMPACT.md"
+  ],
+  "description": "Use the pinned controller configuration with a checked initialization result, verify controller/host startup, release the lease on failure, and distinguish startup failures from a busy radio in Settings.",
+  "reason": "Owner reproduced loss of the device during BLE initialization, before server creation.",
+  "expected": "A returned startup error leaves the device usable and BLE disabled; successful startup follows the existing HID sequence.",
+  "actual": "Injected failure regression RED before and GREEN after. Host, simulator, target build, image capacity and docs checks passed. New physical image verification pending.",
+  "verification": "VER-0145 through VER-0152, HWT-0044, HWT-0045",
+  "risks": "Underlying hardware reset reason, BLE runtime resource headroom, and pairing remain unverified.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Upload only when authorized and complete HWT-0045."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0053",
+  "date": "2026-11-04",
+  "related": [
+    "BUG-0017",
+    "FEAT-0022",
+    "HWT-0048",
+    "HWT-0049"
+  ],
+  "action": "Repair Wi-Fi/BLE coexistence panic in v0.10.7",
+  "files": [
+    "src/services/WiFiService.h",
+    "src/services/WiFiService.cpp",
+    "src/services/BleHidService.cpp",
+    "tests/host/test_main.cpp",
+    "tests/desktop/test_simulator.cpp",
+    "docs/performance/BLE_STARTUP_RESOURCE_IMPACT.md"
+  ],
+  "description": "Read the crash-only partition and decode the backtrace locally against the v0.10.6 ELF. Use Wi-Fi modem sleep throughout BLE startup and operation. Check the driver mode before BLE init, preserve modem sleep across STA reconnect and restore the prior policy after the controller stops.",
+  "reason": "HWT-0048 found coex_core_enable abort during esp_bt_controller_enable. The service set WIFI_PS_NONE, matching Espressif issue 9595.",
+  "expected": "BLE activation succeeds alongside Wi-Fi without an abort. Cleanly reject activation if modem sleep cannot be established.",
+  "actual": "Host regression failed before the repair and passed after it. Simulator, target build, and image checks passed.",
+  "verification": "VER-0153 through VER-0160; HWT-0049 tracks full device acceptance.",
+  "risks": "Concurrent Wi-Fi modem sleep may change latency or power; long-run resource metrics and pairing require device evidence.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Verify BLE enable with Wi-Fi on the board and track pairing and 20-cycle profiling separately."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0054",
+  "date": "2026-11-04",
+  "related": [
+    "BUG-0017",
+    "FEAT-0022",
+    "HWT-0050",
+    "HWT-0051"
+  ],
+  "action": "Verify v0.10.7 app upload and BLE activation on device",
+  "files": [
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/CURRENT_STATE.md",
+    "docs/KNOWN_ISSUES.md",
+    "docs/FEATURE_REGISTRY.md"
+  ],
+  "description": "Installed the verified app0 image and monitored the same Bluetooth activation path on the owner's board.",
+  "reason": "Validate the specific activation reboot on physical hardware.",
+  "expected": "BLE startup reaches advertising and the board stays active.",
+  "actual": "HWT-0050 recorded app0 write and hash verification. HWT-0051 reached advertising and retained runtime CDC after the original activation action.",
+  "verification": "HWT-0050, HWT-0051",
+  "risks": "RF discovery, pairing, typing, Wi-Fi continuity and extended resource measurements remain in HWT-0049.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Complete the extended acceptance in HWT-0049."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0055",
+  "date": "2026-11-04",
+  "related": [
+    "BUG-0018",
+    "FEAT-0022",
+    "HWT-0052",
+    "HWT-0053"
+  ],
+  "action": "Instrument Windows BLE link loss in v0.10.8",
+  "files": [
+    "src/services/BleHidService.cpp",
+    "docs/performance/BLE_STARTUP_RESOURCE_IMPACT.md"
+  ],
+  "description": "Log GATT connect and disconnect, GAP authentication and advertising result. Preserve BLE lifecycle and security configuration. Unregister the GAP hook before deinitialization.",
+  "reason": "Owner reported BLE link unavailable in Generator after Windows pairing succeeded.",
+  "expected": "Capture the disconnect reason without logging a device address, passkey or generated password.",
+  "actual": "Build and regression checks passed. Windows confirms pairing on v0.10.7. v0.10.8 hardware reproduction pending.",
+  "verification": "VER-0161 through VER-0165",
+  "risks": "Sparse diagnostic writes from BLE callbacks can perturb timing; hardware measurements pending.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Upload with authorization and capture HWT-0053."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0056",
+  "date": "2026-11-04",
+  "related": [
+    "BUG-0018",
+    "FEAT-0022",
+    "HWT-0055",
+    "HWT-0056"
+  ],
+  "action": "Add Bluetooth Home card and separate link from HID readiness in v0.11.0",
+  "files": [
+    "src/apps/BluetoothApp.h",
+    "src/apps/BluetoothApp.cpp",
+    "src/apps/SettingsApp.cpp",
+    "src/services/BleHidService.cpp",
+    "src/apps/GeneratorApp.cpp",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "CMakeLists.txt",
+    "tests/host/test_main.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Extract shared Bluetooth app controls, register them beside Wi-Fi, retain Settings entry, request encryption at GATT connect and gate keyboard readiness on the encrypted input-report CCCD subscription. Refresh Generator status on readiness changes.",
+  "reason": "User requested first-level Bluetooth controls and reported a green indicator immediately before Windows terminated the link.",
+  "expected": "Both entry points work. A transient GATT link stays in setup state and cannot send keys.",
+  "actual": "RED before change and GREEN after for navigation and readiness. Firmware and desktop entry point built.",
+  "verification": "VER-0166 through VER-0174; HWT-0056 remains physical acceptance.",
+  "risks": "Windows link stability and CCCD renewal on bonded reconnect need physical evidence. Link readiness does not establish peer identity.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Test new pairing, reconnect, and synthetic HID input on the board with Windows."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0057",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0022",
+    "BUG-0018",
+    "HWT-0058",
+    "HWT-0059"
+  ],
+  "action": "Enable Windows HID enumeration in v0.11.1",
+  "files": [
+    "src/services/BleHidService.cpp",
+    "src/services/BleHidService.h",
+    "tests/host/test_main.cpp",
+    "tests/desktop/test_simulator.cpp",
+    "docs/performance/BLE_STARTUP_RESOURCE_IMPACT.md"
+  ],
+  "description": "Expose neutral report attributes, report references and CCCD during enumeration. Require successful authentication of the matching GATT peer and subscription on that connection before sending. Send only via that GATT connection and do not place keystrokes in the readable attribute. Encode advertising metadata into one bounded packet.",
+  "reason": "On v0.11.0 Windows authenticated after re-pairing but showed battery without HID and never enabled the keyboard CCCD.",
+  "expected": "Windows can discover and subscribe to HID, while unauthenticated links cannot send keys.",
+  "actual": "Host regression RED and GREEN. Simulator, corrected ESP32 build and capacity check passed. Device result pending.",
+  "verification": "VER-0175 through VER-0181; HWT-0058 reproduced the issue; HWT-0059 is the verification procedure.",
+  "risks": "Windows HID enumeration and notification behavior are unverified on v0.11.1. Bonded CCCD persistence and heap across repeated toggles need testing.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Run HWT-0059 on the authorized image."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0058",
+  "date": "2026-11-04",
+  "related": [
+    "BUG-0018",
+    "FEAT-0022",
+    "HWT-0061",
+    "HWT-0062",
+    "HWT-0063"
+  ],
+  "action": "Display an ephemeral BLE pairing code in v0.12.0",
+  "files": [
+    "src/services/BleHidService.cpp",
+    "src/services/BleHidService.h",
+    "src/apps/BluetoothApp.cpp",
+    "src/apps/BluetoothApp.h",
+    "tests/host/test_main.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Configure DisplayOnly authenticated pairing, show the controller-provided passkey in the existing Bluetooth screen, and clear the displayed value on authentication, disconnect and disable. Keep report sending gated on authentication and subscription.",
+  "reason": "Phone stayed connected and subscribed but the previous configuration requested MITM with no input or display capability. It failed authentication. Windows also failed to complete the prior setup.",
+  "expected": "A user can complete the peer prompt by entering the displayed code. Reports require successful authentication and subscription.",
+  "actual": "Host, simulator and target builds passed. Physical passkey negotiation pending.",
+  "verification": "VER-0182 through VER-0187, HWT-0063",
+  "risks": "Old bonds may require re-pairing. Pinned BLE SDK retains allocations across controller restarts, and Windows and phone pairing still need physical validation.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Run HWT-0063 and complete the device resource scenarios."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0059",
+  "date": "2026-11-04",
+  "related": [
+    "BUG-0018",
+    "FEAT-0022",
+    "HWT-0064",
+    "HWT-0065",
+    "HWT-0066"
+  ],
+  "action": "Install and test v0.12.0 display-assisted pairing",
+  "files": [
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/CURRENT_STATE.md",
+    "docs/KNOWN_ISSUES.md",
+    "docs/TEST_MATRIX.md"
+  ],
+  "description": "Authorized app-only upload and serial capture; compare the Windows pairing event and owner phone result.",
+  "reason": "Determine whether display-assisted authentication enables keyboard typing.",
+  "expected": "Passkey completion and HID subscription on the intended host.",
+  "actual": "Windows authenticated once but did not subscribe. Phone reported incorrect PIN/passkey immediately, with no code input field. Test text delivery remains unverified.",
+  "verification": "HWT-0064 upload PASS; HWT-0065 and HWT-0066 functional FAIL.",
+  "risks": "Immediate phone rejection and Windows HID subscription remain separate observations. Peer identity in the serial log is not captured.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Isolate hosts and inspect pairing/CCCD traces without inferring the cause from a generic phone message."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0060",
+  "date": "2026-11-04",
+  "related": [
+    "BUG-0018",
+    "FEAT-0022"
+  ],
+  "action": "Correct BLE Device Information PnP ID serialization in v0.12.1",
+  "files": [
+    "src/services/BleHidService.cpp"
+  ],
+  "description": "Write the existing PnP characteristic in little-endian order, preserving vendor, product and version values.",
+  "reason": "The bundled Bluedroid helper emits high bytes first. The NimBLE HID implementation used by Bruce emits low bytes first.",
+  "expected": "Hosts reading 0x2A50 receive 02 02 E5 11 A1 10 02.",
+  "actual": "Corrected characteristic initialization. No physical peer read or pairing was performed.",
+  "verification": "VER-0188, VER-0189, VER-0190",
+  "risks": "Correct metadata may not resolve Windows HID subscription or the separate phone pairing rejection.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Read 0x2A50 on the device, then test fresh pairing and actual keyboard typing with Wi-Fi active."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0061",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0024"
+  ],
+  "action": "Implement Beacon Lab in v0.13.0",
+  "files": [
+    "src/apps/BeaconLabApp.cpp",
+    "src/services/WiFiService.cpp",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp"
+  ],
+  "description": "Provide seven count positions and a ten-second synthetic beacon session on the current channel with an exclusive radio lease.",
+  "reason": "Add a controlled test of multiple visible SSIDs inside the existing firmware.",
+  "expected": "A receiver observes synthetic SSIDs and transmission stops by timeout or on leaving the app.",
+  "actual": "Implemented the shared UI and ESP32 transmit path. Physical RF reception was not measured.",
+  "verification": "VER-0191 through VER-0194",
+  "risks": "Receiver scan cadence and ESP32 transmit acceptance require hardware testing. Wi-Fi airtime and heap impact have not been measured.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Observe beacon frames from a second receiver in an isolated lab. Run lifecycle and combined resource scenarios."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0062",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0024"
+  ],
+  "action": "Extend Beacon Lab in v0.14.0",
+  "files": [
+    "src/apps/BeaconLabApp.cpp",
+    "src/services/WiFiService.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Replace Orchid template with 48 fictional names. Add open and secured steppers and a 5 to 60 second session setting.",
+  "reason": "Allow different test mixes and durations without changing idle radio behavior.",
+  "expected": "Distinct names, requested open/secured split, and bounded stop.",
+  "actual": "Host, simulator and ESP32 build passed. Physical advertisement parsing has not been tested.",
+  "verification": "VER-0195, VER-0196",
+  "risks": "Scan cache can outlast transmission. Longer sessions increase active radio time.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Capture open and WPA2-advertised beacons on a second receiver and verify timeout and radio recovery."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0063",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0024"
+  ],
+  "action": "Improve Beacon Lab observation in v0.14.1",
+  "files": [
+    "src/apps/BeaconLabApp.cpp",
+    "src/services/WiFiService.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Schedule at most three names per transmit tick and report the number of distinct names accepted by the Wi-Fi driver.",
+  "reason": "On v0.14.0 the user saw six names on phone and PC, and Windows polling observed two distinct names during a separate session. The selected count and raw over-air frame count were not captured.",
+  "expected": "A faster list pass and a driver acceptance count that distinguishes an incomplete submission from a partial scan result.",
+  "actual": "Host, simulator and ESP32 build passed. Physical visibility remains unverified.",
+  "verification": "VER-0197, VER-0198",
+  "risks": "Higher active radio request rate and unknown receiver filtering. Driver acceptance does not verify RF delivery.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Compare TX accepted, serial errors and distinct over-air SSIDs on the transmit channel. Measure resources before accepting the rate change."
+}
+```

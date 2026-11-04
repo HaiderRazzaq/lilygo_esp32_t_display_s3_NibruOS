@@ -1,0 +1,1 @@
+This fallback needs Windows and SDL2_ROOT with include/SDL.h, SDL2.lib and SDL2.dll; otherwise use CMake.

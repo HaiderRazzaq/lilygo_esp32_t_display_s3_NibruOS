@@ -3,7 +3,7 @@
 
 // One owner for radio resource in v0.1. This prevents accidental conflicting use
 // as more apps are added. Non-WiFi apps never acquire it.
-enum class ResourceOwner : uint8_t { None, WiFiScanner, AuthenticatorImport, WebPortal, BleKeyboard };
+enum class ResourceOwner : uint8_t { None, WiFiScanner, AuthenticatorImport, WebPortal, BleKeyboard, BeaconLab };
 class ResourceManager {
 public:
   bool acquireWiFi(ResourceOwner requester);

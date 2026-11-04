@@ -40,7 +40,8 @@ struct MockWiFi {
   const char* disconnectReasonName(wifi_err_reason_t) { return "Simulated reason"; }
 
   void persistent(bool) {}
-  void setSleep(bool) {}
+  bool sleepEnabled = true;
+  void setSleep(bool enabled) { sleepEnabled = enabled; }
   void setMinSecurity(int) {}
   void setScanMethod(int) {}
   void setSortMethod(int) {}

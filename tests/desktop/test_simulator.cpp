@@ -2,6 +2,7 @@
 #define SDL_MAIN_HANDLED
 #include <Arduino.h>
 #include <Preferences.h>
+#include <WiFi.h>
 #include "core/AppContext.h"
 #include "core/AppManager.h"
 #include "core/IApp.h"
@@ -23,6 +24,8 @@
 #include "services/WebPortalService.h"
 #include "services/BleHidService.h"
 #include "apps/WiFiApp.h"
+#include "apps/BluetoothApp.h"
+#include "apps/BeaconLabApp.h"
 #include "apps/TotpApp.h"
 #include "apps/VaultApp.h"
 #include "apps/SettingsApp.h"
@@ -49,7 +52,7 @@ void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, 
   std::printf("[Test] Running Core Lifecycle & AppManager Tests...\n");
 
   assert(launcher.isHome());
-  assert(launcher.appCount() == 8);
+  assert(launcher.appCount() == 9);
   assert(launcher.selectedIndex() == 0);
 
   // Open App 0 (WiFiApp)
@@ -57,15 +60,15 @@ void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, 
   assert(!launcher.isHome());
   assert(launcher.selectedIndex() == 0);
 
-  // Switch directly to App 3 (SettingsApp) - ensures onExit runs on App 0
-  assert(launcher.open(3));
+  // Switch directly to Settings to exercise Wi-Fi onExit.
+  assert(launcher.open(4));
   assert(!launcher.isHome());
-  assert(launcher.selectedIndex() == 3);
+  assert(launcher.selectedIndex() == 4);
 
   // Return home via Back button action
   launcher.handleButton(ButtonAction::Back);
   assert(launcher.isHome());
-  assert(launcher.selectedIndex() == 3); // Preserves selection on return
+  assert(launcher.selectedIndex() == 4); // Preserves selection on return
 
   // Out of bounds open
   assert(!launcher.open(99));
@@ -73,13 +76,13 @@ void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, 
 
   // Navigation: BOOT short press cycles selection on Home
   launcher.handleButton(ButtonAction::SelectNext);
-  assert(launcher.selectedIndex() == 4);
-  launcher.handleButton(ButtonAction::SelectNext);
   assert(launcher.selectedIndex() == 5);
   launcher.handleButton(ButtonAction::SelectNext);
   assert(launcher.selectedIndex() == 6);
   launcher.handleButton(ButtonAction::SelectNext);
   assert(launcher.selectedIndex() == 7);
+  launcher.handleButton(ButtonAction::SelectNext);
+  assert(launcher.selectedIndex() == 8);
   launcher.handleButton(ButtonAction::SelectNext);
   assert(launcher.selectedIndex() == 0);
 
@@ -602,7 +605,6 @@ void testWebPortalSimulation(AppContext& ctx) {
 }
 
 void testNewMvpFeatures(AppContext& ctx, GeneratorApp& genApp, ClockApp& clockApp, AppManager& launcher) {
-  (void)launcher;
   std::printf("[Test] Running New MVP Features (Generator, Clock, BLE) Tests...\n");
 
   // 1. ClockApp & Screensaver tests
@@ -667,7 +669,13 @@ void testNewMvpFeatures(AppContext& ctx, GeneratorApp& genApp, ClockApp& clockAp
   assert(ctx.bleHid.setEnabled(true, ctx));
   assert(ctx.bleHid.isEnabled());
   assert(ctx.resources.wifiOwner() == ResourceOwner::BleKeyboard);
-  ctx.bleHid.simulateConnected(true);
+  ctx.bleHid.onClientConnected();
+  ctx.bleHid.onPairingCode(321);
+  assert(ctx.bleHid.pairingCode() == 321);
+  ctx.bleHid.onInputSubscription(true);
+  assert(!ctx.bleHid.isConnected());
+  ctx.bleHid.onLinkAuthenticated(true);
+  assert(ctx.bleHid.pairingCode() == BleHidService::kNoPairingCode);
   assert(ctx.bleHid.isConnected());
   assert(ctx.bleHid.typeText("test"));
   assert(ctx.bleHid.setEnabled(false, ctx));
@@ -698,12 +706,20 @@ void testNewMvpFeatures(AppContext& ctx, GeneratorApp& genApp, ClockApp& clockAp
   assert(!ctx.bleHid.isEnabled());
   tapEv.gesture = TouchGesture::Tap;
   tapEv.x = 160; tapEv.y = 120;
-  settingsApp.onTouch(ctx, tapEv);
-  assert(ctx.bleHid.isEnabled()); // Verifies SettingsApp::onTouch routes to handleBluetoothTouch
-
-  // Touch DISABLE button (x: 160, y: 120)
+  assert(ctx.resources.acquireWiFi(ResourceOwner::WiFiScanner));
   settingsApp.onTouch(ctx, tapEv);
   assert(!ctx.bleHid.isEnabled());
+  assert(ctx.resources.wifiOwner() == ResourceOwner::WiFiScanner);
+  ctx.resources.releaseWiFi(ResourceOwner::WiFiScanner);
+  settingsApp.onTouch(ctx, tapEv);
+  assert(ctx.bleHid.isEnabled());
+  assert(WiFi.sleepEnabled);
+
+  // Touch DISABLE button (x: 160, y: 120)
+  settingsApp.render(ctx);
+  settingsApp.onTouch(ctx, tapEv);
+  assert(!ctx.bleHid.isEnabled());
+  assert(!WiFi.sleepEnabled);
 
   // Test BOOT button (onPrimaryAction) toggle
   settingsApp.onPrimaryAction(ctx);
@@ -712,6 +728,21 @@ void testNewMvpFeatures(AppContext& ctx, GeneratorApp& genApp, ClockApp& clockAp
   assert(!ctx.bleHid.isEnabled());
 
   settingsApp.onExit(ctx);
+
+  // Home touch navigation opens the Bluetooth card next to Wi-Fi.
+  launcher.goHome();
+  assert(launcher.open(0));
+  launcher.goHome();
+  launcher.handleTouch(TouchEvent{160, 85, 84, 160, TouchGesture::Tap, 71});
+  assert(launcher.isHome() && launcher.isArmed(1));
+  launcher.handleTouch(TouchEvent{160, 85, 84, 160, TouchGesture::Tap, 72});
+  assert(!launcher.isHome());
+  launcher.handleButton(ButtonAction::SelectNext);
+  assert(ctx.bleHid.isEnabled());
+  launcher.handleButton(ButtonAction::Back);
+  assert(launcher.isHome());
+  assert(ctx.bleHid.isEnabled());
+  assert(ctx.bleHid.setEnabled(false, ctx));
 
   std::printf("  -> PASS: New MVP Features verified successfully.\n");
 }
@@ -750,6 +781,7 @@ int main() {
   AppManager launcher(context);
 
   WiFiApp wifiApp;
+  BluetoothApp bluetoothApp;
   TotpApp totpApp;
   VaultApp vaultApp;
   SettingsApp settingsApp;
@@ -759,6 +791,7 @@ int main() {
   TouchTestApp touchTestApp;
 
   launcher.registerApp(wifiApp);
+  launcher.registerApp(bluetoothApp);
   launcher.registerApp(totpApp);
   launcher.registerApp(vaultApp);
   launcher.registerApp(settingsApp);
@@ -771,6 +804,48 @@ int main() {
   testCoreLifecycle(context, launcher, wifiApp, totpApp, settingsApp);
   testUITransformationsAndGestures();
   testWiFiSimulation(context);
+  wifi.shutdown();
+  BeaconLabApp beaconLab;
+  beaconLab.onEnter(context);
+  assert(beaconLab.openCount() == 10 && beaconLab.securedCount() == 0);
+  for (int i = 0; i < 35; ++i) {
+    beaconLab.onTouch(context, {280, 80, 0, 0, TouchGesture::Tap});
+  }
+  assert(beaconLab.openCount() == 10 && beaconLab.securedCount() == 30);
+  beaconLab.onTouch(context, {50, 51, 0, 0, TouchGesture::Tap});
+  beaconLab.onTouch(context, {280, 108, 0, 0, TouchGesture::Tap});
+  assert(beaconLab.openCount() == 9 && beaconLab.durationSeconds() == 15);
+  assert(!wifi.startBeaconLab(0, 0, 10, millis()));
+  assert(!wifi.startBeaconLab(10, 31, 10, millis()));
+  assert(!wifi.startBeaconLab(10, 0, 65, millis()));
+  assert(resources.acquireWiFi(ResourceOwner::BleKeyboard));
+  beaconLab.onPrimaryAction(context);
+  assert(!wifi.beaconActive());
+  resources.releaseWiFi(ResourceOwner::BleKeyboard);
+  beaconLab.onPrimaryAction(context);
+  assert(wifi.beaconActive());
+  assert(resources.ownsWiFi(ResourceOwner::BeaconLab));
+  const auto beaconNow = millis();
+  beaconLab.onTick(context, beaconNow);
+  assert(wifi.beaconAcceptedNames() == 3);
+  beaconLab.onTick(context, beaconNow + 24);
+  assert(wifi.beaconAcceptedNames() == 3);
+  for (uint32_t elapsed = 25; elapsed <= 350; elapsed += 25) {
+    beaconLab.onTick(context, beaconNow + elapsed);
+  }
+  assert(wifi.beaconAcceptedNames() == 39);
+  beaconLab.onTick(context, beaconNow + 10000);
+  assert(wifi.beaconActive());
+  beaconLab.onTick(context, beaconNow + 15000);
+  assert(!wifi.beaconActive());
+  assert(wifi.beaconAcceptedNames() == 39);
+  assert(resources.wifiOwner() == ResourceOwner::None);
+  beaconLab.onPrimaryAction(context);
+  assert(wifi.beaconActive());
+  beaconLab.onExit(context);
+  assert(!wifi.beaconActive());
+  assert(resources.wifiOwner() == ResourceOwner::None);
+
   testSettingsPersistence(context);
   testModularArchitecture(context);
   testSleepLockWakeFlow(context, wifiApp, launcher);

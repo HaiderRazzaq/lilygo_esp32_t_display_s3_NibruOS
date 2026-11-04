@@ -1,0 +1,10 @@
+test_main.cpp
+tests/host/test_main.cpp(352): error C2039: 'onPairingCode': is not a member of 'BleHidService'
+src\services/BleHidService.h(15): note: see declaration of 'BleHidService'
+tests/host/test_main.cpp(353): error C2039: 'pairingCode': is not a member of 'BleHidService'
+src\services/BleHidService.h(15): note: see declaration of 'BleHidService'
+tests/host/test_main.cpp(358): error C2039: 'pairingCode': is not a member of 'BleHidService'
+src\services/BleHidService.h(15): note: see declaration of 'BleHidService'
+tests/host/test_main.cpp(358): error C2039: 'kNoPairingCode': is not a member of 'BleHidService'
+src\services/BleHidService.h(15): note: see declaration of 'BleHidService'
+tests/host/test_main.cpp(358): error C2065: 'kNoPairingCode': undeclared identifier

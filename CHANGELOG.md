@@ -1,5 +1,83 @@
 # Changelog
 
+## [v0.14.1] - 2026-11-04
+
+### Changed
+
+- Beacon Lab requests up to three transmissions per tick and displays the number of unique names accepted by the Wi-Fi driver.
+
+## [v0.14.0] - 2026-11-04
+
+### Added
+
+- Beacon Lab has 48 fictional SSID names, adjustable five- to sixty-second sessions and independent open and WPA2-advertised network counts.
+
+## [v0.13.0] - 2026-11-04
+
+### Added
+
+- Beacon Lab broadcasts synthetic Wi-Fi names in bounded ten-second sessions with selectable counts from 10 to 40. Desktop builds simulate the controls without radio transmission.
+
+## [v0.12.1] - 2026-11-04
+
+### Fixed
+
+- Encode the BLE Device Information PnP ID in little-endian order. Windows keyboard acceptance remains pending.
+
+## [v0.12.0] - 2026-11-04
+
+### Fixed
+
+- Use display-assisted BLE pairing. Show the one-time code on NibruOS and require an authenticated link before sending keyboard input.
+
+## [v0.11.1] - 2026-11-04
+
+### Fixed
+
+- Allow Windows to discover BLE HID report metadata and subscribe before encryption completes. Send keystrokes only to the authenticated and subscribed link.
+
+## [v0.11.0] - 2026-11-04
+
+### Added
+
+- Bluetooth card next to Wi-Fi on Home, with the same controls available from Settings.
+
+### Fixed
+
+- Wait for the host to subscribe to encrypted keyboard reports before showing keyboard readiness and allowing BLE typing. Request link encryption when a host connects.
+
+## [v0.10.8] - 2026-11-04
+
+### Changed
+
+- Record BLE connection, disconnection reason, authentication result and advertising status over USB Serial.
+
+## [v0.10.7] - 2026-11-04
+
+### Fixed
+
+- Enable Wi-Fi modem sleep before BLE keyboard startup and keep it enabled while Bluetooth is active. This avoids the ESP-IDF radio coexistence panic when Wi-Fi connects first.
+
+## [v0.10.6] - 2026-11-04
+
+### Fixed
+
+- Check the BLE controller startup result before Arduino can spin indefinitely on an initialization error. Keep the keyboard disabled, release the radio lease, and report the failure in Settings and over Serial.
+
+## [v0.10.5] - 2026-11-04
+
+### Fixed
+- **BLE HID Stack Stability & Advertising Optimization**: Aligned ESP32-S3 BLE HID keyboard initialization with the proven T-vK standard. Set `pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM_BOND)`, set `pAdvertising->setScanResponse(false)` to prevent advertising packet overflow, and deferred `setBatteryLevel(100)` to execute strictly after service start and advertising launch, preventing pre-service GATTS notification faults.
+- **Native USB Post-Flash Bootloader Recovery**: Resolved native USB-Serial/JTAG bootloader latch where esptool RTS resets left the ESP32-S3 in ROM download mode (`waiting for download`) instead of booting the application image. Added automated watchdog reset recovery to ensure immediate boot into runtime application mode (`COM6`).
+
+## [v0.10.4] - 2026-11-04
+
+### Fixed
+- **BLE HID Null Pointer Crash on Initialization**: Fixed critical crash and board reboot triggered when tapping `[ENABLE BLE KEYBOARD]`. In `BleHidService`, calling `pHid->manufacturer("NibruOS")` directly bypassed `pHid->manufacturer()` characteristic creation in the ESP32 Arduino framework, causing a null pointer dereference (`StoreProhibited` panic). Changed to `pHid->manufacturer()->setValue("NibruOS")`.
+- **BLE HID Output Report & Battery Level Order**: Added `pHid->outputReport(1)` to match keyboard LED output specifications, and moved `setBatteryLevel(100)` prior to `pHid->startServices()`.
+- **BLE Security Stack Allocation**: Optimized `BLESecurity` configuration onto stack allocation without heap leakage.
+- **Detailed BLE Serial Logging**: Added diagnostic serial output for each step of BLE HID startup and advertising.
+
 ## [v0.10.3] - 2026-11-04
 
 ### Fixed

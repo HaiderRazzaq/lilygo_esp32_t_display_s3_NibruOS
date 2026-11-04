@@ -1,0 +1,5 @@
+test.cpp
+BleHidService.cpp
+ResourceManager.cpp
+Generating Code...
+PASS: controller/host failure preserve Disabled, release lease and allow retry

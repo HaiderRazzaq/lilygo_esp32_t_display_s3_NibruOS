@@ -1,0 +1,38 @@
+[1/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\core\ResourceManager.cpp.obj
+[2/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\AccountImportService.cpp.obj
+[3/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\ui\HomeScreen.cpp.obj
+[4/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\CryptoService.cpp.obj
+[5/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\hardware\ButtonManager.cpp.obj
+[6/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\hardware\DisplayManager.cpp.obj
+[7/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\core\MemoryProfiler.cpp.obj
+[8/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\WiFiService.cpp.obj
+[9/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\SecurityService.cpp.obj
+[10/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\core\AppManager.cpp.obj
+[11/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\SettingsService.cpp.obj
+[12/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\TotpService.cpp.obj
+[13/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\ArabicReshaper.cpp.obj
+[14/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\hardware\TouchManager.cpp.obj
+[15/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\UsbHidService.cpp.obj
+[16/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\LocalizationService.cpp.obj
+[17/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\WebPortalService.cpp.obj
+[18/36] Building CXX object CMakeFiles\nibru_simulator.dir\platform\desktop\DesktopMain.cpp.obj
+FAILED: CMakeFiles/nibru_simulator.dir/platform/desktop/DesktopMain.cpp.obj 
+C:\PROGRA~2\MICROS~2\2022\BUILDT~1\VC\Tools\MSVC\1444~1.352\bin\Hostx64\x64\cl.exe  /nologo /TP -DNIBRU_DESKTOP_SIMULATOR=1 -DUNIT_TEST=1 -IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS -IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\platform\desktop\stubs -IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\platform\desktop -IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\include -IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src -external:IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\build\_deps\sdl2_prebuilt-src\include -external:W0 /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd /W4 /utf-8 /wd4996 /showIncludes /FoCMakeFiles\nibru_simulator.dir\platform\desktop\DesktopMain.cpp.obj /FdCMakeFiles\nibru_simulator.dir\ /FS -c C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\platform\desktop\DesktopMain.cpp
+C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\platform\desktop\DesktopMain.cpp(188): error C2039: 'activeApp': is not a member of 'AppManager'
+C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\core/AppManager.h(7): note: see declaration of 'AppManager'
+C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\platform\desktop\DesktopMain.cpp(189): error C2039: 'activeApp': is not a member of 'AppManager'
+C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\core/AppManager.h(7): note: see declaration of 'AppManager'
+[19/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\apps\TouchTestApp.cpp.obj
+[20/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\VaultService.cpp.obj
+[21/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\BleHidService.cpp.obj
+[22/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\TimeService.cpp.obj
+[23/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\apps\WiFiApp.cpp.obj
+[24/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\apps\BluetoothApp.cpp.obj
+[25/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\apps\VaultApp.cpp.obj
+[26/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\apps\TotpApp.cpp.obj
+[27/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\apps\SystemInfoApp.cpp.obj
+[28/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\apps\GeneratorApp.cpp.obj
+[29/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\apps\WiFiScannerApp.cpp.obj
+[30/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\apps\SettingsApp.cpp.obj
+[31/36] Building CXX object CMakeFiles\nibru_simulator.dir\src\apps\ClockApp.cpp.obj
+ninja: build stopped: subcommand failed.

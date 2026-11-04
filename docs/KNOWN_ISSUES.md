@@ -543,3 +543,90 @@ Status vocabulary and resolution rules: [workflow](ENGINEERING_WORKFLOW.md).
   "risks": "Minimal; dirty flag synchronization between screen clearing and view rendering."
 }
 ```
+
+
+```json
+{
+  "record_type": "issue",
+  "id": "BUG-0017",
+  "title": "Device goes dark on BLE keyboard activation",
+  "status": "VERIFIED RESOLVED",
+  "description": "Owner observed shutdown/restart while activating BLE keyboard after the prior HID initialization patches.",
+  "symptoms": "CDC disconnects during BLE controller enable; System info reports Software Crash/Panic.",
+  "reproduction": "Settings > Bluetooth > ENABLE BLE KEYBOARD on the board with a serial monitor attached.",
+  "affected_versions": "Reproduced after the v0.10.5 and v0.10.6 uploads",
+  "suspected_cause": "Initial candidate was the unchecked controller initialization result. In HWT-0048 controller initialization succeeded.",
+  "root_cause": "The HWT-0048 backtrace identifies abort in coex_core_enable via esp_bt_controller_enable. WiFiService disabled modem sleep before enabling BLE, which violates ESP-IDF radio coexistence requirements (Espressif esp-idf issue 9595).",
+  "files": [
+    "src/services/BleHidService.cpp",
+    "src/services/WiFiService.cpp",
+    "src/apps/SettingsApp.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "attempts": [
+    "DEV-0050",
+    "DEV-0051",
+    "HWT-0044",
+    "DEV-0052",
+    "HWT-0048",
+    "DEV-0053"
+  ],
+  "fix": "Enable Wi-Fi modem sleep before starting BLE, verify driver mode when STA is active, preserve the setting across Wi-Fi reconnect, and restore the normal policy after BLE stops.",
+  "verification": [
+    "VER-0153",
+    "VER-0155",
+    "VER-0156",
+    "VER-0158",
+    "HWT-0049",
+    "HWT-0051"
+  ],
+  "risks": "Wi-Fi modem sleep can change latency while BLE is active. Pairing, typing, and complete resource acceptance require physical verification."
+}
+```
+
+```json
+{
+  "record_type": "issue",
+  "id": "BUG-0018",
+  "title": "Windows BLE HID link unavailable when using Generator",
+  "status": "INVESTIGATING",
+  "description": "Windows pairs with NibruOS Keyboard, but Generator reports BLE not connected when TYPE BLE is used.",
+  "symptoms": "Board remains on. Windows reports successful pairing, then BLE keyboard is unavailable to Generator.",
+  "reproduction": "Enable BLE in Settings, connect from Windows, navigate to Generator and tap TYPE BLE with a local blank editor focused.",
+  "affected_versions": "Reported on v0.10.7",
+  "suspected_cause": "HWT-0055 captured remote disconnect 0x13 and an unspecified authentication failure 0x55. Settings treats GATT connection as connected before determining peer identity.",
+  "root_cause": "HWT-0058 confirmed successful link authentication without a Windows HID child or CCCD write. The pinned Arduino BLE HID report metadata and CCCD require encryption during enumeration, unlike the newer Espressif HID implementation. Physical retest of the permissions change is pending.",
+  "files": [
+    "src/services/BleHidService.cpp",
+    "src/apps/GeneratorApp.cpp"
+  ],
+  "attempts": [
+    "HWT-0052",
+    "DEV-0055",
+    "HWT-0054",
+    "HWT-0055",
+    "DEV-0056",
+    "HWT-0058",
+    "DEV-0057",
+    "HWT-0061",
+    "HWT-0062",
+    "DEV-0058",
+    "DEV-0060"
+  ],
+  "fix": "v0.11.1 allows HID metadata and CCCD discovery before encryption. The phone subscribed but failed authentication. v0.12.0 supplies display-assisted pairing while retaining the authentication and subscription guard.",
+  "verification": [
+    "HWT-0052",
+    "HWT-0053",
+    "HWT-0055",
+    "HWT-0056",
+    "HWT-0058",
+    "HWT-0059",
+    "HWT-0061",
+    "HWT-0062",
+    "HWT-0063",
+    "HWT-0065",
+    "HWT-0066"
+  ],
+  "risks": "Readiness does not identify the host. Windows must renew or restore the input-report subscription on bonded reconnect."
+}
+```

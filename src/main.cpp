@@ -18,6 +18,8 @@
 #include "services/WebPortalService.h"
 #include "services/BleHidService.h"
 #include "apps/WiFiApp.h"
+#include "apps/BluetoothApp.h"
+#include "apps/BeaconLabApp.h"
 #include "apps/TotpApp.h"
 #include "apps/VaultApp.h"
 #include "apps/SettingsApp.h"
@@ -42,6 +44,8 @@ BleHidService bleHid;
 AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid};
 AppManager launcher(context);
 WiFiApp wifiApp;
+BluetoothApp bluetoothApp;
+BeaconLabApp beaconLabApp;
 TotpApp totpApp;
 VaultApp vaultApp;
 GeneratorApp generatorApp;
@@ -52,7 +56,7 @@ WakeInputGate wakeInput;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n[NibruOS] boot v0.10.3");
+  Serial.println("\n[NibruOS] boot v0.14.1");
   MemoryProfiler::checkpoint("startup-basic");
   display.begin();
   touch.begin();
@@ -69,11 +73,13 @@ void setup() {
   usbHid.begin();
   bleHid.begin();
   launcher.registerApp(wifiApp);
+  launcher.registerApp(bluetoothApp);
   launcher.registerApp(totpApp);
   launcher.registerApp(vaultApp);
   launcher.registerApp(generatorApp);
   launcher.registerApp(clockApp);
   launcher.registerApp(settingsApp);
+  launcher.registerApp(beaconLabApp);
   launcher.begin();
   launcher.tick(millis());
   MemoryProfiler::checkpoint("home-services-ready");
@@ -152,6 +158,9 @@ void loop() {
     if (vault.isLoaded()) vaultApp.clearSession(context);
     webPortal.stop(context);
     usbHid.cancel();
+  }
+  if (display.isSleeping() || display.isScreensaverActive() || security.isLocked()) {
+    beaconLabApp.onExit(context);
   }
   wifi.tick(now);
   while (Serial.available() > 0) {

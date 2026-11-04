@@ -1,6 +1,7 @@
 #pragma once
 #include "core/App.h"
 #include "apps/TouchTestApp.h"
+#include "apps/BluetoothApp.h"
 #include <stdint.h>
 
 enum class SettingsSubView : uint8_t {
@@ -40,6 +41,7 @@ private:
   uint8_t menuIndex_ = 0, scrollOffset_ = 0, metricPage_ = 0;
   uint8_t deviceIndex_ = 0;
   TouchTestApp touchTest_;
+  BluetoothApp bluetooth_;
   uint32_t lastMetricTickMs_ = 0;
   bool fullRedraw_ = true;
   bool hasRendered_ = false, drawnSaveOk_ = true;
@@ -77,7 +79,6 @@ private:
   void renderSetPin(AppContext& ctx);
   void renderLanguage(AppContext& ctx);
   void renderWebPortal(AppContext& ctx);
-  void renderBluetooth(AppContext& ctx);
 
   void handleMenuTouch(AppContext& ctx, const TouchEvent& ev);
   void handleDisplayTouch(AppContext& ctx, const TouchEvent& ev);
@@ -89,10 +90,7 @@ private:
   void handleSetPinTouch(AppContext& ctx, const TouchEvent& ev);
   void handleLanguageTouch(AppContext& ctx, const TouchEvent& ev);
   void handleWebPortalTouch(AppContext& ctx, const TouchEvent& ev);
-  void handleBluetoothTouch(AppContext& ctx, const TouchEvent& ev);
 
   uint32_t drawnWebPortalSec_ = 9999;
   bool webPortalTyped_ = false;
-  const char* bleFeedbackStatus_ = "";
-  uint32_t bleFeedbackUntilMs_ = 0;
 };

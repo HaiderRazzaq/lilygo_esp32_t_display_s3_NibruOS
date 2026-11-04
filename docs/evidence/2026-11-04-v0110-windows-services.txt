@@ -1,0 +1,7 @@
+Post-repair-attempt PnP child service UUIDs reported by Windows for NibruOS Keyboard, v0.11.0:
+1801 Generic Attribute
+1800 Generic Access
+180a Device Information
+180f Battery
+No 1812 HID child. Owner observed SETTING UP KEYBOARD after re-pairing.
+No addresses, keys or other device data captured.

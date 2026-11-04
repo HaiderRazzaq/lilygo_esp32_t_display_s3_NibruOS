@@ -1,0 +1,9 @@
+Temporary MSVC fault-injection harness compiling the ESP32 branch of BleHidService.cpp
+and the real ResourceManager. Stub controller init returns ESP_ERR_NO_MEM.
+Then allow controller startup and inject Bluedroid startup failure. Finally allow both.
+
+Before repair, exit 1:
+FAIL line 12: !service.setEnabled(true, context)
+
+After repair, exit 0:
+PASS: controller/host failure preserve Disabled, release lease and allow retry

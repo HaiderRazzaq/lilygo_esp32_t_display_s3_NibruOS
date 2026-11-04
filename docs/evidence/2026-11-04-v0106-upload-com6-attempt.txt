@@ -1,0 +1,57 @@
+Processing lilygo-t-display-s3 (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 1.203.210628 (2.3) 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 35 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- CST816S @ 1.3.0+sha.11fe1fb
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|-- Wire @ 2.0.0
+|-- WiFi @ 2.0.0
+|-- ESP32 BLE Arduino @ 2.0.0
+|-- Preferences @ 2.0.0
+|-- USB @ 2.0.0
+|-- WebServer @ 2.0.0
+|-- DNSServer @ 2.0.0
+Building in release mode
+Retrieving maximum program size .pio\build\lilygo-t-display-s3\firmware.elf
+Checking size .pio\build\lilygo-t-display-s3\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [===       ]  26.2% (used 85784 bytes from 327680 bytes)
+Flash: [==        ]  23.9% (used 1565457 bytes from 6553600 bytes)
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-builtin, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: COM6
+Uploading .pio\build\lilygo-t-display-s3\firmware.bin
+esptool.py v4.5.1
+Serial port COM6
+Connecting...
+
+A serial exception error occurred: ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))
+Note: This error originates from pySerial. It is likely not a problem with esptool, but with the hardware connection or drivers.
+For troubleshooting steps visit: https://docs.espressif.com/projects/esptool/en/latest/troubleshooting.html
+*** [upload] Error 1
+========================= [FAILED] Took 26.09 seconds =========================
+
+Environment          Status    Duration
+-------------------  --------  ------------
+lilygo-t-display-s3  FAILED    00:00:26.088
+==================== 1 failed, 0 succeeded in 00:00:26.088 ====================

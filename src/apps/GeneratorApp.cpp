@@ -117,7 +117,7 @@ void GeneratorApp::executeSave(AppContext& ctx) {
 }
 
 void GeneratorApp::onTick(AppContext& ctx, uint32_t nowMs) {
-  (void)ctx;
+  if (drawnBleReady_ != ctx.bleHid.isConnected()) invalidate();
   if (feedbackUntilMs_ && static_cast<int32_t>(nowMs - feedbackUntilMs_) >= 0) {
     feedbackUntilMs_ = 0;
     status_ = "";
@@ -184,8 +184,7 @@ void GeneratorApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     } else if (!ctx.bleHid.isConnected()) {
       status_ = "BLE not connected";
     } else {
-      ctx.bleHid.typeText(currentPass_);
-      status_ = "Typed via BLE!";
+      status_ = ctx.bleHid.typeText(currentPass_) ? "Sent via BLE" : "BLE interrupted";
     }
     feedbackUntilMs_ = millis() + 2000;
     invalidate();
@@ -239,7 +238,8 @@ void GeneratorApp::render(AppContext& ctx) {
   screen.label(18, 122, "TYPE USB", Colors::Bg, 1, Colors::Cyan);
 
   // Type BLE Button
-  const bool bleOk = ctx.bleHid.isEnabled() && ctx.bleHid.isConnected();
+  const bool bleOk = ctx.bleHid.isConnected();
+  drawnBleReady_ = bleOk;
   t.fillRoundRect(104, 110, 90, 34, 5, bleOk ? Colors::Green : Colors::Panel);
   t.drawRoundRect(104, 110, 90, 34, 5, bleOk ? Colors::Green : Colors::Border);
   screen.label(114, 122, "TYPE BLE", bleOk ? Colors::Bg : Colors::Muted, 1, bleOk ? Colors::Green : Colors::Panel);

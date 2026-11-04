@@ -1,0 +1,144 @@
+Processing lilygo-t-display-s3 (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 1.203.210628 (2.3) 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 35 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- CST816S @ 1.3.0+sha.11fe1fb
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|-- Wire @ 2.0.0
+|-- WiFi @ 2.0.0
+|-- ESP32 BLE Arduino @ 2.0.0
+|-- Preferences @ 2.0.0
+|-- USB @ 2.0.0
+|-- WebServer @ 2.0.0
+|-- DNSServer @ 2.0.0
+Building in release mode
+Retrieving maximum program size .pio\build\lilygo-t-display-s3\firmware.elf
+Checking size .pio\build\lilygo-t-display-s3\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [===       ]  26.2% (used 85784 bytes from 327680 bytes)
+Flash: [==        ]  23.9% (used 1565457 bytes from 6553600 bytes)
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-builtin, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: COM5
+Uploading .pio\build\lilygo-t-display-s3\firmware.bin
+esptool.py v4.5.1
+Serial port COM5
+Connecting...
+Chip is ESP32-S3 (revision v0.2)
+Features: WiFi, BLE
+Crystal is 40MHz
+MAC: 44:1b:f6:d3:aa:bc
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00003fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x0000e000 to 0x0000ffff...
+Flash will be erased from 0x00010000 to 0x0018efff...
+Compressed 15104 bytes to 10401...
+Writing at 0x00000000... (100 %)
+Wrote 15104 bytes (10401 compressed) at 0x00000000 in 0.3 seconds (effective 373.3 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 146...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (146 compressed) at 0x00008000 in 0.1 seconds (effective 266.1 kbit/s)...
+Hash of data verified.
+Compressed 8192 bytes to 47...
+Writing at 0x0000e000... (100 %)
+Wrote 8192 bytes (47 compressed) at 0x0000e000 in 0.1 seconds (effective 439.8 kbit/s)...
+Hash of data verified.
+Compressed 1565824 bytes to 979079...
+Writing at 0x00010000... (1 %)
+Writing at 0x0001acb6... (3 %)
+Writing at 0x000265e8... (5 %)
+Writing at 0x000321ef... (6 %)
+Writing at 0x0003fa50... (8 %)
+Writing at 0x0004c111... (10 %)
+Writing at 0x000555ca... (11 %)
+Writing at 0x00067ea9... (13 %)
+Writing at 0x0006d35f... (15 %)
+Writing at 0x00073219... (16 %)
+Writing at 0x0007847d... (18 %)
+Writing at 0x0007d7fe... (20 %)
+Writing at 0x00082f96... (21 %)
+Writing at 0x00088a1e... (23 %)
+Writing at 0x0008ed6b... (25 %)
+Writing at 0x00094eb2... (26 %)
+Writing at 0x0009a9d2... (28 %)
+Writing at 0x000a0115... (30 %)
+Writing at 0x000a55d1... (31 %)
+Writing at 0x000aa9ca... (33 %)
+Writing at 0x000af7d5... (35 %)
+Writing at 0x000b517f... (36 %)
+Writing at 0x000b9fa9... (38 %)
+Writing at 0x000beed4... (40 %)
+Writing at 0x000c490f... (41 %)
+Writing at 0x000c9fed... (43 %)
+Writing at 0x000cf38e... (45 %)
+Writing at 0x000d4340... (46 %)
+Writing at 0x000d97f8... (48 %)
+Writing at 0x000de9d7... (50 %)
+Writing at 0x000e493e... (51 %)
+Writing at 0x000ea0d8... (53 %)
+Writing at 0x000efc70... (55 %)
+Writing at 0x000f5567... (56 %)
+Writing at 0x000fae57... (58 %)
+Writing at 0x00100701... (60 %)
+Writing at 0x0010737b... (61 %)
+Writing at 0x0010ceeb... (63 %)
+Writing at 0x00112634... (65 %)
+Writing at 0x00117fa1... (66 %)
+Writing at 0x0011d64c... (68 %)
+Writing at 0x001229da... (70 %)
+Writing at 0x00127b82... (71 %)
+Writing at 0x0012ceb3... (73 %)
+Writing at 0x001329c2... (75 %)
+Writing at 0x00137d60... (76 %)
+Writing at 0x0013cbea... (78 %)
+Writing at 0x00141d13... (80 %)
+Writing at 0x00146e1a... (81 %)
+Writing at 0x0014c1b6... (83 %)
+Writing at 0x00151668... (85 %)
+Writing at 0x001573e0... (86 %)
+Writing at 0x0015cba6... (88 %)
+Writing at 0x001623fc... (90 %)
+Writing at 0x00167a73... (91 %)
+Writing at 0x0016f967... (93 %)
+Writing at 0x00176e5e... (95 %)
+Writing at 0x0017f01c... (96 %)
+Writing at 0x001843d1... (98 %)
+Writing at 0x00189b43... (100 %)
+Wrote 1565824 bytes (979079 compressed) at 0x00010000 in 13.7 seconds (effective 916.7 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
+========================= [SUCCESS] Took 45.02 seconds =========================
+
+Environment          Status    Duration
+-------------------  --------  ------------
+lilygo-t-display-s3  SUCCESS   00:00:45.020
+========================= 1 succeeded in 00:00:45.020 =========================

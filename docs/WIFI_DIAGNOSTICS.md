@@ -47,6 +47,16 @@ If the new firmware still fails, run the independent test under `tools/wifi_scan
 
 `platformio.ini` currently pins **PlatformIO espressif32 6.5.0** (normally Arduino-ESP32 **2.0.14**). Before changing versions, save the full build output listing core/SDK packages. API changes between Arduino 2.x/3.x mean a casual upgrade can break TFT/USB and Wi-Fi source compatibility. Do one variable at a time. `WiFi.scanNetworks()` is documented by Espressif: https://docs.espressif.com/projects/arduino-esp32/en/latest/api/wifi.html .
 
+## BLE keyboard coexistence
+
+Starting BLE with an active Wi-Fi station in `WIFI_PS_NONE` can abort in
+`coex_core_enable` (BUG-0017, HWT-0048). Starting in v0.10.7, Wi-Fi modem
+sleep is required before BLE activation and remains enabled across station
+connections while the keyboard runs. When BLE stops, Wi-Fi resumes its
+normal policy. If Settings reports a BLE startup failure, capture the
+`[BLE]` lines and the System info reset reason. See
+[Espressif issue 9595](https://github.com/espressif/esp-idf/issues/9595).
+
 ## What to send an AI agent if unresolved
 
 ```

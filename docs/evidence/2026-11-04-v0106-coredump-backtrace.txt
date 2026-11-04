@@ -1,0 +1,18 @@
+Decoder exit: 0
+Crashed task handle: 0x3fced5b8, name: 'loopTask', GDB name: 'process 1070519736'
+#0  0x403774e9 in panic_abort () at ESP-IDF/components/esp_system/panic.c:408
+#1  0x40380448 in esp_system_abort () at ESP-IDF/components/esp_system/esp_system.c:137
+#2  0x403863c4 in abort () at ESP-IDF/components/newlib/abort.c:46
+#3  0x420c3dfd in coex_core_enable ()
+#4  0x420c3c46 in coex_enable ()
+#5  0x420516d0 in esp_bt_controller_enable () at ESP-IDF/components/bt/controller/esp32c3/bt.c:1490
+#6  0x42026800 in btStart () at PlatformIO/framework-arduinoespressif32/cores/esp32/esp32-hal-bt.c:50
+#7  0x4201a4d4 in BLEDevice::init () at PlatformIO/framework-arduinoespressif32/libraries/BLE/src/BLEDevice.cpp:339
+#8  0x4200c991 in ()::startBleStack () at PlatformIO/toolchain-xtensa-esp32s3\xtensa-esp32s3-elf\include\c++\8.4.0\bits/basic_string.h:252
+#9  BleHidService::setEnabled () at src/services/BleHidService.cpp:150
+#10 0x42006444 in SettingsApp::handleBluetoothTouch () at src/apps/SettingsApp.cpp:1149
+#11 SettingsApp::handleBluetoothTouch () at src/apps/SettingsApp.cpp:1141
+#12 0x420069df in SettingsApp::onTouch () at src/apps/SettingsApp.cpp:269
+#13 0x4200ab93 in AppManager::handleTouch () at src/core/AppManager.cpp:76
+#14 0x4200bb28 in loop () at src/main.cpp:133
+#15 0x42027b28 in loopTask () at PlatformIO/framework-arduinoespressif32/cores/esp32/main.cpp:50

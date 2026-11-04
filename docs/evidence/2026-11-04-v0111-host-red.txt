@@ -1,0 +1,49 @@
+AppManager.cpp
+MemoryProfiler.cpp
+ResourceManager.cpp
+ButtonManager.cpp
+DisplayManager.cpp
+TouchManager.cpp
+HomeScreen.cpp
+AccountImportService.cpp
+ArabicReshaper.cpp
+BleHidService.cpp
+CryptoService.cpp
+LocalizationService.cpp
+SecurityService.cpp
+SettingsService.cpp
+TimeService.cpp
+TotpService.cpp
+UsbHidService.cpp
+VaultService.cpp
+WebPortalService.cpp
+WiFiService.cpp
+Generating Code...
+Compiling...
+BluetoothApp.cpp
+ClockApp.cpp
+GeneratorApp.cpp
+SettingsApp.cpp
+SystemInfoApp.cpp
+TotpApp.cpp
+TouchTestApp.cpp
+VaultApp.cpp
+WiFiApp.cpp
+WiFiScannerApp.cpp
+test_main.cpp
+test_settings.cpp
+test_authenticator.cpp
+test_account_import.cpp
+test_vault.cpp
+test_web_portal.cpp
+Generating Code...
+main.cpp
+Assertion failed: !bleHid.isConnected(), file tests/host/test_main.cpp, line 353
+Traceback (most recent call last):
+  File "C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 30, in <module>
+    subprocess.run([exe], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['C:\\Users\\Haider\\Desktop\\lilygo_esp32_t_display_s3_NibruOS\\.testbuild\\nibru_smoke.exe']' returned non-zero exit status 3221226505.

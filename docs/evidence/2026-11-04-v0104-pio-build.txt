@@ -1,0 +1,23 @@
+NibruOS v0.10.4 PlatformIO Release Build Output
+Board: lilygo-t-display-s3
+Framework: arduinoespressif32 @ 3.20014.231204 (2.0.14)
+Date: 2026-11-04
+
+RAM:   [===       ]  26.2% (used 85784 bytes from 327680 bytes)
+Flash: [==        ]  23.9% (used 1565117 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+Successfully created esp32s3 image.
+check_image([".pio\build\lilygo-t-display-s3\firmware.bin"], [".pio\build\lilygo-t-display-s3\firmware.elf"])
+{
+  "binary_bytes": 1565488,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 4988112,
+  "sha256": "ac90d2ce14d31f6a682cff80293449d76109412548a3925e1924a9ca2a307ef9",
+  "growth_percent": 85.98148605751868,
+  "warnings": [
+    "Image growth exceeds provisional 5% review trigger"
+  ],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 64.94 seconds =========================

@@ -12,7 +12,6 @@
 #include "services/LocalizationService.h"
 #include "services/WebPortalService.h"
 #include "services/UsbHidService.h"
-#include "services/BleHidService.h"
 #include "BoardConfig.h"
 #include <Arduino.h>
 #include <cstdio>
@@ -53,6 +52,8 @@ void SettingsApp::onEnter(AppContext&) {
 void SettingsApp::onExit(AppContext& ctx) {
   if (subView_ == SettingsSubView::TouchTest) {
     touchTest_.onExit(ctx);
+  } else if (subView_ == SettingsSubView::Bluetooth) {
+    bluetooth_.onExit(ctx);
   }
   if (ctx.webPortal.isActive()) {
     ctx.webPortal.stop(ctx);
@@ -66,6 +67,7 @@ void SettingsApp::onDisplayRestored(AppContext& ctx) {
   fullRedraw_ = true;
   hasRendered_ = false;
   if (subView_ == SettingsSubView::TouchTest) touchTest_.onDisplayRestored(ctx);
+  if (subView_ == SettingsSubView::Bluetooth) bluetooth_.onDisplayRestored(ctx);
   invalidate();
 }
 
@@ -73,7 +75,10 @@ void SettingsApp::onTick(AppContext& ctx, uint32_t nowMs) {
   if (subView_ == SettingsSubView::TouchTest) {
     touchTest_.onTick(ctx, nowMs);
     if (touchTest_.consumeDirty()) touchTest_.render(ctx);
-  } else if (subView_ == SettingsSubView::Memory || subView_ == SettingsSubView::WiFiDiag || subView_ == SettingsSubView::Bluetooth) {
+  } else if (subView_ == SettingsSubView::Bluetooth) {
+    bluetooth_.onTick(ctx, nowMs);
+    if (bluetooth_.consumeDirty()) invalidate();
+  } else if (subView_ == SettingsSubView::Memory || subView_ == SettingsSubView::WiFiDiag) {
     if (nowMs - lastMetricTickMs_ >= 1000) {
       lastMetricTickMs_ = nowMs;
       invalidate();
@@ -111,9 +116,11 @@ bool SettingsApp::onBack(AppContext& ctx) {
   if (subView_ != SettingsSubView::Menu) {
     if (subView_ == SettingsSubView::TouchTest) {
       touchTest_.onExit(ctx);
-  }
-  if (ctx.webPortal.isActive()) {
-    ctx.webPortal.stop(ctx);
+    } else if (subView_ == SettingsSubView::Bluetooth) {
+      bluetooth_.onExit(ctx);
+    }
+    if (ctx.webPortal.isActive()) {
+      ctx.webPortal.stop(ctx);
     }
     subView_ = SettingsSubView::Menu;
     fullRedraw_ = true;
@@ -141,21 +148,7 @@ void SettingsApp::onPrimaryAction(AppContext& ctx) {
   } else if (subView_ == SettingsSubView::TouchTest) {
     touchTest_.onPrimaryAction(ctx);
   } else if (subView_ == SettingsSubView::Bluetooth) {
-    if (!ctx.bleHid.isEnabled()) {
-      if (ctx.bleHid.setEnabled(true, ctx)) {
-        bleFeedbackStatus_ = "BLE Keyboard Advertising...";
-      } else {
-        bleFeedbackStatus_ = "Cannot acquire radio (Wi-Fi busy)";
-      }
-    } else if (!ctx.bleHid.isConnected()) {
-      ctx.bleHid.setEnabled(false, ctx);
-      bleFeedbackStatus_ = "BLE Keyboard Disabled";
-    } else {
-      ctx.bleHid.typeText("NibruOS-123456\n");
-      bleFeedbackStatus_ = "Sent 'NibruOS-123456' to host!";
-    }
-    bleFeedbackUntilMs_ = millis() + 2500;
-    fullRedraw_ = true;
+    bluetooth_.onPrimaryAction(ctx);
   }
   invalidate();
 }
@@ -170,6 +163,7 @@ void SettingsApp::onActivate(AppContext& ctx) {
     };
     subView_ = views[menuIndex_]; focusedIndex_ = metricPage_ = 0; fullRedraw_ = true;
     if (subView_ == SettingsSubView::TouchTest) touchTest_.onEnter(ctx);
+    else if (subView_ == SettingsSubView::Bluetooth) bluetooth_.onEnter(ctx);
     else if (subView_ == SettingsSubView::WebPortal) {
       ctx.webPortal.start(millis(), ctx);
       webPortalTyped_ = false;
@@ -222,6 +216,7 @@ void SettingsApp::onActivate(AppContext& ctx) {
       focusedIndex_ = deviceIndex_;
     }
   } else if (subView_ == SettingsSubView::Memory) onPrimaryAction(ctx);
+  else if (subView_ == SettingsSubView::Bluetooth) bluetooth_.onActivate(ctx);
   invalidate();
 }
 
@@ -265,7 +260,8 @@ void SettingsApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
       handleLanguageTouch(ctx, ev);
       break;
     case SettingsSubView::Bluetooth:
-      handleBluetoothTouch(ctx, ev);
+      bluetooth_.onTouch(ctx, ev);
+      if (bluetooth_.consumeDirty()) invalidate();
       break;
     case SettingsSubView::WebPortal:
       handleWebPortalTouch(ctx, ev);
@@ -409,7 +405,7 @@ void SettingsApp::render(AppContext& ctx) {
     case SettingsSubView::TouchTest: touchTest_.render(ctx); break;
     case SettingsSubView::SetPin:    renderSetPin(ctx); break;
     case SettingsSubView::Language:  renderLanguage(ctx); break;
-    case SettingsSubView::Bluetooth: renderBluetooth(ctx); break;
+    case SettingsSubView::Bluetooth: bluetooth_.render(ctx); break;
     case SettingsSubView::WebPortal: renderWebPortal(ctx); break;
   }
   if (!ctx.settings.lastSaveOk()) ctx.display.footer("NVS error: preferences were not saved");
@@ -1070,109 +1066,6 @@ void SettingsApp::handleWebPortalTouch(AppContext& ctx, const TouchEvent& ev) {
       webPortalTyped_ = true;
       fullRedraw_ = true;
       invalidate();
-    }
-  }
-}
-
-void SettingsApp::renderBluetooth(AppContext& ctx) {
-  DisplayManager& screen = ctx.display;
-  TFT_eSPI& t = screen.gfx();
-  const auto& loc = LocalizationService::instance();
-  const bool ar = loc.isArabic();
-
-  if (fullRedraw_) {
-    screen.clear();
-    screen.header(loc.get(TextId::MenuBluetooth), true);
-    fullRedraw_ = false;
-  }
-
-  const bool enabled = ctx.bleHid.isEnabled();
-  const bool connected = ctx.bleHid.isConnected();
-
-  // Clear subview content area cleanly
-  t.fillRect(0, 33, 320, 115, Colors::Bg);
-
-  // Main Status Panel (x: 10, y: 36, w: 300, h: 68)
-  t.fillRoundRect(10, 36, 300, 68, 6, Colors::Panel);
-  t.drawRoundRect(10, 36, 300, 68, 6, connected ? Colors::Green : (enabled ? Colors::Cyan : Colors::Border));
-
-  // Device title & State Badge
-  screen.label(20, 44, "DEVICE: NibruOS Keyboard", Colors::White, 1, Colors::Panel);
-
-  if (!enabled) {
-    screen.label(20, 60, ar ? "الحالة: البلوتوث معطل" : "STATUS: BLUETOOTH OFF", Colors::Muted, 1, Colors::Panel);
-    screen.label(20, 76, ar ? "لتوفير الطاقة وحماية الذاكرة" : "Radio sleeping (SRAM preserved)", Colors::Muted, 1, Colors::Panel);
-  } else if (!connected) {
-    screen.label(20, 60, ar ? "الحالة: في انتظار الاقتران..." : "STATUS: PAIRING / ADVERTISING...", Colors::Amber, 1, Colors::Panel);
-    screen.label(20, 76, ar ? "افتح البلوتوث في هاتفك واقترن به" : "Connect via Phone/PC Bluetooth", Colors::Cyan, 1, Colors::Panel);
-  } else {
-    screen.label(20, 60, ar ? "الحالة: متصل بجهازك!" : "STATUS: CONNECTED & READY!", Colors::Green, 1, Colors::Panel);
-    char stats[40];
-    snprintf(stats, sizeof(stats), "Chars typed: %u", static_cast<unsigned int>(ctx.bleHid.typedCount()));
-    screen.label(20, 76, stats, Colors::White, 1, Colors::Panel);
-  }
-
-  // Action Buttons Row (y: 110, h: 32)
-  if (!enabled) {
-    // Single wide ENABLE button (x: 10..310)
-    t.fillRoundRect(10, 110, 300, 32, 6, Colors::Cyan);
-    screen.label(70, 120, ar ? "[ تفعيل لوحة المفاتيح ]" : "[ ENABLE BLE KEYBOARD ]", Colors::Bg, 1, Colors::Cyan);
-  } else if (!connected) {
-    // DISABLE button
-    t.fillRoundRect(10, 110, 300, 32, 6, Colors::Red);
-    screen.label(85, 120, ar ? "[ إيقاف البلوتوث ]" : "[ DISABLE BLUETOOTH ]", Colors::White, 1, Colors::Red);
-  } else {
-    // Two buttons: [TEST KEYBOARD] (x: 10..154) and [DISABLE] (x: 162..310)
-    t.fillRoundRect(10, 110, 144, 32, 6, Colors::Green);
-    screen.label(25, 120, "[ TEST KEYBOARD ]", Colors::Bg, 1, Colors::Green);
-
-    t.fillRoundRect(162, 110, 148, 32, 6, Colors::Red);
-    screen.label(195, 120, ar ? "[ إيقاف ]" : "[ DISABLE BLE ]", Colors::White, 1, Colors::Red);
-  }
-
-  if (bleFeedbackStatus_[0] != '\0' && millis() < bleFeedbackUntilMs_) {
-    screen.footer(bleFeedbackStatus_);
-  } else {
-    screen.footer(ar ? "Back: القائمة | المس للتحكم" : "Back: menu | Tap controls");
-  }
-}
-
-void SettingsApp::handleBluetoothTouch(AppContext& ctx, const TouchEvent& ev) {
-  if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
-
-  const bool enabled = ctx.bleHid.isEnabled();
-  const bool connected = ctx.bleHid.isConnected();
-
-  if (ev.y >= 98 && ev.y <= 150) {
-    if (!enabled) {
-      if (ctx.bleHid.setEnabled(true, ctx)) {
-        bleFeedbackStatus_ = "BLE Keyboard Advertising...";
-      } else {
-        bleFeedbackStatus_ = "Cannot acquire radio (Wi-Fi busy)";
-      }
-      bleFeedbackUntilMs_ = millis() + 2500;
-      fullRedraw_ = true;
-      invalidate();
-    } else if (!connected) {
-      ctx.bleHid.setEnabled(false, ctx);
-      bleFeedbackStatus_ = "BLE Keyboard Disabled";
-      bleFeedbackUntilMs_ = millis() + 2000;
-      fullRedraw_ = true;
-      invalidate();
-    } else {
-      if (ev.x >= 10 && ev.x <= 154) {
-        ctx.bleHid.typeText("NibruOS-123456\n");
-        bleFeedbackStatus_ = "Sent 'NibruOS-123456' to host!";
-        bleFeedbackUntilMs_ = millis() + 2500;
-        fullRedraw_ = true;
-        invalidate();
-      } else if (ev.x >= 162 && ev.x <= 310) {
-        ctx.bleHid.setEnabled(false, ctx);
-        bleFeedbackStatus_ = "BLE Keyboard Disabled";
-        bleFeedbackUntilMs_ = millis() + 2000;
-        fullRedraw_ = true;
-        invalidate();
-      }
     }
   }
 }

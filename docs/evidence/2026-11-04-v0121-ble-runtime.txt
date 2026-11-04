@@ -1,0 +1,120 @@
+[BLE] Disconnected (id=0, reason=0x16)
+[BLE] Starting controller (internal heap=218952, largest=139252 bytes)
+[BLE] Starting Bluedroid host...
+[BLE] Creating BLE Server...
+[BLE] Creating BLE HID Device...
+[BLE] Setting HID Metadata...
+[BLE] Setting Security...
+[BLE] Setting Report Map & Services...
+[BLE] HID service start result=0
+[BLE] Starting Advertising...
+[BLE] Setting Battery Level...
+[BLE] BLE Advertising started successfully!
+[BLE] Advertising result=0
+[BLE] Authentication succeeded (reason=0x00)
+[BLE] Connected (id=0)
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Authentication failed (reason=0x66)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Authentication failed (reason=0x55)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Authentication failed (reason=0x66)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Authentication failed (reason=0x66)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Authentication failed (reason=0x66)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Authentication failed (reason=0x66)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Authentication failed (reason=0x66)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Authentication failed (reason=0x66)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Authentication failed (reason=0x66)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Advertising result=0
+[BLE] Starting controller (internal heap=192624, largest=122868 bytes)
+[BLE] Starting Bluedroid host...
+[BLE] Creating BLE Server...
+[BLE] Creating BLE HID Device...
+[BLE] Setting HID Metadata...
+[BLE] Setting Security...
+[BLE] Setting Report Map & Services...
+[BLE] HID service start result=0
+[BLE] Starting Advertising...
+[BLE] Setting Battery Level...
+[BLE] BLE Advertising started successfully!
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Authentication failed (reason=0x66)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Authentication failed (reason=0x66)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Authentication failed (reason=0x66)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x13)
+[BLE] Advertising result=0
+[BLE] Connected (id=0)
+[BLE] Disconnected (id=0, reason=0x16)
+[BLE] Starting controller (internal heap=179468, largest=110580 bytes)
+[BLE] Starting Bluedroid host...
+[BLE] Creating BLE Server...
+[BLE] Creating BLE HID Device...
+[BLE] Setting HID Metadata...
+[BLE] Setting Security...
+[BLE] Setting Report Map & Services...
+[BLE] HID service start result=0
+[BLE] Starting Advertising...
+[BLE] Setting Battery Level...
+[BLE] BLE Advertising started successfully!
+[BLE] Advertising result=0
+[BLE] Connected (id=0)

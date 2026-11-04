@@ -29,4 +29,5 @@ private:
   const char* status_ = "";
   uint32_t feedbackUntilMs_ = 0;
   bool fullRedraw_ = true;
+  bool drawnBleReady_ = false;
 };
