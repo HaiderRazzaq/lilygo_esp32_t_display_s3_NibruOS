@@ -6,6 +6,19 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 
 ## Unreleased
 
+### 2FA USB Long-Press & Hardware Button Trigger (v0.9.4) — 2026-11-04
+- Redesigned 2FA Authenticator USB button UI into a sleek Cyber USB Action Capsule:
+  - High-contrast Cyan border (`Colors::Cyan`) with rounded corners (`r=7`).
+  - Dark-on-cyan left badge label (`USB`) and modern white prompt text (`HOLD OR BTN TO SEND`).
+  - Dynamic state styling: active transmission (`TYPING TO PC...`), amber prompt on tap (`Hold touch or press BTN`), disconnected alert (`USB DISCONNECTED`), and missing time sync alert (`SYNC TIME TO SEND USB`).
+- Added Touch Long-Press Gating for USB Code Typing:
+  - Short taps no longer trigger accidental USB keystrokes; instead they display guidance (`Hold touch or press BTN`).
+  - Sustained touch (LongPress) triggers `sendCurrentCode(ctx)` to type OTP digits to PC.
+- Added Physical Hardware Button (BOOT / GPIO 0) USB Trigger:
+  - Implemented `TotpApp::onPrimaryAction` (short press of BOOT) and `TotpApp::onActivate` (long press of BOOT) to directly trigger `sendCurrentCode(ctx)`.
+- Sequentially bumped firmware version to v0.9.4 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+- Verified with host unit tests (VER-0117), desktop automated test suite (VER-0118), PlatformIO release build (959,440 B binary, 14.6% flash, 19.9% RAM, VER-0119), documentation verification (VER-0120), and physical upload to device on COM5 (HWT-0036).
+
 ### 2FA Authenticator UI Restoration & Cancel Lifecycle Fix (v0.9.3) — 2026-11-04
 - Fixed 2FA Authenticator screen component loss on cancel/back from ADD or DELETE (BUG-0016):
   - Enforced `cardDirty_ = true` on `TotpApp::onBack()` and on `fullRedraw_` processing inside `render()`, ensuring that after screen clearing, navigation arrows (`<`, `>`), USB button, counter, `ADD`, and `DELETE` buttons are reliably redrawn.

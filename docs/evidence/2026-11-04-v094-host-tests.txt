@@ -1,0 +1,13 @@
+=== Host Tests Run (2026-11-04 v0.9.4) ===
+C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS>python tools/run_host_tests.py
+Compiling C++ host authenticator tests with MSVC...
+Running host authenticator tests...
+[Test] Authenticator Flow & USB Keystroke Tests
+  - Card view UI verification
+  - Short tap guidance test: 'Hold touch or press BTN' displayed
+  - Long press touch USB trigger test: sendCurrentCode initiated
+  - Hardware physical BOOT button trigger test: onPrimaryAction initiated
+  - ADD/DELETE cancel UI restoration regression test: PASSED
+Authenticator host tests PASS
+All host tests executed successfully.
+Exit code: 0

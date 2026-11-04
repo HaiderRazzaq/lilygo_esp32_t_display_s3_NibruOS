@@ -850,3 +850,53 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Flashing and hardware reset verified; physical observation of 2FA cancel UI requested from user"
 }
 ```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0036",
+  "date": "2026-11-04",
+  "firmware_version": "v0.9.4",
+  "commit": "WORKING_TREE",
+  "environment": "Physical LILYGO T-Display-S3 on COM5 via esptool.py",
+  "wiring": "Factory ST7789V 8-bit parallel, CST816S capacitive touch, AW9364 backlight",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized v0.9.4 firmware upload with 2FA USB Cyber Action Capsule UI, touch long-press gating, and physical BOOT button trigger",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "Upload complete v0.9.4 binary (959,440 B) via PlatformIO esptool directly to COM5 at 460800 baud",
+  "expected": "Write intended v0.9.4 image (959,440 B), verify data hashes, reset device via RTS pin",
+  "actual": "SUCCESS in 35.97s. Application 959,440 B (609,379 compressed) written to 0x10000 in 8.3 seconds (926.1 kbit/s). Hash of data verified on all segments. Hard reset via RTS sent.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v094-upload-com5.txt"
+  ],
+  "evidence_kind": "Captured PlatformIO/esptool terminal output for v0.9.4 firmware upload",
+  "limitations": "Flashing and hardware reset verified; physical observation of Cyber USB Action Capsule, long-press touch sending, and BOOT button typing requested from user"
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0037",
+  "date": "2026-11-04",
+  "firmware_version": "v0.9.4",
+  "commit": "WORKING_TREE",
+  "environment": "Physical LILYGO T-Display-S3 on COM5 via esptool.py",
+  "wiring": "Factory ST7789V 8-bit parallel, CST816S capacitive touch, AW9364 backlight, USB HID composite",
+  "verification_type": "HARDWARE",
+  "scope": "Owner physical verification of 2FA USB Cyber Action Capsule, touch long-press gating, and physical BOOT button trigger",
+  "hardware": "ESP32-S3 revision v0.2, COM5 VID 303A PID 1001 MAC 44:1b:f6:d3:aa:bc",
+  "procedure": "Owner opens 2FA Authenticator on device, verifies the new Cyber USB Action Capsule UI layout, verifies that short tap shows 'Hold touch or press BTN', tests long press on the screen to type OTP code into PC Notepad, and presses the physical BOOT hardware button (GPIO 0) to type OTP code into PC Notepad",
+  "expected": "Cyber USB UI renders cleanly without missing elements; short tap shows guidance without sending; long-press touch sends active OTP digits via USB HID keyboard emulation; physical BOOT button press sends active OTP digits via USB HID",
+  "actual": "Owner confirmed physical test PASS ('نجح'): Cyber USB Action Capsule rendered cleanly, long press successfully typed 6-digit OTP code into PC via USB HID, and physical BOOT button successfully typed 6-digit OTP code into PC via USB HID.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v094-owner-hardware-confirmation.txt"
+  ],
+  "evidence_kind": "Owner report from interactive device session",
+  "limitations": "Physical observation confirms UI appearance, long-press touch gating, and BOOT hardware button USB HID typing; RF Wi-Fi and long-term memory profiling scenarios A-E remain ongoing"
+}
+```

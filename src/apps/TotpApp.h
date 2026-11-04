@@ -21,6 +21,8 @@ public:
   void render(AppContext& ctx) override;
   bool onBack(AppContext& ctx) override;
   void onPrimaryAction(AppContext& ctx) override;
+  void onActivate(AppContext& ctx) override;
+  void sendCurrentCode(AppContext& ctx);
   void onDisplayRestored(AppContext&) override { fullRedraw_ = true; cardDirty_ = true; invalidate(); }
   void clearSession(AppContext& ctx);
 

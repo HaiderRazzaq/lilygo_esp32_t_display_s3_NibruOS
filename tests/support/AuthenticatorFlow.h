@@ -11,6 +11,10 @@ inline void authTap(TotpApp& app, AppContext& ctx, int x, int y) {
   app.onTouch(ctx, TouchEvent{static_cast<int16_t>(x), static_cast<int16_t>(y), 0, 0,
                             TouchGesture::Tap, 0, millis()});
 }
+inline void authLongPress(TotpApp& app, AppContext& ctx, int x, int y) {
+  app.onTouch(ctx, TouchEvent{static_cast<int16_t>(x), static_cast<int16_t>(y), 0, 0,
+                            TouchGesture::LongPress, 0, millis()});
+}
 inline void authAdd(TotpApp& app, AppContext& ctx) {
   authTap(app, ctx, 110, 158);
   authTap(app, ctx, 160, 50);

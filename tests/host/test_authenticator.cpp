@@ -242,21 +242,28 @@ void testAuthenticator() {
   display.gfx().printed.clear();
   testEpoch = 1800000000;
   connected = false;
+  // Short tap gives guidance:
   authTap(app, ctx, 160, 115); app.render(ctx);
+  assert(textShown("Hold touch or press BTN"));
+  display.gfx().printed.clear();
+  // LongPress triggers send (disconnected -> USB unavailable):
+  authLongPress(app, ctx, 160, 115); app.render(ctx);
   assert(textShown("USB unavailable") && !textShown("HID reports sent"));
   display.gfx().printed.clear();
   connected = true; acceptReport = false;
-  authTap(app, ctx, 160, 115);
+  // Hardware button (onPrimaryAction) triggers send:
+  app.onPrimaryAction(ctx);
   usb.tick(millis()); app.onTick(ctx, millis()); app.render(ctx);
   assert(textShown("USB send failed") && !textShown("HID reports sent"));
   display.gfx().printed.clear();
   acceptReport = true;
-  authTap(app, ctx, 160, 115);
+  // LongPress triggers send:
+  authLongPress(app, ctx, 160, 115);
   for (unsigned i = 0; i < 13; ++i) usb.tick(millis() + i * 20);
   app.onTick(ctx, millis()); app.render(ctx);
   assert(textShown("HID reports sent"));
   // A clock loss after queuing also cancels the transfer, before another digit.
-  authTap(app, ctx, 160, 115);
+  authLongPress(app, ctx, 160, 115);
   testEpoch = 0;
   app.onTick(ctx, millis());
   assert(usb.transferState() == UsbTransferState::Idle);
@@ -288,13 +295,14 @@ void testAuthenticator() {
   assert(accounts.accountCount() == 1);
 
   // Regression test: Cancel ADD and cancel DELETE must restore all card components (ADD, DELETE, arrows, etc.)
+  testEpoch = 1800000000;
   // 1. Enter ADD then cancel via Back
   authTap(app, ctx, 120, 154);
   app.render(ctx);
   assert(app.onBack(ctx));
   display.gfx().printed.clear();
   app.render(ctx);
-  assert(textShown("ADD") && textShown("DELETE") && textShown("<") && textShown(">") && textShown("TYPE CODE (USB)"));
+  assert(textShown("ADD") && textShown("DELETE") && textShown("<") && textShown(">") && textShown("HOLD OR BTN TO SEND") && textShown("USB"));
 
   // 2. Enter DELETE then cancel via CANCEL touch button
   authTap(app, ctx, 185, 154);
@@ -302,7 +310,7 @@ void testAuthenticator() {
   authTap(app, ctx, 50, 110); // Tap CANCEL
   display.gfx().printed.clear();
   app.render(ctx);
-  assert(textShown("ADD") && textShown("DELETE") && textShown("<") && textShown(">") && textShown("TYPE CODE (USB)"));
+  assert(textShown("ADD") && textShown("DELETE") && textShown("<") && textShown(">") && textShown("HOLD OR BTN TO SEND") && textShown("USB"));
 
   app.onExit(ctx);
   Preferences::resetMock();

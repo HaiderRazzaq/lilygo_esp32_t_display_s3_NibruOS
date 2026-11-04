@@ -1,0 +1,11 @@
+=== Owner Physical Hardware Confirmation (2026-11-04 v0.9.4) ===
+Device: LILYGO T-Display-S3 Touch Glass (ESP32-S3 revision v0.2)
+Firmware: NibruOS v0.9.4 (flashed via HWT-0036)
+Test Scope:
+  1. 2FA Authenticator UI appearance (Cyber USB Action Capsule)
+  2. Touch long-press gating (short tap guidance 'Hold touch or press BTN')
+  3. Touch long-press code typing via USB HID into host PC Notepad
+  4. Physical hardware BOOT button (GPIO 0) code typing via USB HID into host PC Notepad
+Owner Confirmation:
+  User response: "نجح" (Succeeded / Verified working on physical hardware)
+Outcome: PASS

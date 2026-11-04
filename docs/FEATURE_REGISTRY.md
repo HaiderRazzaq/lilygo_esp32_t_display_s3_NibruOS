@@ -538,7 +538,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "verification": {
     "build": "VER-0045",
     "host": "VER-0042; VER-0043; VER-0044",
-    "hardware": "HWT-0019 current upload/hash/reset PASS only; HWT-0017 prior owner entry report; HWT-0018 new native runtime NOT RUN"
+    "hardware": "HWT-0036 upload PASS; HWT-0037 owner physical 2FA UI and USB typing PASS"
   },
   "issues": [
     "BUG-0009",
@@ -550,7 +550,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "DEV-0023",
     "DEV-0024",
     "DEV-0025",
-    "DEV-0026"
+    "DEV-0026",
+    "DEV-0045"
   ]
 }
 ```

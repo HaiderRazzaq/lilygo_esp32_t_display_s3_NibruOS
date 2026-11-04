@@ -1706,3 +1706,44 @@ Corrections must be appended with the original ID reference.
   "follow_up": "User tests 2FA Authenticator on device: taps ADD or DELETE, cancels, and observes complete UI restored."
 }
 ```
+
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0045",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0014",
+    "VER-0117",
+    "VER-0118",
+    "VER-0119",
+    "VER-0120",
+    "HWT-0036"
+  ],
+  "action": "2FA USB ACTION CAPSULE UI REDESIGN / LONG-PRESS GATING / PHYSICAL BUTTON TRIGGER / VERSION BUMP v0.9.4",
+  "files": [
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "tests/support/AuthenticatorFlow.h",
+    "tests/host/test_authenticator.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/FEATURE_REGISTRY.md"
+  ],
+  "description": "Redesigned the 2FA Authenticator USB typing button into a sleek Cyber USB Action Capsule (Cyan border, USB badge, instructional prompt, and dynamic state feedback). Added touch long-press gating so short taps guide the user without accidental keystroke injection, and wired the physical BOOT hardware button (GPIO 0) via onPrimaryAction and onActivate to directly trigger USB HID OTP typing. Monotonically bumped firmware version to v0.9.4.",
+  "reason": "User requested a modern UI redesign for the USB typing button, long-press protection against accidental taps, and physical hardware button triggering.",
+  "expected": "Modern visual layout, short tap guidance, long press triggering code transmission, hardware BOOT button typing code, host tests pass, desktop tests pass, release build fits app0, and device upload succeeds.",
+  "actual": "Host tests PASS with long press, short tap guidance, and button trigger assertions (VER-0117). Desktop tests PASS (VER-0118). PlatformIO build PASS with 959,440 bytes (14.6% flash, 19.9% RAM, VER-0119). Uploaded to physical device via COM5 (HWT-0036). Documentation checks PASS (VER-0120).",
+  "verification": "VER-0117, VER-0118, VER-0119, VER-0120, HWT-0036",
+  "risks": "Minimal; touch long-press uses existing CST816S duration normalization without blocking FreeRTOS event loops.",
+  "commit": "WORKING_TREE",
+  "follow_up": "User tests 2FA on device: tests short tap, long press hold to send USB digits to PC Notepad, and pressing physical BOOT button to send digits."
+}
+```

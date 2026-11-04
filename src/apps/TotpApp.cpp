@@ -101,10 +101,11 @@ void TotpApp::onTick(AppContext& ctx, uint32_t nowMs) {
       sending_ = false;
       status_ = state == UsbTransferState::Sent ? "HID reports sent" : "USB send failed";
       feedbackUntilMs_ = nowMs + 2000;
+      cardDirty_ = true;
       invalidate();
     }
   } else if (feedbackUntilMs_ && static_cast<int32_t>(nowMs - feedbackUntilMs_) >= 0) {
-    feedbackUntilMs_ = 0; status_ = ""; invalidate();
+    feedbackUntilMs_ = 0; status_ = ""; cardDirty_ = true; invalidate();
   }
   const uint32_t epoch = ctx.time.getEpoch();
   if (epoch != lastSecond_) { lastSecond_ = epoch; invalidate(); }
@@ -123,6 +124,34 @@ bool TotpApp::onBack(AppContext& ctx) {
   return true;
 }
 
+void TotpApp::sendCurrentCode(AppContext& ctx) {
+  if (sending_) return;
+  const uint8_t count = ctx.totp.accountCount();
+  if (!count) return;
+  const uint32_t epoch = ctx.time.getEpoch();
+  char code[10]{};
+  uint8_t remaining = 0;
+  if (!epoch) {
+    status_ = "Sync time via Wi-Fi/USB";
+    feedbackUntilMs_ = millis() + 2000;
+  } else if (!ctx.usbHid.isReady()) {
+    status_ = "USB unavailable";
+    feedbackUntilMs_ = millis() + 2000;
+  } else if (!ctx.totp.getAccountCode(accountIndex_, epoch, code, sizeof(code), remaining)) {
+    status_ = "Code unavailable";
+    feedbackUntilMs_ = millis() + 2000;
+  } else if (ctx.usbHid.typeCode(code)) {
+    sending_ = true;
+    status_ = "Sending...";
+  } else {
+    status_ = "USB send failed";
+    feedbackUntilMs_ = millis() + 2000;
+  }
+  CryptoService::secureZero(code, sizeof(code));
+  cardDirty_ = true;
+  invalidate();
+}
+
 void TotpApp::onPrimaryAction(AppContext& ctx) {
   if (view_ == View::ImportUsb && ctx.accountImport.state() == ImportState::Waiting) {
     ctx.accountImport.broadcastPairingCode();
@@ -131,21 +160,24 @@ void TotpApp::onPrimaryAction(AppContext& ctx) {
     }
     status_ = "Code sent to PC!";
     fullRedraw_ = true;
-  cardDirty_ = true;
+    cardDirty_ = true;
     invalidate();
     return;
   }
   if (view_ == View::Card && ctx.totp.accountCount()) {
-    ctx.usbHid.cancel(); sending_ = false; status_ = "";
-    accountIndex_ = (accountIndex_ + 1) % ctx.totp.accountCount();
-    cardDirty_ = true;
-    invalidate();
+    sendCurrentCode(ctx);
+  }
+}
+
+void TotpApp::onActivate(AppContext& ctx) {
+  if (view_ == View::Card && ctx.totp.accountCount()) {
+    sendCurrentCode(ctx);
   }
 }
 
 void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
-  if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::SwipeLeft &&
-      ev.gesture != TouchGesture::SwipeRight) return;
+  if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::LongPress &&
+      ev.gesture != TouchGesture::SwipeLeft && ev.gesture != TouchGesture::SwipeRight) return;
   if (!ctx.security.isPinEnabled() || !ctx.security.hasActiveKey() || !ctx.totp.isLoaded()) return;
   if (view_ == View::Methods) {
     if (ev.gesture != TouchGesture::Tap) return;
@@ -270,17 +302,16 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
       status_ = "Connect Wi-Fi or USB";
     }
     cardDirty_ = true;
-  } else if (ev.gesture == TouchGesture::Tap && count && ev.x >= 58 && ev.x <= 262 && ev.y >= 102 && ev.y <= 134) {
-    const uint32_t epoch = ctx.time.getEpoch();
-    char code[10]{}; uint8_t remaining = 0;
-    if (!epoch) status_ = "Sync: USB (TIME:x) or WiFi";
-    else if (!ctx.usbHid.isReady()) status_ = "USB unavailable";
-    else if (!ctx.totp.getAccountCode(accountIndex_, epoch, code, sizeof(code), remaining))
-      status_ = "Code unavailable";
-    else if (ctx.usbHid.typeCode(code)) { sending_ = true; status_ = "Sending..."; }
-    else status_ = "USB send failed";
-    CryptoService::secureZero(code, sizeof(code));
-    cardDirty_ = true;
+  } else if (count && ev.x >= 40 && ev.x <= 280 && ev.y >= 100 && ev.y <= 142) {
+    if (ev.gesture == TouchGesture::LongPress) {
+      sendCurrentCode(ctx);
+    } else if (ev.gesture == TouchGesture::Tap) {
+      if (!sending_) {
+        status_ = "Hold touch or press BTN";
+        feedbackUntilMs_ = millis() + 1500;
+        cardDirty_ = true;
+      }
+    }
   }
   invalidate();
 }
@@ -399,8 +430,31 @@ void TotpApp::render(AppContext& ctx) {
       if (accountIndex_ >= count) accountIndex_ = count - 1;
       const TotpAccount* account = ctx.totp.getAccount(accountIndex_);
       screen.label(60, 39, account->name, Colors::Cyan, strlen(account->name) > 16 ? 1 : 2);
-      t.fillRoundRect(58, 102, 204, 32, 5, epoch && ctx.usbHid.isReady() ? Colors::Cyan : Colors::Panel);
-      screen.label(76, 114, status_[0] ? status_ : "TYPE CODE (USB)", Colors::White, 1, Colors::Panel);
+      // Modern Cyber USB Action Capsule Button
+      const bool usbReady = ctx.usbHid.isReady();
+      const bool hasTime = epoch != 0;
+      if (sending_) {
+        t.fillRoundRect(45, 104, 230, 34, 7, Colors::Cyan);
+        screen.label(85, 115, "TYPING TO PC...", Colors::Bg, 1, Colors::Cyan);
+      } else if (status_[0] != '\0') {
+        t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
+        t.drawRoundRect(45, 104, 230, 34, 7, Colors::Amber);
+        screen.label(70, 115, status_, Colors::Amber, 1, Colors::Panel);
+      } else if (usbReady && hasTime) {
+        t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
+        t.drawRoundRect(45, 104, 230, 34, 7, Colors::Cyan);
+        t.fillRoundRect(49, 108, 42, 26, 5, Colors::Cyan);
+        screen.label(56, 116, "USB", Colors::Bg, 1, Colors::Cyan);
+        screen.label(102, 116, "HOLD OR BTN TO SEND", Colors::White, 1, Colors::Panel);
+      } else if (!hasTime) {
+        t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
+        t.drawRoundRect(45, 104, 230, 34, 7, Colors::Border);
+        screen.label(62, 116, "SYNC TIME TO SEND USB", Colors::Muted, 1, Colors::Panel);
+      } else {
+        t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
+        t.drawRoundRect(45, 104, 230, 34, 7, Colors::Border);
+        screen.label(75, 116, "USB DISCONNECTED", Colors::Muted, 1, Colors::Panel);
+      }
       screen.label(12, 75, "<", Colors::Cyan, 2);
       screen.label(290, 75, ">", Colors::Cyan, 2);
     }

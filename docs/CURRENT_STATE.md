@@ -7,7 +7,7 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
 {
   "record_type": "state",
   "date": "2026-11-04",
-  "runtime_version": "v0.9.3",
+  "runtime_version": "v0.9.4",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
@@ -49,10 +49,10 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "BUG-0015",
     "BUG-0016"
   ],
-  "latest_build": "VER-0115",
-  "latest_upload": "HWT-0035",
-  "documentation_verification": "VER-0116",
-  "current_host_attempt": "VER-0113",
+  "latest_build": "VER-0119",
+  "latest_upload": "HWT-0036",
+  "documentation_verification": "VER-0120",
+  "current_host_attempt": "VER-0117",
   "source_constants": {
     "kTouchSda": 18,
     "kTouchScl": 17,
@@ -169,3 +169,6 @@ PlatformIO image build passes with 832,464 B (-1.10% vs baseline, 12.7% flash, 1
 
 ## Lock Screen Wake Freeze and Display Restoration Fix — 2026-11-03
 Fixed lock screen freeze on wake: removed ST7789 DISPOFF (0x28) / DISPON (0x29) command hazards from DisplayManager (which caused 120ms hardware stabilization drops and bus desynchronization), suppressed rendering while display.isSleeping() is active so dirty/fullRedraw flags are preserved until wake, enforced invalidateFull() upon display wake, and added onDisplayRestored overrides to WiFiApp and WiFiScannerApp to ensure full UI redraw upon unlock.
+
+## 2FA USB Long-Press & Hardware Button Trigger — 2026-11-04
+Redesigned the 2FA Authenticator USB button with a modern Cyber USB Action Capsule (Cyan border, USB badge, instructional prompt, and status feedback). Added touch hold (long press) gating so short taps guide the user without accidental keystroke injection, and wired the physical BOOT hardware button (GPIO 0) via onPrimaryAction and onActivate to directly trigger USB HID OTP typing. Built and uploaded v0.9.4 to COM5 (HWT-0036); owner confirmed physical test PASS on device (HWT-0037).
