@@ -1592,3 +1592,40 @@ Corrections must be appended with the original ID reference.
   "follow_up": "User tests Web Portal on physical device: connects to SoftAP, loads http://192.168.4.1, adds Vault and TOTP credentials, and tests [TYPE USB] button."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0042",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0019",
+    "VER-0105",
+    "VER-0106",
+    "VER-0107",
+    "VER-0108",
+    "HWT-0033"
+  ],
+  "action": "WEB PORTAL BRAND ALIGNMENT / HAIDER RAZAQ VISUAL IDENTITY / VERSION BUMP v0.9.1",
+  "files": [
+    "src/services/WebPortalService.cpp",
+    "tools/account_setup/test_portal_preview.html",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/HARDWARE_TEST_LOG.md"
+  ],
+  "description": "Redesigned the embedded Web Portal (src/services/WebPortalService.cpp) to fully align with the official visual identity of NibruOS and account_setup. Implemented dark navy/cyan neon theme (#0f1954 / #38ffe1 / #080f2c), embedded vector NibruOS SVG logo, RTL Arabic layout, prominent PIN authorization card, interactive tabs for Password Vault and 2FA accounts, client-side password unmasking and random generator, and developer contact footer (07838844400 / Developed by Haider Razaq). Resolved MSVC C2026 string literal token limit by splitting kIndexHtml into adjacent raw string literals (R\"h0(...)h0\" R\"h1(...)h1\" R\"h2(...)h2\"). Monotonically bumped firmware version to v0.9.1.",
+  "reason": "Align the device Web Portal with the official NibruOS visual identity, branding, Arabic localization, and developer contact per user request.",
+  "expected": "Embedded single-page portal with custom branding, MSVC and ESP32 compiler compatibility, passes all host and desktop tests, builds within partition budget, uploads and resets successfully on physical hardware.",
+  "actual": "Host tests PASS (VER-0105). Desktop tests PASS (VER-0106). PlatformIO build PASS with 956,976 bytes (14.6% flash, 19.9% RAM, VER-0107). Uploaded to physical device via COM5 (HWT-0033). Documentation checks PASS (VER-0108).",
+  "verification": "VER-0105, VER-0106, VER-0107, VER-0108, HWT-0033",
+  "risks": "String literal concatenation occurs at compile-time with zero heap overhead; flash usage grew by 14,176 B (1.5% of flash budget), remaining safely within app0 partition.",
+  "commit": "WORKING_TREE",
+  "follow_up": "User tests the redesigned Web Portal from phone/PC browser to verify visual identity, branding, and credential additions."
+}
+```

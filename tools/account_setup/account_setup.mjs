@@ -55,18 +55,35 @@ export async function makeFrame(account, pairing, nonce = globalThis.crypto.getR
 if (typeof document !== 'undefined') {
   const element = id => document.getElementById(id);
   const status = element('status');
+  const setStatus = (message, state = 'info') => {
+    status.textContent = message;
+    status.dataset.state = state;
+  };
   let port = null;
   let reader = null;
+  let readTask = null;
   let keepReading = false;
 
-  const clearFields = () => { element('secret').value = element('pairing').value = ''; element('secret').type = 'password'; };
+  const clearFields = () => {
+    for (const id of ['name', 'secret', 'pairing', 'ip']) element(id).value = '';
+    element('secret').type = 'password';
+    element('reveal').textContent = 'إظهار';
+    element('reveal').setAttribute('aria-label', 'إظهار مفتاح الإعداد');
+    element('reveal').setAttribute('aria-pressed', 'false');
+  };
   element('mode').addEventListener('change', () => {
     const isWifi = element('mode').value === 'wifi';
     element('wifiFields').hidden = !isWifi;
     const usbFields = element('usbFields');
     if (usbFields) usbFields.hidden = isWifi;
   });
-  element('reveal').addEventListener('click', () => { element('secret').type = element('secret').type === 'password' ? 'text' : 'password'; });
+  element('reveal').addEventListener('click', () => {
+    const reveal = element('secret').type === 'password';
+    element('secret').type = reveal ? 'text' : 'password';
+    element('reveal').textContent = reveal ? 'إخفاء' : 'إظهار';
+    element('reveal').setAttribute('aria-label', reveal ? 'إخفاء مفتاح الإعداد' : 'إظهار مفتاح الإعداد');
+    element('reveal').setAttribute('aria-pressed', String(reveal));
+  });
 
   async function connectUsb() {
     if (!('serial' in navigator)) throw new Error('افتح الصفحة في Chrome أو Edge على الكمبيوتر لاستخدام USB.');
@@ -77,36 +94,38 @@ if (typeof document !== 'undefined') {
     port = selected;
     const badge = element('usbBadge');
     if (badge) { badge.textContent = 'متصل'; badge.className = 'badge connected'; }
-    startReader(port);
+    readTask = startReader(port);
     return port;
   }
 
   async function startReader(p) {
     keepReading = true;
-    while (p && p.readable && keepReading) {
-      try {
-        const textDecoder = new TextDecoderStream();
-        p.readable.pipeTo(textDecoder.writable).catch(() => {});
-        reader = textDecoder.readable.getReader();
-        let buffer = '';
-        while (keepReading) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          buffer += value;
-          const lines = buffer.split('\n');
-          buffer = lines.pop();
-          for (const line of lines) {
-            const m = line.trim().match(/PAIRING:([A-Z2-7]{16})/i);
-            if (m) {
-              element('pairing').value = m[1].toUpperCase();
-              status.textContent = '✓ تم استلام رمز الاقتران تلقائياً من الجهاز (' + m[1].toUpperCase() + ')!';
-              status.style.color = '#5ce3d4';
-            }
+    const activeReader = p.readable.getReader();
+    reader = activeReader;
+    const decoder = new TextDecoder();
+    let buffer = '';
+    try {
+      while (keepReading) {
+        const { value, done } = await activeReader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        // Keep untrusted serial output bounded and only process complete lines.
+        if (buffer.length > 4096) buffer = buffer.slice(-1024);
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop();
+        for (const line of lines) {
+          const match = line.trim().match(/PAIRING:([A-Z2-7]{16})/i);
+          if (match) {
+            element('pairing').value = match[1].toUpperCase();
+            setStatus('تم استلام رمز الاقتران من الجهاز. يمكنك الآن إرسال بيانات الحساب.', 'success');
           }
         }
-      } catch (err) {
-        break;
       }
+    } catch {
+      if (keepReading) setStatus('انقطع استقبال بيانات USB. افحص الاتصال ثم حاول مجدداً.', 'error');
+    } finally {
+      try { activeReader.releaseLock(); } catch {}
+      if (reader === activeReader) reader = null;
     }
   }
 
@@ -115,9 +134,9 @@ if (typeof document !== 'undefined') {
     connectBtn.addEventListener('click', async () => {
       try {
         await connectUsb();
-        status.textContent = 'تم الاتصال بالمنفذ التسلسلي بنجاح. افتح الآن شاشة USB على NibruOS أو المس رمز الاقتران لاستلامه تلقائياً.';
+        setStatus('تم اتصال USB. افتح شاشة إضافة الحساب على NibruOS ليظهر رمز الاقتران.','success');
       } catch (err) {
-        status.textContent = err.message || 'تعذر الاتصال بالمنفذ.';
+        setStatus(err.message || 'تعذر الاتصال بالمنفذ.', 'error');
       }
     });
   }
@@ -125,14 +144,15 @@ if (typeof document !== 'undefined') {
   element('close').addEventListener('click', async () => {
     clearFields();
     keepReading = false;
-    if (reader) { try { await reader.cancel(); } catch {} reader = null; }
+    if (reader) { try { await reader.cancel(); } catch {} }
+    if (readTask) { try { await readTask; } catch {} readTask = null; }
     const closing = port; port = null;
     const badge = element('usbBadge');
     if (badge) { badge.textContent = 'غير متصل'; badge.className = 'badge'; }
     try {
       if (closing) await closing.close();
-      status.textContent = 'تم إغلاق الاتصال ومسح الحقول. ارجع من شاشة الاستيراد على الجهاز.';
-    } catch { status.textContent = 'تم مسح الحقول. تعذر إغلاق المنفذ؛ افصل الكابل عند الحاجة وألغِ الاستيراد من الجهاز.'; }
+      setStatus('تم إغلاق الاتصال ومسح جميع الحقول. ارجع من شاشة الاستيراد على الجهاز.', 'success');
+    } catch { setStatus('تم مسح الحقول، لكن تعذر إغلاق المنفذ؛ افصل الكابل عند الحاجة وألغِ الاستيراد من الجهاز.', 'error'); }
   });
   element('send').addEventListener('click', async () => {
     element('send').disabled = true;
@@ -154,9 +174,9 @@ if (typeof document !== 'undefined') {
         if (!response.ok) throw new Error('تعذر الإرسال. تحقق من عنوان الجهاز واتصال الشبكة المحلية.');
       }
       clearFields();
-      status.textContent = 'أُرسلت البيانات المشفّرة. تحقق من اسم الحساب على شاشة NibruOS واضغط SAVE هناك. الإرسال لا يعني أن الحساب حُفظ.';
+      setStatus('أُرسلت البيانات المشفّرة. راجع اسم الحساب واضغط SAVE على شاشة NibruOS. الإرسال لا يعني أن الحساب حُفظ.', 'success');
     } catch (error) {
-      status.textContent = error.message || 'تعذر الإرسال؛ تحقق من الاتصال وأعد المحاولة.';
+      setStatus(error.message || 'تعذر الإرسال؛ تحقق من الاتصال وأعد المحاولة.', 'error');
     }
     finally { element('send').disabled = false; element('close').disabled = false; }
   });

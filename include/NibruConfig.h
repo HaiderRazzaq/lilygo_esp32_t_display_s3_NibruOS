@@ -7,8 +7,8 @@
  */
 namespace Config {
 
-constexpr const char* kVersion = "v0.9.0";
-constexpr const char* kSystemTitle = "NibruOS v0.9.0";
+constexpr const char* kVersion = "v0.9.1";
+constexpr const char* kSystemTitle = "NibruOS v0.9.1";
 
 // Display geometry (landscape mode)
 constexpr int ScreenWidth = 320;

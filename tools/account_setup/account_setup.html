@@ -1,18 +1,178 @@
 <!doctype html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="csrf" content="__CSRF__"><title>إضافة حساب — NibruOS</title><link rel="stylesheet" href="/account_setup.css">
-<script type="module" src="/account_setup.mjs"></script></head>
-<body><main><div class="brand">NibruOS <span>ACCOUNT SETUP</span></div>
-<h1>انسخ المفتاح، ثم أكّد على جهازك</h1><p class="intro">افتح 2FA ← ADD على الجهاز، واختر USB أو Wi‑Fi. الصق مفتاح الإعداد هنا بدل كتابته على الشاشة الصغيرة.</p>
-<div class="note">مفتاح الإعداد يظهر عادةً تحت «تعذّر مسح QR» عند تفعيل المصادقة في الموقع. هذا المفتاح مختلف عن رمز الدخول المكوّن من 6 أرقام.</div>
-<label for="mode">طريقة الإرسال</label><select id="mode"><option value="usb">كابل USB</option><option value="wifi">Wi‑Fi — نفس الشبكة المحلية</option></select>
-<div id="usbFields"><div class="usb-row"><button id="connectUsb" type="button" class="secondary">توصيل كابل USB بالجهاز</button><span id="usbBadge" class="badge">غير متصل</span></div><p class="hint">اضغط «توصيل كابل USB» للاتصال مسبقاً؛ يتم استلام رمز الاقتران تلقائياً من الجهاز فور لمس الشاشة أو الضغط على الزر، دون الحاجة لكتابته يدوياً وبدون إعادة تشغيل الجهاز.</p></div>
-<div id="wifiFields" hidden><label for="ip">عنوان الجهاز الظاهر على شاشته</label><input id="ip" dir="ltr" placeholder="192.168.1.20" autocomplete="off"></div>
-<label for="name">اسم الحساب — حروف إنجليزية، حتى 23 حرفًا</label><input id="name" dir="ltr" placeholder="GitHub / Personal" maxlength="23" autocomplete="off" spellcheck="false">
-<label for="secret">مفتاح Base32 أو رابط إعداد otpauth</label><div class="secret"><input id="secret" type="password" dir="ltr" autocomplete="off" spellcheck="false" maxlength="2048" placeholder="Paste setup key or otpauth://totp/... here"><button id="reveal" type="button">إظهار / إخفاء</button></div>
-<label for="pairing">رمز الاقتران المؤقت الظاهر على شاشة NibruOS</label><input id="pairing" dir="ltr" autocomplete="off" spellcheck="false" maxlength="24" placeholder="16 characters · ABCD EFGH IJKL MNOP">
-<p class="hint">الرمز صالح لجلسة واحدة ولمدة دقيقتين. لا تستخدم PIN الجهاز هنا. تُشفّر البيانات داخل المتصفح، ولا تُحفظ في ملف أو خدمة سحابية.</p>
-<div class="actions"><button id="send" type="button">إرسال إلى الجهاز</button><button id="close" class="secondary" type="button">مسح الحقول وإغلاق الاتصال</button></div>
-<p id="status" role="status">بعد الإرسال، راجع اسم الحساب واضغط SAVE على شاشة الجهاز. زر Back يلغي العملية.</p>
-<footer>تعمل هذه الصفحة محليًا على هذا الكمبيوتر. USB يحتاج Chrome أو Edge ومنفذًا غير مشغول بمراقب Serial.</footer>
-</main></body></html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0F1954">
+  <meta name="description" content="إعداد حسابات المصادقة الثنائية على جهاز NibruOS بأمان عبر USB أو الشبكة المحلية.">
+  <meta name="csrf" content="__CSRF__">
+  <title>إضافة حساب 2FA | NibruOS</title>
+  <link rel="stylesheet" href="/account_setup.css">
+  <script type="module" src="/account_setup.mjs"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#main" aria-label="NibruOS — الانتقال إلى إعداد الحساب">
+        <span class="brand-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="155 92 560 460" fill="none" aria-hidden="true" focusable="false"><path d="M359.332 255.166V343C359.332 377.257 372.941 410.111 397.164 434.335C421.388 458.558 454.242 472.167 488.499 472.167C522.756 472.167 555.611 458.558 579.834 434.335C604.058 410.111 617.666 377.257 617.666 343V255.166" stroke="url(#paint0_linear_7630_71)" stroke-width="65" />
+<path d="M359.332 430.834V492.834H297.332" stroke="url(#paint1_linear_7630_71)" stroke-width="58" />
+<path d="M560.831 358.5H416.164V381.75H560.831V358.5Z" fill="white" />
+<path d="M542.75 324.916H434.25V348.166H542.75V324.916Z" fill="white" />
+<path d="M524.67 291.334H452.336V314.584H524.67V291.334Z" fill="white" />
+<path d="M509.169 257.75H467.836V281H509.169V257.75Z" fill="white" />
+<path d="M628.001 126H586.668V167.333H628.001V126Z" fill="url(#paint2_linear_7630_71)" />
+<path d="M674.501 167.334H633.168V208.667H674.501V167.334Z" fill="url(#paint3_linear_7630_71)" />
+<path d="M281.833 456.666H240.5V497.999H281.833V456.666Z" fill="url(#paint4_linear_7630_71)" />
+<defs>
+<linearGradient id="paint0_linear_7630_71" x1="359.332" y1="472.167" x2="573.076" y2="217.71" gradientUnits="userSpaceOnUse">
+<stop stop-color="#1FB6C9" />
+<stop offset="1" stop-color="#38FFE1" />
+</linearGradient>
+<linearGradient id="paint1_linear_7630_71" x1="297.332" y1="492.834" x2="359.332" y2="430.834" gradientUnits="userSpaceOnUse">
+<stop stop-color="#1FB6C9" />
+<stop offset="1" stop-color="#38FFE1" />
+</linearGradient>
+<linearGradient id="paint2_linear_7630_71" x1="586.668" y1="167.333" x2="628.001" y2="126" gradientUnits="userSpaceOnUse">
+<stop stop-color="#1FB6C9" />
+<stop offset="1" stop-color="#38FFE1" />
+</linearGradient>
+<linearGradient id="paint3_linear_7630_71" x1="633.168" y1="208.667" x2="674.501" y2="167.334" gradientUnits="userSpaceOnUse">
+<stop stop-color="#1FB6C9" />
+<stop offset="1" stop-color="#38FFE1" />
+</linearGradient>
+<linearGradient id="paint4_linear_7630_71" x1="240.5" y1="497.999" x2="281.833" y2="456.666" gradientUnits="userSpaceOnUse">
+<stop stop-color="#1FB6C9" />
+<stop offset="1" stop-color="#38FFE1" />
+</linearGradient>
+</defs>
+</svg></span>
+        <span class="brand-names">
+          <span class="brand-word">NIBRU<span class="brand-dot">.</span></span>
+          <span class="brand-system">NIBRU OS <span class="brand-separator">/</span> ACCOUNT SETUP</span>
+        </span>
+      </a>
+      <span class="topbar-chip"><span class="chip-dot"></span><span>إعداد آمن ومحلي</span></span>
+    </header>
+
+    <main id="main" class="layout">
+      <div class="content-column">
+        <div class="hero">
+          <div class="eyebrow"><span class="eyebrow-line"></span><span dir="ltr">2FA / ACCOUNT IMPORT</span></div>
+          <h1>حساباتك بأمان،<br><span>على جهازك.</span></h1>
+          <p class="intro">أضف حساب المصادقة الثنائية إلى جهاز <strong>NibruOS</strong> بخطوات واضحة. الصق مفتاح الإعداد هنا، أرسله للجهاز، ثم أكّد الحفظ من شاشته.</p>
+        </div>
+
+        <section class="setup-card" aria-label="إعداد حساب جديد">
+          <div class="form-section">
+            <div class="section-header">
+              <div class="section-number" aria-hidden="true">01</div>
+              <div>
+                <h2>الاتصال بالجهاز</h2>
+                <p>اختَر الطريقة الأنسب للتواصل مع NibruOS.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="mode">طريقة الإرسال</label>
+              <div class="select-wrap">
+                <select id="mode" aria-describedby="modeHint">
+                  <option value="usb">USB — اتصال مباشر بالكابل</option>
+                  <option value="wifi">Wi‑Fi — عبر الشبكة المحلية</option>
+                </select>
+              </div>
+              <p class="field-help" id="modeHint">اتصال USB يحتاج Chrome أو Edge على الكمبيوتر.</p>
+            </div>
+
+            <div id="usbFields" class="connection-box">
+              <div class="connection-head">
+                <div class="connection-label"><span class="connection-symbol" aria-hidden="true">⌁</span><span>حالة اتصال USB</span></div>
+                <span id="usbBadge" class="badge"><span class="badge-dot"></span>غير متصل</span>
+              </div>
+              <div class="usb-row"><button id="connectUsb" type="button" class="button button-subtle">توصيل الجهاز الآن <span aria-hidden="true">↗</span></button></div>
+              <p class="field-help">بعد التوصيل، افتح شاشة إضافة الحساب على الجهاز؛ يمكن استقبال رمز الاقتران تلقائياً عند ظهوره على الاتصال التسلسلي.</p>
+            </div>
+
+            <div id="wifiFields" class="connection-box" hidden>
+              <div class="field field-no-margin">
+                <label for="ip">عنوان IP الظاهر على شاشة الجهاز</label>
+                <input id="ip" type="text" dir="ltr" inputmode="decimal" placeholder="192.168.1.20" autocomplete="off" spellcheck="false" aria-describedby="ipHint">
+                <p class="field-help" id="ipHint">تأكد أن الكمبيوتر والجهاز متصلان بنفس الشبكة المحلية.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-header">
+              <div class="section-number" aria-hidden="true">02</div>
+              <div>
+                <h2>تفاصيل الحساب</h2>
+                <p>أدخل اسم الحساب ومفتاح إعداد المصادقة الثنائية.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="name">اسم الحساب <span class="label-optional">(بالإنجليزية، 23 حرفاً كحد أقصى)</span></label>
+              <input id="name" type="text" dir="ltr" placeholder="GitHub / Personal" maxlength="23" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="field">
+              <label for="secret">مفتاح الإعداد <span class="label-optional">(Base32 أو رابط otpauth)</span></label>
+              <div class="secret">
+                <input id="secret" type="password" dir="ltr" autocomplete="off" spellcheck="false" maxlength="2048" placeholder="Paste your setup key or otpauth://…" aria-describedby="secretHint">
+                <button id="reveal" type="button" class="reveal-button" aria-label="إظهار مفتاح الإعداد" aria-pressed="false">إظهار</button>
+              </div>
+              <p class="field-help" id="secretHint">تجد المفتاح عادةً ضمن خيار «تعذّر مسح رمز QR» في إعدادات المصادقة بالموقع. لا تُدخل رمز الدخول المتغيّر هنا.</p>
+            </div>
+          </div>
+
+          <div class="form-section last-section">
+            <div class="section-header">
+              <div class="section-number" aria-hidden="true">03</div>
+              <div>
+                <h2>تأكيد الاقتران</h2>
+                <p>خطوة أخيرة لحماية نقل بيانات الحساب إلى جهازك.</p>
+              </div>
+            </div>
+            <div class="field">
+              <label for="pairing">رمز الاقتران المؤقت</label>
+              <input id="pairing" type="text" dir="ltr" autocomplete="off" spellcheck="false" maxlength="24" placeholder="ABCD EFGH IJKL MNOP" aria-describedby="pairingHint">
+              <p class="field-help" id="pairingHint">رمز من 16 حرفاً يظهر على شاشة NibruOS وصالح لجلسة واحدة ولمدة دقيقتين. <strong>لا تستخدم PIN الجهاز.</strong></p>
+            </div>
+            <div class="security-line"><span class="lock-symbol" aria-hidden="true">◆</span><span>تُشفَّر بيانات الحساب داخل المتصفح قبل إرسالها للجهاز.</span></div>
+            <div class="actions">
+              <button id="send" type="button" class="button button-primary">إرسال إلى الجهاز <span aria-hidden="true">←</span></button>
+              <button id="close" type="button" class="button button-outline">مسح الحقول وإغلاق الاتصال</button>
+            </div>
+            <div id="status" class="status-panel" role="status" aria-live="polite" aria-atomic="true">بعد الإرسال، راجع اسم الحساب على شاشة الجهاز واضغط <bdi dir="ltr">SAVE</bdi> لتأكيد الحفظ. زر <bdi dir="ltr">Back</bdi> يلغي العملية.</div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="side-column" aria-label="تعليمات الإعداد">
+        <div class="guide-card">
+          <div class="guide-icon" aria-hidden="true">✦</div>
+          <span class="guide-kicker">QUICK GUIDE</span>
+          <h2>جاهز تضيف حسابك؟</h2>
+          <p class="guide-intro">كل اللي تحتاجه هو جهاز NibruOS ومفتاح الإعداد من الموقع اللي تريد تربطه.</p>
+          <ol class="guide-steps">
+            <li><span class="guide-step">01</span><span>افتح تطبيق <bdi dir="ltr">2FA</bdi> على الجهاز، ثم اختَر <bdi dir="ltr">ADD</bdi>.</span></li>
+            <li><span class="guide-step">02</span><span>حدّد <bdi dir="ltr">USB</bdi> أو <bdi dir="ltr">Wi‑Fi</bdi>، وأدخل بيانات الحساب.</span></li>
+            <li><span class="guide-step">03</span><span>أرسِل البيانات، وبعدها أكّد الحفظ من شاشة الجهاز.</span></li>
+          </ol>
+          <div class="guide-divider"></div>
+          <div class="guide-foot"><span class="guide-shield" aria-hidden="true">✓</span><div><strong>التحكم يبقى بيدك</strong><p>إرسال البيانات ما يعني حفظها؛ لازم تؤكد العملية على الجهاز.</p></div></div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-heading"><span aria-hidden="true">ⓘ</span><strong>معلومة مهمة</strong></div>
+          <p>مفتاح الإعداد سرّي ويسمح بإنشاء رموز الدخول لحسابك. لا تشاركه مع أي شخص ولا تتركه محفوظاً في ملف عام.</p>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-brand"><span class="footer-mark" aria-hidden="true">◆</span><span><strong>NIBRU OS</strong><small>SECURE ACCOUNT IMPORT</small></span></div>
+      <div class="footer-contact"><span>للتواصل</span><a href="tel:+9647838844400" dir="ltr">07838844400</a></div>
+      <div class="developer-credit" dir="ltr">Developed by <strong>Haider Razaq</strong></div>
+    </footer>
+  </div>
+</body>
+</html>

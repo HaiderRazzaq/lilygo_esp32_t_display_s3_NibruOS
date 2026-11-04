@@ -6,6 +6,19 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 
 ## Unreleased
 
+### Web Portal Visual Identity & Haider Razaq Brand Alignment (v0.9.1) — 2026-11-04
+- Redesigned the embedded Web Portal (`src/services/WebPortalService.cpp`) to match the official NibruOS visual identity in `tools/account_setup`:
+  - Dark navy/cyan neon theme (`--brand-navy: #0f1954`, `--brand-aqua: #38ffe1`, `--bg: #080f2c`).
+  - Embedded NibruOS vector SVG logo with radial and linear gradients (`#1FB6C9` -> `#38FFE1`).
+  - Full RTL Arabic typography (`dir="rtl"`, `lang="ar"`).
+  - Modern card layouts with glowing neon borders, prominent Web PIN authorization card, and real-time connection status pill.
+  - Interactive tab switcher for Password Vault entry and 2FA Authenticator entry.
+  - Developer contact information (`07838844400`) and signature (`Developed by Haider Razaq`) in the responsive footer.
+  - Secure random password generation and password unmasking toggle directly in the browser interface.
+  - Split embedded HTML/CSS/JS into chunked C++ raw string literals (`R"h0(...)h0" R"h1(...)h1" R"h2(...)h2"`) to comply with MSVC 16,380-byte string token limits across compilers.
+- Sequentially bumped firmware version to v0.9.1 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+- Verified with host unit tests (VER-0105), desktop automated test suite (VER-0106), PlatformIO release build (956,976 B binary, 14.6% flash, 19.9% RAM, VER-0107), documentation verification (VER-0108), and physical upload to device on COM5 (HWT-0033).
+
 ### Local Web Portal & Device Control Center (v0.9.0) — 2026-11-04
 - Implemented FEAT-0019: Local Web Portal and Device Control Center:
   - Added `WebPortalService` broadcasting an ephemeral SoftAP with random SSID (`NibruOS-XXXX`) and 8-character WPA2 passphrase.

@@ -42,111 +42,350 @@ static bool extractJsonString(const char* json, const char* key, char* out, size
 }
 
 const char kIndexHtml[] =
-"<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\">"
-"<meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">"
-"<title>NibruOS Portal</title><style>"
-":root{--bg:#0d1117;--card:#161b22;--border:#30363d;--accent:#00e5ff;--accent2:#00b4d8;--text:#f0f6fc;--muted:#8b949e;--success:#2ea043;--danger:#f85149;}"
-"*{box-sizing:border-box;margin:0;padding:0;}"
-"body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;display:flex;justify-content:center;padding:16px;}"
-".container{width:100%;max-width:440px;}"
-".header{text-align:center;margin-bottom:16px;}"
-".logo{font-size:22px;font-weight:700;color:var(--accent);letter-spacing:1px;}"
-".sublogo{font-size:12px;color:var(--muted);margin-top:2px;}"
-".card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;box-shadow:0 4px 12px rgba(0,0,0,0.4);}"
-".title{font-size:14px;font-weight:600;margin-bottom:10px;color:var(--accent);}"
-".tabs{display:flex;gap:6px;margin-bottom:14px;}"
-".tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:600;background:var(--card);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted);transition:0.2s;}"
-".tab.active{background:var(--border);color:var(--accent);border-color:var(--accent);}"
-".form-group{margin-bottom:10px;}"
-"label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;}"
-"input{width:100%;padding:9px 12px;background:#090d13;border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;}"
-"input:focus{outline:none;border-color:var(--accent);}"
-".input-group{display:flex;gap:6px;}"
-".btn{width:100%;padding:10px;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;transition:0.2s;}"
-".btn-primary{background:var(--accent);color:#000;margin-top:6px;}"
-".btn-primary:hover{background:var(--accent2);}"
-".btn-sec{padding:0 12px;background:var(--border);color:var(--text);font-size:12px;}"
-".status{padding:10px;border-radius:6px;font-size:13px;text-align:center;margin-bottom:12px;display:none;}"
-".status.success{background:rgba(46,160,67,0.2);color:var(--success);border:1px solid var(--success);display:block;}"
-".status.error{background:rgba(248,81,73,0.2);color:var(--danger);border:1px solid var(--danger);display:block;}"
-".timer{text-align:center;font-size:12px;color:var(--muted);margin-top:12px;}"
-"</style></head><body><div class=\"container\">"
-"<div class=\"header\"><div class=\"logo\">NibruOS Portal</div>"
-"<div class=\"sublogo\">بوابة التحكم بالأجهزة وإدارة الحسابات</div></div>"
-"<div id=\"status\" class=\"status\"></div>"
-"<div class=\"card\"><div class=\"form-group\" style=\"margin-bottom:0;\">"
-"<label>Web PIN (Shown on device screen / رمز الجلسة):</label>"
-"<input type=\"password\" id=\"pin\" maxlength=\"8\" placeholder=\"Enter 4-digit PIN\" style=\"font-weight:700;letter-spacing:4px;text-align:center;\">"
-"</div></div>"
-"<div class=\"tabs\">"
-"<div class=\"tab active\" onclick=\"switchTab('vault')\">🔑 Vault Passwords</div>"
-"<div class=\"tab\" onclick=\"switchTab('totp')\">🛡️ 2FA Account</div>"
-"</div>"
-"<div id=\"tab-vault\" class=\"card\">"
-"<div class=\"title\">Add Account to Vault (إضافة كلمة سر للخزنة)</div>"
-"<div class=\"form-group\"><label>Title (e.g. Google, GitHub, Bank):</label>"
-"<input type=\"text\" id=\"v_title\" maxlength=\"23\" placeholder=\"Account Name\"></div>"
-"<div class=\"form-group\"><label>Username / Email:</label>"
-"<input type=\"text\" id=\"v_user\" maxlength=\"31\" placeholder=\"user@example.com\"></div>"
-"<div class=\"form-group\"><label>Password:</label><div class=\"input-group\">"
-"<input type=\"password\" id=\"v_pass\" maxlength=\"47\" placeholder=\"Secret password\">"
-"<button type=\"button\" class=\"btn btn-sec\" onclick=\"togglePass()\">👁️</button>"
-"<button type=\"button\" class=\"btn btn-sec\" onclick=\"genPass()\">🎲</button></div></div>"
-"<div class=\"form-group\"><label>Notes (Optional):</label>"
-"<input type=\"text\" id=\"v_notes\" maxlength=\"23\" placeholder=\"Personal account\"></div>"
-"<button class=\"btn btn-primary\" onclick=\"submitVault()\">Save to Device Vault</button></div>"
-"<div id=\"tab-totp\" class=\"card\" style=\"display:none;\">"
-"<div class=\"title\">Add 2FA Account (إضافة مصادقة ثنائية)</div>"
-"<div class=\"form-group\"><label>Service Name (e.g. AWS, Discord):</label>"
-"<input type=\"text\" id=\"t_name\" maxlength=\"23\" placeholder=\"Service Name\"></div>"
-"<div class=\"form-group\"><label>Base32 Secret Key:</label>"
-"<input type=\"text\" id=\"t_secret\" maxlength=\"52\" placeholder=\"e.g. JBSWY3DPEHPK3PXP\" style=\"text-transform:uppercase;\"></div>"
-"<button class=\"btn btn-primary\" onclick=\"submitTotp()\">Save 2FA to Device</button></div>"
-"<div class=\"timer\" id=\"timer\">Device IP: 192.168.4.1 | Session Active</div></div>"
-"<script>"
-"function switchTab(t){"
-"document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',(t==='vault'&&i===0)||(t==='totp'&&i===1)));"
-"document.getElementById('tab-vault').style.display=t==='vault'?'block':'none';"
-"document.getElementById('tab-totp').style.display=t==='totp'?'block':'none';}"
-"function togglePass(){const p=document.getElementById('v_pass');p.type=p.type==='password'?'text':'password';}"
-"function genPass(){const chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%^&*';"
-"let s='';for(let i=0;i<16;i++)s+=chars.charAt(Math.floor(Math.random()*chars.length));"
-"const p=document.getElementById('v_pass');p.type='text';p.value=s;}"
-"function showStatus(msg,isErr){const el=document.getElementById('status');el.textContent=msg;"
-"el.className='status '+(isErr?'error':'success');window.scrollTo({top:0,behavior:'smooth'});}"
-"async function submitVault(){"
-"const pin=document.getElementById('pin').value.trim();"
-"const title=document.getElementById('v_title').value.trim();"
-"const user=document.getElementById('v_user').value.trim();"
-"const pass=document.getElementById('v_pass').value;"
-"const notes=document.getElementById('v_notes').value.trim();"
-"if(!pin){showStatus('Please enter the Web PIN shown on device',true);return;}"
-"if(!title||!pass){showStatus('Title and Password are required',true);return;}"
-"try{const res=await fetch('/api/vault/add',{method:'POST',headers:{'Content-Type':'application/json'},"
-"body:JSON.stringify({pin,title,username:user,password:pass,notes})});"
-"const d=await res.json();if(res.ok&&d.success){"
-"showStatus('Account saved to NibruOS Vault successfully! ('+title+')',false);"
-"document.getElementById('v_title').value='';"
-"document.getElementById('v_user').value='';"
-"document.getElementById('v_pass').value='';"
-"document.getElementById('v_notes').value='';}"
-"else{showStatus(d.error||'Failed to save account',true);}}"
-"catch(e){showStatus('Connection error: '+e.message,true);}}"
-"async function submitTotp(){"
-"const pin=document.getElementById('pin').value.trim();"
-"const name=document.getElementById('t_name').value.trim();"
-"const secret=document.getElementById('t_secret').value.trim().toUpperCase();"
-"if(!pin){showStatus('Please enter the Web PIN shown on device',true);return;}"
-"if(!name||!secret){showStatus('Service name and Secret key are required',true);return;}"
-"try{const res=await fetch('/api/totp/add',{method:'POST',headers:{'Content-Type':'application/json'},"
-"body:JSON.stringify({pin,name,secret})});"
-"const d=await res.json();if(res.ok&&d.success){"
-"showStatus('2FA account saved to NibruOS successfully! ('+name+')',false);"
-"document.getElementById('t_name').value='';"
-"document.getElementById('t_secret').value='';}"
-"else{showStatus(d.error||'Failed to save 2FA account',true);}}"
-"catch(e){showStatus('Connection error: '+e.message,true);}}"
-"</script></body></html>";
+R"h0(
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0F1954">
+<title>بوابة التحكم | NibruOS Portal</title>
+<style>
+:root {
+color-scheme: dark;
+--brand-navy: #0f1954;
+--brand-aqua: #38ffe1;
+--brand-offwhite: #f1fffd;
+--bg: #080f2c;
+--panel: #101b42;
+--panel-elevated: #15234d;
+--line: rgba(186, 212, 250, .14);
+--line-strong: rgba(186, 212, 250, .24);
+--text: #f1fffd;
+--muted: #afc2d9;
+--subtle: #8198b4;
+--radius-xl: 22px;
+font-family: Fustat, "Segoe UI", Tahoma, Arial, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+min-width: 320px;
+color: var(--text);
+background: radial-gradient(ellipse 48% 32% at 9% 2%, rgba(30, 214, 208, .095), transparent 80%),
+radial-gradient(ellipse 62% 47% at 100% 0%, rgba(25, 49, 131, .44), transparent 72%),
+var(--bg);
+font-size: 14px;
+line-height: 1.65;
+}
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .58; cursor: wait; }
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--brand-aqua); outline-offset: 3px; }
+::selection { color: #071d2b; background: var(--brand-aqua); }
+.page-shell { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding-bottom: 40px; }
+.topbar {
+min-height: 90px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 16px;
+border-bottom: 1px solid rgba(186, 212, 250, .11);
+margin-bottom: 30px;
+}
+.brand { display: inline-flex; align-items: center; gap: 12px; }
+.brand-icon { width: 48px; height: 48px; border: 1px solid rgba(56, 255, 225, .22); border-radius: 14px; display: grid; place-items: center; background: linear-gradient(155deg, #172967, var(--brand-navy)); box-shadow: 0 8px 25px rgba(0, 0, 0, .2); }
+.brand-icon svg { display: block; width: 40px; height: 36px; }
+.brand-names { display: flex; flex-direction: column; align-items: flex-start; direction: ltr; }
+.brand-word { font: 800 23px/1.1 "Segoe UI", Arial, sans-serif; letter-spacing: .045em; }
+.brand-dot { color: var(--brand-aqua); }
+.brand-system { font: 700 8.5px/1.8 "Segoe UI", Arial, sans-serif; letter-spacing: .16em; color: #9ab5d2; }
+.brand-separator { color: var(--brand-aqua); margin: 0 3px; }
+.topbar-chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; color: #c8e9e4; background: rgba(56, 255, 225, .045); font-size: 11.5px; }
+.chip-dot { width: 7px; height: 7px; background: var(--brand-aqua); border-radius: 50%; box-shadow: 0 0 0 4px rgba(56, 255, 225, .09); }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; column-gap: 28px; align-items: start; }
+.content-column { min-width: 0; }
+.hero { margin-bottom: 24px; }
+.eyebrow { display: flex; align-items: center; gap: 8px; color: var(--brand-aqua); font: 700 10px/1.3 "Segoe UI", Arial, sans-serif; letter-spacing: .2em; margin-bottom: 6px; }
+.eyebrow-line { height: 2px; width: 20px; display: inline-block; background: var(--brand-aqua); border-radius: 4px; }
+h1 { font-size: clamp(28px, 4vw, 42px); letter-spacing: -.04em; line-height: 1.25; margin: 8px 0; font-weight: 800; }
+h1 span { color: var(--brand-aqua); }
+.intro { color: #b6c7dd; font-size: 13.5px; line-height: 1.8; margin-top: 6px; }
+.setup-card { border: 1px solid var(--line); border-radius: var(--radius-xl); background: linear-gradient(144deg, rgba(22, 34, 75, .92), rgba(15, 25, 61, .98)); box-shadow: 0 20px 60px rgba(0, 3, 18, .25); overflow: hidden; }
+.form-section { padding: 24px 26px; border-bottom: 1px solid var(--line); }
+.form-section:last-child { border-bottom: 0; }
+.section-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+.section-number { color: var(--brand-aqua); display: grid; place-items: center; width: 36px; height: 36px; background: rgba(56, 255, 225, .07); border: 1px solid rgba(56, 255, 225, .17); border-radius: 11px; font: 700 13px/1 "Segoe UI", Arial, sans-serif; flex-shrink: 0; }
+.section-header h2 { margin: -2px 0 2px; font-size: 17px; font-weight: 800; }
+.section-header p { margin: 0; font-size: 12px; color: #a6bdd3; }
+.pin-box { background: rgba(4, 13, 37, .45); border: 1px solid rgba(156, 188, 235, .15); border-radius: 14px; padding: 18px; margin-top: 4px; }
+.pin-input { font-size: 20px !important; font-weight: 800 !important; letter-spacing: 8px !important; text-align: center !important; color: var(--brand-aqua) !important; background: #060e26 !important; }
+.tab-nav { display: flex; gap: 8px; margin-bottom: 20px; }
+.tab-btn { flex: 1; padding: 12px; font-size: 13px; font-weight: 750; background: #0c173b; border: 1px solid #23345d; border-radius: 11px; color: #a4b9d4; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.tab-btn:hover { border-color: rgba(56, 255, 225, .35); color: #fff; }
+.tab-btn.active { background: #182859; border-color: var(--brand-aqua); color: var(--brand-aqua); box-shadow: 0 4px 15px rgba(56, 255, 225, .1); }
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+label { display: block; margin-bottom: 7px; font-size: 12.5px; font-weight: 700; color: #e8f4ff; }
+.label-optional { font-size: 11px; font-weight: 400; color: #9db1cb; }
+input { width: 100%; height: 46px; padding: 0 14px; background: #0b1534; border: 1px solid #344566; border-radius: 10px; color: var(--brand-offwhite); outline: 0; transition: border-color .2s, box-shadow .2s; }
+input::placeholder { color: #6b82a3; }
+input[dir="ltr"] { text-align: left; font-family: "Segoe UI", Arial, sans-serif; }
+input:focus { border-color: var(--brand-aqua); box-shadow: 0 0 0 3px rgba(56, 255, 225, .1); }
+.input-row { display: flex; gap: 6px; }
+.input-row input { flex: 1; }
+.btn-icon { background: #1d3158; color: #dcf5f3; min-width: 46px; height: 46px; border: 1px solid #385477; border-radius: 10px; font-size: 14px; display: grid; place-items: center; transition: 0.2s; }
+.btn-icon:hover { background: #294268; border-color: var(--brand-aqua); color: #fff; }
+.button { min-height: 48px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px; border-radius: 10px; padding: 12px 18px; font-size: 13.5px; font-weight: 800; border: 1px solid transparent; transition: 0.2s; text-align: center; }
+.button:not(:disabled):active { transform: translateY(1px); }
+.button-primary { background: var(--brand-aqua); color: #071e32; box-shadow: 0 8px 25px rgba(56, 255, 225, .15); margin-top: 10px; }
+.button-primary:hover:not(:disabled) { background: #8affef; }
+.status-panel { padding: 13px 16px; background: rgba(3, 13, 35, .54); border-radius: 10px; border: 1px solid #304566; color: #c8d9ed; font-size: 12px; line-height: 1.8; border-inline-start: 3px solid #607d9f; margin-bottom: 16px; display: none; }
+.status-panel.active { display: block; }
+.status-panel[data-state="success"] { border-inline-start-color: var(--brand-aqua); color: #c6f8ee; background: rgba(56, 255, 225, .08); }
+.status-panel[data-state="error"] { border-inline-start-color: #f4aa8c; color: #ffdacc; background: rgba(244, 170, 140, .08); }
+.side-column { min-width: 0; padding-top: 20px; }
+.guide-card { border-radius: 18px; border: 1px solid rgba(56, 255, 225, .11); background: linear-gradient(148deg, #162766, #0f1954 67%, #111f51); padding: 22px 20px; margin-bottom: 16px; }
+.guide-icon { width: 34px; height: 
+)h0"
+R"h1(
+34px; display: grid; place-items: center; background: rgba(56, 255, 225, .10); color: var(--brand-aqua); border-radius: 10px; margin-bottom: 12px; font-size: 18px; }
+.guide-kicker { display: block; color: var(--brand-aqua); font: 700 9.5px/1.4 Arial, sans-serif; letter-spacing: .2em; direction: ltr; text-align: right; }
+.guide-card h2 { font-size: 18px; margin: 8px 0 6px; font-weight: 800; }
+.guide-intro { color: #bfcee5; font-size: 11.5px; line-height: 1.8; margin: 0; }
+.guide-steps { list-style: none; margin: 18px 0 16px; padding: 0; }
+.guide-steps li { display: flex; align-items: flex-start; gap: 10px; padding: 0 0 14px; position: relative; color: #dbe7f5; font-size: 11.5px; line-height: 1.7; }
+.guide-step { font: 700 10px/1 Arial, sans-serif; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid rgba(56, 255, 225, .24); background: rgba(56, 255, 225, .05); color: var(--brand-aqua); border-radius: 50%; flex-shrink: 0; }
+.guide-foot { display: flex; align-items: flex-start; gap: 9px; border-top: 1px solid rgba(202, 224, 250, .12); padding-top: 14px; }
+.guide-shield { color: var(--brand-aqua); background: rgba(56, 255, 225, .12); border-radius: 50%; display: grid; place-items: center; font: bold 11px Arial, sans-serif; width: 20px; height: 20px; flex-shrink: 0; }
+.guide-foot strong { font-size: 11.5px; }
+.guide-foot p { color: #aebfda; font-size: 10.5px; margin: 3px 0 0; line-height: 1.7; }
+.site-footer { border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 24px 0 10px; margin-top: 40px; }
+.footer-brand { display: flex; align-items: center; gap: 10px; color: #e4f9f4; }
+.footer-mark { color: var(--brand-aqua); font-size: 11px; }
+.footer-brand strong, .footer-brand small { display: block; direction: ltr; text-align: right; }
+.footer-brand strong { font: 700 12px/1.3 "Segoe UI", Arial, sans-serif; letter-spacing: .10em; }
+.footer-brand small { font: 600 8.5px/1.8 "Segoe UI", Arial, sans-serif; color: #8ea8c6; letter-spacing: .12em; }
+.footer-contact { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #a8bad1; }
+.footer-contact a { color: #d9fffa; font-weight: 700; letter-spacing: .025em; direction: ltr; }
+.footer-contact a:hover { text-decoration: underline; text-decoration-color: var(--brand-aqua); }
+.developer-credit { color: #a1b8d0; font: 12px/1.6 "Segoe UI", Arial, sans-serif; }
+.developer-credit strong { color: #e8f5f7; font-weight: 700; }
+@media (max-width: 860px) {
+.layout { grid-template-columns: 1fr; }
+.side-column { padding-top: 0; }
+}
+</style>
+</head>
+<body>
+<div class="page-shell">
+<header class="topbar">
+<div class="brand">
+<span class="brand-icon" aria-hidden="true">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="155 92 560 460" fill="none"><path d="M359.332 255.166V343C359.332 377.257 372.941 410.111 397.164 434.335C421.388 458.558 454.242 472.167 488.499 472.167C522.756 472.167 555.611 458.558 579.834 434.335C604.058 410.111 617.666 377.257 617.666 343V255.166" stroke="url(#p0)" stroke-width="65" /><path d="M359.332 430.834V492.834H297.332" stroke="url(#p1)" stroke-width="58" /><path d="M560.831 358.5H416.164V381.75H560.831V358.5Z" fill="white" /><path d="M542.75 324.916H434.25V348.166H542.75V324.916Z" fill="white" /><path d="M524.67 291.334H452.336V314.584H524.67V291.334Z" fill="white" /><path d="M509.169 257.75H467.836V281H509.169V257.75Z" fill="white" /><path d="M628.001 126H586.668V167.333H628.001V126Z" fill="url(#p2)" /><path d="M674.501 167.334H633.168V208.667H674.501V167.334Z" fill="url(#p3)" /><path d="M281.833 456.666H240.5V497.999H281.833V456.666Z" fill="url(#p4)" /><defs><linearGradient id="p0" x1="359.332" y1="472.167" x2="573.076" y2="217.71" gradientUnits="userSpaceOnUse"><stop stop-color="#1FB6C9" /><stop offset="1" stop-color="#38FFE1" /></linearGradient><linearGradient id="p1" x1="297.332" y1="492.834" x2="359.332" y2="430.834" gradientUnits="userSpaceOnUse"><stop stop-color="#1FB6C9" /><stop offset="1" stop-color="#38FFE1" /></linearGradient><linearGradient id="p2" x1="586.668" y1="167.333" x2="628.001" y2="126" gradientUnits="userSpaceOnUse"><stop stop-color="#1FB6C9" /><stop offset="1" stop-color="#38FFE1" /></linearGradient><linearGradient id="p3" x1="633.168" y1="208.667" x2="674.501" y2="167.334" gradientUnits="userSpaceOnUse"><stop stop-color="#1FB6C9" /><stop offset="1" stop-color="#38FFE1" /></linearGradient><linearGradient id="p4" x1="240.5" y1="497.999" x2="281.833" y2="456.666" gradientUnits="userSpaceOnUse"><stop stop-color="#1FB6C9" /><stop offset="1" stop-color="#38FFE1" /></linearGradient></defs></svg>
+</span>
+<span class="brand-names">
+<span class="brand-word">NIBRU<span class="brand-dot">.</span></span>
+<span class="brand-system">NIBRU OS <span class="brand-separator">/</span> CONTROL CENTER</span>
+</span>
+</div>
+<span class="topbar-chip"><span class="chip-dot"></span><span>بوابة التحكم المحلية</span></span>
+</header>
+<div class="layout">
+<div class="content-column">
+<div class="hero">
+<div class="eyebrow"><span class="eyebrow-line"></span><span dir="ltr">LOCAL DEVICE PORTAL</span></div>
+<h1>حساباتك بأمان،<br><span>على جهازك.</span></h1>
+<p class="intro">أضف كلمات المرور وحسابات المصادقة الثنائية (2FA) إلى جهاز <strong>NibruOS</strong> مباشرة وبشكل مشفّر عبر الاتصال المحلي.</p>
+</div>
+<div id="status" class="status-panel"></div>
+<section class="setup-card">
+<div class="form-section">
+<div class="section-header">
+<div class="section-number">01</div>
+<div>
+<h2>رمز الجلسة المؤقت (Web PIN)</h2>
+<p>أدخل الرمز المكون من 4 أرقام الظاهر على شاشة جهاز NibruOS لتأكيد هويتك.</p>
+</div>
+</div>
+<div class="pin-box">
+<input type="password" id="pin" class="pin-input" maxlength="8" placeholder="••••" autocomplete="off">
+</div>
+</div>
+<div class="form-section">
+<div class="section-header">
+<div class="section-number">02</div>
+<div>
+<h2>اختيار نوع الحساب</h2>
+<p>حدّد ما إذا كنت تريد إضافة كلمة سر إلى الخزنة أو حساب مصادقة ثنائية.</p>
+</div>
+</div>
+<div class="tab-nav">
+<button type="button" class="tab-btn active" id="btn-tab-vault" onclick="switchTab('vault')">🔑 خزنة كلمات المرور (Vault)</button>
+<button type="button" class="tab-btn" id="btn-tab-totp" onclick="switchTab('totp')">🛡️ المصادقة الثنائية (2FA)</button>
+</div>
+<div id="tab-vault">
+<div class="field">
+<label for="v_title">اسم الخدمة أو الموقع <span class="label-optional">(مثل: Google, GitHub, البنك)</span></label>
+<input type="text" id="v_title" maxlength="23" placeholder="Google / GitHub" autocomplete="off">
+</div>
+<div class="field">
+<label for="v_user">اسم المستخدم أو البريد الإلكتروني</label>
+<input type="text" id="v_user" maxlength="31" dir="ltr" placeholder="user@example.com" autocomplete="off">
+</div>
+<div class="field">
+<label for="v_pass">كلمة السر</label>
+<div class="input-row">
+<input type="password" id="v_pass" maxlength="47" dir="ltr" placeholder="••••••••••••" autocomplete="off">
+<button type="button" class="btn-icon" onclick="togglePass()" title="إظهار / إخفاء">👁️</button>
+<button type="button" class="btn-icon" onclick="genPass()" title="توليد كلمة سر عشوائية قوية">🎲</button>
+</div>
+</div>
+<div class="field">
+<label for="v_notes">ملاحظات إضافية <span class="label-optional">(اختياري)</span></label>
+<input type="text" id="v_notes" maxlength="23" placeholder="حساب العمل / شخصي" autocomplete="off">
+</div>
+<button type="button" class="button button-primary" onclick="submitVault()">حفظ في خزنة الجهاز 🔒</button>
+</div>
+<div i
+)h1"
+R"h2(
+d="tab-totp" style="display:none;">
+<div class="field">
+<label for="t_name">اسم المنصة أو الخدمة <span class="label-optional">(مثل: AWS, Binance)</span></label>
+<input type="text" id="t_name" maxlength="23" placeholder="AWS / GitHub" autocomplete="off">
+</div>
+<div class="field">
+<label for="t_user">اسم المستخدم أو الحساب <span class="label-optional">(اختياري)</span></label>
+<input type="text" id="t_user" maxlength="31" dir="ltr" placeholder="user@example.com" autocomplete="off">
+</div>
+<div class="field">
+<label for="t_secret">مفتاح الإعداد السري (Base32 Secret)</label>
+<input type="text" id="t_secret" maxlength="52" dir="ltr" style="text-transform:uppercase; letter-spacing:1px;" placeholder="JBSWY3DPEHPK3PXP" autocomplete="off">
+</div>
+<button type="button" class="button button-primary" onclick="submitTotp()">حفظ حساب 2FA في الجهاز 🛡️</button>
+</div>
+</div>
+</section>
+</div>
+<aside class="side-column">
+<div class="guide-card">
+<div class="guide-icon">✦</div>
+<span class="guide-kicker">QUICK GUIDE</span>
+<h2>إعداد فوري وآمن</h2>
+<p class="guide-intro">اتصال محلي مباشر ومحمي بين هاتفك أو حاسوبك وجهاز NibruOS.</p>
+<ol class="guide-steps">
+<li><span class="guide-step">01</span><span>تأكد من رمز Web PIN المعروض على شاشة الجهاز.</span></li>
+<li><span class="guide-step">02</span><span>اختر التبويب المطلوب وأدخل بيانات الحساب وكلمة السر.</span></li>
+<li><span class="guide-step">03</span><span>اضغط حفظ ليتم تشفير البيانات فوراً وتخزينها بالجهاز.</span></li>
+</ol>
+<div class="guide-foot">
+<span class="guide-shield">✓</span>
+<div>
+<strong>تشفير محلي فوري</strong>
+<p>تُشفَّر البيانات بخوارزمية AES-256-GCM بمفتاح الجلسة النشط ولا تمر بأي خادم سحابي.</p>
+</div>
+</div>
+</div>
+</aside>
+</div>
+<footer class="site-footer">
+<div class="footer-brand">
+<span class="footer-mark">◆</span>
+<span><strong>NIBRU OS</strong><small>LOCAL CONTROL CENTER</small></span>
+</div>
+<div class="footer-contact">
+<span>للتواصل:</span>
+<a href="tel:+9647838844400" dir="ltr">07838844400</a>
+</div>
+<div class="developer-credit" dir="ltr">Developed by <strong>Haider Razaq</strong></div>
+</footer>
+</div>
+<script>
+function switchTab(t) {
+document.getElementById('btn-tab-vault').classList.toggle('active', t === 'vault');
+document.getElementById('btn-tab-totp').classList.toggle('active', t === 'totp');
+document.getElementById('tab-vault').style.display = t === 'vault' ? 'block' : 'none';
+document.getElementById('tab-totp').style.display = t === 'totp' ? 'block' : 'none';
+}
+function togglePass() {
+const p = document.getElementById('v_pass');
+p.type = p.type === 'password' ? 'text' : 'password';
+}
+function genPass() {
+const chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%^&*';
+let s = '';
+for (let i = 0; i < 16; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
+const p = document.getElementById('v_pass');
+p.type = 'text';
+p.value = s;
+}
+function showStatus(msg, isErr) {
+const el = document.getElementById('status');
+el.textContent = msg;
+el.setAttribute('data-state', isErr ? 'error' : 'success');
+el.className = 'status-panel active';
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+async function submitVault() {
+const pin = document.getElementById('pin').value.trim();
+const title = document.getElementById('v_title').value.trim();
+const user = document.getElementById('v_user').value.trim();
+const pass = document.getElementById('v_pass').value;
+const notes = document.getElementById('v_notes').value.trim();
+if (!pin) { showStatus('يرجى إدخال رمز Web PIN المعروض على شاشة الجهاز أولاً', true); return; }
+if (!title || !pass) { showStatus('اسم الخدمة وكلمة السر مطلوبان لإتمام الحفظ', true); return; }
+try {
+const res = await fetch('/api/vault/add', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ pin, title, username: user, password: pass, notes })
+});
+const d = await res.json();
+if (res.ok && d.success) {
+showStatus('تم تشفير وحفظ الحساب بنجاح في خزنة NibruOS! (' + title + ')', false);
+document.getElementById('v_title').value = '';
+document.getElementById('v_user').value = '';
+document.getElementById('v_pass').value = '';
+document.getElementById('v_notes').value = '';
+} else {
+showStatus(d.error || 'فشل في حفظ الحساب، تأكد من صحة رمز PIN وأن الجهاز غير مقفل', true);
+}
+} catch (e) {
+showStatus('خطأ في الاتصال بالجهاز: ' + e.message, true);
+}
+}
+async function submitTotp() {
+const pin = document.getElementById('pin').value.trim();
+const name = document.getElementById('t_name').value.trim();
+const user = document.getElementById('t_user').value.trim();
+const secret = document.getElementById('t_secret').value.trim().toUpperCase();
+if (!pin) { showStatus('يرجى إدخال رمز Web PIN المعروض على شاشة الجهاز أولاً', true); return; }
+if (!name || !secret) { showStatus('اسم الخدمة ومفتاح الإعداد (Base32) مطلوبان', true); return; }
+try {
+const res = await fetch('/api/totp/add', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ pin, name, user, secret })
+});
+const d = await res.json();
+if (res.ok && d.success) {
+showStatus('تم حفظ وتفعيل حساب المصادقة الثنائية (2FA) بنجاح! (' + name + ')', false);
+document.getElementById('t_name').value = '';
+document.getElementById('t_user').value = '';
+document.getElementById('t_secret').value = '';
+} else {
+showStatus(d.error || 'فشل في حفظ حساب 2FA، تأكد من المفتاح السري ورمز PIN', true);
+}
+} catch (e) {
+showStatus('خطأ في الاتصال بالجهاز: ' + e.message, true);
+}
+}
+</script>
+</body>
+</html>
+)h2";
 
 } // namespace
 
