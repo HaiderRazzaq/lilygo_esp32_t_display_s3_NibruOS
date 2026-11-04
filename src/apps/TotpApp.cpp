@@ -115,7 +115,11 @@ bool TotpApp::onBack(AppContext& ctx) {
   endImport(ctx);
   clearEditor();
   ctx.usbHid.cancel();
-  view_ = View::Card; status_ = ""; fullRedraw_ = true; invalidate();
+  view_ = View::Card;
+  status_ = "";
+  fullRedraw_ = true;
+  cardDirty_ = true;
+  invalidate();
   return true;
 }
 
@@ -193,7 +197,7 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     const ImportedAccount* account = ctx.accountImport.candidate();
     if (account && ctx.totp.addAccount(ctx.security.getActiveVaultKey(), account->name, "", account->secret, account->digits, account->period)) {
       accountIndex_ = ctx.totp.accountCount() - 1;
-      endImport(ctx); view_ = View::Card; status_ = "Saved"; fullRedraw_ = true;
+      endImport(ctx); view_ = View::Card; status_ = "Saved"; fullRedraw_ = true; cardDirty_ = true;
     } else status_ = "Save failed - retry";
     invalidate(); return;
   }
@@ -227,7 +231,7 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
           status_ = "Save failed - retry";
         else {
           accountIndex_ = ctx.totp.accountCount() - 1;
-          clearEditor(); view_ = View::Card; status_ = "Saved"; fullRedraw_ = true;
+          clearEditor(); view_ = View::Card; status_ = "Saved"; fullRedraw_ = true; cardDirty_ = true;
         }
       }
     }
@@ -235,12 +239,12 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     return;
   }
   if (view_ == View::ConfirmDelete) {
-    if (ev.gesture != TouchGesture::Tap || ev.y < 96 || ev.y > 130) return;
+    if (ev.gesture != TouchGesture::Tap || ev.y < 96 || ev.y > 135) return;
     if (ev.x < 155) { onBack(ctx); return; }
     const uint32_t start = ev.contactId ? ev.contactStartedMs : millis();
     if (static_cast<int32_t>(start - confirmAfterMs_) < 0) return;
     if (ctx.totp.removeAccount(ctx.security.getActiveVaultKey(), accountIndex_)) {
-      accountIndex_ = 0; view_ = View::Card; status_ = "Deleted"; fullRedraw_ = true;
+      accountIndex_ = 0; view_ = View::Card; status_ = "Deleted"; fullRedraw_ = true; cardDirty_ = true;
     } else status_ = "Delete failed - retry";
     invalidate();
     return;
@@ -364,13 +368,18 @@ void TotpApp::render(AppContext& ctx) {
   if (view_ == View::Name || view_ == View::Secret) { renderEditor(ctx); return; }
   auto& screen = ctx.display;
   auto& t = screen.gfx();
-  if (fullRedraw_) { screen.clear(); screen.header("2FA Authenticator", true); fullRedraw_ = false; }
+  if (fullRedraw_) {
+    screen.clear();
+    screen.header(view_ == View::ConfirmDelete ? "Delete account" : "2FA Authenticator", true);
+    fullRedraw_ = false;
+    cardDirty_ = true;
+  }
   if (view_ == View::ConfirmDelete) {
     t.fillRect(0, 33, 320, 137, Colors::Bg);
     screen.label(40, 50, "Delete this account?", Colors::White, 2);
     screen.label(35, 76, status_[0] ? status_ : "Keep a recovery copy elsewhere.", Colors::Amber, 1);
-    screen.label(45, 110, "CANCEL", Colors::Cyan, 2);
-    screen.label(190, 110, "DELETE", Colors::Red, 2);
+    TextKeyboard::button(screen, 25, 100, 120, 32, "CANCEL", Colors::Cyan);
+    TextKeyboard::button(screen, 175, 100, 120, 32, "DELETE", Colors::Red);
     return;
   }
   const uint8_t count = ctx.totp.accountCount();

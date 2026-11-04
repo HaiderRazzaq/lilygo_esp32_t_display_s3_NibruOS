@@ -1,0 +1,83 @@
+Processing lilygo-t-display-s3 (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+RAM:   [==        ]  19.9% (used 65096 bytes from 327680 bytes)
+Flash: [=         ]  14.6% (used 958557 bytes from 6553600 bytes)
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-builtin, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: COM5
+Uploading .pio\build\lilygo-t-display-s3\firmware.bin
+esptool.py v4.5.1
+Serial port COM5
+Connecting...
+Chip is ESP32-S3 (revision v0.2)
+Features: WiFi, BLE
+Crystal is 40MHz
+MAC: 44:1b:f6:d3:aa:bc
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00003fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x0000e000 to 0x0000ffff...
+Flash will be erased from 0x00010000 to 0x000fafff...
+Compressed 15104 bytes to 10401...
+Writing at 0x00000000... (100 %)
+Wrote 15104 bytes (10401 compressed) at 0x00000000 in 0.3 seconds (effective 377.5 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 146...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (146 compressed) at 0x00008000 in 0.1 seconds (effective 261.7 kbit/s)...
+Hash of data verified.
+Compressed 8192 bytes to 47...
+Writing at 0x0000e000... (100 %)
+Wrote 8192 bytes (47 compressed) at 0x0000e000 in 0.1 seconds (effective 451.9 kbit/s)...
+Hash of data verified.
+Compressed 958928 bytes to 609119...
+Writing at 0x00010000... (2 %)
+Writing at 0x0001af3d... (5 %)
+Writing at 0x000257e0... (7 %)
+Writing at 0x0003110e... (10 %)
+Writing at 0x0003d0fc... (13 %)
+Writing at 0x00044ef5... (15 %)
+Writing at 0x0004a150... (18 %)
+Writing at 0x0004f664... (21 %)
+Writing at 0x00054eed... (23 %)
+Writing at 0x0005adff... (26 %)
+Writing at 0x0006094b... (28 %)
+Writing at 0x00066080... (31 %)
+Writing at 0x0006b4be... (34 %)
+Writing at 0x0007064f... (36 %)
+Writing at 0x000753f3... (39 %)
+Writing at 0x0007a408... (42 %)
+Writing at 0x0007f218... (44 %)
+Writing at 0x00084323... (47 %)
+Writing at 0x00089880... (50 %)
+Writing at 0x0008eabf... (52 %)
+Writing at 0x00093abb... (55 %)
+Writing at 0x00099524... (57 %)
+Writing at 0x0009ea86... (60 %)
+Writing at 0x000a380a... (63 %)
+Writing at 0x000a8964... (65 %)
+Writing at 0x000ad83b... (68 %)
+Writing at 0x000b2dcf... (71 %)
+Writing at 0x000b81f7... (73 %)
+Writing at 0x000bdcc1... (76 %)
+Writing at 0x000c3592... (78 %)
+Writing at 0x000c8c26... (81 %)
+Writing at 0x000cea7c... (84 %)
+Writing at 0x000d77ce... (86 %)
+Writing at 0x000df868... (89 %)
+Writing at 0x000e7cbc... (92 %)
+Writing at 0x000eda96... (94 %)
+Writing at 0x000f327a... (97 %)
+Writing at 0x000f9037... (100 %)
+Wrote 958928 bytes (609119 compressed) at 0x00010000 in 8.3 seconds (effective 928.0 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
+========================= [SUCCESS] Took 34.72 seconds =========================

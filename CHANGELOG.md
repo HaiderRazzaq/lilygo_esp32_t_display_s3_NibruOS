@@ -6,6 +6,15 @@ Release evidence and tagging policy: [releases](docs/releases/README.md).
 
 ## Unreleased
 
+### 2FA Authenticator UI Restoration & Cancel Lifecycle Fix (v0.9.3) — 2026-11-04
+- Fixed 2FA Authenticator screen component loss on cancel/back from ADD or DELETE (BUG-0016):
+  - Enforced `cardDirty_ = true` on `TotpApp::onBack()` and on `fullRedraw_` processing inside `render()`, ensuring that after screen clearing, navigation arrows (`<`, `>`), USB button, counter, `ADD`, and `DELETE` buttons are reliably redrawn.
+  - Updated `TotpApp::onDisplayRestored` to set both `fullRedraw_` and `cardDirty_`, preventing unrendered UI upon waking from sleep.
+  - Enhanced `ConfirmDelete` view rendering with rounded interactive buttons (`CANCEL` and `DELETE`) via `TextKeyboard::button`.
+  - Added automated host regression tests in `tests/host/test_authenticator.cpp` asserting that cancelling from both ADD and DELETE views restores all card components and action buttons.
+- Sequentially bumped firmware version to v0.9.3 across `include/NibruConfig.h`, `include/BoardConfig.h`, `src/main.cpp`, and `docs/CURRENT_STATE.md`.
+- Verified with host unit tests (VER-0113), desktop automated test suite (VER-0114), PlatformIO release build (958,928 B binary, 14.6% flash, 19.9% RAM, VER-0115), documentation verification (VER-0116), and physical upload to device on COM5 (HWT-0035).
+
 ### Web Portal & Account Setup LinkedIn Integration (v0.9.2) — 2026-11-04
 - Added official LinkedIn profiles and responsive badges to all web pages:
   - Embedded Web Portal (`src/services/WebPortalService.cpp` & `tools/account_setup/test_portal_preview.html`).

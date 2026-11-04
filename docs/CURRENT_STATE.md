@@ -7,7 +7,7 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
 {
   "record_type": "state",
   "date": "2026-11-04",
-  "runtime_version": "v0.9.2",
+  "runtime_version": "v0.9.3",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
@@ -46,12 +46,13 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "BUG-0009",
     "BUG-0010",
     "BUG-0011",
-    "BUG-0015"
+    "BUG-0015",
+    "BUG-0016"
   ],
-  "latest_build": "VER-0111",
-  "latest_upload": "HWT-0034",
-  "documentation_verification": "VER-0112",
-  "current_host_attempt": "VER-0109",
+  "latest_build": "VER-0115",
+  "latest_upload": "HWT-0035",
+  "documentation_verification": "VER-0116",
+  "current_host_attempt": "VER-0113",
   "source_constants": {
     "kTouchSda": 18,
     "kTouchScl": 17,

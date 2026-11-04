@@ -1668,3 +1668,41 @@ Corrections must be appended with the original ID reference.
   "follow_up": "User tests the updated Web Portal in browser and confirms LinkedIn links open correctly."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0044",
+  "date": "2026-11-04",
+  "related": [
+    "BUG-0016",
+    "VER-0113",
+    "VER-0114",
+    "VER-0115",
+    "VER-0116",
+    "HWT-0035"
+  ],
+  "action": "2FA AUTHENTICATOR UI RESTORATION FIX / VERSION BUMP v0.9.3",
+  "files": [
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "tests/host/test_authenticator.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/HARDWARE_TEST_LOG.md"
+  ],
+  "description": "Resolved BUG-0016 where cancelling from ADD or DELETE in 2FA Authenticator caused all UI controls (navigation arrows, bottom bar, ADD/DELETE buttons) to disappear, leaving only the OTP code and seconds timer. Root cause: TotpApp::onBack() cleared the screen via fullRedraw_ but omitted cardDirty_ = true, causing the card rendering block to be skipped. Enforced cardDirty_ = true on onBack(), on onDisplayRestored, and universally whenever fullRedraw_ runs in render(). Modernized ConfirmDelete with TextKeyboard::button styled buttons. Added regression test in test_authenticator.cpp. Monotonically bumped firmware version to v0.9.3.",
+  "reason": "Fix reported UI regression where cancelling ADD or DELETE rendered an empty screen with only numbers and seconds.",
+  "expected": "Cancelling ADD or DELETE restores complete card layout with navigation arrows, USB button, counter, and action buttons; passes all host and desktop tests; compiles and uploads to hardware.",
+  "actual": "Host tests PASS with regression assertions (VER-0113). Desktop tests PASS (VER-0114). PlatformIO build PASS with 958,928 bytes (14.6% flash, 19.9% RAM, VER-0115). Uploaded to physical device via COM5 (HWT-0035). Documentation checks PASS (VER-0116).",
+  "verification": "VER-0113, VER-0114, VER-0115, VER-0116, HWT-0035",
+  "risks": "Low risk; ensures dirty flag synchronization between screen clearing and view rendering.",
+  "commit": "WORKING_TREE",
+  "follow_up": "User tests 2FA Authenticator on device: taps ADD or DELETE, cancels, and observes complete UI restored."
+}
+```

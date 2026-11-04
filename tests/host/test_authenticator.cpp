@@ -286,6 +286,24 @@ void testAuthenticator() {
   assert(accounts.accountCount() == 2);
   authTap(app, ctx, 210, 110);
   assert(accounts.accountCount() == 1);
+
+  // Regression test: Cancel ADD and cancel DELETE must restore all card components (ADD, DELETE, arrows, etc.)
+  // 1. Enter ADD then cancel via Back
+  authTap(app, ctx, 120, 154);
+  app.render(ctx);
+  assert(app.onBack(ctx));
+  display.gfx().printed.clear();
+  app.render(ctx);
+  assert(textShown("ADD") && textShown("DELETE") && textShown("<") && textShown(">") && textShown("TYPE CODE (USB)"));
+
+  // 2. Enter DELETE then cancel via CANCEL touch button
+  authTap(app, ctx, 185, 154);
+  app.render(ctx);
+  authTap(app, ctx, 50, 110); // Tap CANCEL
+  display.gfx().printed.clear();
+  app.render(ctx);
+  assert(textShown("ADD") && textShown("DELETE") && textShown("<") && textShown(">") && textShown("TYPE CODE (USB)"));
+
   app.onExit(ctx);
   Preferences::resetMock();
   std::puts("PASS: authenticator lifecycle");
