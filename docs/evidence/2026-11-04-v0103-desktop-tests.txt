@@ -1,0 +1,68 @@
+NibruOS v0.10.3 Desktop Automated Tests
+Build & Test Output (Windows 11 / MSVC 2022 / SDL2)
+Date: 2026-11-04
+
+==================================================
+  NibruOS Automated Desktop & Shared Logic Tests
+==================================================
+
+[DesktopStorage] Initialized with runtime directory '.testbuild/auth_runtime_test'
+[Test] Running Core Lifecycle & AppManager Tests...
+  -> Core Lifecycle Tests PASS
+[Test] Running UI & Coordinate Transformation Tests...
+  -> UI & Transformation Tests PASS
+[Test] Running Wi-Fi Service & Fault Injection Tests...
+[MockWiFi] Simulation mode set to: Normal (Success)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 1700 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Scan completed with 5 APs
+[WiFi] Scan complete: 5 APs discovered in 1300 ms
+[MockWiFi] Simulation mode set to: Timeout (11s delay -> retry)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 3700 ms (mode: Timeout (11s delay -> retry))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[WiFi] attempt 1/2 failed: Scan timed out
+[WiFi] retrying scan (attempt 2/2)...
+[MockWiFi] Disconnected
+[WiFi] attempt 2/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 15900 ms (mode: Timeout (11s delay -> retry))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[WiFi] attempt 2/2 failed: Scan timed out
+[MockWiFi] Simulation mode set to: ScanFailed (Immediate error)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Simulating immediate scan start failure
+[WiFi] scanNetworks(async)=-2, freeHeap=215000
+[WiFi] attempt 1/2 failed: Scan start rejected
+[WiFi] retrying scan (attempt 2/2)...
+[MockWiFi] Disconnected
+[WiFi] attempt 2/2: STA preparing (650 ms warmup)
+[MockWiFi] Simulating immediate scan start failure
+[WiFi] scanNetworks(async)=-2, freeHeap=215000
+[WiFi] attempt 2/2 failed: Scan start rejected
+[MockWiFi] Simulation mode set to: Normal (Success)
+  -> Wi-Fi Simulation Tests PASS
+[Test] Running Settings Persistence & Desktop NVS Tests...
+  -> Settings Persistence Tests PASS
+[Test] Running Modular Architecture & HAL Contract Tests...
+  -> Modular Architecture & HAL Tests PASS
+[TEST] Sleep / Lock / Wake and Display Restoration Flow...
+  -> PASS: Sleep/Lock/Wake and Display Restoration verified.
+[TEST] Running Encrypted Password Vault Desktop Simulation Tests...
+  -> PASS: Encrypted Password Vault Desktop Storage & Backup verified.
+[TEST] Running Password Vault Application UI & Confirmed USB HID Tests...
+  -> PASS: Password Vault Application UI & Confirmed USB HID verified.
+[Test] Running Web Portal Service & Simulation Tests...
+  -> PASS: Web Portal Service & REST Simulation verified.
+[Test] Running New MVP Features (Generator, Clock, BLE) Tests...
+  -> SettingsApp Bluetooth Subview Touch and PrimaryAction PASS
+  -> PASS: New MVP Features verified successfully.
+[Test] Running 25 Repeated Lifecycle Entry/Exit Cycles...
+  -> 25 Lifecycle Cycles PASS
+
+==================================================
+  ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY!
+==================================================

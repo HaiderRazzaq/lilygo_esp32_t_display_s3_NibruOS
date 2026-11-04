@@ -45,6 +45,7 @@ private:
   bool symbols_ = false;
   uint32_t importRemaining_ = 0;
   bool importSent_ = false;
+  bool useBle_ = false;
 
   void ensureSession(AppContext& ctx);
   void clearEditor();

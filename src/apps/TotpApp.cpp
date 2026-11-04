@@ -4,6 +4,7 @@
 #include "services/TimeService.h"
 #include "services/TotpService.h"
 #include "services/UsbHidService.h"
+#include "services/BleHidService.h"
 #include "services/SecurityService.h"
 #include "services/CryptoService.h"
 #include "ui/TextKeyboard.h"
@@ -134,11 +135,24 @@ void TotpApp::sendCurrentCode(AppContext& ctx) {
   if (!epoch) {
     status_ = "Sync time via Wi-Fi/USB";
     feedbackUntilMs_ = millis() + 2000;
-  } else if (!ctx.usbHid.isReady()) {
-    status_ = "USB unavailable";
-    feedbackUntilMs_ = millis() + 2000;
   } else if (!ctx.totp.getAccountCode(accountIndex_, epoch, code, sizeof(code), remaining)) {
     status_ = "Code unavailable";
+    feedbackUntilMs_ = millis() + 2000;
+  } else if (useBle_) {
+    if (!ctx.bleHid.isEnabled()) {
+      status_ = "Enable BLE in Settings";
+      feedbackUntilMs_ = millis() + 2000;
+    } else if (!ctx.bleHid.isConnected()) {
+      status_ = "BLE not connected";
+      feedbackUntilMs_ = millis() + 2000;
+    } else {
+      sending_ = true;
+      status_ = "Typing BLE...";
+      ctx.bleHid.typeText(code);
+      ctx.bleHid.sendKey(0x28);
+    }
+  } else if (!ctx.usbHid.isReady()) {
+    status_ = "USB unavailable";
     feedbackUntilMs_ = millis() + 2000;
   } else if (ctx.usbHid.typeCode(code)) {
     sending_ = true;
@@ -303,6 +317,14 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     }
     cardDirty_ = true;
   } else if (count && ev.x >= 40 && ev.x <= 280 && ev.y >= 100 && ev.y <= 142) {
+    if (ev.gesture == TouchGesture::Tap && ev.x <= 95) {
+      useBle_ = !useBle_;
+      status_ = useBle_ ? "Switched to BLE mode" : "Switched to USB mode";
+      feedbackUntilMs_ = millis() + 1800;
+      cardDirty_ = true;
+      invalidate();
+      return;
+    }
     if (ev.gesture == TouchGesture::LongPress) {
       sendCurrentCode(ctx);
     } else if (ev.gesture == TouchGesture::Tap) {
@@ -434,12 +456,28 @@ void TotpApp::render(AppContext& ctx) {
       const bool usbReady = ctx.usbHid.isReady();
       const bool hasTime = epoch != 0;
       if (sending_) {
-        t.fillRoundRect(45, 104, 230, 34, 7, Colors::Cyan);
-        screen.label(85, 115, "TYPING TO PC...", Colors::Bg, 1, Colors::Cyan);
+        t.fillRoundRect(45, 104, 230, 34, 7, useBle_ ? Colors::Green : Colors::Cyan);
+        screen.label(85, 115, useBle_ ? "TYPING VIA BLE..." : "TYPING TO PC...", Colors::Bg, 1, useBle_ ? Colors::Green : Colors::Cyan);
       } else if (status_[0] != '\0') {
         t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
         t.drawRoundRect(45, 104, 230, 34, 7, Colors::Amber);
         screen.label(70, 115, status_, Colors::Amber, 1, Colors::Panel);
+      } else if (useBle_) {
+        const bool bleConn = ctx.bleHid.isConnected();
+        const bool bleEnabled = ctx.bleHid.isEnabled();
+        t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
+        t.drawRoundRect(45, 104, 230, 34, 7, bleConn ? Colors::Green : (bleEnabled ? Colors::Cyan : Colors::Border));
+        t.fillRoundRect(49, 108, 42, 26, 5, bleConn ? Colors::Green : (bleEnabled ? Colors::Cyan : Colors::Border));
+        screen.label(56, 116, "BLE", Colors::Bg, 1, bleConn ? Colors::Green : (bleEnabled ? Colors::Cyan : Colors::Border));
+        if (bleConn && hasTime) {
+          screen.label(102, 116, "HOLD OR BTN TO SEND", Colors::White, 1, Colors::Panel);
+        } else if (!hasTime) {
+          screen.label(102, 116, "SYNC TIME TO SEND", Colors::Muted, 1, Colors::Panel);
+        } else if (bleEnabled) {
+          screen.label(102, 116, "WAITING FOR PAIR...", Colors::Amber, 1, Colors::Panel);
+        } else {
+          screen.label(102, 116, "ENABLE IN SETTINGS", Colors::Muted, 1, Colors::Panel);
+        }
       } else if (usbReady && hasTime) {
         t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
         t.drawRoundRect(45, 104, 230, 34, 7, Colors::Cyan);

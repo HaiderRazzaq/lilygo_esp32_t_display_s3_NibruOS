@@ -21,6 +21,10 @@ public:
   uint16_t screenTimeoutSec() const { return screenTimeoutSec_; }
   bool setScreenTimeoutSec(uint16_t sec);
 
+  // Clock Screensaver: true = show clock screensaver on timeout, false = screen off / sleep
+  bool clockScreensaver() const { return clockScreensaver_; }
+  bool setClockScreensaver(bool enabled);
+
   // Theme Accent: 0=Cyan, 1=Green, 2=Amber, 3=Magenta
   uint8_t theme() const { return theme_; }
   bool setTheme(uint8_t themeIndex);
@@ -52,6 +56,7 @@ private:
   uint8_t rotation_ = 1;
   uint8_t language_ = 0;
   int8_t timezoneOffset_ = 3;
+  bool clockScreensaver_ = false;
 
   void applyToDisplay();
 };

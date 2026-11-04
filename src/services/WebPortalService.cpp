@@ -41,6 +41,34 @@ static bool extractJsonString(const char* json, const char* key, char* out, size
   return true;
 }
 
+static void toHex(const uint8_t* in, size_t inLen, char* out, size_t maxOut) {
+  static const char kHexDigits[] = "0123456789abcdef";
+  size_t o = 0;
+  for (size_t i = 0; i < inLen && (o + 3) <= maxOut; ++i) {
+    out[o++] = kHexDigits[(in[i] >> 4) & 0x0F];
+    out[o++] = kHexDigits[in[i] & 0x0F];
+  }
+  out[o] = '\0';
+}
+
+static size_t fromHex(const char* in, uint8_t* out, size_t maxOut) {
+  if (!in) return 0;
+  size_t len = 0;
+  auto hexVal = [](char c) -> int {
+    if (c >= '0' && c <= '9') return c - '0';
+    if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+    if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+    return -1;
+  };
+  while (*in && *(in + 1) && len < maxOut) {
+    int h1 = hexVal(*in++);
+    int h2 = hexVal(*in++);
+    if (h1 < 0 || h2 < 0) break;
+    out[len++] = static_cast<uint8_t>((h1 << 4) | h2);
+  }
+  return len;
+}
+
 const char kIndexHtml[] =
 R"h0(
 <!doctype html>
@@ -231,6 +259,7 @@ R"h1(
 <div class="tab-nav">
 <button type="button" class="tab-btn active" id="btn-tab-vault" onclick="switchTab('vault')">🔑 خزنة كلمات المرور (Vault)</button>
 <button type="button" class="tab-btn" id="btn-tab-totp" onclick="switchTab('totp')">🛡️ المصادقة الثنائية (2FA)</button>
+<button type="button" class="tab-btn" id="btn-tab-backup" onclick="switchTab('backup')">💾 النسخ والاستعادة (Backup)</button>
 </div>
 <div id="tab-vault">
 <div class="field">
@@ -272,6 +301,23 @@ d="tab-totp" style="display:none;">
 <input type="text" id="t_secret" maxlength="52" dir="ltr" style="text-transform:uppercase; letter-spacing:1px;" placeholder="JBSWY3DPEHPK3PXP" autocomplete="off">
 </div>
 <button type="button" class="button button-primary" onclick="submitTotp()">حفظ حساب 2FA في الجهاز 🛡️</button>
+</div>
+<div id="tab-backup" style="display:none">
+<div class="field">
+<label for="bk_pass_export">كلمة سر تشفير النسخة الاحتياطية (AES-256)</label>
+<input type="password" id="bk_pass_export" placeholder="أدخل كلمة مرور لتأمين ملف النسخة">
+<button type="button" class="button button-primary" style="margin-top:14px" onclick="downloadBackup()">تنزيل النسخة المشفرة 📥</button>
+</div>
+<hr style="border:0;border-top:1px solid rgba(186,212,250,.15);margin:24px 0">
+<div class="field">
+<label for="bk_file_import">استعادة نسخة احتياطية من ملف (.bin)</label>
+<input type="file" id="bk_file_import" accept=".bin">
+</div>
+<div class="field" style="margin-top:12px">
+<label for="bk_pass_import">كلمة سر فك تشفير النسخة</label>
+<input type="password" id="bk_pass_import" placeholder="كلمة المرور الأصلية للنسخة">
+<button type="button" class="button button-primary" style="margin-top:14px" onclick="uploadRestore()">استعادة الحسابات إلى الخزنة 🔄</button>
+</div>
 </div>
 </div>
 </section>
@@ -323,8 +369,68 @@ d="tab-totp" style="display:none;">
 function switchTab(t) {
 document.getElementById('btn-tab-vault').classList.toggle('active', t === 'vault');
 document.getElementById('btn-tab-totp').classList.toggle('active', t === 'totp');
+document.getElementById('btn-tab-backup').classList.toggle('active', t === 'backup');
 document.getElementById('tab-vault').style.display = t === 'vault' ? 'block' : 'none';
 document.getElementById('tab-totp').style.display = t === 'totp' ? 'block' : 'none';
+document.getElementById('tab-backup').style.display = t === 'backup' ? 'block' : 'none';
+}
+async function downloadBackup() {
+const pin = document.getElementById('pin').value.trim();
+const pass = document.getElementById('bk_pass_export').value;
+if (!pin) { showStatus('يرجى إدخال رمز Web PIN أولاً', true); return; }
+if (!pass) { showStatus('يرجى تحديد كلمة مرور لتشفير النسخة الاحتياطية', true); return; }
+try {
+const res = await fetch('/api/vault/backup', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ pin, passphrase: pass })
+});
+const d = await res.json();
+if (res.ok && d.success && d.payload) {
+const bytes = new Uint8Array(d.payload.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+const blob = new Blob([bytes], { type: 'application/octet-stream' });
+const a = document.createElement('a');
+a.href = URL.createObjectURL(blob);
+a.download = 'nibru-vault-backup.bin';
+a.click();
+showStatus('تم تنزيل النسخة الاحتياطية المشفرة بنجاح!', false);
+} else {
+showStatus(d.error || 'فشل تصدير النسخة الاحتياطية', true);
+}
+} catch (e) {
+showStatus('خطأ في تصدير النسخة: ' + e.message, true);
+}
+}
+async function uploadRestore() {
+const pin = document.getElementById('pin').value.trim();
+const pass = document.getElementById('bk_pass_import').value;
+const fileInput = document.getElementById('bk_file_import');
+if (!pin) { showStatus('يرجى إدخال رمز Web PIN أولاً', true); return; }
+if (!pass) { showStatus('يرجى إدخال كلمة سر فك التشفير', true); return; }
+if (!fileInput.files || !fileInput.files[0]) { showStatus('يرجى اختيار ملف النسخة الاحتياطية', true); return; }
+const file = fileInput.files[0];
+const reader = new FileReader();
+reader.onload = async function() {
+try {
+const arr = new Uint8Array(reader.result);
+let hex = '';
+for (let b of arr) hex += b.toString(16).padStart(2, '0');
+const res = await fetch('/api/vault/restore', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ pin, passphrase: pass, payload: hex })
+});
+const d = await res.json();
+if (res.ok && d.success) {
+showStatus('تمت استعادة ' + d.count + ' حساب بنجاح إلى الخزنة!', false);
+} else {
+showStatus(d.error || 'فشلت الاستعادة: كلمة المرور خاطئة أو الملف تالف', true);
+}
+} catch (e) {
+showStatus('خطأ أثناء الاستعادة: ' + e.message, true);
+}
+};
+reader.readAsArrayBuffer(file);
 }
 function togglePass() {
 const p = document.getElementById('v_pass');
@@ -470,6 +576,18 @@ bool WebPortalService::start(uint32_t nowMs, AppContext& ctx) {
     int code = handleAddTotp(ctx, body.c_str(), resp, sizeof(resp));
     server.send(code, "application/json", resp);
   });
+  server.on("/api/vault/backup", HTTP_POST, [this, &ctx]() {
+    char resp[2048];
+    String body = server.arg("plain");
+    int code = handleBackup(ctx, body.c_str(), resp, sizeof(resp));
+    server.send(code, "application/json", resp);
+  });
+  server.on("/api/vault/restore", HTTP_POST, [this, &ctx]() {
+    char resp[512];
+    String body = server.arg("plain");
+    int code = handleRestore(ctx, body.c_str(), resp, sizeof(resp));
+    server.send(code, "application/json", resp);
+  });
   server.onNotFound([]() {
     server.send(200, "text/html", kIndexHtml);
   });
@@ -590,6 +708,96 @@ int WebPortalService::handleAddTotp(AppContext& ctx, const char* body, char* out
   return 200;
 }
 
+int WebPortalService::handleBackup(AppContext& ctx, const char* body, char* outResponse, size_t maxLen) {
+  char pin[16]{}, pass[48]{};
+  extractJsonString(body, "pin", pin, sizeof(pin));
+  extractJsonString(body, "passphrase", pass, sizeof(pass));
+
+  if (strcmp(pin, webPin_) != 0) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Invalid Web PIN\"}");
+    return 401;
+  }
+  if (!pass[0]) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Passphrase is required\"}");
+    return 400;
+  }
+  if (!ctx.vault.isLoaded()) {
+    if (!ctx.vault.loadVault(ctx.security.getActiveVaultKey())) {
+      snprintf(outResponse, maxLen, "{\"error\":\"Failed to load vault\"}");
+      return 500;
+    }
+  }
+
+  uint8_t payload[2048]{};
+  size_t outLen = 0;
+  if (!ctx.vault.exportBackup(pass, payload, sizeof(payload), outLen)) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Backup export failed\"}");
+    return 500;
+  }
+
+  snprintf(outResponse, maxLen, "{\"success\":true,\"payload\":\"");
+  size_t prefixLen = strlen(outResponse);
+  toHex(payload, outLen, outResponse + prefixLen, maxLen - prefixLen - 3);
+  size_t end = strlen(outResponse);
+  if (end + 3 < maxLen) {
+    outResponse[end++] = '"';
+    outResponse[end++] = '}';
+    outResponse[end] = '\0';
+  }
+  CryptoService::secureZero(payload, sizeof(payload));
+  return 200;
+}
+
+int WebPortalService::handleRestore(AppContext& ctx, const char* body, char* outResponse, size_t maxLen) {
+  char pin[16]{}, pass[48]{};
+  extractJsonString(body, "pin", pin, sizeof(pin));
+  extractJsonString(body, "passphrase", pass, sizeof(pass));
+
+  if (strcmp(pin, webPin_) != 0) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Invalid Web PIN\"}");
+    return 401;
+  }
+  if (!ctx.security.hasActiveKey()) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Device locked. Unlock on device first.\"}");
+    return 403;
+  }
+  if (!pass[0]) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Passphrase is required\"}");
+    return 400;
+  }
+
+  const char* pKey = "\"payload\"";
+  const char* pPos = strstr(body, pKey);
+  if (!pPos) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Missing payload field\"}");
+    return 400;
+  }
+  pPos += strlen(pKey);
+  while (*pPos && (*pPos == ' ' || *pPos == '\t' || *pPos == ':')) ++pPos;
+  if (*pPos != '"') {
+    snprintf(outResponse, maxLen, "{\"error\":\"Invalid payload format\"}");
+    return 400;
+  }
+  ++pPos;
+
+  uint8_t binPayload[2048]{};
+  size_t binLen = fromHex(pPos, binPayload, sizeof(binPayload));
+  if (binLen < 48) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Payload corrupted or too short\"}");
+    return 400;
+  }
+
+  if (!ctx.vault.importBackup(pass, binPayload, binLen, ctx.security.getActiveVaultKey())) {
+    CryptoService::secureZero(binPayload, sizeof(binPayload));
+    snprintf(outResponse, maxLen, "{\"error\":\"Restore failed: wrong passphrase or corrupted data\"}");
+    return 400;
+  }
+
+  CryptoService::secureZero(binPayload, sizeof(binPayload));
+  snprintf(outResponse, maxLen, "{\"success\":true,\"count\":%u}", static_cast<unsigned int>(ctx.vault.count()));
+  return 200;
+}
+
 int WebPortalService::simulateRequest(AppContext& ctx, const char* method, const char* path, const char* body, char* outResponse, size_t maxLen) {
   if (state_ != WebPortalState::Active) {
     snprintf(outResponse, maxLen, "{\"error\":\"Portal not active\"}");
@@ -601,6 +809,10 @@ int WebPortalService::simulateRequest(AppContext& ctx, const char* method, const
     return handleAddVault(ctx, body, outResponse, maxLen);
   } else if (strcmp(path, "/api/totp/add") == 0 && strcmp(method, "POST") == 0) {
     return handleAddTotp(ctx, body, outResponse, maxLen);
+  } else if (strcmp(path, "/api/vault/backup") == 0 && strcmp(method, "POST") == 0) {
+    return handleBackup(ctx, body, outResponse, maxLen);
+  } else if (strcmp(path, "/api/vault/restore") == 0 && strcmp(method, "POST") == 0) {
+    return handleRestore(ctx, body, outResponse, maxLen);
   } else if (strcmp(path, "/") == 0) {
     snprintf(outResponse, maxLen, "HTML_PORTAL");
     return 200;

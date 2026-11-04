@@ -21,12 +21,15 @@
 #include "services/TotpService.h"
 #include "services/UsbHidService.h"
 #include "services/WebPortalService.h"
+#include "services/BleHidService.h"
 #include "apps/WiFiApp.h"
 #include "apps/TotpApp.h"
 #include "apps/VaultApp.h"
 #include "apps/SettingsApp.h"
 #include "apps/SystemInfoApp.h"
 #include "apps/TouchTestApp.h"
+#include "apps/GeneratorApp.h"
+#include "apps/ClockApp.h"
 
 #include "platform/desktop/SDLDisplay.h"
 #include "platform/desktop/DesktopInput.h"
@@ -46,7 +49,7 @@ void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, 
   std::printf("[Test] Running Core Lifecycle & AppManager Tests...\n");
 
   assert(launcher.isHome());
-  assert(launcher.appCount() == 6);
+  assert(launcher.appCount() == 8);
   assert(launcher.selectedIndex() == 0);
 
   // Open App 0 (WiFiApp)
@@ -73,6 +76,10 @@ void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, 
   assert(launcher.selectedIndex() == 4);
   launcher.handleButton(ButtonAction::SelectNext);
   assert(launcher.selectedIndex() == 5);
+  launcher.handleButton(ButtonAction::SelectNext);
+  assert(launcher.selectedIndex() == 6);
+  launcher.handleButton(ButtonAction::SelectNext);
+  assert(launcher.selectedIndex() == 7);
   launcher.handleButton(ButtonAction::SelectNext);
   assert(launcher.selectedIndex() == 0);
 
@@ -514,7 +521,7 @@ void testWebPortalSimulation(AppContext& ctx) {
   assert(strlen(ctx.webPortal.webPin()) == 4);
 
   // Status check
-  char resp[256];
+  char resp[1024];
   int code = ctx.webPortal.simulateRequest(ctx, "GET", "/api/status", "", resp, sizeof(resp));
   assert(code == 200);
   assert(strstr(resp, "\"ok\":true") != nullptr);
@@ -555,6 +562,33 @@ void testWebPortalSimulation(AppContext& ctx) {
   assert(code == 200);
   assert(strstr(resp, "\"success\":true") != nullptr);
 
+  // Test Web Portal Backup & Restore endpoints
+  char backupReq[128];
+  snprintf(backupReq, sizeof(backupReq), "{\"pin\":\"%s\",\"passphrase\":\"BackupPass1\"}", ctx.webPortal.webPin());
+  code = ctx.webPortal.simulateRequest(ctx, "POST", "/api/vault/backup", backupReq, resp, sizeof(resp));
+  assert(code == 200);
+  assert(strstr(resp, "\"payload\":") != nullptr);
+
+  const char* pKey = "\"payload\":\"";
+  const char* pStart = strstr(resp, pKey);
+  assert(pStart != nullptr);
+  pStart += strlen(pKey);
+  const char* pEnd = strchr(pStart, '"');
+  assert(pEnd != nullptr);
+  char hexPayload[1024]{};
+  size_t pLen = static_cast<size_t>(pEnd - pStart);
+  assert(pLen < sizeof(hexPayload));
+  memcpy(hexPayload, pStart, pLen);
+  hexPayload[pLen] = '\0';
+
+  char restoreReq[1200];
+  snprintf(restoreReq, sizeof(restoreReq), "{\"pin\":\"%s\",\"passphrase\":\"BackupPass1\",\"payload\":\"%s\"}",
+           ctx.webPortal.webPin(), hexPayload);
+  code = ctx.webPortal.simulateRequest(ctx, "POST", "/api/vault/restore", restoreReq, resp, sizeof(resp));
+  std::printf("RESTORE RESULT: code=%d resp=%s\n", code, resp);
+  assert(code == 200);
+  assert(strstr(resp, "\"success\":true") != nullptr);
+
   // Cleanup vault entry
   ctx.vault.removeEntry(ctx.security.getActiveVaultKey(), 0);
   assert(ctx.vault.count() == 0);
@@ -565,6 +599,121 @@ void testWebPortalSimulation(AppContext& ctx) {
   assert(ctx.resources.wifiOwner() == ResourceOwner::None);
 
   std::printf("  -> PASS: Web Portal Service & REST Simulation verified.\n");
+}
+
+void testNewMvpFeatures(AppContext& ctx, GeneratorApp& genApp, ClockApp& clockApp, AppManager& launcher) {
+  (void)launcher;
+  std::printf("[Test] Running New MVP Features (Generator, Clock, BLE) Tests...\n");
+
+  // 1. ClockApp & Screensaver tests
+  clockApp.onEnter(ctx);
+  clockApp.render(ctx);
+  TouchEvent tapEv{};
+  tapEv.gesture = TouchGesture::Tap;
+  tapEv.x = 100; tapEv.y = 100;
+  clockApp.onTouch(ctx, tapEv); // cycle theme
+  // Tap Screensaver toggle pill
+  assert(!ctx.settings.clockScreensaver());
+  tapEv.x = 200; tapEv.y = 125;
+  clockApp.onTouch(ctx, tapEv);
+  assert(ctx.settings.clockScreensaver());
+  clockApp.onTouch(ctx, tapEv);
+  assert(!ctx.settings.clockScreensaver());
+  clockApp.onTouch(ctx, tapEv);
+  assert(ctx.settings.clockScreensaver());
+
+  clockApp.onTick(ctx, 1000);
+  clockApp.render(ctx);
+  clockApp.renderScreensaver(ctx, 1000);
+  clockApp.onExit(ctx);
+
+  // DisplayManager screensaver inactivity test
+  assert(ctx.display.screensaverEnabled());
+  ctx.display.setSleepTimeoutSeconds(2);
+  ctx.display.notifyActivity(1000);
+  ctx.display.tick(3001);
+  assert(ctx.display.isScreensaverActive());
+  clockApp.renderScreensaver(ctx, 3001);
+  ctx.display.stopScreensaver();
+  assert(!ctx.display.isScreensaverActive());
+
+  // 2. GeneratorApp tests
+  genApp.onEnter(ctx);
+  genApp.render(ctx);
+  // Tap Length button
+  tapEv.x = 50; tapEv.y = 85;
+  genApp.onTouch(ctx, tapEv);
+  // Tap Regen button
+  tapEv.x = 250; tapEv.y = 85;
+  genApp.onTouch(ctx, tapEv);
+  // Tap Type USB
+  tapEv.x = 50; tapEv.y = 125;
+  genApp.onTouch(ctx, tapEv);
+  // Save to Vault test
+  if (!ctx.security.hasActiveKey()) {
+    ctx.security.verifyPin("739126");
+    ctx.security.unlock();
+  }
+  tapEv.x = 200; tapEv.y = 125;
+  genApp.onTouch(ctx, tapEv); // Tap Save to Vault
+  assert(ctx.vault.count() >= 1);
+  ctx.vault.removeEntry(ctx.security.getActiveVaultKey(), 0);
+  genApp.render(ctx);
+  genApp.onExit(ctx);
+
+  // 3. BleHidService tests
+  assert(!ctx.bleHid.isEnabled());
+  assert(!ctx.bleHid.isConnected());
+  assert(ctx.bleHid.setEnabled(true, ctx));
+  assert(ctx.bleHid.isEnabled());
+  assert(ctx.resources.wifiOwner() == ResourceOwner::BleKeyboard);
+  ctx.bleHid.simulateConnected(true);
+  assert(ctx.bleHid.isConnected());
+  assert(ctx.bleHid.typeText("test"));
+  assert(ctx.bleHid.setEnabled(false, ctx));
+  assert(!ctx.bleHid.isEnabled());
+  assert(ctx.resources.wifiOwner() == ResourceOwner::None);
+
+  // 4. GeneratorApp & BLE typing integration test
+  genApp.onEnter(ctx);
+  assert(ctx.bleHid.setEnabled(true, ctx));
+  ctx.bleHid.simulateConnected(true);
+  const uint32_t countBefore = ctx.bleHid.typedCount();
+  tapEv.gesture = TouchGesture::Tap;
+  tapEv.x = 150; tapEv.y = 125; // Tap Type BLE
+  genApp.onTouch(ctx, tapEv);
+  assert(ctx.bleHid.typedCount() > countBefore);
+  genApp.onExit(ctx);
+  assert(ctx.bleHid.setEnabled(false, ctx));
+
+  // 5. SettingsApp Bluetooth Subview Touch & PrimaryAction test
+  SettingsApp settingsApp;
+  settingsApp.onEnter(ctx);
+  // Navigate to Bluetooth subview (index 9 in menu)
+  for (int i = 0; i < 9; ++i) settingsApp.onPrimaryAction(ctx);
+  settingsApp.onActivate(ctx);
+  settingsApp.render(ctx);
+
+  // Touch ENABLE BLE KEYBOARD button (x: 160, y: 120)
+  assert(!ctx.bleHid.isEnabled());
+  tapEv.gesture = TouchGesture::Tap;
+  tapEv.x = 160; tapEv.y = 120;
+  settingsApp.onTouch(ctx, tapEv);
+  assert(ctx.bleHid.isEnabled()); // Verifies SettingsApp::onTouch routes to handleBluetoothTouch
+
+  // Touch DISABLE button (x: 160, y: 120)
+  settingsApp.onTouch(ctx, tapEv);
+  assert(!ctx.bleHid.isEnabled());
+
+  // Test BOOT button (onPrimaryAction) toggle
+  settingsApp.onPrimaryAction(ctx);
+  assert(ctx.bleHid.isEnabled());
+  settingsApp.onPrimaryAction(ctx);
+  assert(!ctx.bleHid.isEnabled());
+
+  settingsApp.onExit(ctx);
+
+  std::printf("  -> PASS: New MVP Features verified successfully.\n");
 }
 namespace {
 bool simUsbReady() { return true; }
@@ -595,14 +744,17 @@ int main() {
   AccountImportService accountImport;
   VaultService vault;
   WebPortalService webPortal;
+  BleHidService bleHid;
 
-  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal};
+  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid};
   AppManager launcher(context);
 
   WiFiApp wifiApp;
   TotpApp totpApp;
   VaultApp vaultApp;
   SettingsApp settingsApp;
+  GeneratorApp generatorApp;
+  ClockApp clockApp;
   SystemInfoApp sysInfoApp;
   TouchTestApp touchTestApp;
 
@@ -610,6 +762,8 @@ int main() {
   launcher.registerApp(totpApp);
   launcher.registerApp(vaultApp);
   launcher.registerApp(settingsApp);
+  launcher.registerApp(generatorApp);
+  launcher.registerApp(clockApp);
   launcher.registerApp(sysInfoApp);
   launcher.registerApp(touchTestApp);
   launcher.begin();
@@ -623,6 +777,7 @@ int main() {
   testEncryptedVaultStorage(context);
   testVaultAppUI(context, vaultApp, launcher);
   testWebPortalSimulation(context);
+  testNewMvpFeatures(context, generatorApp, clockApp, launcher);
   testRepeatedLifecycleCycles(launcher);
   // Shared application UI, real Windows crypto, disk-backed test-only NVS.
   Preferences::resetMock();
@@ -666,7 +821,7 @@ int main() {
   totpApp.onExit(context);
   AccountImportTransport io(ImportFixture::openImport, ImportFixture::closeImport, ImportFixture::readImport);
   AccountImportService paired(&io);
-  AppContext pairedContext{display, resources, wifi, security, settings, timeService, totp, usbHid, paired, vault, webPortal};
+  AppContext pairedContext{display, resources, wifi, security, settings, timeService, totp, usbHid, paired, vault, webPortal, bleHid};
   totpApp.onEnter(pairedContext);
   authTap(totpApp, pairedContext, 110, 158);
   authTap(totpApp, pairedContext, 160, 88);

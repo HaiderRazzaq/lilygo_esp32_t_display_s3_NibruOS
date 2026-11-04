@@ -90,6 +90,7 @@ set(NIBRU_SHARED_SOURCES
   src/services/LocalizationService.cpp
   src/services/VaultService.cpp
   src/services/WebPortalService.cpp
+  src/services/BleHidService.cpp
   src/apps/WiFiApp.cpp
   src/apps/WiFiScannerApp.cpp
   src/apps/TotpApp.cpp
@@ -97,6 +98,8 @@ set(NIBRU_SHARED_SOURCES
   src/apps/SettingsApp.cpp
   src/apps/SystemInfoApp.cpp
   src/apps/TouchTestApp.cpp
+  src/apps/GeneratorApp.cpp
+  src/apps/ClockApp.cpp
 )
 
 # Desktop platform sources

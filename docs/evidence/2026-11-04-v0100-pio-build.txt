@@ -1,0 +1,27 @@
+NibruOS PlatformIO Build (v0.10.0)
+==================================================
+Date: 2026-11-04
+Target: lilygo-t-display-s3
+Command: pio run -e lilygo-t-display-s3
+Output:
+RAM:   [==        ]  19.9% (used 65176 bytes from 327680 bytes)
+Flash: [=         ]  14.9% (used 975293 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+check_image([".pio\\build\\lilygo-t-display-s3\\firmware.bin"], [".pio\\build\\lilygo-t-display-s3\\firmware.elf"])
+{
+  "binary_bytes": 975664,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5577936,
+  "sha256": "925c0124ecc20b65bc007da07f016623611570554a55f971b007221e091b33e7",
+  "growth_percent": 15.90982531506016,
+  "warnings": [
+    "Image growth exceeds provisional 5% review trigger"
+  ],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 71.32 seconds =========================

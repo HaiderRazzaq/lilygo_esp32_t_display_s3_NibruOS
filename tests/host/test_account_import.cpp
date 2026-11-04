@@ -6,6 +6,7 @@
 #include "services/TimeService.h"
 #include "services/VaultService.h"
 #include "services/WebPortalService.h"
+#include "services/BleHidService.h"
 #include "services/UsbHidService.h"
 #include "services/WiFiService.h"
 #include "hardware/DisplayManager.h"
@@ -80,7 +81,8 @@ void testAccountImport() {
   UsbHidService usb;
   VaultService vault;
   WebPortalService webPortal;
-  AppContext ctx{display, resources, wifi, security, settings, time, totp, usb, service, vault, webPortal};
+  BleHidService bleHid;
+  AppContext ctx{display, resources, wifi, security, settings, time, totp, usb, service, vault, webPortal, bleHid};
   TotpApp app;
   app.onEnter(ctx);
   authTap(app, ctx, 110, 158); // ADD > methods

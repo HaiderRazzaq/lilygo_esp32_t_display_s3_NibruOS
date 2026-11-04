@@ -19,6 +19,8 @@ enum class TextId : uint16_t {
   AppVault,
   AppSystemInfo,
   AppTouchTest,
+  AppGenerator,
+  AppClock,
 
   // App Subtitles
   SubLauncher,
@@ -28,6 +30,8 @@ enum class TextId : uint16_t {
   SubVault,
   SubSystemInfo,
   SubTouchTest,
+  SubGenerator,
+  SubClock,
 
   // Settings Menu Items
   MenuDisplay,
@@ -39,6 +43,7 @@ enum class TextId : uint16_t {
   MenuLanguage,
   MenuTouchTest,
   MenuWebPortal,
+  MenuBluetooth,
 
   // Display Settings
   DisplayTitle,

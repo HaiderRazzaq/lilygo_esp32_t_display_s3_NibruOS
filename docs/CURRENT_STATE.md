@@ -7,7 +7,7 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
 {
   "record_type": "state",
   "date": "2026-11-04",
-  "runtime_version": "v0.9.4",
+  "runtime_version": "v0.10.3",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
@@ -30,7 +30,11 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "FEAT-0016",
     "FEAT-0017",
     "FEAT-0018",
-    "FEAT-0019"
+    "FEAT-0019",
+    "FEAT-0020",
+    "FEAT-0021",
+    "FEAT-0022",
+    "FEAT-0023"
   ],
   "planned_features": [
     "FEAT-0007"

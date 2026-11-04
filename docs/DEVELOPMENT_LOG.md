@@ -1747,3 +1747,188 @@ Corrections must be appended with the original ID reference.
   "follow_up": "User tests 2FA on device: tests short tap, long press hold to send USB digits to PC Notepad, and pressing physical BOOT button to send digits."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0046",
+  "date": "2026-11-04T14:30:00+03:00",
+  "related": [
+    "FEAT-0020",
+    "FEAT-0021",
+    "FEAT-0022",
+    "FEAT-0023"
+  ],
+  "action": "ADD / ARCHITECTURE / CRYPTO / SECURITY / TOOLING",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/services/LocalizationService.h",
+    "src/services/LocalizationService.cpp",
+    "src/apps/ClockApp.h",
+    "src/apps/ClockApp.cpp",
+    "src/apps/GeneratorApp.h",
+    "src/apps/GeneratorApp.cpp",
+    "src/apps/VaultApp.h",
+    "src/apps/VaultApp.cpp",
+    "src/core/ResourceManager.h",
+    "src/core/AppContext.h",
+    "src/services/BleHidService.h",
+    "src/services/BleHidService.cpp",
+    "src/services/WebPortalService.h",
+    "src/services/WebPortalService.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "CMakeLists.txt",
+    "tests/host/test_main.cpp",
+    "tests/host/test_authenticator.cpp",
+    "tests/host/test_account_import.cpp",
+    "tests/host/test_web_portal.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Implemented suite of 5 MVP features requested by device owner without regressions: Password Generator Tool (GeneratorApp) with random bytes, configurable length/symbols, one-touch USB typing and direct vault save; Cyber Desk Clock App (ClockApp) with large digital time, date, NTP badge, seconds bar and theme cycle; Bluetooth LE HID service (BleHidService) mediated safely by ResourceManager mutex; Vault category filtering (VaultApp) with tap cycling and filtered navigation; Authenticated Web Portal encrypted backup and restore endpoints (/api/vault/backup and /api/vault/restore) with PBKDF2/AES-GCM encryption. Monotonically bumped firmware version to v0.10.0.",
+  "reason": "User requested all 5 suggested enhancements in MVP form without touching or breaking any existing working functionality.",
+  "expected": "All existing features remain functional, new apps register and render cleanly, desktop and host tests pass with 0 errors, release binary fits app0 partition with ample free internal RAM, and device upload succeeds.",
+  "actual": "Host tests PASS with 0 errors (VER-0122). Desktop tests PASS with all modules (VER-0121). PlatformIO build SUCCESS: 975,293 B Flash (14.9%), 65,176 B RAM (19.9%), binary 975,664 B (VER-0123). Uploaded to physical device on COM5 via esptool (HWT-0038). Documentation check PASS (VER-0124).",
+  "verification": "VER-0121, VER-0122, VER-0123, VER-0124, HWT-0038",
+  "risks": "Minimal; BLE radio remains unadvertised by default to protect internal heap; vault categories do not alter persistent storage format; web backup uses authenticated PBKDF2/AES-GCM.",
+  "commit": "WORKING_TREE",
+  "follow_up": "User tests the new Password Generator app, Desk Clock, categories filter in Vault, and Web Portal Backup/Restore on the device."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0047",
+  "date": "2026-11-04T15:05:00+03:00",
+  "related": [
+    "FEAT-0020",
+    "FEAT-0021",
+    "VER-0125",
+    "VER-0126",
+    "VER-0127",
+    "VER-0128",
+    "HWT-0039"
+  ],
+  "action": "PASSWORD GENERATOR VAULT AUTO-UNLOCK & SAVE / CLOCK SCREENSAVER MODE & CONTROLS / VERSION BUMP v0.10.1",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/apps/GeneratorApp.h",
+    "src/apps/GeneratorApp.cpp",
+    "src/apps/ClockApp.h",
+    "src/apps/ClockApp.cpp",
+    "src/hardware/DisplayManager.h",
+    "src/hardware/DisplayManager.cpp",
+    "src/services/SettingsService.h",
+    "src/services/SettingsService.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "tests/desktop/test_simulator.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/FEATURE_REGISTRY.md"
+  ],
+  "description": "Resolved two key owner requests: 1) Password Generator auto-unlock & save flow: when [+ SAVE VAULT] is pressed in GeneratorApp without an active key, it seamlessly displays the PIN entry pad, caches pending save state, and upon successful authentication automatically loads the vault and commits the password entry without displaying 'Unlock Vault first!'. If already unlocked, it directly ensures session loading and commits. 2) Cyber Desk Clock Screensaver architecture: integrated DisplayManager screensaver state triggered by inactivity timeout, added dedicated screensaver rendering in ClockApp with animated seconds progress bar, added one-touch [SAVER: ON/OFF] toggle button in ClockApp, and added screensaver toggle option in SettingsApp Display & Screen view. Touch or hardware button wakes the device instantly. Monotonically bumped firmware version to v0.10.1.",
+  "reason": "Address device owner issues: prevent 'unlock vault first' blocker when saving generated passwords, and enable controllable clock screensaver.",
+  "expected": "Seamless PIN unlock and auto-save in GeneratorApp, full clock screensaver on inactivity with instant wake on touch/button, toggle controls in ClockApp and SettingsApp, all tests PASS, binary fits app0, uploaded to physical device on COM5.",
+  "actual": "Host tests PASS with 0 errors (VER-0126). Desktop tests PASS including screensaver and generator auto-save assertions (VER-0125). PlatformIO build SUCCESS: 977,297 B Flash (14.9%), 65,200 B RAM (19.9%), binary 977,664 B (VER-0127). Uploaded to physical device on COM5 via esptool (HWT-0039). Documentation check PASS (VER-0128).",
+  "verification": "VER-0125, VER-0126, VER-0127, VER-0128, HWT-0039",
+  "risks": "Low; screensaver uses existing non-blocking tick and sleep timer without extra thread allocations or persistent overhead.",
+  "commit": "WORKING_TREE",
+  "follow_up": "User tests Password Generator save flow with locked/unlocked vault, and observes Clock Screensaver activation on timeout with wake on touch."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0048",
+  "date": "2026-11-04T16:15:00+03:00",
+  "related": [
+    "FEAT-0022",
+    "VER-0129",
+    "VER-0130",
+    "VER-0131",
+    "VER-0132",
+    "HWT-0040"
+  ],
+  "action": "BLUETOOTH LE HID WIRELESS KEYBOARD INTEGRATION / 2FA & GENERATOR & VAULT WIRELESS TRANSMISSION / VERSION BUMP v0.10.2",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/services/BleHidService.h",
+    "src/services/BleHidService.cpp",
+    "src/services/LocalizationService.h",
+    "src/services/LocalizationService.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "src/apps/GeneratorApp.h",
+    "src/apps/GeneratorApp.cpp",
+    "src/apps/VaultApp.h",
+    "src/apps/VaultApp.cpp",
+    "tests/desktop/test_simulator.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/FEATURE_REGISTRY.md"
+  ],
+  "description": "Implemented Option 1: Native Bluetooth LE HID Wireless Keyboard stack and interactive controls across NibruOS. 1) BleHidService incorporates native ESP32-S3 BLEHIDDevice advertising 'NibruOS Keyboard' with Just-Works bonding, dynamic 8-byte HID reports, and complete deinitialization on disable to free heap memory. 2) SettingsApp incorporates dedicated Bluetooth subview with real-time pairing status, [ENABLE BLE], [DISABLE BLE], and [TEST KEYBOARD] buttons. 3) TotpApp adds interactive USB/BLE transport toggle to Cyber Action Capsule, typing OTP codes wirelessly to phones/PCs via long-press touch or physical BOOT button. 4) GeneratorApp adds [TYPE BLE] action button typing generated credentials wirelessly. 5) VaultApp adds wireless Bluetooth typing for vault usernames and passwords. Monotonically bumped firmware version to v0.10.2.",
+  "reason": "User requested Option 1 (Wireless Bluetooth LE keyboard typing) professionally without disrupting any existing features.",
+  "expected": "Full wireless keyboard emulation over BLE, zero disruption to existing features, tests pass on host and desktop, PlatformIO build succeeds with safe memory margins.",
+  "actual": "Desktop tests PASS (VER-0129). Host tests PASS (VER-0130). PlatformIO release build PASS: 1,454,077 B Flash (22.2% of 6.25 MB partition), 84,952 B RAM (25.9%), binary 1,454,448 B (VER-0131). Documentation check PASS (VER-0132). Hardware upload pending device connection (HWT-0040).",
+  "verification": "VER-0129, VER-0130, VER-0131, VER-0132, HWT-0040",
+  "risks": "Low; BLE stack deinitializes completely when disabled, preserving internal RAM for Wi-Fi and applications.",
+  "commit": "WORKING_TREE",
+  "follow_up": "User connects ESP32-S3 to PC, uploads image on COM5, pairs phone or laptop with 'NibruOS Keyboard', and tests wireless OTP and password entry."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0049",
+  "date": "2026-11-04T17:05:00+03:00",
+  "related": [
+    "FEAT-0022",
+    "VER-0133",
+    "VER-0134",
+    "VER-0135",
+    "VER-0136",
+    "HWT-0041"
+  ],
+  "action": "SETTINGS BLUETOOTH TOUCH ROUTING FIX / HARDWARE BOOT BUTTON TRIGGER / SCAN RESPONSE / VERSION BUMP v0.10.3",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/apps/SettingsApp.cpp",
+    "src/services/BleHidService.cpp",
+    "tests/desktop/test_simulator.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/HARDWARE_TEST_LOG.md"
+  ],
+  "description": "Fixed issue where pressing [ENABLE BLE KEYBOARD] did nothing: SettingsApp::onTouch routed SettingsSubView::Bluetooth to renderBluetooth(ctx) instead of handleBluetoothTouch(ctx, ev). Fixed touch routing, expanded touch y-bounds to 98..150 for CST816S tolerance, added hardware BOOT button primary action trigger for BLE toggle/test, added setScanResponse(true) to BleHidService, and added desktop simulator regression test.",
+  "reason": "User reported that tapping ENABLE BLE KEYBOARD did not do anything.",
+  "expected": "Tapping ENABLE BLE KEYBOARD immediately transitions state to Advertising and updates UI, hardware BOOT button also toggles/tests BLE.",
+  "actual": "Desktop simulator verified SettingsApp touch routing and primary action PASS (VER-0133). Host tests PASS (VER-0134). PlatformIO build PASS: 1,564,432 B binary, 23.9% Flash, 26.2% RAM (VER-0135). Documentation checks PASS (VER-0136).",
+  "verification": "VER-0133, VER-0134, VER-0135, VER-0136, HWT-0041",
+  "risks": "Low; straightforward touch handler routing fix and hardware button addition.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Flash v0.10.3 to ESP32-S3 on COM5, verify touch response on ENABLE button and test Bluetooth pairing."
+}
+```

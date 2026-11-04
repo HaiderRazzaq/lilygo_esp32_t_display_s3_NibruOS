@@ -1,0 +1,56 @@
+Processing lilygo-t-display-s3 (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 35 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- CST816S @ 1.3.0+sha.11fe1fb
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|-- Wire @ 2.0.0
+|-- WiFi @ 2.0.0
+|-- ESP32 BLE Arduino @ 2.0.0
+|-- Preferences @ 2.0.0
+|-- USB @ 2.0.0
+|-- WebServer @ 2.0.0
+|-- DNSServer @ 2.0.0
+Building in release mode
+Linking .pio\build\lilygo-t-display-s3\firmware.elf
+Retrieving maximum program size .pio\build\lilygo-t-display-s3\firmware.elf
+Checking size .pio\build\lilygo-t-display-s3\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [===       ]  25.9% (used 84952 bytes from 327680 bytes)
+Flash: [==        ]  22.2% (used 1454077 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3\firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32s3 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_flash(__env__)} --flash_size 16MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+check_image([".pio\build\lilygo-t-display-s3\firmware.bin"], [".pio\build\lilygo-t-display-s3\firmware.elf"])
+{
+  "binary_bytes": 1454448,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 5099152,
+  "sha256": "3cc05a41a5cea930e5509d4781c00590274f9e2fe731f1fed0b71d75ef40a280",
+  "growth_percent": 72.78982683571252,
+  "warnings": [
+    "Image growth exceeds provisional 5% review trigger"
+  ],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 22.83 seconds =========================

@@ -2996,3 +2996,387 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Scope limited to documentation schema"
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0121",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulation tests for MVP features suite (Generator, Clock, BLE, Vault categories, Web Portal Backup & Restore)",
+  "hardware": "Windows host simulation (MSVC 2022 / SDL2)",
+  "wiring": "None (Host simulation)",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: All desktop simulator tests passed (lifecycle, UI, Wi-Fi, settings, HAL, sleep/wake, vault, web portal backup & restore, generator, clock, ble, 25 entry/exit cycles)",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0100-desktop-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "Windows 11 / MSVC 2022 / SDL2",
+  "limitations": "Desktop simulation only; does not verify physical ESP32-S3 hardware"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0122",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host Python and MSVC test suite for v0.10.0",
+  "hardware": "Windows host",
+  "wiring": "None (Host unit tests)",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: All host tests passed (authenticator lifecycle, bounded paired account import, vault encrypted storage & backup, web portal endpoints, crypto, settings)",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0100-host-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "Windows 11 / Python 3.14 / MSVC 2022",
+  "limitations": "Scope limited to host software tests"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0123",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO release build for lilygo-t-display-s3 (v0.10.0)",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: Flash: 975,293 B (14.9% of 6.25 MB partition), RAM: 65,176 B (19.9%), binary: 975,664 B",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0100-pio-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Scope limited to compile-time analysis"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0124",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.10.0",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0100-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to documentation schema"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0125",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulation tests for Password Generator vault auto-save and Clock Screensaver",
+  "hardware": "Windows host simulation (MSVC 2022 / SDL2)",
+  "wiring": "None (Host simulation)",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: All desktop simulator tests passed (screensaver activation, deactivation on touch/button, generator vault auto-unlock & auto-save, lifecycle, 25 entry/exit cycles)",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0101-desktop-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "Windows 11 / MSVC 2022 / SDL2",
+  "limitations": "Desktop simulation only; does not verify physical ESP32-S3 hardware"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0126",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host Python and MSVC test suite for v0.10.1",
+  "hardware": "Windows host",
+  "wiring": "None (Host unit tests)",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: All host tests passed (authenticator lifecycle, bounded paired account import, vault encrypted storage & backup, web portal endpoints, crypto, settings)",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0101-host-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "Windows 11 / Python 3.14 / MSVC 2022",
+  "limitations": "Scope limited to host software tests"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0127",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO release build for lilygo-t-display-s3 (v0.10.1)",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: Flash: 977,297 B (14.9% of 6.25 MB partition), RAM: 65,200 B (19.9%), binary: 977,664 B",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0101-pio-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Scope limited to compile-time analysis"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0128",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.10.1",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0101-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to documentation schema"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0129",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulation tests for Bluetooth LE HID stack, GeneratorApp BLE typing, and TotpApp BLE toggle",
+  "hardware": "Windows host simulation (MSVC 2022 / SDL2)",
+  "wiring": "None (Host simulation)",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: All desktop simulator tests passed (BLE lifecycle, BLE typing in GeneratorApp, 25 entry/exit cycles)",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0102-desktop-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "Windows 11 / MSVC 2022 / SDL2",
+  "limitations": "Desktop simulation only; does not verify physical ESP32-S3 radio"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0130",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host Python and MSVC test suite for v0.10.2",
+  "hardware": "Windows host",
+  "wiring": "None (Host unit tests)",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: All host tests passed (authenticator lifecycle, bounded paired account import, vault encrypted storage & backup, web portal endpoints, crypto, settings)",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0102-host-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "Windows 11 / Python 3.14 / MSVC 2022",
+  "limitations": "Scope limited to host software tests"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0131",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO release build for lilygo-t-display-s3 (v0.10.2) with native ESP32 BLE stack",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S / BLE radio",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: Flash: 1,454,077 B (22.2% of 6.25 MB partition), RAM: 84,952 B (25.9%), binary: 1,454,448 B",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0102-pio-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Scope limited to compile-time analysis"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0132",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.10.2",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0102-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to documentation schema"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0133",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.3",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulation tests for SettingsApp Bluetooth touch routing, enable/disable, and BOOT primaryAction",
+  "hardware": "Windows host simulation (MSVC 2022 / SDL2)",
+  "wiring": "None (Host simulation)",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: All desktop simulator tests passed (SettingsApp Bluetooth subview touch and primaryAction toggle)",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0103-desktop-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "Windows 11 / MSVC 2022 / SDL2",
+  "limitations": "Desktop simulation only; does not verify physical ESP32-S3 radio"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0134",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.3",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Host Python and MSVC test suite for v0.10.3",
+  "hardware": "Windows host",
+  "wiring": "None (Host unit tests)",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: All host tests passed (authenticator lifecycle, bounded paired account import, vault encrypted storage & backup, web portal endpoints, crypto, settings)",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0103-host-tests.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "Windows 11 / Python 3.14 / MSVC 2022",
+  "limitations": "Scope limited to host software tests"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0135",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.3",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "PlatformIO release build for lilygo-t-display-s3 (v0.10.3)",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S / BLE radio",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "PASS with zero errors",
+  "actual": "PASS: Flash: 1,564,065 B (23.9% of 6.25 MB partition), RAM: 85,784 B (26.2%), binary: 1,564,432 B",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0103-pio-build.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Scope limited to compile-time analysis"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0136",
+  "date": "2026-11-04",
+  "firmware_version": "v0.10.3",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.10.3",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0103-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / MSVC 2022 / Python 3.14",
+  "limitations": "Scope limited to documentation schema"
+}
+```

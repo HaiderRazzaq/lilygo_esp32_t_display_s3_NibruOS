@@ -16,10 +16,13 @@
 #include "services/TotpService.h"
 #include "services/UsbHidService.h"
 #include "services/WebPortalService.h"
+#include "services/BleHidService.h"
 #include "apps/WiFiApp.h"
 #include "apps/TotpApp.h"
 #include "apps/VaultApp.h"
 #include "apps/SettingsApp.h"
+#include "apps/GeneratorApp.h"
+#include "apps/ClockApp.h"
 
 namespace {
 DisplayManager display;
@@ -35,18 +38,21 @@ UsbHidService usbHid;
 AccountImportService accountImport;
 VaultService vault;
 WebPortalService webPortal;
-AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal};
+BleHidService bleHid;
+AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid};
 AppManager launcher(context);
 WiFiApp wifiApp;
 TotpApp totpApp;
 VaultApp vaultApp;
+GeneratorApp generatorApp;
+ClockApp clockApp;
 SettingsApp settingsApp;
 WakeInputGate wakeInput;
 }
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n[NibruOS] boot v0.9.4");
+  Serial.println("\n[NibruOS] boot v0.10.3");
   MemoryProfiler::checkpoint("startup-basic");
   display.begin();
   touch.begin();
@@ -61,9 +67,12 @@ void setup() {
   totp.begin();
   vault.begin();
   usbHid.begin();
+  bleHid.begin();
   launcher.registerApp(wifiApp);
   launcher.registerApp(totpApp);
   launcher.registerApp(vaultApp);
+  launcher.registerApp(generatorApp);
+  launcher.registerApp(clockApp);
   launcher.registerApp(settingsApp);
   launcher.begin();
   launcher.tick(millis());
@@ -93,6 +102,19 @@ void loop() {
       } else {
         launcher.invalidate();
       }
+    }
+  } else if (display.isScreensaverActive()) {
+    if (hasTouch || touch.isPressed() || action != ButtonAction::None) {
+      display.stopScreensaver();
+      wakeInput.arm(now);
+      if (security.isPinEnabled()) {
+        security.lock();
+        security.invalidateFull();
+      } else {
+        launcher.invalidate();
+      }
+    } else {
+      clockApp.renderScreensaver(context, now);
     }
   } else if (wakeInput.consume(hasTouch, action != ButtonAction::None,
                                buttons.anyPressed() || touch.isPressed(), now)) {
@@ -139,7 +161,7 @@ void loop() {
     }
   }
   timeService.tick(now, wifi.isConnected());
-  if (!display.isSleeping()) {
+  if (!display.isSleeping() && !display.isScreensaverActive()) {
     if (security.isLocked()) {
       security.tick(now);
       if (security.consumeDirty()) {

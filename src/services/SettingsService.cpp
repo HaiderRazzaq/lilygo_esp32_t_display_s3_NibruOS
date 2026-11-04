@@ -55,6 +55,9 @@ void SettingsService::load() {
       if (prefs.isKey("tz")) {
         timezoneOffset_ = static_cast<int8_t>(prefs.getChar("tz", 3));
       }
+      if (prefs.isKey("saver")) {
+        clockScreensaver_ = prefs.getBool("saver", false);
+      }
       prefs.end();
     } else if (prefs.isKey("bright") || prefs.isKey("timeout") || prefs.isKey("theme") || prefs.isKey("rot") || prefs.isKey("lang")) {
       brightness_ = prefs.getUChar("bright", 100);
@@ -123,6 +126,14 @@ bool SettingsService::save() {
   } else if (timezoneOffset_ != 3) {
     if (prefs.putChar("tz", timezoneOffset_) != sizeof(int8_t)) ok = false;
   }
+  if (prefs.isKey("saver")) {
+    const bool storedSaver = prefs.getBool("saver", true);
+    if (storedSaver != clockScreensaver_) {
+      if (!prefs.putBool("saver", clockScreensaver_)) ok = false;
+    }
+  } else if (!clockScreensaver_) {
+    if (!prefs.putBool("saver", clockScreensaver_)) ok = false;
+  }
   prefs.end();
   lastSaveOk_ = ok;
   if (!lastSaveOk_) Serial.println("[Settings] NVS write failed; preferences unchanged");
@@ -135,7 +146,7 @@ bool SettingsService::resetToDefaults() {
   const int8_t oldTz = timezoneOffset_;
   const uint16_t oldS = screenTimeoutSec_;
   const bool oldWritable = writable_;
-  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; rotation_ = 1; language_ = 0; timezoneOffset_ = 3; writable_ = true;
+  brightness_ = 100; screenTimeoutSec_ = 30; theme_ = 0; rotation_ = 1; language_ = 0; timezoneOffset_ = 3; clockScreensaver_ = false; writable_ = true;
   if (!save()) {
     brightness_ = oldB; screenTimeoutSec_ = oldS; theme_ = oldT; language_ = oldL; timezoneOffset_ = oldTz; writable_ = oldWritable;
     return false;
@@ -231,10 +242,20 @@ void SettingsService::applyToDisplay() {
     display_->setSleepTimeoutSeconds(screenTimeoutSec_);
     display_->setThemeColor(themeColor());
     display_->setRotation(rotation_);
+    display_->setScreensaverEnabled(clockScreensaver_);
   }
   if (touch_) {
     touch_->setRotation(rotation_);
   }
+}
+
+bool SettingsService::setClockScreensaver(bool enabled) {
+  if (clockScreensaver_ == enabled) return lastSaveOk_;
+  const bool old = clockScreensaver_;
+  clockScreensaver_ = enabled;
+  if (!save()) { clockScreensaver_ = old; return false; }
+  applyToDisplay();
+  return true;
 }
 
 bool SettingsService::setTimezoneOffset(int8_t offsetHours) {

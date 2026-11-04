@@ -54,4 +54,6 @@ private:
   int handleStatus(AppContext& ctx, char* outResponse, size_t maxLen);
   int handleAddVault(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
   int handleAddTotp(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
+  int handleBackup(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
+  int handleRestore(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
 };

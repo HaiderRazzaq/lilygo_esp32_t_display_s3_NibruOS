@@ -41,6 +41,7 @@ private:
   };
 
   uint8_t entryIndex_ = 0;
+  uint8_t categoryFilter_ = 0; // 0: ALL, 1: WORK, 2: PERS, 3: FIN
   View view_ = View::Card;
   ArmedAction armedAction_ = ArmedAction::None;
   uint32_t armedContactId_ = 0;

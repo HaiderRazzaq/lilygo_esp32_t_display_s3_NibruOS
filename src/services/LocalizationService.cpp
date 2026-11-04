@@ -17,6 +17,8 @@ const char* LocalizationService::get(TextId id) const {
     case TextId::AppVault:        return ar ? "الخزنة" : "Passwords";
     case TextId::AppSystemInfo:   return ar ? "النظام" : "System Info";
     case TextId::AppTouchTest:    return ar ? "اللمس" : "Touch Test";
+    case TextId::AppGenerator:    return ar ? "المولد" : "Generator";
+    case TextId::AppClock:        return ar ? "الساعة" : "Clock";
 
     // App Subtitles
     case TextId::SubLauncher:    return ar ? "نظام نبرو" : "NibruOS";
@@ -26,6 +28,8 @@ const char* LocalizationService::get(TextId id) const {
     case TextId::SubVault:        return ar ? "خزنة كلمات المرور" : "Password Vault";
     case TextId::SubSystemInfo:   return ar ? "المعلومات" : "Telemetry";
     case TextId::SubTouchTest:    return ar ? "فحص الشاشة" : "Diagnostics";
+    case TextId::SubGenerator:    return ar ? "توليد كلمات السر" : "Pass Generator";
+    case TextId::SubClock:        return ar ? "الساعة المكتبية" : "Desk Clock";
 
     // Settings Menu Items
     case TextId::MenuDisplay:     return ar ? "الشاشة والسطوع" : "Display & timeout";
@@ -37,6 +41,7 @@ const char* LocalizationService::get(TextId id) const {
     case TextId::MenuLanguage:    return ar ? "لغة الجهاز (Language)" : "Language / اللغة";
     case TextId::MenuTouchTest:   return ar ? "اختبار اللمس" : "Touch test";
     case TextId::MenuWebPortal:   return ar ? "بوابة الويب والتحكم" : "Web Portal (AP Mode)";
+    case TextId::MenuBluetooth:   return ar ? "لوحة مفاتيح بلوتوث" : "Bluetooth Keyboard";
 
     // Display Settings
     case TextId::DisplayTitle:       return ar ? "الشاشة والعرض" : "Display & Screen";

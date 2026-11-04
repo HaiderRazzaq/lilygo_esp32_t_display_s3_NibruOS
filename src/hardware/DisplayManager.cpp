@@ -195,7 +195,22 @@ void DisplayManager::notifyActivity(uint32_t nowMs) {
   lastActivityMs_ = nowMs;
 }
 
+void DisplayManager::startScreensaver() {
+  if (screensaverActive_ || sleeping_) return;
+  screensaverActive_ = true;
+  screensaverStartedMs_ = millis();
+  Serial.println("[Display] Clock Screensaver activated");
+}
+
+void DisplayManager::stopScreensaver() {
+  if (!screensaverActive_) return;
+  screensaverActive_ = false;
+  lastActivityMs_ = millis();
+  Serial.println("[Display] Clock Screensaver deactivated");
+}
+
 void DisplayManager::sleep() {
+  if (screensaverActive_) stopScreensaver();
   if (sleeping_) return;
   sleeping_ = true;
   applyBacklight(0);
@@ -203,6 +218,7 @@ void DisplayManager::sleep() {
 }
 
 void DisplayManager::wake() {
+  if (screensaverActive_) stopScreensaver();
   if (!sleeping_) return;
   applyBacklight(brightnessPercent_);
   sleeping_ = false;
@@ -214,7 +230,13 @@ void DisplayManager::tick(uint32_t nowMs) {
   if (sleeping_) return;
   if (sleepTimeoutSec_ == 0) return; // 0 = Never sleep
 
-  if (nowMs - lastActivityMs_ >= (static_cast<uint32_t>(sleepTimeoutSec_) * 1000UL)) {
-    sleep();
+  if (!screensaverActive_) {
+    if (nowMs - lastActivityMs_ >= (static_cast<uint32_t>(sleepTimeoutSec_) * 1000UL)) {
+      if (screensaverEnabled_) {
+        startScreensaver();
+      } else {
+        sleep();
+      }
+    }
   }
 }

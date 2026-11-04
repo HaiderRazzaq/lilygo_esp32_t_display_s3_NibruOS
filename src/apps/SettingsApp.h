@@ -14,7 +14,8 @@ enum class SettingsSubView : uint8_t {
   TouchTest,
   SetPin,
   Language,
-  WebPortal
+  WebPortal,
+  Bluetooth
 };
 
 class SettingsApp final : public App {
@@ -46,6 +47,7 @@ private:
   uint8_t drawnFocus_ = 255, drawnMenu_ = 255, drawnScroll_ = 255;
   uint8_t drawnBrightness_ = 0, drawnTheme_ = 255, drawnRotation_ = 255;
   uint8_t drawnLanguage_ = 255;
+  bool drawnSaver_ = false;
   uint16_t drawnTimeout_ = 65535;
   uint8_t armedMenuIndex_ = 255;
   uint8_t drawnArmedMenu_ = 255;
@@ -75,6 +77,7 @@ private:
   void renderSetPin(AppContext& ctx);
   void renderLanguage(AppContext& ctx);
   void renderWebPortal(AppContext& ctx);
+  void renderBluetooth(AppContext& ctx);
 
   void handleMenuTouch(AppContext& ctx, const TouchEvent& ev);
   void handleDisplayTouch(AppContext& ctx, const TouchEvent& ev);
@@ -86,7 +89,10 @@ private:
   void handleSetPinTouch(AppContext& ctx, const TouchEvent& ev);
   void handleLanguageTouch(AppContext& ctx, const TouchEvent& ev);
   void handleWebPortalTouch(AppContext& ctx, const TouchEvent& ev);
+  void handleBluetoothTouch(AppContext& ctx, const TouchEvent& ev);
 
   uint32_t drawnWebPortalSec_ = 9999;
   bool webPortalTyped_ = false;
+  const char* bleFeedbackStatus_ = "";
+  uint32_t bleFeedbackUntilMs_ = 0;
 };

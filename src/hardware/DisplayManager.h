@@ -43,13 +43,23 @@ public:
   void notifyActivity(uint32_t nowMs);
   void tick(uint32_t nowMs);
 
+  // Screensaver management
+  bool isScreensaverActive() const { return screensaverActive_; }
+  void startScreensaver();
+  void stopScreensaver();
+  bool screensaverEnabled() const { return screensaverEnabled_; }
+  void setScreensaverEnabled(bool en) { screensaverEnabled_ = en; }
+
 private:
   TFT_eSPI tft_;
   bool sleeping_ = false;
+  bool screensaverActive_ = false;
+  bool screensaverEnabled_ = false;
   uint8_t rotation_ = 1;
   uint8_t brightnessPercent_ = 100;
   uint16_t sleepTimeoutSec_ = 30;
   uint32_t lastActivityMs_ = 0;
+  uint32_t screensaverStartedMs_ = 0;
   uint16_t themeAccent_ = Colors::Cyan;
   bool pwmReady_ = false;
 

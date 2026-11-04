@@ -1,0 +1,53 @@
+NibruOS Host Test Suite (v0.10.0)
+==================================================
+Date: 2026-11-04
+Command: python tools/run_host_tests.py
+Output:
+AppManager.cpp
+MemoryProfiler.cpp
+ResourceManager.cpp
+ButtonManager.cpp
+DisplayManager.cpp
+TouchManager.cpp
+HomeScreen.cpp
+AccountImportService.cpp
+ArabicReshaper.cpp
+BleHidService.cpp
+CryptoService.cpp
+LocalizationService.cpp
+SecurityService.cpp
+SettingsService.cpp
+TimeService.cpp
+TotpService.cpp
+UsbHidService.cpp
+VaultService.cpp
+WebPortalService.cpp
+WiFiService.cpp
+Generating Code...
+Compiling...
+ClockApp.cpp
+GeneratorApp.cpp
+SettingsApp.cpp
+SystemInfoApp.cpp
+TotpApp.cpp
+TouchTestApp.cpp
+VaultApp.cpp
+WiFiApp.cpp
+WiFiScannerApp.cpp
+test_main.cpp
+test_settings.cpp
+test_authenticator.cpp
+test_account_import.cpp
+test_vault.cpp
+test_web_portal.cpp
+Generating Code...
+main.cpp
+PASS: authenticator lifecycle
+PASS: bounded paired account import
+[TEST] Running Encrypted Password Vault Storage & Backup Tests...
+  -> PASS: Encrypted Password Vault Storage & Backup verified.
+[TEST] Running Web Portal Service Host Tests...
+  -> PASS: Web Portal Service Host Tests verified successfully.
+PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests
+==================================================
+Status: 0 errors

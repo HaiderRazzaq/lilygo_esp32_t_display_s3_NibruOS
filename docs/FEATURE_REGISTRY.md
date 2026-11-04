@@ -765,3 +765,162 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   ]
 }
 ```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0020",
+  "name": "Cyber Desk Clock Application",
+  "purpose": "Provide a high-contrast cyber-styled desk clock with large digital time, date, NTP synchronization status badge, animated seconds indicator, and tap color-theme cycling",
+  "module": "src/apps/ClockApp",
+  "files": [
+    "src/apps/ClockApp.h",
+    "src/apps/ClockApp.cpp",
+    "src/services/TimeService.h",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp"
+  ],
+  "dependencies": [
+    "FEAT-0001",
+    "FEAT-0008",
+    "FEAT-0010"
+  ],
+  "hardware": "Integrated ST7789V display, CST816S touch",
+  "gpio": "Uses standard display and touch pins; no extra GPIO",
+  "lifecycle": "Updates time representation on 1000ms tick; tap toggles cyber theme; back button or touch exits to home",
+  "registration": "clockApp",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0127",
+    "host": "VER-0125",
+    "hardware": "HWT-0039"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0046",
+    "DEV-0047"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0021",
+  "name": "Password Generator Tool",
+  "purpose": "Provide secure on-device cryptographic password generation with configurable length and symbols, direct one-touch USB HID typing to PC, and one-touch saving to encrypted Password Vault",
+  "module": "src/apps/GeneratorApp",
+  "files": [
+    "src/apps/GeneratorApp.h",
+    "src/apps/GeneratorApp.cpp",
+    "src/services/CryptoService.h",
+    "src/services/UsbHidService.h",
+    "src/services/VaultService.h",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp"
+  ],
+  "dependencies": [
+    "FEAT-0001",
+    "FEAT-0008",
+    "FEAT-0010",
+    "FEAT-0017",
+    "FEAT-0018"
+  ],
+  "hardware": "Integrated ST7789V display, CST816S touch, native USB HID controller",
+  "gpio": "Uses standard display, touch, and USB pins; no extra GPIO",
+  "lifecycle": "Generates passwords via CryptoService::fillRandom; securely zeroes memory buffers on exit",
+  "registration": "generatorApp",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0127",
+    "host": "VER-0125",
+    "hardware": "HWT-0039"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0046",
+    "DEV-0047"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0022",
+  "name": "Bluetooth LE HID Architecture & Mutex Service",
+  "purpose": "Provide a modular Bluetooth LE HID service architecture strictly mediated through ResourceManager mutual exclusion, coexisting safely with Wi-Fi without degrading internal heap headroom",
+  "module": "src/services/BleHidService",
+  "files": [
+    "src/services/BleHidService.h",
+    "src/services/BleHidService.cpp",
+    "src/core/ResourceManager.h",
+    "src/core/AppContext.h",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "src/apps/SettingsApp.h",
+    "src/apps/SettingsApp.cpp",
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "src/apps/GeneratorApp.h",
+    "src/apps/GeneratorApp.cpp",
+    "src/apps/VaultApp.h",
+    "src/apps/VaultApp.cpp"
+  ],
+  "dependencies": [
+    "FEAT-0001",
+    "FEAT-0004"
+  ],
+  "hardware": "ESP32-S3 BLE radio",
+  "gpio": "No extra GPIO allocation",
+  "lifecycle": "Leases ResourceOwner::BleKeyboard; released on exit; safely unadvertised by default to maintain internal heap",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0131",
+    "host": "VER-0129",
+    "hardware": "HWT-0040"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0046",
+    "DEV-0047",
+    "DEV-0048",
+    "DEV-0049"
+  ]
+}
+```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0023",
+  "name": "Encrypted Web Portal Backup & Restore System",
+  "purpose": "Provide authenticated browser-based encrypted vault export and import via Web Portal endpoints (/api/vault/backup and /api/vault/restore) with passphrase-based PBKDF2/AES-GCM encryption",
+  "module": "src/services/WebPortalService",
+  "files": [
+    "src/services/WebPortalService.h",
+    "src/services/WebPortalService.cpp",
+    "src/services/VaultService.h",
+    "src/services/VaultService.cpp"
+  ],
+  "dependencies": [
+    "FEAT-0017",
+    "FEAT-0018",
+    "FEAT-0019"
+  ],
+  "hardware": "Integrated 2.4GHz radio (SoftAP), native USB HID controller",
+  "gpio": "No extra GPIO allocation",
+  "lifecycle": "Requires active Web PIN and master PIN session; generates authenticated downloadable backup binary and parses uploaded backup blobs",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0127",
+    "host": "VER-0125",
+    "hardware": "HWT-0039"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0046",
+    "DEV-0047"
+  ]
+}
+```

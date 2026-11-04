@@ -1,5 +1,41 @@
 # Changelog
 
+## [v0.10.3] - 2026-11-04
+
+### Fixed
+- **Settings Bluetooth Touch Dispatch Routing**: Fixed critical bug where SettingsApp::onTouch called renderBluetooth(ctx) instead of handleBluetoothTouch(ctx, ev) under SettingsSubView::Bluetooth, preventing the [ENABLE BLE KEYBOARD] button from registering user touch input.
+- **Settings Bluetooth Hardware Button Trigger**: Added SettingsSubView::Bluetooth handler in SettingsApp::onPrimaryAction, allowing users to toggle BLE keyboard activation or send test keystrokes using the physical BOOT button in addition to touchscreen taps.
+- **Bluetooth Subview Clean Redraw & Generous Hit Target**: Enhanced touch coordinate tolerance (y: 98..150) for the CST816S touch controller and added background clearing to eliminate visual artifacts on state transitions.
+- **Bluetooth LE Advertising Discovery**: Added setScanResponse(true) to BleHidService advertising configuration for optimal discovery across modern iOS, Android, and Windows hosts.
+
+## [v0.10.2] - 2026-11-04
+
+### Added
+- **Bluetooth LE Wireless Keyboard Integration**: Implemented native on-device ESP32-S3 BLE HID keyboard stack (`BleHidService`) advertising as "NibruOS Keyboard" with bonded encrypted connection support, safe radio leasing via `ResourceManager`, and complete deinitialization on disable to preserve internal SRAM.
+- **Settings Bluetooth Control View**: Added dedicated subview in `SettingsApp` with real-time connection state (`DISABLED`, `PAIRING...`, `CONNECTED!`), instant one-touch enable/disable, and a `[TEST KEYBOARD]` verification button typing keystrokes directly to the paired phone or computer.
+- **Wireless OTP Transmission in 2FA Authenticator (`TotpApp`)**: Added interactive `[USB] / [BLE]` transport toggle in the Cyber Action Capsule. When in BLE mode and connected, holding touch or pressing the physical BOOT button transmits 6-digit OTP codes wirelessly over Bluetooth.
+- **Wireless Password Typing in Password Generator (`GeneratorApp`)**: Added dedicated `[TYPE BLE]` button for instant wireless entry of high-entropy generated passwords to phone or PC.
+- **Wireless Credential Typing in Password Vault (`VaultApp`)**: Added automatic wireless fallback/direct transmission of stored usernames and passwords over Bluetooth when BLE is connected.
+
+## [v0.10.1] - 2026-11-04
+
+### Added
+- **Clock Screensaver Mode & Interactive Controls**: Cyber Desk Clock can now be engaged as an interactive screensaver upon system inactivity timeout. Added instant `[SAVER: ON/OFF]` toggle button directly inside `ClockApp`, and added screensaver toggle control inside `SettingsApp` -> `Display & Screen` view.
+- **Wake on Input**: Any touch on the display or physical button press instantly exits screensaver mode and restores the active view.
+
+### Fixed
+- **Password Generator Vault Auto-Unlock & Save**: Fixed issue where tapping `[+ SAVE VAULT]` in `GeneratorApp` failed with "Unlock Vault first!". Now seamlessly detects locked session, prompts for master PIN pad, and upon successful authentication automatically loads the vault and commits the generated credential in one continuous flow.
+
+## [v0.10.0] - 2026-11-04
+
+### Added
+- **Password Generator Tool (`GeneratorApp`)**: On-device cryptographic high-entropy password generator with configurable length (8-32), symbols toggle, one-touch USB HID typing, and direct "Save to Vault" integration.
+- **Cyber Desk Clock App (`ClockApp`)**: Fullscreen cyber-themed digital clock displaying HH:MM:SS, date, animated seconds progress bar, NTP synchronization badge, and tap theme cycling.
+- **Bluetooth LE HID Architecture Service (`BleHidService`)**: Modular BLE HID service mediated by `ResourceManager` mutual exclusion, safe default state to preserve internal SRAM.
+- **Vault Categories & Quick Filter (`VaultApp`)**: Category tags (`ALL`, `WORK`, `PERS`, `FIN`) displayed on credentials cards with instant tap cycling and filtered `<` / `>` navigation.
+- **Web Portal Encrypted Backup & Restore**: Added authenticated endpoints (`/api/vault/backup` and `/api/vault/restore`) and web portal UI tab for downloading and restoring PBKDF2/AES-GCM encrypted `.bin` vault backup files.
+
+
 User-facing changes follow Keep a Changelog categories and Semantic Versioning
 when a release is actually made. Do not increment versions for every edit.
 Release evidence and tagging policy: [releases](docs/releases/README.md).

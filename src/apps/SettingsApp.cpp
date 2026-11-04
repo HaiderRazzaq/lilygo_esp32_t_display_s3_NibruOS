@@ -12,6 +12,7 @@
 #include "services/LocalizationService.h"
 #include "services/WebPortalService.h"
 #include "services/UsbHidService.h"
+#include "services/BleHidService.h"
 #include "BoardConfig.h"
 #include <Arduino.h>
 #include <cstdio>
@@ -72,7 +73,7 @@ void SettingsApp::onTick(AppContext& ctx, uint32_t nowMs) {
   if (subView_ == SettingsSubView::TouchTest) {
     touchTest_.onTick(ctx, nowMs);
     if (touchTest_.consumeDirty()) touchTest_.render(ctx);
-  } else if (subView_ == SettingsSubView::Memory || subView_ == SettingsSubView::WiFiDiag) {
+  } else if (subView_ == SettingsSubView::Memory || subView_ == SettingsSubView::WiFiDiag || subView_ == SettingsSubView::Bluetooth) {
     if (nowMs - lastMetricTickMs_ >= 1000) {
       lastMetricTickMs_ = nowMs;
       invalidate();
@@ -124,11 +125,11 @@ bool SettingsApp::onBack(AppContext& ctx) {
 
 void SettingsApp::onPrimaryAction(AppContext& ctx) {
   if (subView_ == SettingsSubView::Menu) {
-    menuIndex_ = static_cast<uint8_t>((menuIndex_ + 1) % 9);
+    menuIndex_ = static_cast<uint8_t>((menuIndex_ + 1) % 10);
     if (menuIndex_ < scrollOffset_ || menuIndex_ >= scrollOffset_ + 3)
       scrollOffset_ = menuIndex_ > 2 ? menuIndex_ - 2 : 0;
   } else if (subView_ == SettingsSubView::Display) {
-    focusedIndex_ = (focusedIndex_ + 1) % 12;
+    focusedIndex_ = (focusedIndex_ + 1) % 13;
   } else if (subView_ == SettingsSubView::Theme) {
     focusedIndex_ = (focusedIndex_ + 1) % 4;
   } else if (subView_ == SettingsSubView::Device) {
@@ -139,6 +140,22 @@ void SettingsApp::onPrimaryAction(AppContext& ctx) {
     metricPage_ ^= 1; fullRedraw_ = true;
   } else if (subView_ == SettingsSubView::TouchTest) {
     touchTest_.onPrimaryAction(ctx);
+  } else if (subView_ == SettingsSubView::Bluetooth) {
+    if (!ctx.bleHid.isEnabled()) {
+      if (ctx.bleHid.setEnabled(true, ctx)) {
+        bleFeedbackStatus_ = "BLE Keyboard Advertising...";
+      } else {
+        bleFeedbackStatus_ = "Cannot acquire radio (Wi-Fi busy)";
+      }
+    } else if (!ctx.bleHid.isConnected()) {
+      ctx.bleHid.setEnabled(false, ctx);
+      bleFeedbackStatus_ = "BLE Keyboard Disabled";
+    } else {
+      ctx.bleHid.typeText("NibruOS-123456\n");
+      bleFeedbackStatus_ = "Sent 'NibruOS-123456' to host!";
+    }
+    bleFeedbackUntilMs_ = millis() + 2500;
+    fullRedraw_ = true;
   }
   invalidate();
 }
@@ -149,7 +166,7 @@ void SettingsApp::onActivate(AppContext& ctx) {
       SettingsSubView::Display, SettingsSubView::Theme,
       SettingsSubView::Memory, SettingsSubView::WiFiDiag, SettingsSubView::Device,
       SettingsSubView::Security, SettingsSubView::TouchTest, SettingsSubView::Language,
-      SettingsSubView::WebPortal
+      SettingsSubView::WebPortal, SettingsSubView::Bluetooth
     };
     subView_ = views[menuIndex_]; focusedIndex_ = metricPage_ = 0; fullRedraw_ = true;
     if (subView_ == SettingsSubView::TouchTest) touchTest_.onEnter(ctx);
@@ -177,6 +194,10 @@ void SettingsApp::onActivate(AppContext& ctx) {
         ctx.settings.setRotation(3);
         fullRedraw_ = true;
       }
+    } else if (focusedIndex_ == 11) {
+      const bool newSaver = !ctx.settings.clockScreensaver();
+      ctx.settings.setClockScreensaver(newSaver);
+      ctx.display.setScreensaverEnabled(newSaver);
     } else ctx.display.sleep();
   } else if (subView_ == SettingsSubView::Theme) ctx.settings.setTheme(focusedIndex_);
   else if (subView_ == SettingsSubView::Device) {
@@ -243,6 +264,9 @@ void SettingsApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
     case SettingsSubView::Language:
       handleLanguageTouch(ctx, ev);
       break;
+    case SettingsSubView::Bluetooth:
+      handleBluetoothTouch(ctx, ev);
+      break;
     case SettingsSubView::WebPortal:
       handleWebPortalTouch(ctx, ev);
       break;
@@ -251,7 +275,7 @@ void SettingsApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
 
 void SettingsApp::handleMenuTouch(AppContext& ctx, const TouchEvent& ev) {
   if (ev.gesture == TouchGesture::SwipeUp || ev.gesture == TouchGesture::SwipeDown) {
-    if (ev.gesture == TouchGesture::SwipeUp && scrollOffset_ < 6) ++scrollOffset_;
+    if (ev.gesture == TouchGesture::SwipeUp && scrollOffset_ < 7) ++scrollOffset_;
     if (ev.gesture == TouchGesture::SwipeDown && scrollOffset_ > 0) --scrollOffset_;
     menuIndex_ = scrollOffset_;
     armedMenuIndex_ = 255;
@@ -289,13 +313,15 @@ void SettingsApp::handleDisplayTouch(AppContext& ctx, const TouchEvent& ev) {
     for (uint8_t i = 0; i < 5; ++i) if (ev.x >= sx[i] && ev.x < sx[i] + 54) {
       focusedIndex_ = i + 4; onActivate(ctx); return;
     }
-  } else if (ev.y >= 112 && ev.y < 136) {
-    if (ev.x >= 14 && ev.x < 126) {
+  } else if (ev.y >= 112 && ev.y < 138) {
+    if (ev.x >= 10 && ev.x < 100) {
       focusedIndex_ = 9; onActivate(ctx); return;
-    } else if (ev.x >= 130 && ev.x < 242) {
+    } else if (ev.x >= 102 && ev.x < 196) {
       focusedIndex_ = 10; onActivate(ctx); return;
-    } else if (ev.x >= 246 && ev.x < 312) {
+    } else if (ev.x >= 198 && ev.x < 262) {
       focusedIndex_ = 11; onActivate(ctx); return;
+    } else if (ev.x >= 264 && ev.x < 312) {
+      focusedIndex_ = 12; onActivate(ctx); return;
     }
   }
 }
@@ -360,6 +386,7 @@ void SettingsApp::render(AppContext& ctx) {
       drawnBrightness_ == ctx.settings.brightness() &&
       drawnTheme_ == ctx.settings.theme() && drawnTimeout_ == ctx.settings.screenTimeoutSec() &&
       drawnRotation_ == ctx.settings.rotation() &&
+      drawnSaver_ == ctx.settings.clockScreensaver() &&
       drawnLanguage_ == ctx.settings.language() &&
       drawnSaveOk_ == ctx.settings.lastSaveOk()) return;
 
@@ -382,13 +409,14 @@ void SettingsApp::render(AppContext& ctx) {
     case SettingsSubView::TouchTest: touchTest_.render(ctx); break;
     case SettingsSubView::SetPin:    renderSetPin(ctx); break;
     case SettingsSubView::Language:  renderLanguage(ctx); break;
+    case SettingsSubView::Bluetooth: renderBluetooth(ctx); break;
     case SettingsSubView::WebPortal: renderWebPortal(ctx); break;
   }
   if (!ctx.settings.lastSaveOk()) ctx.display.footer("NVS error: preferences were not saved");
   hasRendered_ = true; drawnView_ = subView_; drawnConfirmation_ = confirmAction_;
   drawnFocus_ = focusedIndex_; drawnMenu_ = menuIndex_; drawnScroll_ = scrollOffset_;
   drawnBrightness_ = ctx.settings.brightness(); drawnTheme_ = ctx.settings.theme();
-  drawnTimeout_ = ctx.settings.screenTimeoutSec(); drawnRotation_ = ctx.settings.rotation(); drawnLanguage_ = ctx.settings.language();
+  drawnTimeout_ = ctx.settings.screenTimeoutSec(); drawnRotation_ = ctx.settings.rotation(); drawnSaver_ = ctx.settings.clockScreensaver(); drawnLanguage_ = ctx.settings.language();
   drawnSaveOk_ = ctx.settings.lastSaveOk(); drawnArmedMenu_ = armedMenuIndex_;
   if (subView_ == SettingsSubView::Security) {
     drawnPinEnabled_ = ctx.security.isPinEnabled();
@@ -424,7 +452,8 @@ void SettingsApp::renderMenu(AppContext& ctx) {
     loc.get(TextId::MenuSecurity),
     loc.get(TextId::MenuTouchTest),
     loc.get(TextId::MenuLanguage),
-    loc.get(TextId::MenuWebPortal)
+    loc.get(TextId::MenuWebPortal),
+    loc.get(TextId::MenuBluetooth)
   };
   for (uint8_t row = 0; row < 3; ++row) {
     const uint8_t i = scrollOffset_ + row;
@@ -512,41 +541,35 @@ void SettingsApp::renderDisplay(AppContext& ctx) {
       t.drawRoundRect(sX[i], 82, 54, 18, 4, focusedIndex_ == i + 4 ? Colors::White : Colors::Border);
   }
 
-  // Section 3: Screen Orientation & Sleep Test
-  char rStr[48];
+  // Section 3: Screen Orientation, Screensaver & Sleep Test
+  char rStr[64];
   const uint8_t curRot = ctx.settings.rotation();
-  snprintf(rStr, sizeof(rStr), "ORIENTATION: %s", curRot == 3 ? "Inverted (180)" : "Landscape (0)");
-  if (fullRedraw_ || drawnRotation_ != curRot) {
-    t.fillRect(14, 103, 292, 10, Colors::Bg);
-    screen.label(14, 103, rStr, Colors::Amber, 1, Colors::Bg);
+  const bool curSaver = ctx.settings.clockScreensaver();
+  snprintf(rStr, sizeof(rStr), "ORIENTATION & SCREENSAVER: %s", curSaver ? "Clock Saver" : "Blackout");
+  if (fullRedraw_ || drawnRotation_ != curRot || drawnSaver_ != curSaver) {
+    t.fillRect(10, 103, 300, 10, Colors::Bg);
+    screen.label(10, 103, rStr, Colors::Amber, 1, Colors::Bg);
   }
 
-  const uint8_t rotVals[2] = {1, 3};
-  const char* rotLabels[2] = {"Normal (0)", "Invert (180)"};
-  const int rX[2] = {14, 130};
-  const int rW[2] = {110, 110};
+  const int s3X[4] = {10, 104, 198, 264};
+  const int s3W[4] = {88, 88, 60, 46};
+  const char* s3Labels[4] = {"Normal (0)", "Invert (180)", curSaver ? "Saver: ON" : "Saver: OFF", "Sleep"};
+  const bool s3Active[4] = {curRot == 1, curRot == 3, curSaver, false};
+  const uint16_t s3Colors[4] = {Colors::Amber, Colors::Amber, Colors::Cyan, Colors::Red};
 
-  for (int i = 0; i < 2; ++i) {
-    const bool active = (curRot == rotVals[i]);
-    const uint16_t bg = active ? Colors::Amber : Colors::Panel;
+  for (int i = 0; i < 4; ++i) {
+    const bool active = s3Active[i];
+    const uint16_t bg = active ? s3Colors[i] : Colors::Panel;
     const uint16_t tc = active ? Colors::Bg : Colors::White;
-    const bool valueChanged = fullRedraw_ || drawnRotation_ != curRot;
+    const bool valueChanged = fullRedraw_ || drawnRotation_ != curRot || drawnSaver_ != curSaver;
     if (valueChanged) {
-      t.fillRoundRect(rX[i], 115, rW[i], 18, 4, bg);
-      const int tx = rX[i] + (rW[i] - static_cast<int>(strlen(rotLabels[i])) * 6) / 2;
-      screen.label(tx, 120, rotLabels[i], tc, 1, bg);
+      t.fillRoundRect(s3X[i], 115, s3W[i], 18, 4, bg);
+      const int tx = s3X[i] + (s3W[i] - static_cast<int>(strlen(s3Labels[i])) * 6) / 2;
+      screen.label(tx, 120, s3Labels[i], tc, 1, bg);
     }
     if (valueChanged || focusedIndex_ == i + 9 || drawnFocus_ == i + 9)
-      t.drawRoundRect(rX[i], 115, rW[i], 18, 4, focusedIndex_ == i + 9 ? Colors::White : Colors::Border);
+      t.drawRoundRect(s3X[i], 115, s3W[i], 18, 4, focusedIndex_ == i + 9 ? Colors::White : Colors::Border);
   }
-
-  // Sleep button (Index 11)
-  if (fullRedraw_) {
-    t.fillRoundRect(246, 115, 60, 18, 4, Colors::Panel);
-    screen.label(256, 120, "Sleep", Colors::Amber, 1, Colors::Panel);
-  }
-  if (fullRedraw_ || focusedIndex_ == 11 || drawnFocus_ == 11)
-    t.drawRoundRect(246, 115, 60, 18, 4, focusedIndex_ == 11 ? Colors::White : Colors::Border);
 }
 
 void SettingsApp::renderTheme(AppContext& ctx) {
@@ -1047,6 +1070,109 @@ void SettingsApp::handleWebPortalTouch(AppContext& ctx, const TouchEvent& ev) {
       webPortalTyped_ = true;
       fullRedraw_ = true;
       invalidate();
+    }
+  }
+}
+
+void SettingsApp::renderBluetooth(AppContext& ctx) {
+  DisplayManager& screen = ctx.display;
+  TFT_eSPI& t = screen.gfx();
+  const auto& loc = LocalizationService::instance();
+  const bool ar = loc.isArabic();
+
+  if (fullRedraw_) {
+    screen.clear();
+    screen.header(loc.get(TextId::MenuBluetooth), true);
+    fullRedraw_ = false;
+  }
+
+  const bool enabled = ctx.bleHid.isEnabled();
+  const bool connected = ctx.bleHid.isConnected();
+
+  // Clear subview content area cleanly
+  t.fillRect(0, 33, 320, 115, Colors::Bg);
+
+  // Main Status Panel (x: 10, y: 36, w: 300, h: 68)
+  t.fillRoundRect(10, 36, 300, 68, 6, Colors::Panel);
+  t.drawRoundRect(10, 36, 300, 68, 6, connected ? Colors::Green : (enabled ? Colors::Cyan : Colors::Border));
+
+  // Device title & State Badge
+  screen.label(20, 44, "DEVICE: NibruOS Keyboard", Colors::White, 1, Colors::Panel);
+
+  if (!enabled) {
+    screen.label(20, 60, ar ? "الحالة: البلوتوث معطل" : "STATUS: BLUETOOTH OFF", Colors::Muted, 1, Colors::Panel);
+    screen.label(20, 76, ar ? "لتوفير الطاقة وحماية الذاكرة" : "Radio sleeping (SRAM preserved)", Colors::Muted, 1, Colors::Panel);
+  } else if (!connected) {
+    screen.label(20, 60, ar ? "الحالة: في انتظار الاقتران..." : "STATUS: PAIRING / ADVERTISING...", Colors::Amber, 1, Colors::Panel);
+    screen.label(20, 76, ar ? "افتح البلوتوث في هاتفك واقترن به" : "Connect via Phone/PC Bluetooth", Colors::Cyan, 1, Colors::Panel);
+  } else {
+    screen.label(20, 60, ar ? "الحالة: متصل بجهازك!" : "STATUS: CONNECTED & READY!", Colors::Green, 1, Colors::Panel);
+    char stats[40];
+    snprintf(stats, sizeof(stats), "Chars typed: %u", static_cast<unsigned int>(ctx.bleHid.typedCount()));
+    screen.label(20, 76, stats, Colors::White, 1, Colors::Panel);
+  }
+
+  // Action Buttons Row (y: 110, h: 32)
+  if (!enabled) {
+    // Single wide ENABLE button (x: 10..310)
+    t.fillRoundRect(10, 110, 300, 32, 6, Colors::Cyan);
+    screen.label(70, 120, ar ? "[ تفعيل لوحة المفاتيح ]" : "[ ENABLE BLE KEYBOARD ]", Colors::Bg, 1, Colors::Cyan);
+  } else if (!connected) {
+    // DISABLE button
+    t.fillRoundRect(10, 110, 300, 32, 6, Colors::Red);
+    screen.label(85, 120, ar ? "[ إيقاف البلوتوث ]" : "[ DISABLE BLUETOOTH ]", Colors::White, 1, Colors::Red);
+  } else {
+    // Two buttons: [TEST KEYBOARD] (x: 10..154) and [DISABLE] (x: 162..310)
+    t.fillRoundRect(10, 110, 144, 32, 6, Colors::Green);
+    screen.label(25, 120, "[ TEST KEYBOARD ]", Colors::Bg, 1, Colors::Green);
+
+    t.fillRoundRect(162, 110, 148, 32, 6, Colors::Red);
+    screen.label(195, 120, ar ? "[ إيقاف ]" : "[ DISABLE BLE ]", Colors::White, 1, Colors::Red);
+  }
+
+  if (bleFeedbackStatus_[0] != '\0' && millis() < bleFeedbackUntilMs_) {
+    screen.footer(bleFeedbackStatus_);
+  } else {
+    screen.footer(ar ? "Back: القائمة | المس للتحكم" : "Back: menu | Tap controls");
+  }
+}
+
+void SettingsApp::handleBluetoothTouch(AppContext& ctx, const TouchEvent& ev) {
+  if (ev.gesture != TouchGesture::Tap && ev.gesture != TouchGesture::DoubleTap) return;
+
+  const bool enabled = ctx.bleHid.isEnabled();
+  const bool connected = ctx.bleHid.isConnected();
+
+  if (ev.y >= 98 && ev.y <= 150) {
+    if (!enabled) {
+      if (ctx.bleHid.setEnabled(true, ctx)) {
+        bleFeedbackStatus_ = "BLE Keyboard Advertising...";
+      } else {
+        bleFeedbackStatus_ = "Cannot acquire radio (Wi-Fi busy)";
+      }
+      bleFeedbackUntilMs_ = millis() + 2500;
+      fullRedraw_ = true;
+      invalidate();
+    } else if (!connected) {
+      ctx.bleHid.setEnabled(false, ctx);
+      bleFeedbackStatus_ = "BLE Keyboard Disabled";
+      bleFeedbackUntilMs_ = millis() + 2000;
+      fullRedraw_ = true;
+      invalidate();
+    } else {
+      if (ev.x >= 10 && ev.x <= 154) {
+        ctx.bleHid.typeText("NibruOS-123456\n");
+        bleFeedbackStatus_ = "Sent 'NibruOS-123456' to host!";
+        bleFeedbackUntilMs_ = millis() + 2500;
+        fullRedraw_ = true;
+        invalidate();
+      } else if (ev.x >= 162 && ev.x <= 310) {
+        ctx.bleHid.setEnabled(false, ctx);
+        bleFeedbackStatus_ = "BLE Keyboard Disabled";
+        bleFeedbackUntilMs_ = millis() + 2000;
+        fullRedraw_ = true;
+        invalidate();
+      }
     }
   }
 }

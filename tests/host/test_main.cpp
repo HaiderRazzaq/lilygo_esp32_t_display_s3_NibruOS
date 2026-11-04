@@ -25,6 +25,7 @@
 #include "services/TotpService.h"
 #include "services/UsbHidService.h"
 #include "services/WebPortalService.h"
+#include "services/BleHidService.h"
 #include <Arduino.h>
 #include <WiFi.h>
 #include <cassert>
@@ -166,7 +167,8 @@ int main() {
   AccountImportService accountImport;
   VaultService vault;
   WebPortalService webPortal;
-  AppContext context{display, resources, wifi, security, settings, timeService, totpService, usbHid, accountImport, vault, webPortal};
+  BleHidService bleHid;
+  AppContext context{display, resources, wifi, security, settings, timeService, totpService, usbHid, accountImport, vault, webPortal, bleHid};
   AppManager mgr(context);
   SystemInfoApp info;
   TouchTestApp touch;

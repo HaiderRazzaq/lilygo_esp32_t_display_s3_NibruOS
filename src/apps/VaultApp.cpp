@@ -3,12 +3,22 @@
 #include "hardware/DisplayManager.h"
 #include "services/VaultService.h"
 #include "services/UsbHidService.h"
+#include "services/BleHidService.h"
 #include "services/SecurityService.h"
 #include "services/CryptoService.h"
 #include "ui/TextKeyboard.h"
 #include <Arduino.h>
 #include <cstring>
 #include <cstdio>
+
+static const char* kCategories[] = {"ALL", "WORK", "PERS", "FIN"};
+
+static bool entryMatchesCategory(const VaultEntry* entry, uint8_t cat) {
+  if (!entry || cat == 0) return true;
+  if (!entry->notes[0]) return false;
+  const char* tag = kCategories[cat];
+  return (strstr(entry->notes, tag) != nullptr);
+}
 
 void VaultApp::clearEditor() {
   CryptoService::secureZero(editTitle_, sizeof(editTitle_));
@@ -232,29 +242,52 @@ void VaultApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
   const bool unlocked = ctx.security.isPinEnabled() && ctx.security.hasActiveKey() && ctx.vault.isLoaded();
   if (!unlocked) return;
 
-  // Swipe or Arrow navigation
+  // Swipe or Arrow navigation (respects category filter)
   if (ev.gesture == TouchGesture::SwipeLeft || (ev.gesture == TouchGesture::Tap && ev.x >= 284 && ev.y >= 35 && ev.y < 144)) {
-    if (entryIndex_ + 1 < count) {
-      ++entryIndex_;
-      showPassword_ = false;
-      armedAction_ = ArmedAction::None;
-      cardDirty_ = true;
-      invalidate();
+    for (int next = entryIndex_ + 1; next < count; ++next) {
+      if (entryMatchesCategory(ctx.vault.getEntry(static_cast<uint8_t>(next)), categoryFilter_)) {
+        entryIndex_ = static_cast<uint8_t>(next);
+        showPassword_ = false;
+        armedAction_ = ArmedAction::None;
+        cardDirty_ = true;
+        invalidate();
+        break;
+      }
     }
     return;
   }
   if (ev.gesture == TouchGesture::SwipeRight || (ev.gesture == TouchGesture::Tap && ev.x <= 36 && ev.y >= 35 && ev.y < 144)) {
-    if (entryIndex_ > 0) {
-      --entryIndex_;
-      showPassword_ = false;
-      armedAction_ = ArmedAction::None;
-      cardDirty_ = true;
-      invalidate();
+    for (int prev = entryIndex_ - 1; prev >= 0; --prev) {
+      if (entryMatchesCategory(ctx.vault.getEntry(static_cast<uint8_t>(prev)), categoryFilter_)) {
+        entryIndex_ = static_cast<uint8_t>(prev);
+        showPassword_ = false;
+        armedAction_ = ArmedAction::None;
+        cardDirty_ = true;
+        invalidate();
+        break;
+      }
     }
     return;
   }
 
   if (ev.gesture != TouchGesture::Tap) return;
+
+  // Category filter pill tap: x: 210..280, y: 35..55
+  if (ev.x >= 210 && ev.x <= 280 && ev.y >= 35 && ev.y <= 55) {
+    categoryFilter_ = static_cast<uint8_t>((categoryFilter_ + 1) % 4);
+    // Find first entry matching new filter
+    for (uint8_t i = 0; i < count; ++i) {
+      if (entryMatchesCategory(ctx.vault.getEntry(i), categoryFilter_)) {
+        entryIndex_ = i;
+        break;
+      }
+    }
+    showPassword_ = false;
+    armedAction_ = ArmedAction::None;
+    cardDirty_ = true;
+    invalidate();
+    return;
+  }
 
   // Bottom action bar
   if (ev.y >= 146) {
@@ -299,8 +332,12 @@ void VaultApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
       if (ev.contactId != armedContactId_) {
         const VaultEntry* entry = ctx.vault.getEntry(entryIndex_);
         if (entry && entry->username[0]) {
-          if (!ctx.usbHid.isReady()) {
-            status_ = "USB unavailable";
+          if (ctx.bleHid.isEnabled() && ctx.bleHid.isConnected()) {
+            ctx.bleHid.typeText(entry->username);
+            sending_ = true;
+            status_ = "Typed user via BLE!";
+          } else if (!ctx.usbHid.isReady()) {
+            status_ = "USB/BLE unavailable";
           } else if (ctx.usbHid.typeText(entry->username, false)) {
             sending_ = true;
             status_ = "Typing user...";
@@ -331,8 +368,12 @@ void VaultApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
       if (ev.contactId != armedContactId_) {
         const VaultEntry* entry = ctx.vault.getEntry(entryIndex_);
         if (entry && entry->password[0]) {
-          if (!ctx.usbHid.isReady()) {
-            status_ = "USB unavailable";
+          if (ctx.bleHid.isEnabled() && ctx.bleHid.isConnected()) {
+            ctx.bleHid.typeText(entry->password);
+            sending_ = true;
+            status_ = "Typed pass via BLE!";
+          } else if (!ctx.usbHid.isReady()) {
+            status_ = "USB/BLE unavailable";
           } else if (ctx.usbHid.typeText(entry->password, false)) {
             sending_ = true;
             status_ = "Typing password...";
@@ -437,7 +478,15 @@ void VaultApp::renderCard(AppContext& ctx) {
       t.drawRoundRect(34, 33, 252, 108, 6, Colors::Border);
 
       // Title
-      screen.label(42, 38, entry->title, Colors::Cyan, strlen(entry->title) > 16 ? 1 : 2, Colors::Panel);
+      screen.label(42, 38, entry->title, Colors::Cyan, strlen(entry->title) > 14 ? 1 : 2, Colors::Panel);
+
+      // Category Pill Button
+      static const uint16_t kCatColors[] = {Colors::White, Colors::Cyan, Colors::Green, Colors::Amber};
+      const char* catLabel = kCategories[categoryFilter_ % 4];
+      const uint16_t catColor = kCatColors[categoryFilter_ % 4];
+      t.fillRoundRect(224, 38, 54, 16, 3, Colors::Bg);
+      t.drawRoundRect(224, 38, 54, 16, 3, catColor);
+      screen.label(234, 42, catLabel, catColor, 1, Colors::Bg);
 
       // Username
       screen.label(42, 54, "User:", Colors::Muted, 1, Colors::Panel);

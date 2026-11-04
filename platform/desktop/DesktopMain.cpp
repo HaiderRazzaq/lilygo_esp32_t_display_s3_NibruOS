@@ -21,6 +21,9 @@
 #include "apps/SettingsApp.h"
 #include "apps/SystemInfoApp.h"
 #include "apps/TouchTestApp.h"
+#include "apps/GeneratorApp.h"
+#include "apps/ClockApp.h"
+#include "services/BleHidService.h"
 
 #include "platform/desktop/SDLDisplay.h"
 #include "platform/desktop/DesktopInput.h"
@@ -90,13 +93,16 @@ int main(int argc, char* argv[]) {
   AccountImportService accountImport;
   VaultService vault;
   WebPortalService webPortal;
+  BleHidService bleHid;
 
-  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal};
+  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid};
   AppManager launcher(context);
 
   WiFiApp wifiApp;
   TotpApp totpApp;
   VaultApp vaultApp;
+  GeneratorApp generatorApp;
+  ClockApp clockApp;
   SettingsApp settingsApp;
 
   WakeInputGate wakeInput;
@@ -112,11 +118,14 @@ int main(int argc, char* argv[]) {
     totp.begin();
     vault.begin();
     usbHid.begin();
+    bleHid.begin();
 
     // Register applications exactly matching physical device baseline (src/main.cpp)
     launcher.registerApp(wifiApp);
     launcher.registerApp(totpApp);
     launcher.registerApp(vaultApp);
+    launcher.registerApp(generatorApp);
+    launcher.registerApp(clockApp);
     launcher.registerApp(settingsApp);
 
     launcher.begin();
@@ -164,6 +173,22 @@ int main(int argc, char* argv[]) {
           launcher.invalidate();
         }
       }
+    } else if (display.isScreensaverActive()) {
+      if (hasTouch || action != ButtonAction::None) {
+        display.stopScreensaver();
+        wakeInput.arm(now);
+        if (security.isPinEnabled()) {
+          security.lock();
+          security.invalidateFull();
+        } else {
+          launcher.invalidate();
+          if (launcher.activeApp()) {
+            launcher.activeApp()->onDisplayRestored(context);
+          }
+        }
+      } else {
+        clockApp.renderScreensaver(context, now);
+      }
     } else if (wakeInput.consume(hasTouch, action != ButtonAction::None,
                                  DesktopInput::instance().anyButtonPressed() ||
                                  DesktopInput::instance().isTouchPressed(), now)) {
@@ -204,7 +229,7 @@ int main(int argc, char* argv[]) {
     wifi.tick(tickNow);
     timeService.tick(tickNow, wifi.isConnected());
 
-    if (!display.isSleeping()) {
+    if (!display.isSleeping() && !display.isScreensaverActive()) {
       if (security.isLocked()) {
         security.tick(tickNow);
         if (security.consumeDirty()) {

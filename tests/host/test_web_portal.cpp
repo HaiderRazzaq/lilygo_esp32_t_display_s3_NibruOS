@@ -1,4 +1,5 @@
 #include "services/WebPortalService.h"
+#include "services/BleHidService.h"
 #include "services/VaultService.h"
 #include "services/TotpService.h"
 #include "services/SecurityService.h"
@@ -30,8 +31,9 @@ void runWebPortalHostTests() {
   AccountImportService accountImport;
   VaultService vault;
   WebPortalService webPortal;
+  BleHidService bleHid;
 
-  AppContext ctx{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal};
+  AppContext ctx{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid};
 
   // 1. Initial State
   assert(!webPortal.isActive());

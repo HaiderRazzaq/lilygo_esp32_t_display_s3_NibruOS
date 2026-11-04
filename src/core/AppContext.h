@@ -10,6 +10,7 @@ class UsbHidService;
 class AccountImportService;
 class VaultService;
 class WebPortalService;
+class BleHidService;
 
 struct AppContext {
   DisplayManager& display;
@@ -23,4 +24,5 @@ struct AppContext {
   AccountImportService& accountImport;
   VaultService& vault;
   WebPortalService& webPortal;
+  BleHidService& bleHid;
 };
