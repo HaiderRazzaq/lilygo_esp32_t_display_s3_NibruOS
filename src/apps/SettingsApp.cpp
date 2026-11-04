@@ -284,7 +284,8 @@ void SettingsApp::handleMenuTouch(AppContext& ctx, const TouchEvent& ev) {
   if ((ev.y - 36) % 36 >= 32) return;
   const uint8_t target = scrollOffset_ + row;
 
-  if (armedMenuIndex_ == target && ev.contactId != armedMenuContactId_ && ev.contactId != 0) {
+  if (ev.gesture == TouchGesture::DoubleTap ||
+      (armedMenuIndex_ == target && ev.contactId != armedMenuContactId_ && ev.contactId != 0)) {
     armedMenuIndex_ = 255;
     armedMenuContactId_ = 0;
     menuIndex_ = target;
@@ -457,6 +458,7 @@ void SettingsApp::renderMenu(AppContext& ctx) {
     if (rowsChanged) {
       t.fillRoundRect(10, y, 294, 32, 5, Colors::Panel);
       screen.label(20, y + 10, titles[i], Colors::White, 1, Colors::Panel);
+      screen.label(288, y + 10, ">", Colors::Muted, 1, Colors::Panel);
     }
     const bool isSelected = (i == menuIndex_);
     const bool isArmed = (isSelected && i == armedMenuIndex_);

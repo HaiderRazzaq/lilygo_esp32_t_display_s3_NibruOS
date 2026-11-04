@@ -26,6 +26,8 @@
 #include "services/UsbHidService.h"
 #include "services/WebPortalService.h"
 #include "services/BleHidService.h"
+#include "services/WifiDefenseService.h"
+#include "apps/WifiDefenseApp.h"
 #include <Arduino.h>
 #include <WiFi.h>
 #include <cassert>
@@ -168,7 +170,8 @@ int main() {
   VaultService vault;
   WebPortalService webPortal;
   BleHidService bleHid;
-  AppContext context{display, resources, wifi, security, settings, timeService, totpService, usbHid, accountImport, vault, webPortal, bleHid};
+  WifiDefenseService wifiDefense;
+  AppContext context{display, resources, wifi, security, settings, timeService, totpService, usbHid, accountImport, vault, webPortal, bleHid, wifiDefense};
   AppManager mgr(context);
   SystemInfoApp info;
   TouchTestApp touch;
@@ -520,5 +523,82 @@ int main() {
   runVaultTests();
   extern void runWebPortalHostTests();
   runWebPortalHostTests();
-  puts("PASS: host navigation/resource/async scan/timeout/connect/crypto/settings smoke tests");
+
+  // Wi-Fi Defense IDS Host Tests
+  wifiDefense.begin();
+  assert(!wifiDefense.isRunning());
+  assert(wifiDefense.totalPackets() == 0);
+  assert(wifiDefense.deauthCount() == 0);
+
+  assert(wifiDefense.start(6, true, fakeMs));
+  assert(wifiDefense.isRunning());
+  assert(wifiDefense.channel() == 6);
+  assert(wifiDefense.autoHop());
+
+  // 1. Inject synthetic 802.11 Deauth packet (0xC0)
+  const uint8_t deauthPacket[26] = {
+    0xC0, 0x00,                         // Frame Control (Deauth)
+    0x00, 0x00,                         // Duration
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Destination (Broadcast)
+    0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, // Source / Attacker MAC
+    0x00, 0x11, 0x22, 0x33, 0x44, 0x55, // BSSID
+    0x10, 0x00,                         // Sequence Control
+    0x07, 0x00                          // Reason Code 7 (Class 3)
+  };
+  wifiDefense.processFrame(deauthPacket, sizeof(deauthPacket), -48, 6, fakeMs);
+  assert(wifiDefense.totalPackets() == 1);
+  assert(wifiDefense.deauthCount() == 1);
+  assert(wifiDefense.hasIncident());
+  assert(wifiDefense.lastIncident().isDeauth == true);
+  assert(wifiDefense.lastIncident().reasonCode == 7);
+  assert(wifiDefense.lastIncident().rssi == -48);
+  assert(wifiDefense.lastIncident().sourceMac[0] == 0x12 && wifiDefense.lastIncident().sourceMac[5] == 0xBC);
+
+  // 2. Inject synthetic EAPOL handshake packet (Data frame with 0x88 0x8E)
+  uint8_t eapolPacket[36] = {
+    0x08, 0x00, 0x00, 0x00,
+    0x11, 0x22, 0x33, 0x44, 0x55, 0x66,
+    0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF,
+    0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+    0x20, 0x00
+  };
+  eapolPacket[24] = 0xAA; eapolPacket[25] = 0xAA; eapolPacket[26] = 0x03;
+  eapolPacket[27] = 0x00; eapolPacket[28] = 0x00; eapolPacket[29] = 0x00;
+  eapolPacket[30] = 0x88; eapolPacket[31] = 0x8E;
+  wifiDefense.processFrame(eapolPacket, sizeof(eapolPacket), -55, 6, fakeMs);
+  assert(wifiDefense.totalPackets() == 2);
+  assert(wifiDefense.eapolCount() == 1);
+
+  // 3. Channel Mode Cycling
+  wifiDefense.cycleChannelMode();
+  assert(!wifiDefense.autoHop() && wifiDefense.channel() == 1);
+  wifiDefense.cycleChannelMode();
+  assert(!wifiDefense.autoHop() && wifiDefense.channel() == 6);
+  wifiDefense.cycleChannelMode();
+  assert(!wifiDefense.autoHop() && wifiDefense.channel() == 11);
+  wifiDefense.cycleChannelMode();
+  assert(wifiDefense.autoHop());
+
+  // 4. Attack Rate Triggering
+  for (int i = 0; i < 5; ++i) {
+    wifiDefense.processFrame(deauthPacket, sizeof(deauthPacket), -50, 6, fakeMs);
+  }
+  wifiDefense.tick(fakeMs + 1050);
+  assert(wifiDefense.deauthRate() >= 5);
+  assert(wifiDefense.isUnderAttack());
+
+  // 5. WifiDefenseApp Lifecycle & Clean Exit
+  WifiDefenseApp defenseApp;
+  defenseApp.onEnter(context);
+  defenseApp.onTick(context, fakeMs + 1200);
+  defenseApp.onExit(context);
+
+  wifiDefense.resetStats();
+  assert(wifiDefense.totalPackets() == 0);
+  assert(wifiDefense.deauthCount() == 0);
+  assert(!wifiDefense.hasIncident());
+  wifiDefense.stop();
+  assert(!wifiDefense.isRunning());
+
+  puts("PASS: host navigation/resource/async scan/timeout/connect/crypto/settings/defense smoke tests");
 }

@@ -68,7 +68,7 @@ void AppManager::handleTouch(const TouchEvent& ev) {
   if (active_) {
     // Header Back zone is reserved by the shell (all apps share it).
     if ((ev.gesture == TouchGesture::Tap || ev.gesture == TouchGesture::DoubleTap)
-        && ev.y < 33 && ev.x < 40) {
+        && ev.y < 38 && ev.x < 55) {
       if (active_->onBack(ctx_)) return;
       goHome();
       return;
@@ -116,7 +116,9 @@ void AppManager::handleTouch(const TouchEvent& ev) {
       // Select-then-Confirm:
       // Touch 1: If card not armed, select and arm it, show prominent highlight.
       // Touch 2: If card already armed and contact is separate, confirm & open.
-      if (armedIndex_ == targetIdx && ev.contactId != armedContactId_ && ev.contactId != 0) {
+      // DoubleTap: Direct fast launch immediately.
+      if (ev.gesture == TouchGesture::DoubleTap ||
+          (armedIndex_ == targetIdx && ev.contactId != armedContactId_ && ev.contactId != 0)) {
         armedIndex_ = 0xFF;
         armedContactId_ = 0;
         open(targetIdx);

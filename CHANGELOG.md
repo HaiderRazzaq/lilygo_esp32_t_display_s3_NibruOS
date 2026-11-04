@@ -1,5 +1,26 @@
 # Changelog
 
+## [v0.15.0] - 2026-11-04
+
+### Added
+
+- Wi-Fi Defense IDS application (FEAT-0025) monitoring 802.11 promiscuous mode for deauthentication and disassociation attacks.
+- Live attack rate detection and visual alert pill triggering on sudden deauth floods (> 3 pkts/s).
+- EAPOL 4-way handshake sniffer detecting active client authentications.
+- Channel management supporting automatic hopping across channels 1..13 or lock on specific channels.
+- Threat Inspector displaying attacker MAC, victim destination, BSSID, RSSI, and IEEE 802.11 reason code.
+
+## [v0.14.2] - 2026-11-04
+
+### Added
+
+- Thumb-friendly tactile back button styling in header with dark pill background and border across all views.
+- Expanded shell header back touch hitbox (55x38 px) ensuring consistent single-tap Back escape without capacitive edge misses.
+- Live system status pills in Home screen header for Wi-Fi and Bluetooth BLE states.
+- Visual pagination indicator dots and swipe chevrons `<` / `>` on Home screen for multi-page card navigation.
+- DoubleTap direct fast-launch gesture for Home cards and Settings menu rows.
+- Right-aligned navigation chevrons `>` on Settings menu list items.
+
 ## [v0.14.1] - 2026-11-04
 
 ### Changed

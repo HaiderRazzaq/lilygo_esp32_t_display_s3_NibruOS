@@ -7,6 +7,7 @@
 #include "services/VaultService.h"
 #include "services/WebPortalService.h"
 #include "services/BleHidService.h"
+#include "services/WifiDefenseService.h"
 #include "services/SettingsService.h"
 #include "services/WiFiService.h"
 #include "hardware/DisplayManager.h"
@@ -226,7 +227,8 @@ void testAuthenticator() {
   VaultService vault;
   WebPortalService webPortal;
   BleHidService bleHid;
-  AppContext ctx{display, resources, wifi, session, settings, clock, accounts, usb, accountImport, vault, webPortal, bleHid};
+  WifiDefenseService wifiDefense;
+  AppContext ctx{display, resources, wifi, session, settings, clock, accounts, usb, accountImport, vault, webPortal, bleHid, wifiDefense};
   TotpApp app;
   testAuthenticatorEntryFlow(ctx, app);
   app.onEnter(ctx);

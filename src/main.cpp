@@ -25,6 +25,8 @@
 #include "apps/SettingsApp.h"
 #include "apps/GeneratorApp.h"
 #include "apps/ClockApp.h"
+#include "services/WifiDefenseService.h"
+#include "apps/WifiDefenseApp.h"
 
 namespace {
 DisplayManager display;
@@ -41,10 +43,12 @@ AccountImportService accountImport;
 VaultService vault;
 WebPortalService webPortal;
 BleHidService bleHid;
-AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid};
+WifiDefenseService wifiDefense;
+AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid, wifiDefense};
 AppManager launcher(context);
 WiFiApp wifiApp;
 BluetoothApp bluetoothApp;
+WifiDefenseApp wifiDefenseApp;
 BeaconLabApp beaconLabApp;
 TotpApp totpApp;
 VaultApp vaultApp;
@@ -56,7 +60,7 @@ WakeInputGate wakeInput;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n[NibruOS] boot v0.14.1");
+  Serial.println("\n[NibruOS] boot v0.15.0");
   MemoryProfiler::checkpoint("startup-basic");
   display.begin();
   touch.begin();
@@ -72,8 +76,10 @@ void setup() {
   vault.begin();
   usbHid.begin();
   bleHid.begin();
+  wifiDefense.begin();
   launcher.registerApp(wifiApp);
   launcher.registerApp(bluetoothApp);
+  launcher.registerApp(wifiDefenseApp);
   launcher.registerApp(totpApp);
   launcher.registerApp(vaultApp);
   launcher.registerApp(generatorApp);

@@ -33,6 +33,7 @@
 #include "apps/TouchTestApp.h"
 #include "apps/GeneratorApp.h"
 #include "apps/ClockApp.h"
+#include "services/WifiDefenseService.h"
 
 #include "platform/desktop/SDLDisplay.h"
 #include "platform/desktop/DesktopInput.h"
@@ -121,6 +122,17 @@ void testCoreLifecycle(AppContext& ctx, AppManager& launcher, WiFiApp& wifiApp, 
   assert(launcher.selectedIndex() == 2);
 
   launcher.handleButton(ButtonAction::Back);
+  assert(launcher.isHome());
+
+  // Test DoubleTap fast-launch directly opening card 1 without prior arming:
+  TouchEvent evDoubleTap{160, 85, 84, 160, TouchGesture::DoubleTap, 4};
+  launcher.handleTouch(evDoubleTap);
+  assert(!launcher.isHome());
+  assert(launcher.selectedIndex() == 1);
+
+  // Test Shell Header Back button touch with expanded thumb-friendly hit zone (x=45, y=30 < 55, 38)
+  TouchEvent evBackTouch{45, 30, 139, 45, TouchGesture::Tap, 5};
+  launcher.handleTouch(evBackTouch);
   assert(launcher.isHome());
 
   std::printf("  -> Core Lifecycle Tests PASS\n");
@@ -776,8 +788,9 @@ int main() {
   VaultService vault;
   WebPortalService webPortal;
   BleHidService bleHid;
+  WifiDefenseService wifiDefense;
 
-  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid};
+  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid, wifiDefense};
   AppManager launcher(context);
 
   WiFiApp wifiApp;
@@ -896,7 +909,7 @@ int main() {
   totpApp.onExit(context);
   AccountImportTransport io(ImportFixture::openImport, ImportFixture::closeImport, ImportFixture::readImport);
   AccountImportService paired(&io);
-  AppContext pairedContext{display, resources, wifi, security, settings, timeService, totp, usbHid, paired, vault, webPortal, bleHid};
+  AppContext pairedContext{display, resources, wifi, security, settings, timeService, totp, usbHid, paired, vault, webPortal, bleHid, wifiDefense};
   totpApp.onEnter(pairedContext);
   authTap(totpApp, pairedContext, 110, 158);
   authTap(totpApp, pairedContext, 160, 88);

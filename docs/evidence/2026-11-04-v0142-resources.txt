@@ -1,0 +1,9 @@
+{
+  "binary_bytes": 1578656,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 4974944,
+  "sha256": "5eeb8ef0ba03c9824ceb87a129f8fd11380abddb8dd687bad1c29b46b122981c",
+  "growth_percent": 87.5458571727271,
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS

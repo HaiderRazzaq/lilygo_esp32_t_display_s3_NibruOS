@@ -11,6 +11,7 @@ class AccountImportService;
 class VaultService;
 class WebPortalService;
 class BleHidService;
+class WifiDefenseService;
 
 struct AppContext {
   DisplayManager& display;
@@ -25,4 +26,5 @@ struct AppContext {
   VaultService& vault;
   WebPortalService& webPortal;
   BleHidService& bleHid;
+  WifiDefenseService& wifiDefense;
 };

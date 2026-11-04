@@ -1716,3 +1716,55 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Boot banner, UI, RF transmission and resource metrics were not captured."
 }
 ```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0072",
+  "date": "2026-11-04",
+  "firmware_version": "v0.14.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app0 upload for v0.14.2",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB",
+  "procedure": "Verify image SHA-256, write app0 at 0x10000 via COM5, then check runtime port.",
+  "expected": "Written data verifies, hash is confirmed, and device resets successfully.",
+  "actual": "1,578,656 bytes written and hash verified in 13.6 seconds. Hard reset via RTS succeeded and runtime COM5 opened at 115200.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0142-upload.txt",
+    "docs/evidence/2026-11-04-v0142-runtime.txt"
+  ],
+  "evidence_kind": "esptool output and runtime USB observation",
+  "environment": "Windows / native USB",
+  "limitations": "Physical touch accuracy and thumb comfort on real capacitive glass not yet measured."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0073",
+  "date": "2026-11-04",
+  "firmware_version": "v0.15.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app0 upload for v0.15.0 with Wi-Fi Defense IDS",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB",
+  "procedure": "Verify image SHA-256, write app0 at 0x10000 via COM5, then check runtime port.",
+  "expected": "Written data verifies, hash is confirmed, and device resets successfully into v0.15.0.",
+  "actual": "1,583,328 bytes written and hash verified in 13.6 seconds. Hard reset via RTS succeeded and runtime COM5 opened at 115200.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0150-upload.txt",
+    "docs/evidence/2026-11-04-v0150-runtime.txt"
+  ],
+  "evidence_kind": "esptool output and runtime USB observation",
+  "environment": "Windows / native USB",
+  "limitations": "Physical RF reception and real over-air deauth packet observation require laboratory radio emissions."
+}
+```

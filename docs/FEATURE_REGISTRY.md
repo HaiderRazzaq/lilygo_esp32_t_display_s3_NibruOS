@@ -45,7 +45,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "issues": [],
   "history": [
     "DEV-0001",
-    "DEV-0021"
+    "DEV-0021",
+    "DEV-0064"
   ]
 }
 ```
@@ -970,5 +971,39 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "DEV-0063"
   ],
   "registration": "beaconLabApp"
+}
+```
+
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0025",
+  "name": "WiFi Defense IDS",
+  "purpose": "Promiscuous mode 802.11 intrusion detection monitoring deauthentication, disassociation and EAPOL handshakes with live attack alerts and channel hopping.",
+  "module": "src/apps/WifiDefenseApp",
+  "files": [
+    "src/apps/WifiDefenseApp.cpp",
+    "src/apps/WifiDefenseApp.h",
+    "src/services/WifiDefenseService.cpp",
+    "src/services/WifiDefenseService.h"
+  ],
+  "dependencies": [
+    "FEAT-0004"
+  ],
+  "hardware": "Integrated ESP32-S3 2.4 GHz Wi-Fi",
+  "gpio": "No extra GPIO",
+  "lifecycle": "onEnter acquires WifiDefense lease and starts sniffer. onExit disables promiscuous mode and releases radio lease cleanly.",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0203",
+    "host": "VER-0202",
+    "hardware": "NOT RUN"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0065"
+  ],
+  "registration": "wifiDefenseApp"
 }
 ```

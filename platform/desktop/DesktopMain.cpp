@@ -26,6 +26,8 @@
 #include "apps/GeneratorApp.h"
 #include "apps/ClockApp.h"
 #include "services/BleHidService.h"
+#include "services/WifiDefenseService.h"
+#include "apps/WifiDefenseApp.h"
 
 #include "platform/desktop/SDLDisplay.h"
 #include "platform/desktop/DesktopInput.h"
@@ -96,12 +98,14 @@ int main(int argc, char* argv[]) {
   VaultService vault;
   WebPortalService webPortal;
   BleHidService bleHid;
+  WifiDefenseService wifiDefense;
 
-  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid};
+  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid, wifiDefense};
   AppManager launcher(context);
 
   WiFiApp wifiApp;
   BluetoothApp bluetoothApp;
+  WifiDefenseApp wifiDefenseApp;
   BeaconLabApp beaconLabApp;
   TotpApp totpApp;
   VaultApp vaultApp;
@@ -123,10 +127,12 @@ int main(int argc, char* argv[]) {
     vault.begin();
     usbHid.begin();
     bleHid.begin();
+    wifiDefense.begin();
 
     // Register applications exactly matching physical device baseline (src/main.cpp)
     launcher.registerApp(wifiApp);
     launcher.registerApp(bluetoothApp);
+    launcher.registerApp(wifiDefenseApp);
     launcher.registerApp(totpApp);
     launcher.registerApp(vaultApp);
     launcher.registerApp(generatorApp);

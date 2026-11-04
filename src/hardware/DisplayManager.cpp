@@ -107,9 +107,10 @@ void DisplayManager::header(const char* title, bool showBack) {
   tft_.fillRect(0, 0, 320, 33, Colors::Panel);
   tft_.drawFastHLine(0, 32, 320, Colors::Border);
   if (showBack) {
-    tft_.drawRoundRect(5, 5, 31, 23, 5, Colors::Border);
-    label(14, 9, "<", themeAccent_, 2, Colors::Panel);
-    label(43, 11, title, Colors::White, 2, Colors::Panel);
+    tft_.fillRoundRect(5, 5, 34, 23, 5, Colors::Bg);
+    tft_.drawRoundRect(5, 5, 34, 23, 5, Colors::Border);
+    label(16, 9, "<", themeAccent_, 2, Colors::Bg);
+    label(46, 11, title, Colors::White, 2, Colors::Panel);
   } else {
     label(9, 11, title, themeAccent_, 2, Colors::Panel);
   }

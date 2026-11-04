@@ -1,0 +1,8 @@
+NibruOS ESP32 Firmware Build - v0.14.2
+PlatformIO Build: SUCCESS
+RAM:   [===       ]  26.2% (used 85968 bytes from 327680 bytes)
+Flash: [==        ]  24.1% (used 1578289 bytes from 6553600 bytes)
+firmware.bin: 1578656 bytes / partition app0: 6553600 bytes
+SHA256: 5eeb8ef0ba03c9824ceb87a129f8fd11380abddb8dd687bad1c29b46b122981c
+Resource artifact check PASS (runtime acceptance pending)
+Environment: lilygo-t-display-s3 SUCCESS

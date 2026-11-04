@@ -1,0 +1,9 @@
+NibruOS Host Test Suite - v0.15.0
+PASS: authenticator lifecycle
+PASS: bounded paired account import
+[TEST] Running Encrypted Password Vault Storage & Backup Tests...
+  -> PASS: Encrypted Password Vault Storage & Backup verified.
+[TEST] Running Web Portal Service Host Tests...
+  -> PASS: Web Portal Service Host Tests verified successfully.
+PASS: host navigation/resource/async scan/timeout/connect/crypto/settings/defense smoke tests
+All host tests passed with exit code 0.

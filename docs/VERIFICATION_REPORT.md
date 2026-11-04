@@ -4882,3 +4882,152 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Physical RF and resource scenarios A\u2013E not run."
 }
 ```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0199",
+  "date": "2026-11-04",
+  "firmware_version": "v0.14.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "UI UX and shell navigation tests",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py and tools/run_desktop_tests.bat",
+  "expected": "PASS with zero errors across all lifecycle, touch, and UI test suites.",
+  "actual": "Host and simulator test suites passed. Verified tactile back navigation, DoubleTap fast-launch, and shell hitboxes.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0142-host.txt",
+    "docs/evidence/2026-11-04-v0142-desktop.txt"
+  ],
+  "evidence_kind": "Captured output",
+  "environment": "Windows",
+  "limitations": "Physical touch accuracy and thumb comfort on real capacitive glass not yet measured."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0200",
+  "date": "2026-11-04",
+  "firmware_version": "v0.14.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "ESP32 firmware build and resource partition check for v0.14.2",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3 and python tools/check_resources.py",
+  "expected": "Successful compilation within app0 partition capacity (6,553,600 bytes).",
+  "actual": "Build passed cleanly. Flash 1,578,289 bytes (24.1%), RAM 85,968 bytes (26.2%). Partition fit verified.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0142-build.txt",
+    "docs/evidence/2026-11-04-v0142-resources.txt"
+  ],
+  "evidence_kind": "Captured output",
+  "environment": "Windows",
+  "limitations": "Physical board flash and runtime heap profiling not yet executed."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0201",
+  "date": "2026-11-04",
+  "firmware_version": "v0.14.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation integrity and version synchronization check for v0.14.2",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Documentation checks PASS with zero errors.",
+  "actual": "All required docs, records, anchors, links, and version synchronizations verified cleanly.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0142-docs.txt"
+  ],
+  "evidence_kind": "Captured output",
+  "environment": "Windows",
+  "limitations": "Static cross-reference and schema validation only."
+}
+```
+
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0202",
+  "date": "2026-11-04",
+  "firmware_version": "v0.15.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Wi-Fi Defense IDS unit and host integration tests",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "PASS with zero errors across all lifecycle, frame injection, rate tracking, and defense suites.",
+  "actual": "Host test suite passed. Verified deauth detection, EAPOL handshake parsing, attack rate alert, and channel mode cycling.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0150-host.txt"
+  ],
+  "evidence_kind": "Captured output",
+  "environment": "Windows",
+  "limitations": "Physical RF reception and hardware promiscuous capture not tested in host test."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0203",
+  "date": "2026-11-04",
+  "firmware_version": "v0.15.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "ESP32 firmware build and resource partition check for v0.15.0",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3 and python tools/check_resources.py",
+  "expected": "Successful compilation within app0 partition capacity (6,553,600 bytes).",
+  "actual": "Build passed cleanly. Flash 1,582,961 bytes (24.2%), RAM 86,088 bytes (26.3%). Partition fit verified.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0150-build.txt",
+    "docs/evidence/2026-11-04-v0150-resources.txt"
+  ],
+  "evidence_kind": "Captured output",
+  "environment": "Windows",
+  "limitations": "Physical board flash and runtime heap profiling not yet executed."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0204",
+  "date": "2026-11-04",
+  "firmware_version": "v0.15.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation integrity and version synchronization check for v0.15.0",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Documentation checks PASS with zero errors.",
+  "actual": "All required docs, records, anchors, links, and version synchronizations verified cleanly.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-04-v0150-docs.txt"
+  ],
+  "evidence_kind": "Captured output",
+  "environment": "Windows",
+  "limitations": "Static cross-reference and schema validation only."
+}
+```

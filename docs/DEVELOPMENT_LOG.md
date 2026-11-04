@@ -2353,3 +2353,61 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Compare TX accepted, serial errors and distinct over-air SSIDs on the transmit channel. Measure resources before accepting the rate change."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0064",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0001"
+  ],
+  "action": "Elevate system UI and UX in v0.14.2",
+  "files": [
+    "src/hardware/DisplayManager.cpp",
+    "src/core/AppManager.cpp",
+    "src/ui/HomeScreen.cpp",
+    "src/apps/SettingsApp.cpp",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Style tactile header Back button with pill background and border, expand shell Back hitbox to 55x38 px to prevent capacitive edge misses, add Home live status bar badges for Wi-Fi and BLE, add pagination dots and swipe chevrons, support DoubleTap direct app launch and Settings menu entry, and add chevrons to Settings rows.",
+  "reason": "Enhance system usability, visual hierarchy, touch feedback, and navigational responsiveness on the physical 320x170 touch display.",
+  "expected": "Thumb-friendly tactile touch targets, immediate DoubleTap app opening, live connectivity status at a glance, and visual pagination cues.",
+  "actual": "Host and desktop simulator test suites passed with all gestures and navigation verified.",
+  "verification": "VER-0199, VER-0200, VER-0201",
+  "risks": "Minimal; all UI rendering and touch handling are non-blocking and fit within existing render loops.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Observe tactile responsiveness and thumb accuracy on physical capacitive touch hardware."
+}
+```
+
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0065",
+  "date": "2026-11-04",
+  "related": [
+    "FEAT-0025"
+  ],
+  "action": "Implement Wi-Fi Defense IDS in v0.15.0",
+  "files": [
+    "src/apps/WifiDefenseApp.cpp",
+    "src/apps/WifiDefenseApp.h",
+    "src/services/WifiDefenseService.cpp",
+    "src/services/WifiDefenseService.h",
+    "src/core/ResourceManager.h",
+    "src/core/AppContext.h",
+    "src/main.cpp",
+    "tests/host/test_main.cpp"
+  ],
+  "description": "Create WifiDefenseService and WifiDefenseApp to detect 802.11 Deauth/Disassoc attacks and EAPOL handshakes via promiscuous packet sniffing. Provide real-time threat inspector showing attacker MAC, destination, reason code and RSSI.",
+  "reason": "Empower cybersecurity research and classroom defense demonstrations with dedicated wireless intrusion detection on the ESP32-S3.",
+  "expected": "Real-time detection of deauth frames, live threat alert pill, channel hopping across 1..13, and zero memory leaks.",
+  "actual": "Host tests passed with frame injection, rate tracking, and lifecycle clean shutdown verified.",
+  "verification": "VER-0202, VER-0203, VER-0204",
+  "risks": "Promiscuous mode uses Wi-Fi hardware while active; cleanly releases on app exit.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Observe real deauth detection in laboratory RF environment with physical packet generation."
+}
+```
