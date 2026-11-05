@@ -1,0 +1,17 @@
+﻿ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x15 (USB_UART_CHIP_RESET),boot:0x21 (DOWNLOAD(USB/UART0))
+Saved PC:0x40041a79
+waiting for download
+
+Note: this capture came from a post-upload DTR/RTS probe and shows the ROM
+download mode, not normal application runtime. esptool chip_id with
+--after hard_reset restored normal boot. The v0.20.0 banner was not captured
+because the native USB CDC banner prints before a host can open the port.
+
+
+Correction (later same day): the statement above that esptool chip_id with
+--after hard_reset restored normal boot is superseded. Later no-reset sync and
+ROM-banner captures showed the chip remained in ROM download mode
+(boot:0x21 DOWNLOAD(USB/UART0)). See 2026-11-05-v0200-runtime-probe.txt.
+

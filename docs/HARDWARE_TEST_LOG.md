@@ -1768,3 +1768,352 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Physical RF reception and real over-air deauth packet observation require laboratory radio emissions."
 }
 ```
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0074",
+  "date": "2026-11-05",
+  "firmware_version": "UNKNOWN; latest recorded upload v0.15.0 (HWT-0073)",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Owner-reported Beacon Lab operation after scheduling update",
+  "hardware": "Owner ESP32-S3 board with phone/PC receivers described earlier in the conversation",
+  "wiring": "Owner setup; not independently inspected",
+  "procedure": "Owner ran Beacon Lab and reported its result after the proposed receiver check.",
+  "expected": "Synthetic network advertisements are visible to the receiver.",
+  "actual": "Owner confirmed the feature works successfully. Exact selected and received counts were not provided.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-beacon-owner-report.txt"
+  ],
+  "evidence_kind": "Owner report in this conversation",
+  "environment": "Owner hardware",
+  "limitations": "Limited functional confirmation. Exact running image, all forty names, WPA2 display, timing and resource scenarios are not independently verified."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0075",
+  "date": "2026-11-05",
+  "firmware_version": "v0.16.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Wi-Fi Channels receiver, UI and resource acceptance",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB for serial; baseline display/touch wiring",
+  "procedure": "After an authorized upload, open Wi-Fi Channels, refresh, select channels by touch and swipe, compare counts and RSSI with known APs, rescan while connected, and use Back during a scan. Capture MemoryProfiler startup, entry, exit, twenty cycles and connected Wi-Fi combined workloads.",
+  "expected": "Responsive UI, correct known-channel summaries, clean ownership release, preserved connection and at least 150 KiB free internal heap.",
+  "actual": "Not run. v0.16.0 has not been uploaded in this task, and physical UI/RF/heap/stack/power measurements are unavailable.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending physical procedure",
+  "environment": "Physical ESP32-S3 required",
+  "limitations": "Host cancellation cycles do not establish physical leak freedom or RF accuracy."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0076",
+  "date": "2026-11-05",
+  "firmware_version": "v0.17.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "BLE Lab receiver and resource acceptance",
+  "hardware": "LILYGO T-Display-S3 Touch Glass and a BLE scanner receiver",
+  "wiring": "Native USB for serial diagnostics",
+  "procedure": "After authorized upload, run five identities for thirty seconds, inspect names, addresses and service UUID. Repeat with ten identities. Check Stop, Back, expiry, lock, sleep, subsequent keyboard activation and connected Wi-Fi. Capture resource scenarios A-E including twenty lifecycle cycles.",
+  "expected": "Requested identities are observed, radio cleanup succeeds and internal heap remains at least 150 KiB.",
+  "actual": "NOT RUN. The feature image has not been uploaded and no physical receiver or resource measurements were taken.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending physical acceptance procedure",
+  "environment": "ESP32-S3 hardware required",
+  "limitations": "Host mocks and GAP start events cannot establish over-air reception or physical lifecycle stability."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0077",
+  "date": "2026-11-05",
+  "firmware_version": "v0.17.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app0 upload and runtime serial return",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB",
+  "procedure": "Verify the image hash, write app0 at 0x10000 through COM5 and check runtime serial after watchdog reset.",
+  "expected": "Written flash data verifies and the runtime serial port returns.",
+  "actual": "1,588,688 bytes written in 11.3 seconds and flash hash verified. COM5 detached during watchdog reset, producing an esptool post-write serial exception. Runtime COM6 returned and opened at 115200.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0170-upload.txt",
+    "docs/evidence/2026-11-05-v0170-runtime.txt"
+  ],
+  "evidence_kind": "Captured esptool output and USB serial observation",
+  "environment": "Windows / esptool 5.6.0",
+  "limitations": "The boot banner was not captured. BLE receiver discovery, touch and runtime resources were not tested."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0078",
+  "date": "2026-11-05",
+  "firmware_version": "v0.18.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Accessory discovery notifications and resources",
+  "hardware": "ESP32-S3 with Android/Windows receiver; Apple/Samsung receivers for their profiles",
+  "wiring": "Native USB",
+  "procedure": "Select a matching profile, five identities and thirty seconds. Check receiver discovery settings and observe notifications. Record receiver model and OS version. Test stop, timeout, Back, twenty cycles, Wi-Fi coexistence and A-E resource scenarios.",
+  "expected": "Reference-compatible receivers may show accessory discovery notifications; cleanup and resource limits remain satisfied.",
+  "actual": "NOT RUN. Payload format tests do not establish receiver notifications.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending receiver acceptance procedure",
+  "environment": "Physical receivers required",
+  "limitations": "Availability of registered models, platform filtering and notification settings affect results."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0079",
+  "date": "2026-11-05",
+  "firmware_version": "v0.18.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app0 upload and runtime USB return",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB",
+  "procedure": "Verify build SHA-256, write app0 at 0x10000 via COM5, reset and check runtime serial.",
+  "expected": "Written flash data verifies and runtime serial returns.",
+  "actual": "1,589,984 bytes written in 11.8 seconds and flash hash verified. COM5 detached during watchdog reset, causing a post-write serial exception. Runtime COM6 returned and opened at 115200.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0180-upload.txt",
+    "docs/evidence/2026-11-05-v0180-runtime.txt"
+  ],
+  "evidence_kind": "Captured esptool output and USB observation",
+  "environment": "Windows / esptool 5.6.0",
+  "limitations": "Boot banner and receiver notifications were not captured. Physical resource acceptance remains pending."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0080",
+  "date": "2026-11-05",
+  "firmware_version": "v0.18.0 (latest upload HWT-0079)",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Windows notification and received BLE payloads",
+  "hardware": "Owner ESP32-S3 and Windows Bluetooth receiver",
+  "wiring": "Native USB for serial",
+  "procedure": "Observe BLE packets in Windows while the owner runs Android and Windows profiles, then record the owner notification report.",
+  "expected": "Matching payloads are received and Windows may show Swift Pair notification.",
+  "actual": "Captured five FE2C model records followed by ten Microsoft records with Classroom Buds01-10 names, at reported RSSI -10 to -12 dBm. The owner confirmed notifications appeared and described Classroom Buds text. Serial recorded 232452 B free internal heap and 221172 B largest block before controller start.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0180-ble-observation.txt",
+    "docs/evidence/2026-11-05-v0180-ble-serial.txt",
+    "docs/evidence/2026-11-05-swift-pair-owner-report.txt"
+  ],
+  "evidence_kind": "Captured Bleak 3.0.2 receiver output, serial output and owner report",
+  "environment": "Windows receiver; observer dependencies isolated under .testbuild",
+  "limitations": "Notification display is owner-reported. The initial no-notification report preceded matched Windows profile reception. No controlled comparison proves a single cause. Android notification display and post-start resource minima were not measured."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0081",
+  "date": "2026-11-05",
+  "firmware_version": "v0.19.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Target picker, Random and resource acceptance",
+  "hardware": "ESP32-S3 and matching receiver devices",
+  "wiring": "Native USB",
+  "procedure": "Choose each target via touch and BOOT, exercise Back and same-contact suppression, run Random with bounded duration, and test stop, timeout, lock and sleep. Measure resource scenarios A-E and twenty cycles.",
+  "expected": "Correct target selection, random data/address rotation and clean radio recovery.",
+  "actual": "NOT RUN. Host tests do not establish physical touch or Random notification behavior.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending physical procedure",
+  "environment": "Physical board and receivers required",
+  "limitations": "Windows v0.18.0 success does not validate the new picker or Random mode."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0082",
+  "date": "2026-11-05",
+  "firmware_version": "v0.19.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Authorized app0 upload and runtime USB return",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB",
+  "procedure": "Verify the build hash, write app0 at 0x10000 through COM5, reset and open runtime serial.",
+  "expected": "Written data verifies and runtime serial returns.",
+  "actual": "1,590,992 bytes written in 11.8 seconds and flash hash verified. COM5 detached during watchdog reset and esptool reported a post-write serial exception. Runtime COM6 returned and opened at 115200.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0190-upload.txt",
+    "docs/evidence/2026-11-05-v0190-runtime.txt"
+  ],
+  "evidence_kind": "Captured esptool output and USB observation",
+  "environment": "Windows / esptool 5.6.0",
+  "limitations": "Boot banner, new picker touch behavior, Random receiver notifications and runtime resource acceptance were not captured."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0083",
+  "date": "2026-11-05",
+  "firmware_version": "v0.19.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Owner-requested repeat upload of verified v0.19.0",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB",
+  "procedure": "Check the existing image hash and write only app0 at 0x10000 through COM5; check runtime COM6.",
+  "expected": "Flash data verifies and runtime serial returns.",
+  "actual": "The same 1,590,992 B image was written in 11.8 seconds and its flash hash verified. COM5 detached during watchdog reset, producing the post-write serial exception. Runtime COM6 returned and opened at 115200.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0190-reupload.txt",
+    "docs/evidence/2026-11-05-v0190-reupload-runtime.txt"
+  ],
+  "evidence_kind": "Captured esptool output and USB observation",
+  "environment": "Windows / esptool 5.6.0",
+  "limitations": "Repeat installation only. Physical UI, receiver notifications and resource acceptance remain separately scoped."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0084",
+  "date": "2026-11-05",
+  "firmware_version": "v0.20.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Apple Action, Apple Not Your Device and Beacon advertisement reception",
+  "hardware": "ESP32-S3 and Apple/Android/Windows receivers",
+  "wiring": "Native USB for serial",
+  "procedure": "Build and upload v0.20.0 under explicit owner instruction. Open BLE Lab, switch to picker page 2, run each new profile with one identity and 60 seconds, observe receiver notification behavior, then test Back, lock, sleep and twenty cycles.",
+  "expected": "The board advertises bounded 31-byte payloads, ends sessions cleanly and the matching receiver may display its alert or discovery UI.",
+  "actual": "NOT RUN. No v0.20.0 image was uploaded and no receiver was tested. Build, host payload and documentation checks do not establish physical behavior.",
+  "result": "NOT RUN",
+  "evidence": [],
+  "evidence_kind": "Pending physical procedure",
+  "environment": "Physical board and matching receivers required",
+  "limitations": "Receiver filtering varies by OS, vendor software, location permission and nearby-device settings."
+}
+```
+
+Correction (2026-11-05, after HWT-0084): v0.20.0 was subsequently uploaded and
+hash-verified under HWT-0085. HWT-0084's receiver procedure remains NOT RUN; its
+statement that no image had been uploaded was accurate when that record was
+written.
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0085",
+  "date": "2026-11-05",
+  "firmware_version": "v0.20.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Upload and flash hash verification only",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB",
+  "procedure": "Write app0 through PlatformIO/esptool and verify the write hash. First attempt used the stale COM6 port; retry used the re-enumerated COM5 port.",
+  "expected": "The 1,592,096 B image writes completely and esptool verifies its hash.",
+  "actual": "The COM6 attempt failed while Connecting with ClearCommError and wrote no data (upload-attempt evidence). COM5 then reported Writing to 100 percent and 'Hash of data verified'. Upload finished SUCCESS in 48.43 seconds. Runtime receiver behavior was not exercised. A post-upload DTR/RTS probe entered ROM download mode; esptool chip_id with --after hard_reset restored normal boot, but the boot banner was not captured.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0200-upload.txt",
+    "docs/evidence/2026-11-05-v0200-upload-attempt.txt",
+    "docs/evidence/2026-11-05-v0200-build.txt",
+    "docs/evidence/2026-11-05-v0200-reset-attempt.txt"
+  ],
+  "evidence_kind": "Captured esptool output and USB port observation",
+  "environment": "Windows / PlatformIO 6.2.0 / esptool 4.5.1",
+  "limitations": "Installation only. Runtime banner, BLE receiver alerts, UI touch acceptance, heap/latency/power and twenty cycles remain NOT RUN."
+}
+```
+
+Correction (2026-11-05, after HWT-0085): the statement that a post-upload
+esptool reset "restored normal boot" was wrong. Later no-reset synchronization
+and ROM-banner captures proved the chip stayed in the ROM USB download mode. See
+HWT-0086 and `docs/evidence/2026-11-05-v0200-runtime-probe.txt`.
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0086",
+  "date": "2026-11-05",
+  "firmware_version": "v0.20.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Post-upload runtime boot and serial response",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB",
+  "procedure": "After HWT-0085, test whether the chip runs the application: no-reset esptool sync, DTR/RTS strap experiments, stub reboot command and a TIME serial probe over COM5.",
+  "expected": "The chip leaves the bootloader, the v0.20.0 application runs and the TIME serial command returns a TimeService acknowledgement.",
+  "actual": "BLOCKED. Every software reset sampled boot:0x21 DOWNLOAD(USB/UART0) and printed 'waiting for download'. no_reset esptool sync kept reporting 'Staying in bootloader'. The stub reboot and soft-reset attempts did not start the app. TIME:1762340000 returned NO_RESPONSE. A physical RESET press or USB re-plug is required.",
+  "result": "BLOCKED",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0200-runtime-probe.txt",
+    "docs/evidence/2026-11-05-v0200-reset-attempt.txt"
+  ],
+  "evidence_kind": "Captured ROM banner, esptool output and serial probe",
+  "environment": "Windows / PlatformIO 6.2.0 / esptool 4.5.1 / pyserial",
+  "limitations": "The upload and its hash remain verified under HWT-0085. This record does not evaluate the application itself; it documents that the board could not be returned to normal boot without physical intervention."
+}
+```
+
+Update (2026-11-05, after HWT-0086): the owner pressed the physical RESET
+button / re-plugged USB. The board then re-enumerated as COM6 and the running
+application answered the serial TIME command. See HWT-0087.
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0087",
+  "date": "2026-11-05",
+  "firmware_version": "v0.20.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Runtime boot after physical reset",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB",
+  "procedure": "Owner performed a physical RESET / USB re-plug. Then list USB serial devices and send TIME:1762340000 at 115200 with DTR asserted on the re-enumerated port.",
+  "expected": "The application enumerates its native USB CDC and answers the serial time command.",
+  "actual": "PASS. The device re-enumerated as COM6 with SER=441BF6D3AABC (the ROM USB-JTAG had reported SER=44:1B:F6:D3:AA:BC on COM5). The application replied '[TimeService] Time set: 1762340000 (source: USB)', proving the firmware loop is running. The boot banner was not captured because native USB CDC prints it before a host can open the port.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0200-runtime.txt"
+  ],
+  "evidence_kind": "Captured serial response and USB enumeration",
+  "environment": "Windows / Python pyserial 3.x",
+  "limitations": "Runtime boot only. BLE receiver alerts, page-two touch acceptance, heap/largest block, stack high-water marks, PSRAM, latency, power and twenty cycles remain NOT RUN."
+}
+```

@@ -1,0 +1,10 @@
+Owner report in this conversation, 2026-11-05, Asia/Baghdad.
+After selecting Windows Swift Pair the owner confirmed that notifications appeared.
+The owner described the visible text as "new class room buds".
+The owner then requested clearer target-family selection and a Random option.
+
+The host BLE observer independently captured ten Microsoft manufacturer records
+with Classroom Buds01 through Classroom Buds10 names at reported RSSI -10 to
+-12 dBm. Earlier it captured five FE2C Android advertisements. These captures
+establish received advertisement data. Notification display is an owner report.
+Apple, Samsung and Android notification display was not confirmed by this report.

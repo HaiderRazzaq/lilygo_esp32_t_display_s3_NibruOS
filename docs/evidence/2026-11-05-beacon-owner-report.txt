@@ -1,0 +1,5 @@
+Owner report in this conversation on 2026-11-05, Asia/Baghdad.
+The owner stated that Beacon Lab works successfully after the scheduling update.
+The owner did not supply selected counts, received counts, a TX accepted reading,
+a fresh boot/version observation, an RF capture or resource measurements.
+This is an owner observation, not an independently measured RF test.

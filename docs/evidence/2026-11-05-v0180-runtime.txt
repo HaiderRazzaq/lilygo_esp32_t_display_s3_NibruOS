@@ -1,0 +1,1 @@
+Runtime port opened: COM6 VID/PID 0x303a 0x1001

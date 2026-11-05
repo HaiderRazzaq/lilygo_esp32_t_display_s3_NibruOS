@@ -203,6 +203,8 @@ bool WiFiService::prepareStation(uint32_t nowMs) {
 bool WiFiService::startScan(uint32_t nowMs) {
   if (state_ == ScanState::Preparing || state_ == ScanState::Scanning) return false;
   count_ = 0;
+  scanResultCount_ = 0;
+  for (auto& channel : channels_) channel = {};
   error_ = "";
   attempt_ = 1;
   return prepareStation(nowMs);
@@ -257,13 +259,31 @@ void WiFiService::onFailure(uint32_t nowMs, const char* why) {
 
 void WiFiService::collectResults(int n) {
   const int found = n < 0 ? 0 : n;
+  scanResultCount_ = static_cast<uint16_t>(found);
   count_ = static_cast<uint8_t>(found > 12 ? 12 : found);
-  for (uint8_t i = 0; i < count_; ++i) {
+  for (int i = 0; i < found; ++i) {
+#if defined(ARDUINO_ARCH_ESP32) && !defined(UNIT_TEST)
+    // The Arduino RSSI/channel accessors use uint8_t indices. Read the driver's
+    // existing records directly so dense scans do not wrap at result 256.
+    const auto* record = static_cast<const wifi_ap_record_t*>(WiFi.getScanInfoByIndex(i));
+    if (!record) continue;
+    const int channel = record->primary;
+    const int16_t rssi = record->rssi;
+#else
+    const int channel = WiFi.channel(i);
+    const auto rssi = static_cast<int16_t>(WiFi.RSSI(i));
+#endif
+    if (channel >= 1 && channel <= kChannelCount) {
+      auto& summary = channels_[channel - 1];
+      if (summary.accessPoints == 0 || rssi > summary.strongestRssi) summary.strongestRssi = rssi;
+      ++summary.accessPoints;
+    }
+    if (i >= count_) continue;
     String s = WiFi.SSID(i);
     strncpy(networks_[i].ssid, s.c_str(), sizeof(networks_[i].ssid) - 1);
     networks_[i].ssid[sizeof(networks_[i].ssid) - 1] = '\0';
-    networks_[i].rssi = static_cast<int16_t>(WiFi.RSSI(i));
-    networks_[i].channel = static_cast<int8_t>(WiFi.channel(i));
+    networks_[i].rssi = rssi;
+    networks_[i].channel = static_cast<int8_t>(channel);
     networks_[i].secured = (WiFi.encryptionType(i) != WIFI_AUTH_OPEN);
   }
   WiFi.scanDelete();
@@ -692,6 +712,8 @@ void WiFiService::shutdown() {
   stopScan();
   WiFi.mode(WIFI_OFF);
   count_ = 0;
+  scanResultCount_ = 0;
+  for (auto& channel : channels_) channel = {};
   attempt_ = 0;
   state_ = ScanState::Idle;
   error_ = "";

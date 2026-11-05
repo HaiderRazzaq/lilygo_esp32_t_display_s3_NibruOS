@@ -1,0 +1,56 @@
+AppManager.cpp
+MemoryProfiler.cpp
+ResourceManager.cpp
+ButtonManager.cpp
+DisplayManager.cpp
+TouchManager.cpp
+HomeScreen.cpp
+AccountImportService.cpp
+ArabicReshaper.cpp
+BleAdvertisingService.cpp
+BleHidService.cpp
+CryptoService.cpp
+LocalizationService.cpp
+SecurityService.cpp
+SettingsService.cpp
+TimeService.cpp
+TotpService.cpp
+UsbHidService.cpp
+VaultService.cpp
+WebPortalService.cpp
+Generating Code...
+Compiling...
+WifiDefenseService.cpp
+WiFiService.cpp
+BeaconLabApp.cpp
+BleLabApp.cpp
+BluetoothApp.cpp
+ClockApp.cpp
+GeneratorApp.cpp
+SettingsApp.cpp
+SystemInfoApp.cpp
+TotpApp.cpp
+TouchTestApp.cpp
+VaultApp.cpp
+WiFiApp.cpp
+WiFiChannelsApp.cpp
+WifiDefenseApp.cpp
+WiFiScannerApp.cpp
+test_main.cpp
+test_settings.cpp
+test_authenticator.cpp
+test_account_import.cpp
+Generating Code...
+Compiling...
+test_vault.cpp
+test_web_portal.cpp
+Generating Code...
+main.cpp
+PASS: authenticator lifecycle
+PASS: bounded paired account import
+[TEST] Running Encrypted Password Vault Storage & Backup Tests...
+  -> PASS: Encrypted Password Vault Storage & Backup verified.
+[TEST] Running Web Portal Service Host Tests...
+  -> PASS: Web Portal Service Host Tests verified successfully.
+PASS: BLE Lab GAP sequence, payload, timeouts, cleanup and 20 host cycles
+PASS: host navigation/resource/async scan/timeout/connect/crypto/settings/defense smoke tests

@@ -1,0 +1,32 @@
+==================================================
+  NibruOS Desktop Simulator (Windows Target)
+  Resolution: 320x170 (ST7789 landscape simulation)
+  Default Scale: 3x | Headless: YES
+==================================================
+Controls:
+  Mouse: Click/Drag = Touchscreen Tap & Swipes
+  Keyboard:
+    Escape/Backspace/U = Back (GPIO14 User Button)
+    Space/Tab/B/Right  = Select Next (BOOT short press)
+    Enter/O            = Activate / Open (BOOT long press)
+    Arrow Up/Down/Left = Touch gestures
+  Simulator Function Keys:
+    F1 = Cycle Window Scale (1x -> 2x -> 3x -> 4x)
+    F2 = Wi-Fi Scan Mode: Normal
+    F3 = Wi-Fi Scan Mode: Timeout (simulates timeout bug & retry)
+    F4 = Wi-Fi Scan Mode: Scan Error
+    F5 = Device Reboot / Restart
+    F6 = Toggle Diagnostic HUD
+    F9 = Wi-Fi Mode: STA Error
+==================================================
+
+[DesktopStorage] Initialized with runtime directory '.testbuild/channels_smoke'
+
+[NibruOS] Booting system services...
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+[Display] Rotation set to 1
+[Settings] Loaded: Bright=100% Timeout=30s Theme=Cyber Cyan Rot=1 Lang=English
+
+[NibruOS] Simulator shutting down cleanly...
+[NibruOS] Goodbye.

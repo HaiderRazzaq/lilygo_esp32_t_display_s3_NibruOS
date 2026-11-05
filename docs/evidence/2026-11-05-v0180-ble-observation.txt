@@ -1,0 +1,15 @@
+{"slot": "01", "name": null, "rssi": -10, "manufacturer": {}, "service_data": {"0000fe2c-0000-1000-8000-00805f9b34fb": "0001f0"}, "uuids": ["0000fe2c-0000-1000-8000-00805f9b34fb"]}
+{"slot": "02", "name": null, "rssi": -10, "manufacturer": {}, "service_data": {"0000fe2c-0000-1000-8000-00805f9b34fb": "000047"}, "uuids": ["0000fe2c-0000-1000-8000-00805f9b34fb"]}
+{"slot": "04", "name": null, "rssi": -10, "manufacturer": {}, "service_data": {"0000fe2c-0000-1000-8000-00805f9b34fb": "01e5ce"}, "uuids": ["0000fe2c-0000-1000-8000-00805f9b34fb"]}
+{"slot": "05", "name": null, "rssi": -10, "manufacturer": {}, "service_data": {"0000fe2c-0000-1000-8000-00805f9b34fb": "0200f0"}, "uuids": ["0000fe2c-0000-1000-8000-00805f9b34fb"]}
+{"slot": "03", "name": null, "rssi": -10, "manufacturer": {}, "service_data": {"0000fe2c-0000-1000-8000-00805f9b34fb": "00b727"}, "uuids": ["0000fe2c-0000-1000-8000-00805f9b34fb"]}
+{"slot": "04", "name": null, "rssi": -10, "manufacturer": {"0006": "030080436c617373726f6f6d20427564733034"}, "service_data": {}}
+{"slot": "05", "name": null, "rssi": -10, "manufacturer": {"0006": "030080436c617373726f6f6d20427564733035"}, "service_data": {}}
+{"slot": "01", "name": null, "rssi": -12, "manufacturer": {"0006": "030080436c617373726f6f6d20427564733031"}, "service_data": {}}
+{"slot": "02", "name": null, "rssi": -10, "manufacturer": {"0006": "030080436c617373726f6f6d20427564733032"}, "service_data": {}}
+{"slot": "03", "name": null, "rssi": -10, "manufacturer": {"0006": "030080436c617373726f6f6d20427564733033"}, "service_data": {}}
+{"slot": "0A", "name": null, "rssi": -10, "manufacturer": {"0006": "030080436c617373726f6f6d20427564733130"}, "service_data": {}}
+{"slot": "06", "name": null, "rssi": -10, "manufacturer": {"0006": "030080436c617373726f6f6d20427564733036"}, "service_data": {}}
+{"slot": "07", "name": null, "rssi": -10, "manufacturer": {"0006": "030080436c617373726f6f6d20427564733037"}, "service_data": {}}
+{"slot": "08", "name": null, "rssi": -10, "manufacturer": {"0006": "030080436c617373726f6f6d20427564733038"}, "service_data": {}}
+{"slot": "09", "name": null, "rssi": -10, "manufacturer": {"0006": "030080436c617373726f6f6d20427564733039"}, "service_data": {}}

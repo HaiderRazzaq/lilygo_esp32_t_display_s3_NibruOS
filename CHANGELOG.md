@@ -1,5 +1,63 @@
 # Changelog
 
+## [v0.20.0] - 2026-11-05
+
+### Added
+
+- BLE Lab Apple Action (Continuity NearbyAction) and Apple Not Your Device
+  advertisement profiles adapted from Bruce.
+- BLE Beacon name-spam profile with Bruce's UUID 0x1812 / appearance 0x0180
+  layout and preset names.
+- Second target-picker page with header paging; the first page and its touch
+  coordinates are unchanged.
+- Random now selects among all seven pairing and Apple alert profiles; Beacon
+  remains an explicit target.
+
+### Changed
+
+- Non-connectable advertising now covers both BLE scanner and Beacon profiles;
+  pairing and Apple alert profiles remain connectable.
+
+### Fixed
+
+- Advertising-profile validation accepts the extended profile enum instead of
+  rejecting every value above Random.
+
+## [v0.19.0] - 2026-11-05
+
+### Added
+
+- BLE Lab target-family picker with touch, Back and BOOT navigation.
+- Random pairing advertisements choose a protocol and accessory model per window with a fresh random address.
+
+## [v0.18.0] - 2026-11-05
+
+### Added
+
+- BLE Lab pairing advertisement profiles adapted from Bruce for Android Fast Pair, Windows Swift Pair, Apple AirPods and Samsung Buds/Watch, plus mixed-profile sessions.
+- Preserve upstream code attribution and the Bruce AGPL-3.0 license.
+
+## [v0.17.0] - 2026-11-05
+
+### Added
+
+- BLE Lab advertises one to ten fictional non-connectable identities for five to sixty seconds, with stable per-session random addresses and LabBLE names.
+
+### Changed
+
+- Reuse checked Bluedroid startup for the keyboard and BLE Lab.
+- Defer desktop integration while simulator work is paused by the owner.
+
+## [v0.16.0] - 2026-11-05
+
+### Added
+
+- Wi-Fi Channels Home app with a channel histogram, access point counts and strongest RSSI per selected channel. Refresh uses the existing asynchronous scanner.
+
+### Fixed
+
+- Include the existing WiFi Defense implementation in both CMake desktop targets.
+
 ## [v0.15.0] - 2026-11-04
 
 ### Added

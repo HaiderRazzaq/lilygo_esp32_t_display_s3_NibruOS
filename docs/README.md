@@ -41,3 +41,5 @@ Start with [AGENTS](../AGENTS.md), [project context](PROJECT_CONTEXT.md), and
 
 Evidence files live under [evidence](evidence/README.md). Records complement Git;
 they cannot reconstruct changes before the first available commit.
+
+BLE Lab operation and deferred target coverage are described in [BLE Lab](BLE_LAB.md).

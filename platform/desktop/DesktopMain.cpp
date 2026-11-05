@@ -16,6 +16,7 @@
 #include "services/UsbHidService.h"
 #include "services/WebPortalService.h"
 #include "apps/WiFiApp.h"
+#include "apps/WiFiChannelsApp.h"
 #include "apps/BluetoothApp.h"
 #include "apps/BeaconLabApp.h"
 #include "apps/TotpApp.h"
@@ -104,6 +105,7 @@ int main(int argc, char* argv[]) {
   AppManager launcher(context);
 
   WiFiApp wifiApp;
+  WiFiChannelsApp wifiChannelsApp;
   BluetoothApp bluetoothApp;
   WifiDefenseApp wifiDefenseApp;
   BeaconLabApp beaconLabApp;
@@ -139,6 +141,7 @@ int main(int argc, char* argv[]) {
     launcher.registerApp(clockApp);
     launcher.registerApp(settingsApp);
     launcher.registerApp(beaconLabApp);
+    launcher.registerApp(wifiChannelsApp);
 
     launcher.begin();
     launcher.tick(millis());

@@ -1,0 +1,34 @@
+NibruOS v0.20.0 upload attempt 1 (COM6)
+
+Processing lilygo-t-display-s3 (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+PACKAGES:
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14)
+ - tool-esptoolpy @ 1.40501.0 (4.5.1)
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+RAM:   [===       ]  26.3% (used 86264 bytes from 327680 bytes)
+Flash: [==        ]  24.3% (used 1591733 bytes from 6553600 bytes)
+Configuring upload protocol...
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: COM6
+Uploading .pio\build\lilygo-t-display-s3\firmware.bin
+esptool.py v4.5.1
+Serial port COM6
+Connecting...
+
+A serial exception error occurred: ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22))
+Note: This error originates from pySerial. It is likely not a problem with esptool, but with the hardware connection or drivers.
+For troubleshooting steps visit: https://docs.espressif.com/projects/esptool/en/latest/troubleshooting.html
+*** [upload] Error 1
+========================= [FAILED] Took 31.75 seconds =========================
+Environment          Status    Duration
+lilygo-t-display-s3  FAILED    00:00:31.752
+==================== 1 failed, 0 succeeded in 00:00:31.752 ====================
+
+Observation: the failure occurred before any write. The native USB CDC port
+re-enumerated from COM6 to COM5. Retry on COM5 succeeded; see
+2026-11-05-v0200-upload.txt.

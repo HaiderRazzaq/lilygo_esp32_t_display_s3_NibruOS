@@ -1,0 +1,44 @@
+===================================================
+  NibruOS Desktop Automated Test Runner
+===================================================
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.23
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+-- Fetching prebuilt official SDL2 VC Development Package...
+CMake Warning (dev) at C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.31/Modules/FetchContent.cmake:1373 (message):
+  The DOWNLOAD_EXTRACT_TIMESTAMP option was not given and policy CMP0135 is
+  not set.  The policy's OLD behavior will be used.  When using a URL
+  download, the timestamps of extracted files should preferably be that of
+  the time of extraction, otherwise code that depends on the extracted
+  contents might not be rebuilt if the URL changes.  The OLD behavior
+  preserves the timestamps from the archive instead, but this is usually not
+  what you want.  Update your project to the NEW behavior or specify the
+  DOWNLOAD_EXTRACT_TIMESTAMP option with a value of true to avoid this
+  robustness issue.
+Call Stack (most recent call first):
+  CMakeLists.txt:28 (FetchContent_Declare)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Configuring done (2.1s)
+-- Generating done (0.2s)
+-- Build files have been written to: C:/Users/Haider/Desktop/lilygo_esp32_t_display_s3_NibruOS/build
+[1/24] Building CXX object CMakeFiles\nibru_tests.dir\tests\desktop\test_simulator.cpp.obj
+FAILED: CMakeFiles/nibru_tests.dir/tests/desktop/test_simulator.cpp.obj 
+C:\PROGRA~2\MICROS~2\2022\BUILDT~1\VC\Tools\MSVC\1444~1.352\bin\Hostx64\x64\cl.exe  /nologo /TP -DNIBRU_DESKTOP_SIMULATOR=1 -DNIBRU_HEADLESS=1 -DUNIT_TEST=1 -IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS -IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\platform\desktop\stubs -IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\platform\desktop -IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\include -IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src -external:IC:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\build\_deps\sdl2_prebuilt-src\include -external:W0 /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd /W4 /utf-8 /wd4996 /showIncludes /FoCMakeFiles\nibru_tests.dir\tests\desktop\test_simulator.cpp.obj /FdCMakeFiles\nibru_tests.dir\ /FS -c C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\tests\desktop\test_simulator.cpp
+C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\tests\desktop\test_simulator.cpp(27): fatal error C1083: Cannot open include file: 'apps/WiFiChannelsApp.h': No such file or directory
+[2/24] Building CXX object CMakeFiles\nibru_tests.dir\src\core\ResourceManager.cpp.obj
+[3/24] Building CXX object CMakeFiles\nibru_tests.dir\src\ui\HomeScreen.cpp.obj
+[4/24] Building CXX object CMakeFiles\nibru_tests.dir\src\apps\BluetoothApp.cpp.obj
+[5/24] Building CXX object CMakeFiles\nibru_tests.dir\src\services\WebPortalService.cpp.obj
+[6/24] Building CXX object CMakeFiles\nibru_tests.dir\src\services\BleHidService.cpp.obj
+[7/24] Building CXX object CMakeFiles\nibru_tests.dir\src\core\AppManager.cpp.obj
+[8/24] Building CXX object CMakeFiles\nibru_tests.dir\src\apps\WiFiApp.cpp.obj
+[9/24] Building CXX object CMakeFiles\nibru_tests.dir\src\hardware\ButtonManager.cpp.obj
+[10/24] Building CXX object CMakeFiles\nibru_tests.dir\src\apps\BeaconLabApp.cpp.obj
+[11/24] Building CXX object CMakeFiles\nibru_tests.dir\src\hardware\DisplayManager.cpp.obj
+[12/24] Building CXX object CMakeFiles\nibru_tests.dir\src\hardware\TouchManager.cpp.obj
+[13/24] Building CXX object CMakeFiles\nibru_tests.dir\src\services\WiFiService.cpp.obj
+[14/24] Building CXX object CMakeFiles\nibru_tests.dir\src\services\SecurityService.cpp.obj
+ninja: build stopped: subcommand failed.

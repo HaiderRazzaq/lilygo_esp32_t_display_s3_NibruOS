@@ -91,7 +91,10 @@ set(NIBRU_SHARED_SOURCES
   src/services/VaultService.cpp
   src/services/WebPortalService.cpp
   src/services/BleHidService.cpp
+  src/services/WifiDefenseService.cpp
   src/apps/WiFiApp.cpp
+  src/apps/WiFiChannelsApp.cpp
+  src/apps/WifiDefenseApp.cpp
   src/apps/BluetoothApp.cpp
   src/apps/BeaconLabApp.cpp
   src/apps/WiFiScannerApp.cpp

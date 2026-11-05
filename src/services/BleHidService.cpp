@@ -1,4 +1,5 @@
 #include "services/BleHidService.h"
+#include "services/BleStack.h"
 #include "services/WiFiService.h"
 #include "core/AppContext.h"
 #include "core/ResourceManager.h"
@@ -16,34 +17,6 @@
 #include <esp_heap_caps.h>
 
 namespace {
-bool startBleStack(const char* name) {
-  constexpr uint32_t internalCaps = MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT;
-  Serial.printf("[BLE] Starting controller (internal heap=%u, largest=%u bytes)\n",
-                static_cast<unsigned>(heap_caps_get_free_size(internalCaps)),
-                static_cast<unsigned>(heap_caps_get_largest_free_block(internalCaps)));
-
-  // Arduino-ESP32 2.0.14's btStart() spins while IDLE if controller init fails.
-  // Initialize explicitly so the error can be handled before calling BLEDevice.
-  if (esp_bt_controller_get_status() == ESP_BT_CONTROLLER_STATUS_IDLE) {
-    esp_bt_controller_config_t config = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
-    const esp_err_t result = esp_bt_controller_init(&config);
-    if (result != ESP_OK) {
-      Serial.printf("[BLE] Controller init failed: %s\n", esp_err_to_name(result));
-      return false;
-    }
-  }
-
-  Serial.println("[BLE] Starting Bluedroid host...");
-  BLEDevice::init(name);
-  if (esp_bt_controller_get_status() != ESP_BT_CONTROLLER_STATUS_ENABLED ||
-      esp_bluedroid_get_status() != ESP_BLUEDROID_STATUS_ENABLED) {
-    Serial.println("[BLE] Controller or Bluedroid failed to start");
-    BLEDevice::deinit(false);
-    return false;
-  }
-  return true;
-}
-
 // Standard 8-byte HID keyboard report map
 const uint8_t hidReportMap[] = {
   0x05, 0x01,  // USAGE_PAGE (Generic Desktop)
@@ -254,7 +227,7 @@ bool BleHidService::setEnabled(bool enable, AppContext& ctx) {
       return false;
     }
 #if defined(ARDUINO_ARCH_ESP32) && !defined(NIBRU_DESKTOP_SIMULATOR) && !defined(UNIT_TEST)
-    if (!startBleStack(deviceName())) {
+    if (!BleStack::start(deviceName())) {
       if (esp_bt_controller_get_status() != ESP_BT_CONTROLLER_STATUS_ENABLED) {
         ctx.wifi.setBleCoexistence(false);
       }

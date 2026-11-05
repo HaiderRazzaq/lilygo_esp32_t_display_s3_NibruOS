@@ -12,6 +12,11 @@ struct NetworkRecord {
   bool secured;
 };
 
+struct WiFiChannelSummary {
+  uint16_t accessPoints = 0;
+  int16_t strongestRssi = 0; // Valid only when accessPoints is nonzero.
+};
+
 struct SavedNetwork {
   char ssid[33];
   char password[65];
@@ -38,6 +43,11 @@ public:
   uint8_t beaconAcceptedNames() const { return beaconAcceptedNames_; }
   ScanState state() const { return state_; }
   uint8_t count() const { return count_; }
+  static constexpr uint8_t kChannelCount = 14;
+  uint16_t scanResultCount() const { return scanResultCount_; }
+  const WiFiChannelSummary* channelSummary(uint8_t channel) const {
+    return channel >= 1 && channel <= kChannelCount ? &channels_[channel - 1] : nullptr;
+  }
   const NetworkRecord* network(uint8_t idx) const {
     return idx < count_ ? &networks_[idx] : nullptr;
   }
@@ -79,6 +89,8 @@ public:
 
 private:
   NetworkRecord networks_[12]{};
+  WiFiChannelSummary channels_[kChannelCount]{};
+  uint16_t scanResultCount_ = 0;
   ScanState state_ = ScanState::Idle;
   uint8_t count_ = 0;
   uint8_t attempt_ = 0;

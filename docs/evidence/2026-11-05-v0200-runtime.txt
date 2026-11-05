@@ -1,0 +1,29 @@
+﻿NibruOS v0.20.0 runtime after physical reset — 2026-11-05
+
+Action: owner pressed the board RESET button / re-plugged USB after the
+software-only probes left the chip in ROM download mode.
+
+Observation 1 — USB re-enumeration:
+  pio device list
+  COM6
+  Hardware ID: USB VID:PID=303A:1001 SER=441BF6D3AABC LOCATION=1-1:x.1
+  Description: USB Serial Device (COM6)
+
+  The previous ROM USB-JTAG enumeration on COM5 reported
+  SER=44:1B:F6:D3:AA:BC. The changed serial string and new COM number show the
+  application's TinyUSB CDC stack is now enumerated.
+
+Observation 2 — live serial command:
+  Probe: send "TIME:1762340000\n" at 115200 with DTR asserted.
+  Response: "[TimeService] Time set: 1762340000 (source: USB)"
+
+  The application loop is running and processing serial input, which the ROM
+  downloader cannot do.
+
+Conclusion: the uploaded v0.20.0 application boots and runs after a physical
+reset. The boot banner itself was not captured because native USB CDC prints it
+before a host can open the port.
+
+Remaining NOT RUN: BLE receiver behavior for Apple Action / Not Your Device /
+Beacon, touch acceptance on page two, heap/largest-block, stack high-water
+marks, PSRAM, latency, power and twenty physical cycles.

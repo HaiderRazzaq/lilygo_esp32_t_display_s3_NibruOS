@@ -1,0 +1,47 @@
+NibruOS v0.20.0 runtime probe — 2026-11-05
+
+Goal: confirm the uploaded image boots and the running app responds to the
+existing serial TIME command.
+
+Sequence and observations:
+
+1) esptool chip_id --port COM5 --before default_reset --after hard_reset
+   Output ended with "Hard resetting via RTS pin..." and the port stayed COM5.
+
+2) esptool --port COM5 --before no_reset --after no_reset flash_id
+   Output: "Chip is ESP32-S3 ... Stub running ... Staying in bootloader."
+   => the chip was still in the ROM bootloader, not running the application.
+
+3) Manual normal-boot attempt (pyserial):
+   dtr=False, rts=True, sleep, rts=False
+   Captured ROM banner:
+     ESP-ROM:esp32s3-20210327
+     Build:Mar 27 2021
+     rst:0x15 (USB_UART_CHIP_RESET),boot:0x21 (DOWNLOAD(USB/UART0))
+     Saved PC:0x40041a76
+     waiting for download
+   => every reset with DTR low samples the download strap (GPIO0 low).
+
+4) Opposite polarity attempt (dtr=True, rts pulse):
+   No ROM banner and no reset observed; the chip remained in the bootloader.
+
+5) esptool --after soft_reset flash_id
+   "Soft resetting is currently only supported on ESP8266."
+
+6) Stub reboot attempt (flash_begin 0/0 + flash_finish reboot=True):
+   Reboot command sent; esptool --before no_reset still reported
+   "Staying in bootloader."
+
+7) TIME:1762340000 probe over COM5, DTR asserted:
+   NO_RESPONSE (twice).
+
+Conclusion: the board is latched in the ROM USB download mode after the
+upload/probing sequence. Software-only reset over USB-JTAG keeps sampling the
+download strap, so the application is not running. A physical RESET press or a
+USB unplug/re-plug is required to boot v0.20.0 normally. Runtime banner,
+receiver behavior, heap, latency, power and 20-cycle tests remain NOT RUN.
+
+The earlier note in 2026-11-05-v0200-reset-attempt.txt that
+"esptool chip_id with --after hard_reset restored normal boot" is superseded:
+later probes proved the chip was still in the bootloader. Keeping the original
+note for history; this file is the correction.

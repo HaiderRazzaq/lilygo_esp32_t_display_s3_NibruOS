@@ -2411,3 +2411,171 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Observe real deauth detection in laboratory RF environment with physical packet generation."
 }
 ```
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0066",
+  "date": "2026-11-05",
+  "related": [
+    "FEAT-0026",
+    "FEAT-0004",
+    "FEAT-0024",
+    "HWT-0074",
+    "HWT-0075"
+  ],
+  "action": "Add Wi-Fi channel analysis in v0.16.0",
+  "files": [
+    "src/apps/WiFiChannelsApp.h",
+    "src/apps/WiFiChannelsApp.cpp",
+    "src/services/WiFiService.h",
+    "src/services/WiFiService.cpp",
+    "src/core/ResourceManager.h",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "CMakeLists.txt",
+    "tests/desktop/test_simulator.cpp",
+    "tests/host/test_main.cpp"
+  ],
+  "description": "Add a Home channel chart with manual refresh, per-channel AP counts and peak RSSI. Aggregate all driver scan records while preserving the existing twelve-entry connection list. Include missing existing WiFi Defense sources in desktop CMake targets. Record the owner confirmation of Beacon Lab operation.",
+  "reason": "Extend radio diagnostics through existing services and ownership without another scan worker or hardware dependency.",
+  "expected": "Correct summaries, manual bounded scans, responsive Back and clean radio ownership.",
+  "actual": "Host and desktop tests passed, including a 261-result scan and twenty cancellation cycles. Both desktop targets built, a headless startup/exit completed, and the ESP32 build and partition check passed. Physical measurements remain pending.",
+  "verification": "VER-0205 through VER-0210; HWT-0074 owner report; HWT-0075 NOT RUN",
+  "risks": "Scan counts are a snapshot of discoverable APs. Post-scan aggregation scales with driver result count. Physical latency, heap, stacks, PSRAM and power were not measured.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Run HWT-0075 after an authorized upload. Retain existing resource baseline and measure A\u2013E before accepting runtime performance."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0067",
+  "date": "2026-11-05",
+  "related": ["FEAT-0027", "FEAT-0022"],
+  "action": "Add BLE Lab in v0.17.0",
+  "files": [
+    "src/services/BleAdvertisingService.h",
+    "src/services/BleAdvertisingService.cpp",
+    "src/services/BleStack.h",
+    "src/services/BleHidService.cpp",
+    "src/apps/BleLabApp.h",
+    "src/apps/BleLabApp.cpp",
+    "src/core/AppContext.h",
+    "src/core/ResourceManager.h",
+    "src/main.cpp",
+    "tests/host/test_main.cpp"
+  ],
+  "description": "Add one to ten fictional non-connectable identities with stable per-session random addresses, explicit duration, GAP completion sequencing, bounded cleanup and shared checked Bluedroid startup.",
+  "reason": "The owner selected multiple fictional devices visible in a BLE scanner for classroom defense demonstrations.",
+  "expected": "Identities rotate without controller reinitialization and the session releases its radio ownership on stop.",
+  "actual": "Host fault-injection tests and the ESP32 build passed. Desktop work was skipped under the owner pause. Physical reception and resource acceptance are pending.",
+  "verification": "VER-0211 through VER-0217; HWT-0076",
+  "risks": "Radio activity changes power and coexistence behavior. GAP completion is not receiver evidence. Repeated physical lifecycle measurements are pending.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Run HWT-0076 after an authorized upload and resume desktop integration only on owner instruction."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0068",
+  "date": "2026-11-05",
+  "related": ["FEAT-0027", "HWT-0078"],
+  "action": "Add Bruce pairing advertisement profiles in v0.18.0",
+  "files": [
+    "src/services/BleAdvertisingPayload.h",
+    "src/services/BleAdvertisingPayload.cpp",
+    "src/services/BleAdvertisingService.h",
+    "src/services/BleAdvertisingService.cpp",
+    "src/apps/BleLabApp.h",
+    "src/apps/BleLabApp.cpp",
+    "tests/host/test_main.cpp",
+    "LICENSES/Bruce-AGPL-3.0.txt"
+  ],
+  "description": "Adapt Bruce payload layouts and model data for Android, Windows, Apple and Samsung. Add a profile selector and mixed sessions while retaining bounded asynchronous operation and attribution.",
+  "reason": "The owner requested accessory discovery notifications and selected Android or Windows for the first device test.",
+  "expected": "Correct reference payloads reach supported receivers and may trigger their accessory discovery UI.",
+  "actual": "Host format/lifecycle tests and ESP32 build passed. Receiver notifications remain unverified. The owner authorized upload after verification.",
+  "verification": "VER-0218 through VER-0223; HWT-0078",
+  "risks": "Receiver filtering varies. Samsung Buds retains the reference truncated final AD element. Incoming connections can end an advertising window. Physical coexistence and resource effects remain pending.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Upload the verified image and test Windows Swift Pair or Android Fast Pair on the owner receiver; capture acceptance and performance separately."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0069",
+  "date": "2026-11-05",
+  "related": ["FEAT-0027", "HWT-0080", "HWT-0081"],
+  "action": "Add target-family picker and Random in v0.19.0",
+  "files": [
+    "src/apps/BleLabApp.h",
+    "src/apps/BleLabApp.cpp",
+    "src/services/BleAdvertisingPayload.h",
+    "src/services/BleAdvertisingPayload.cpp",
+    "src/services/BleAdvertisingService.cpp",
+    "tests/host/test_main.cpp"
+  ],
+  "description": "Replace mode cycling with a target picker and add per-window random protocol, model and address selection. Preserve fixed-profile behavior and session cleanup.",
+  "reason": "The owner confirmed Windows notifications and requested clearer target types and Random.",
+  "expected": "Clear touch and BOOT selection, responsive Back and bounded random pairing demonstrations.",
+  "actual": "Host picker, contact suppression, random payload and address-rotation tests passed. ESP32 build and capacity passed. Simulator work remains paused.",
+  "verification": "VER-0224 through VER-0229; HWT-0080",
+  "risks": "Random creates fresh receiver-visible identities, so receiver cache and notification behavior may differ. Physical resources and touch acceptance remain pending.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Upload under the existing owner instruction, then run HWT-0081 and physical resource scenarios."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0070",
+  "date": "2026-11-05",
+  "related": ["FEAT-0027", "VER-0230", "VER-0231", "VER-0232"],
+  "action": "Add Bruce-derived BLE advertising modes in v0.20.0",
+  "files": [
+    "src/apps/BleLabApp.h",
+    "src/apps/BleLabApp.cpp",
+    "src/services/BleAdvertisingPayload.h",
+    "src/services/BleAdvertisingPayload.cpp",
+    "src/services/BleAdvertisingService.cpp",
+    "tests/host/test_main.cpp"
+  ],
+  "description": "Extend the existing BLE Lab with Apple Continuity NearbyAction, Apple Not Your Device and BLE Beacon name profiles. Add a second picker page behind header arrows while leaving the first page and its coordinates unchanged. Make Beacon non-connectable, extend Random across seven connectable profile types and accept the extended profile enum in the service.",
+  "reason": "The owner requested selected Bruce BLE spam/advertising capabilities for university cybersecurity defense demonstrations without affecting existing modes or performance.",
+  "expected": "Bounded 31-byte payloads, unchanged lifecycle and radio ownership, responsive paging and cleanup, and no regression in the existing eight targets.",
+  "actual": "Host payload, paging, connectable/non-connectable routing and cleanup tests passed. The ESP32 image built at 1,592,096 B (+1,104 B) with unchanged 86,264 B static RAM and was uploaded on the second port attempt with a verified write hash. No receiver notification was tested.",
+  "verification": "VER-0230 through VER-0232; HWT-0085 upload",
+  "risks": "Apple alert and beacon payloads are advertisement-only demonstrations. Modern Android, iOS/HyperOS and vendor software may suppress or filter them. Physical RF, heap, latency and power effects are NOT MEASURED.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Test Apple Action, Not Your Device and Beacon reception with matching receivers and run resource scenarios A-E under HWT-0084."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0071",
+  "date": "2026-11-05",
+  "related": ["FEAT-0027", "HWT-0085", "HWT-0086"],
+  "action": "Record post-upload runtime boot blocker after v0.20.0 installation",
+  "files": [
+    "docs/evidence/2026-11-05-v0200-runtime-probe.txt",
+    "docs/evidence/2026-11-05-v0200-reset-attempt.txt",
+    "docs/HARDWARE_TEST_LOG.md"
+  ],
+  "description": "After the hash-verified v0.20.0 upload, software probing over native USB could not return the board to normal boot. Every reset sampled the download strap (boot:0x21 DOWNLOAD(USB/UART0)) and the serial TIME probe returned no response. esptool no-reset sync kept reporting 'Staying in bootloader'.",
+  "reason": "Record the actual post-upload state honestly instead of implying that a successful write proves the application is running.",
+  "expected": "A reset would start the application and the TIME serial command would return a TimeService acknowledgement.",
+  "actual": "BLOCKED. The upload and write hash remain PASS (HWT-0085). A physical RESET press or USB re-plug is required to boot v0.20.0. An earlier note claiming that esptool restored normal boot was corrected in the evidence file and in HWT-0085.",
+  "verification": "HWT-0086",
+  "risks": "The application itself is not implicated; the board simply stayed in the ROM downloader. Receiver, heap, latency, power and 20-cycle results remain NOT RUN.",
+  "commit": "WORKING_TREE",
+  "follow_up": "After a physical reset, capture the v0.20.0 boot banner and run HWT-0084 plus resource scenarios A-E."
+}
+```

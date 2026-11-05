@@ -1,0 +1,12 @@
+{
+  "binary_bytes": 1590992,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 4962608,
+  "sha256": "9e509accad02f266486618644c394ac0016e8f318b1aafa3890eb3d46d6d4fca",
+  "growth_percent": 89.01138588454447,
+  "warnings": [
+    "Image growth exceeds provisional 5% review trigger"
+  ],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)

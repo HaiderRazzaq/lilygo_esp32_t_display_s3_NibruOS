@@ -17,7 +17,10 @@
 #include "services/UsbHidService.h"
 #include "services/WebPortalService.h"
 #include "services/BleHidService.h"
+#include "services/BleAdvertisingService.h"
+#include "apps/BleLabApp.h"
 #include "apps/WiFiApp.h"
+#include "apps/WiFiChannelsApp.h"
 #include "apps/BluetoothApp.h"
 #include "apps/BeaconLabApp.h"
 #include "apps/TotpApp.h"
@@ -44,9 +47,12 @@ VaultService vault;
 WebPortalService webPortal;
 BleHidService bleHid;
 WifiDefenseService wifiDefense;
-AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid, wifiDefense};
+BleAdvertisingService bleAdvertising;
+AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid, wifiDefense, &bleAdvertising};
 AppManager launcher(context);
 WiFiApp wifiApp;
+WiFiChannelsApp wifiChannelsApp;
+BleLabApp bleLabApp;
 BluetoothApp bluetoothApp;
 WifiDefenseApp wifiDefenseApp;
 BeaconLabApp beaconLabApp;
@@ -60,7 +66,7 @@ WakeInputGate wakeInput;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n[NibruOS] boot v0.15.0");
+  Serial.println("\n[NibruOS] boot v0.20.0");
   MemoryProfiler::checkpoint("startup-basic");
   display.begin();
   touch.begin();
@@ -86,6 +92,8 @@ void setup() {
   launcher.registerApp(clockApp);
   launcher.registerApp(settingsApp);
   launcher.registerApp(beaconLabApp);
+  launcher.registerApp(wifiChannelsApp);
+  launcher.registerApp(bleLabApp);
   launcher.begin();
   launcher.tick(millis());
   MemoryProfiler::checkpoint("home-services-ready");
@@ -167,7 +175,9 @@ void loop() {
   }
   if (display.isSleeping() || display.isScreensaverActive() || security.isLocked()) {
     beaconLabApp.onExit(context);
+    bleAdvertising.stop(now, context);
   }
+  bleAdvertising.tick(now, context);
   wifi.tick(now);
   while (Serial.available() > 0) {
     char c = static_cast<char>(Serial.read());

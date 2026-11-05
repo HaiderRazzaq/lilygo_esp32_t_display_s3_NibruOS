@@ -170,3 +170,27 @@ NibruOS supports two targets compiled from shared application code:
 2. **Desktop Simulator Target (`nibru_simulator`)**: Windows desktop executable using SDL2, RGB565 framebuffer simulation, and simulated peripherals (`MockWiFiService`, `DesktopStorage`, `DesktopInput`).
 
 Applications and UI logic reside in platform-neutral code in `src/` and must never include target-specific headers (`SDL.h` or hardware registers) directly.
+
+## Wi-Fi channel summaries
+
+WiFiService owns fourteen fixed-size channel summaries and a full scan-result count. Completed scans aggregate channel counts and strongest RSSI before deleting driver results, while the connection list retains its existing twelve-record limit. WiFiChannelsApp reads the shared snapshot through AppContext, owns a WiFiChannels radio lease, and requests manual asynchronous scans. It is registered on both execution targets. No new task, library, GPIO, persistent setting or raw driver call is added to the application layer.
+
+## BLE Lab radio ownership
+
+BleAdvertisingService uses an asynchronous GAP transport and host fault
+injection. Its ESP32 adapter reuses checked Bluedroid startup in BleStack.
+Each identity is configured after advertising stops. Address, payload and start
+requests are acknowledged through a single atomic completion mailbox.
+The controller is initialized once per session.
+
+AppContext accepts an optional BLE advertising service pointer, defaulting to
+null for existing callers. BLE Lab is registered in the physical entry point.
+Desktop integration is deferred by the owner. Main ticks the service separately
+from rendering and stops it on lock, sleep or screensaver. Cleanup retains radio
+ownership until the host and controller are stopped.
+
+BleAdvertisingPayload owns all profile payloads and stays platform-neutral.
+v0.20.0 adds Apple Continuity NearbyAction, the ProximityPair Not Your Device
+prefix and beacon name records beside the existing pairing builders. The
+service keeps one payload buffer and one GAP operation mailbox regardless of
+profile; only connectable routing and the selected builder vary.

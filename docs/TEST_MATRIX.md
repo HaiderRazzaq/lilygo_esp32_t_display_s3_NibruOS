@@ -135,3 +135,15 @@ Current easier-entry default upload HWT-0019 PASS for write/hash/reset only; mat
 | Beacon Lab names, open/secured counts and duration | VER-0195 HOST/SIMULATOR, VER-0196 BUILD | NOT RUN. Verify unique names, WPA2 flags, and transmission stop on a second receiver. |
 
 | Beacon Lab batch scheduling and accepted-name count | VER-0197 HOST/SIMULATOR, VER-0198 BUILD | NOT RUN. Compare on-device accepted count with a capture on the transmit channel. |
+
+| Wi-Fi Channels aggregation, manual refresh, busy radio, Back and cancellation | VER-0205 RED, VER-0206 compile/link attempt FAIL, VER-0207 HOST/SIMULATOR, VER-0208 ESP32 BUILD | HWT-0075 NOT RUN; includes physical A–E and 20-cycle resource checks |
+| Beacon Lab receiver visibility | Existing host/build evidence | HWT-0074 owner reports working; counts and runtime metrics were not captured |
+| BLE Lab identities, GAP events, timeout and cleanup | VER-0211 RED, VER-0212 initial compile FAIL, VER-0213 HOST, VER-0214 ESP32 BUILD | HWT-0076 NOT RUN |
+| BLE Lab desktop registration and simulation | VER-0216 SKIPPED by owner | Resume after explicit owner instruction |
+| Bruce pairing payload layouts, profiles and mixed sessions | VER-0218 RED, VER-0219 HOST, VER-0220 BUILD | HWT-0078 notification and resource acceptance NOT RUN |
+| Pairing profile desktop integration | VER-0222 SKIPPED by owner | Simulator remains paused |
+| Matched Windows Swift Pair reception and notification | Existing payload/host build evidence | HWT-0080 receiver capture and owner-confirmed notification PASS |
+| Target-family picker, contact suppression, Back/BOOT and Random | VER-0224 RED, VER-0225 HOST, VER-0226 BUILD | HWT-0081 NOT RUN |
+| v0.19.0 simulator integration | VER-0228 SKIPPED by owner | Paused |
+| Apple Action, Apple Not Your Device, Beacon payloads and page-two picker | VER-0230 HOST, VER-0231 BUILD, VER-0232 DOCS | HWT-0085 upload/hash PASS; HWT-0086 runtime boot BLOCKED until a physical reset; HWT-0084 receiver alerts, twenty cycles and resource scenarios A–E NOT RUN. |
+| v0.20.0 simulator integration | VER-0233 SKIPPED by owner | BLE Lab remains absent from the paused simulator |

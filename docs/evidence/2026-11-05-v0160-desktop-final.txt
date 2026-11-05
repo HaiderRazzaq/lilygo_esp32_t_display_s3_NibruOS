@@ -1,0 +1,253 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.23
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+[0/1] Re-running CMake...
+-- Fetching prebuilt official SDL2 VC Development Package...
+CMake Warning (dev) at C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.31/Modules/FetchContent.cmake:1373 (message):
+  The DOWNLOAD_EXTRACT_TIMESTAMP option was not given and policy CMP0135 is
+  not set.  The policy's OLD behavior will be used.  When using a URL
+  download, the timestamps of extracted files should preferably be that of
+  the time of extraction, otherwise code that depends on the extracted
+  contents might not be rebuilt if the URL changes.  The OLD behavior
+  preserves the timestamps from the archive instead, but this is usually not
+  what you want.  Update your project to the NEW behavior or specify the
+  DOWNLOAD_EXTRACT_TIMESTAMP option with a value of true to avoid this
+  robustness issue.
+Call Stack (most recent call first):
+  CMakeLists.txt:28 (FetchContent_Declare)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Configuring done (1.0s)
+-- Generating done (0.2s)
+-- Build files have been written to: C:/Users/Haider/Desktop/lilygo_esp32_t_display_s3_NibruOS/build
+[1/7] Building CXX object CMakeFiles\nibru_tests.dir\src\services\WifiDefenseService.cpp.obj
+[2/7] Building CXX object CMakeFiles\nibru_simulator.dir\src\services\WifiDefenseService.cpp.obj
+[3/7] Building CXX object CMakeFiles\nibru_simulator.dir\src\apps\WifiDefenseApp.cpp.obj
+[4/7] Building CXX object CMakeFiles\nibru_tests.dir\src\apps\WifiDefenseApp.cpp.obj
+[5/7] Linking CXX executable nibru_simulator.exe
+[6/7] Linking CXX executable nibru_tests.exe
+
+==================================================
+  NibruOS Automated Desktop & Shared Logic Tests
+==================================================
+
+[DesktopStorage] Initialized with runtime directory '.testbuild/auth_runtime_test'
+[Test] Running Core Lifecycle & AppManager Tests...
+  -> Core Lifecycle Tests PASS
+[Test] Running UI & Coordinate Transformation Tests...
+  -> UI & Transformation Tests PASS
+[Test] Running Wi-Fi Service & Fault Injection Tests...
+[MockWiFi] Simulation mode set to: Normal (Success)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 1700 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Scan completed with 5 APs
+[WiFi] Scan complete: 5 APs discovered in 1300 ms
+[MockWiFi] Simulation mode set to: Timeout (11s delay -> retry)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 3700 ms (mode: Timeout (11s delay -> retry))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[WiFi] attempt 1/2 failed: Scan timed out
+[WiFi] retrying scan (attempt 2/2)...
+[MockWiFi] Disconnected
+[WiFi] attempt 2/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 15900 ms (mode: Timeout (11s delay -> retry))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[WiFi] attempt 2/2 failed: Scan timed out
+[MockWiFi] Simulation mode set to: ScanFailed (Immediate error)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Simulating immediate scan start failure
+[WiFi] scanNetworks(async)=-2, freeHeap=215000
+[WiFi] attempt 1/2 failed: Scan start rejected
+[WiFi] retrying scan (attempt 2/2)...
+[MockWiFi] Disconnected
+[WiFi] attempt 2/2: STA preparing (650 ms warmup)
+[MockWiFi] Simulating immediate scan start failure
+[WiFi] scanNetworks(async)=-2, freeHeap=215000
+[WiFi] attempt 2/2 failed: Scan start rejected
+[MockWiFi] Simulation mode set to: Normal (Success)
+  -> Wi-Fi Simulation Tests PASS
+[Test] Wi-Fi channel summaries and lifecycle...
+[MockWiFi] Simulation mode set to: Normal (Success)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 50700 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Scan completed with 19 APs
+[WiFi] Scan complete: 12 APs discovered in 1300 ms
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 52700 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Scan completed with 19 APs
+[WiFi] Scan complete: 12 APs discovered in 1300 ms
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Simulation mode set to: Empty (0 APs found)
+[MockWiFi] Scan started at 54700 ms (mode: Empty (0 APs found))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Scan completed with 0 APs
+[WiFi] Scan complete: 0 APs discovered in 1300 ms
+[MockWiFi] Simulation mode set to: StaError (Mode init fail)
+[MockWiFi] Simulating STA mode init failure
+[WiFi] STA initialization failed
+[MockWiFi] Simulation mode set to: Normal (Success)
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 56700 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 57400 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 58100 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 58800 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 59500 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 60200 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 60900 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 61600 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 62300 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 63000 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 63700 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 64400 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 65100 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 65800 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 66500 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 67200 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 67900 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 68600 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 69300 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+[MockWiFi] Disconnected
+[WiFi] attempt 1/2: STA preparing (650 ms warmup)
+[MockWiFi] Scan started at 70000 ms (mode: Normal (Success))
+[WiFi] scanNetworks(async)=-1, freeHeap=215000
+  -> Channel analysis and 20 cancellation cycles PASS (HOST)
+[Test] Running Settings Persistence & Desktop NVS Tests...
+[DesktopStorage] NVS storage reset to empty
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+[Display] Rotation set to 1
+[Settings] Loaded: Bright=100% Timeout=30s Theme=Cyber Cyan Rot=1 Lang=English
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 30 s
+[Display] Rotation set to 1
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Display] Rotation set to 1
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Display] Rotation set to 1
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Display] Rotation set to 3
+[Display] Brightness set to 50%
+[Display] Sleep timeout set to 60 s
+[Display] Rotation set to 3
+[Settings] Loaded: Bright=50% Timeout=60s Theme=Amber Gold Rot=3 Lang=English
+[Display] Brightness set to 100%
+[Display] Sleep timeout set to 30 s
+[Display] Rotation set to 1
+  -> Settings Persistence Tests PASS
+[Test] Running Modular Architecture & HAL Contract Tests...
+  -> Modular Architecture & HAL Tests PASS
+[TEST] Sleep / Lock / Wake and Display Restoration Flow...
+[Display] Sleep mode entered (backlight OFF)
+[Security] New PIN hash and salt stored securely.
+[Display] Woke up (backlight restored)
+  -> PASS: Sleep/Lock/Wake and Display Restoration verified.
+[TEST] Running Encrypted Password Vault Desktop Simulation Tests...
+[VaultService] Added entry 'Email', total: 1
+[VaultService] Added entry 'AWS', total: 2
+[VaultService] Exported authenticated backup (2 entries, 304 bytes)
+[VaultService] Loaded 2 encrypted entries successfully.
+[VaultService] Removed entry at 0, remaining: 1
+[VaultService] Removed entry at 0, remaining: 0
+  -> PASS: Encrypted Password Vault Desktop Storage & Backup verified.
+[TEST] Running Password Vault Application UI & Confirmed USB HID Tests...
+[Security] New PIN hash and salt stored securely.
+[VaultService] Added entry 'GitHub', total: 1
+[VaultService] Loaded 1 encrypted entries successfully.
+[VaultService] Loaded 1 encrypted entries successfully.
+[VaultService] Removed entry at 0, remaining: 0
+  -> PASS: Password Vault Application UI & Confirmed USB HID verified.
+[Test] Running Web Portal Service & Simulation Tests...
+[VaultService] Added entry 'WebMail', total: 1
+[VaultService] Exported authenticated backup (1 entries, 176 bytes)
+[VaultService] Successfully imported and persisted 1 entries from backup.
+RESTORE RESULT: code=200 resp={"success":true,"count":1}
+[VaultService] Removed entry at 0, remaining: 0
+  -> PASS: Web Portal Service & REST Simulation verified.
+[Test] Running New MVP Features (Generator, Clock, BLE) Tests...
+[Display] Sleep timeout set to 2 s
+[Display] Clock Screensaver activated
+[Display] Clock Screensaver deactivated
+[VaultService] Added entry 'Gen-310', total: 1
+[VaultService] Removed entry at 0, remaining: 0
+  -> PASS: New MVP Features verified successfully.
+[Test] Running 25 Repeated Lifecycle Entry/Exit Cycles...
+  -> 25 Lifecycle Cycles PASS (host control flow; no physical leak measurement)
+[DesktopStorage] NVS storage reset to empty
+[Security] New PIN hash and salt stored securely.
+[DesktopStorage] NVS storage reset to empty
+[DesktopStorage] NVS storage reset to empty
+
+==================================================
+  ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY!
+==================================================
+

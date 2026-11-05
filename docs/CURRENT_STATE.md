@@ -1,17 +1,17 @@
 # Current state
 
-Snapshot: 2026-11-04, Asia/Baghdad. Implementation and physical acceptance are
+Snapshot: 2026-11-05, Asia/Baghdad. Implementation and physical acceptance are
 separate; [history](DEVELOPMENT_LOG.md) is append-only.
 
 ```json
 {
   "record_type": "state",
-  "date": "2026-11-04",
-  "runtime_version": "v0.15.0",
+  "date": "2026-11-05",
+  "runtime_version": "v0.20.0",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
-  "working_tree": "Screen orientation control (0 deg/180 deg), architecture audit, layer boundary hardening, single-source-of-truth configuration alignment (ADR-0003), zero compiler warnings",
+  "working_tree": "BLE advertising lab with Apple Action, Not Your Device and Beacon modes; physical verification pending; simulator work paused by the owner",
   "implemented_features": [
     "FEAT-0024",
     "FEAT-0001",
@@ -36,7 +36,9 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "FEAT-0021",
     "FEAT-0022",
     "FEAT-0023",
-    "FEAT-0025"
+    "FEAT-0025",
+    "FEAT-0026",
+    "FEAT-0027"
   ],
   "planned_features": [
     "FEAT-0007"
@@ -56,10 +58,10 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "BUG-0016",
     "BUG-0018"
   ],
-  "latest_build": "VER-0203",
-  "latest_upload": "HWT-0073",
-  "documentation_verification": "VER-0204",
-  "current_host_attempt": "VER-0202",
+  "latest_build": "VER-0231",
+  "latest_upload": "HWT-0085",
+  "documentation_verification": "VER-0232",
+  "current_host_attempt": "VER-0230",
   "source_constants": {
     "kTouchSda": 18,
     "kTouchScl": 17,
@@ -236,3 +238,90 @@ Open and Secured are separate counts, with a combined range of 1 to 40. Seconds 
 ### Beacon Lab scan visibility in v0.14.1
 
 Beacon Lab sends at most three different names per scheduled tick, with at least 25 ms between batches. TX accepted shows distinct names accepted by the driver. It is not a receiver count. A failed raw TX request stops the session and logs its error and progress. The board remains on v0.14.0 pending upload.
+
+### Wi-Fi channel analysis in v0.16.0
+
+Wi-Fi Channels is registered after the existing Home apps on ESP32 and desktop. It opens the latest completed scan, if available, and scans only through REFRESH or BOOT. The chart covers channels 1–14, with the number of visible access point records and strongest RSSI on the selected channel. Statistics aggregate the entire scan before the existing twelve-entry connection list is retained. Counts describe detected APs and do not measure channel airtime or interference. Regulatory scan coverage is determined by the existing driver configuration.
+
+The owner confirmed Beacon Lab works (HWT-0074), without reporting counts, exact image or physical resource measurements. Channel reception and device resource scenarios A–E remain NOT RUN (HWT-0075). The latest recorded physical upload remains v0.15.0 (HWT-0073); v0.16.0 is a source/build version.
+
+### BLE Lab in v0.17.0
+
+BLE Lab is a physical Home app. Defaults are five identities for thirty seconds,
+adjustable from one to ten and five to sixty seconds. Names are LabBLE01 through
+LabBLE10, with stable per-session random addresses and a custom service UUID.
+The Advertised count records successful GAP starts for unique identities.
+Each operation has a two-second timeout. Startup reuses the checked HID path
+and requires 150 KiB free internal heap after controller initialization.
+
+Radio leasing excludes other tools and the keyboard. Connected Wi-Fi uses the
+existing modem-sleep coexistence policy. Back, Stop, expiry, lock and sleep end
+the session. Failed teardown retains the lease and retries once per second.
+Physical reception, keyboard recovery and resource scenarios are pending.
+The v0.17.0 image was written and hash-verified, and runtime COM6 returned
+(HWT-0077). Receiver and resource acceptance remain pending. Simulator integration and validation are
+SKIPPED at the owner request (VER-0216). See [BLE Lab](BLE_LAB.md).
+
+### Pairing discovery profiles in v0.18.0
+
+BLE Lab includes Android Fast Pair, Windows Swift Pair, Apple AirPods and
+Samsung Buds/Watch advertisement profiles adapted from Bruce. The generic
+scanner mode is retained. Tap the top row to select a mode. Defaults are
+Android, five identities and thirty seconds. All pairing types uses the
+selected number per protocol across five protocols.
+
+Pairing profiles use connectable advertising. The transmitted layouts and
+model identifiers follow the reference; receiver notification behavior still
+depends on software, discovery settings and model support. HWT-0078 tracks
+physical notification and resource acceptance. Simulator work remains paused.
+
+The v0.18.0 image was written and hash-verified and runtime COM6 returned
+(HWT-0079). Receiver notification behavior remains unverified.
+
+### Target picker and Random in v0.19.0
+
+The owner confirmed Windows Swift Pair notifications displaying Classroom Buds
+after the matching profile was selected (HWT-0080). The Windows observer
+independently received ten Microsoft manufacturer payloads and five Android
+FE2C payloads in separate sessions. Android notification display is unverified.
+
+Tapping BLE Lab's profile row now opens a target picker for Android, Windows,
+iPhone/iPad, Samsung Buds/Watch, All types, BLE scanner and Random. Back returns
+to configuration. BOOT selects a card and hold activates it. The contact that
+opens the picker is ignored for selection to avoid touch bleed-through.
+
+Random chooses a pairing protocol and model for every advertising window and
+refreshes the random address. Duration remains bounded. Fixed profiles retain
+their configured identity counts. Random's count row describes automatic type
+and model selection instead of a fixed identity count. The session stops on
+Back, expiry, lock and sleep. Physical picker/Random acceptance remains pending
+(HWT-0081). Simulator work remains paused.
+
+The v0.19.0 image was written and hash-verified and runtime COM6 returned
+(HWT-0082). New picker and Random receiver acceptance are still pending.
+
+### BLE spam/advertising modes in v0.20.0
+
+BLE Lab now includes a second target-picker page for Apple Action, Apple Not
+Your Device and Beacon spam. Header arrows switch pages; the first page, its
+touch coordinates, BOOT navigation and selection behavior are unchanged. The
+picker's Back behavior still returns to configuration before leaving the app.
+
+Apple Action emits the Continuity NearbyAction record with one of Bruce's
+fifteen action type codes and fresh trailing bytes per window. Apple Not Your
+Device reuses the ProximityPair layout with prefix 0x01. Beacon spam emits
+Bruce's UUID 0x1812, appearance 0x0180 and one of five preset names, capped at
+31 bytes, with non-connectable advertising. Random now chooses among all seven
+profile types.
+
+The ESP32 build passed at 1,592,096 B of 6,553,600 B app0 capacity, 4,961,504 B
+remaining, with unchanged 86,264 B static RAM (VER-0231). Host payload, paging
+and cleanup tests passed (VER-0230). The image was uploaded on the second
+attempt (COM5) and esptool verified the write hash (HWT-0085). Post-upload
+probing could not return the board to normal boot: every software reset sampled
+the USB download strap and the serial TIME probe returned no response, so a
+physical RESET press or USB re-plug is required (HWT-0086). No receiver was
+tested and no heap, latency, power or twenty-cycle physical result exists, so
+Apple Action, Not Your Device and Beacon receiver behavior is NOT RUN
+(HWT-0084). Simulator work remains paused by the owner.
+

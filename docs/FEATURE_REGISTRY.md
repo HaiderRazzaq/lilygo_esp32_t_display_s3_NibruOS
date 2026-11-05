@@ -121,7 +121,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "record_type": "feature",
   "id": "FEAT-0004",
   "name": "Wi-Fi Scanner and WiFiService",
-  "purpose": "Read-only async 2.4GHz AP discovery, 12 records, 3 visible rows, rescan and scrolling",
+  "purpose": "Read-only async 2.4GHz AP discovery, 12 connection-list records, full-scan channel summaries, 3 visible rows, rescan and scrolling",
   "module": "src/apps/WiFiScannerApp + src/services/WiFiService",
   "files": [
     "src/apps/WiFiScannerApp.cpp",
@@ -962,7 +962,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "verification": {
     "build": "VER-0193, VER-0198",
     "host": "VER-0192, VER-0197",
-    "hardware": "NOT RUN"
+    "hardware": "HWT-0074 owner-reported working; resource profiling pending"
   },
   "issues": [],
   "history": [
@@ -1005,5 +1005,71 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "DEV-0065"
   ],
   "registration": "wifiDefenseApp"
+}
+```
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0026",
+  "name": "Wi-Fi channel analysis",
+  "purpose": "Show access point counts and strongest RSSI per 2.4GHz channel using completed asynchronous scans.",
+  "module": "src/apps/WiFiChannelsApp",
+  "files": [
+    "src/apps/WiFiChannelsApp.h",
+    "src/apps/WiFiChannelsApp.cpp",
+    "src/services/WiFiService.h",
+    "src/services/WiFiService.cpp"
+  ],
+  "dependencies": [
+    "FEAT-0004"
+  ],
+  "hardware": "Integrated ESP32-S3 Wi-Fi radio",
+  "gpio": "No extra GPIO",
+  "lifecycle": "Acquire WiFiChannels lease on entry; cached display and explicit Refresh; cancel pending scan and release lease on exit. Preserve an established station connection.",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0208",
+    "host": "VER-0205 RED, VER-0207 GREEN",
+    "hardware": "HWT-0075 NOT RUN"
+  },
+  "issues": [],
+  "history": [
+    "DEV-0066"
+  ],
+  "registration": "wifiChannelsApp"
+}
+```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0027",
+  "name": "BLE Lab advertising",
+  "purpose": "Classroom demonstrations of generic discovery, accessory pairing advertisement profiles, Apple Continuity alerts and beacon name advertisements.",
+  "module": "src/apps/BleLabApp + src/services/BleAdvertisingService",
+  "files": [
+    "src/apps/BleLabApp.h",
+    "src/apps/BleLabApp.cpp",
+    "src/services/BleAdvertisingService.h",
+    "src/services/BleAdvertisingService.cpp",
+    "src/services/BleStack.h",
+    "src/services/BleAdvertisingPayload.h",
+    "src/services/BleAdvertisingPayload.cpp",
+    "src/core/AppContext.h"
+  ],
+  "dependencies": ["FEAT-0004", "FEAT-0022"],
+  "hardware": "Integrated ESP32-S3 Bluetooth LE controller",
+  "gpio": "No extra GPIO",
+  "lifecycle": "Explicit Start acquires BleAdvertising radio lease. GAP events sequence advertising identities with per-profile connectable routing. Stop, timeout, Back, lock and sleep end the session. A failed teardown retains ownership and retries cleanup.",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0231",
+    "host": "VER-0211/VER-0218/VER-0224 RED; VER-0213/VER-0219/VER-0225/VER-0230 GREEN",
+    "hardware": "HWT-0080 Windows notification and received advertisements PASS; HWT-0081 Random/picker pending; HWT-0085 v0.20.0 upload PASS; HWT-0086 runtime boot BLOCKED pending physical reset; HWT-0084 Apple and beacon receiver behavior NOT RUN",
+    "desktop": "VER-0216/VER-0222/VER-0228 SKIPPED by owner"
+  },
+  "issues": [],
+  "history": ["DEV-0067", "DEV-0068", "DEV-0069", "DEV-0070"],
+  "registration": "bleLabApp"
 }
 ```

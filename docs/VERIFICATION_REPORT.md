@@ -5031,3 +5031,656 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Static cross-reference and schema validation only."
 }
 ```
+```json
+{
+  "record_type": "test",
+  "id": "VER-0205",
+  "date": "2026-11-05",
+  "firmware_version": "v0.16.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Initial channel feature regression",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "Complete the scoped verification; the initial regression is expected to fail before implementation.",
+  "actual": "Test failed as expected because WiFiChannelsApp.h did not exist before implementation.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0160-desktop-red.txt"
+  ],
+  "evidence_kind": "Captured command output",
+  "environment": "Windows / MSVC / PlatformIO",
+  "limitations": "Host and desktop outcomes are software evidence. Driver RF reception, UI timing and physical resource headroom are not verified."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0206",
+  "date": "2026-11-05",
+  "firmware_version": "v0.16.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Initial cross-platform compilation attempts",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "Host and desktop compilation, then interactive desktop linking",
+  "expected": "Complete the scoped verification; the initial regression is expected to fail before implementation.",
+  "actual": "The first implementation used drawRect, absent from both host adapters. Switched to the existing drawRoundRect API. Interactive linking separately exposed missing existing WiFi Defense CMake sources, which were then added.",
+  "result": "FAIL",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0160-host-attempt.txt",
+    "docs/evidence/2026-11-05-v0160-desktop-attempt.txt",
+    "docs/evidence/2026-11-05-v0160-desktop-link-attempt.txt"
+  ],
+  "evidence_kind": "Captured command output",
+  "environment": "Windows / MSVC / PlatformIO",
+  "limitations": "Host and desktop outcomes are software evidence. Driver RF reception, UI timing and physical resource headroom are not verified."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0207",
+  "date": "2026-11-05",
+  "firmware_version": "v0.16.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Channel summaries, UI lifecycle and regressions",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py; build nibru_simulator and nibru_tests; run nibru_tests and a five-frame headless simulator startup",
+  "expected": "Complete the scoped verification; the initial regression is expected to fail before implementation.",
+  "actual": "Both host suites passed. Tests covered records beyond twelve and 255, negative RSSI peaks, invalid channels, empty results, refresh reset, radio contention, mode failure, channel touch/swipe and twenty shell cancellation cycles. Interactive simulator startup and clean exit passed.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0160-host-final.txt",
+    "docs/evidence/2026-11-05-v0160-desktop-dense.txt",
+    "docs/evidence/2026-11-05-v0160-simulator-startup.txt"
+  ],
+  "evidence_kind": "Captured command output",
+  "environment": "Windows / MSVC / PlatformIO",
+  "limitations": "Host and desktop outcomes are software evidence. Driver RF reception, UI timing and physical resource headroom are not verified."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0208",
+  "date": "2026-11-05",
+  "firmware_version": "v0.16.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Final ESP32 release build",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Complete the scoped verification; the initial regression is expected to fail before implementation.",
+  "actual": "Final source built successfully with the pinned platform. Existing TFT/core compiler warnings remain.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0160-build-dense.txt"
+  ],
+  "evidence_kind": "Captured command output",
+  "environment": "Windows / MSVC / PlatformIO",
+  "limitations": "Host and desktop outcomes are software evidence. Driver RF reception, UI timing and physical resource headroom are not verified."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0209",
+  "date": "2026-11-05",
+  "firmware_version": "v0.16.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "STATIC",
+  "scope": "Actual firmware and partition resource comparison",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_resources.py",
+  "expected": "Complete the scoped verification; the initial regression is expected to fail before implementation.",
+  "actual": "Actual firmware is 1,584,960 B in app0 of 6,553,600 B, leaving 4,968,640 B. The existing growth warning against the accepted baseline remains.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0160-resources.txt"
+  ],
+  "evidence_kind": "Captured command output",
+  "environment": "Windows / MSVC / PlatformIO",
+  "limitations": "Host and desktop outcomes are software evidence. Driver RF reception, UI timing and physical resource headroom are not verified."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0210",
+  "date": "2026-11-05",
+  "firmware_version": "v0.16.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Version synchronization and engineering records",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Documentation checks pass.",
+  "actual": "Documentation checks passed with synchronized v0.16.0 constants and feature, development, test and resource records.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0160-docs.txt"
+  ],
+  "evidence_kind": "Captured command output",
+  "environment": "Windows / Python",
+  "limitations": "Checks document consistency; physical evidence remains separately scoped."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0211",
+  "date": "2026-11-05",
+  "firmware_version": "v0.17.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Initial BLE Lab regression",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py before implementation",
+  "expected": "The new feature test fails before implementation.",
+  "actual": "Compilation failed because BleAdvertisingService.h did not exist.",
+  "result": "FAIL",
+  "evidence": ["docs/evidence/2026-11-05-v0170-host-red.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / MSVC",
+  "limitations": "Expected RED test."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0212",
+  "date": "2026-11-05",
+  "firmware_version": "v0.17.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Initial target build",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build with the pinned framework.",
+  "actual": "C++11 rejected aggregate initialization with default member initializers. Explicit constructors corrected the event and optional context initialization.",
+  "result": "FAIL",
+  "evidence": ["docs/evidence/2026-11-05-v0170-build.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / PlatformIO",
+  "limitations": "Superseded by VER-0214."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0213",
+  "date": "2026-11-05",
+  "firmware_version": "v0.17.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "BLE Lab and existing host regressions",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "Host tests pass.",
+  "actual": "Passed GAP sequencing, 31-byte payloads, LabBLE10 naming, stable rotation without reinit, exclusive ownership, operation timeout/rejection, startup and teardown failures, automatic cleanup retry and twenty app entry/exit cycles.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0170-host-verified.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / MSVC",
+  "limitations": "Injected transport events do not measure RF or physical heap."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0214",
+  "date": "2026-11-05",
+  "firmware_version": "v0.17.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Final ESP32 build",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build the physical target with existing dependencies.",
+  "actual": "Build passed. Existing TFT library warnings remain.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0170-build-verified.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / PlatformIO / Arduino-ESP32 2.0.14",
+  "limitations": "Compilation does not establish receiver discovery or performance."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0215",
+  "date": "2026-11-05",
+  "firmware_version": "v0.17.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "STATIC",
+  "scope": "Actual image and partition capacity",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_resources.py",
+  "expected": "The image fits the generated app0 partition.",
+  "actual": "1,588,688 B image fits 6,553,600 B app0 with 4,964,912 B remaining. Existing baseline growth warning retained.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0170-resources.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / Python",
+  "limitations": "Runtime metrics are NOT MEASURED."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0216",
+  "date": "2026-11-05",
+  "firmware_version": "v0.17.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "BLE Lab desktop integration and simulator verification",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "Deferred at owner instruction.",
+  "expected": "Resume after the owner requests reactivation.",
+  "actual": "Simulator code, registration and execution were not changed or run during the BLE Lab task.",
+  "result": "SKIPPED",
+  "evidence": ["docs/BLE_LAB.md"],
+  "evidence_kind": "Owner instruction in this conversation",
+  "environment": "Desktop work paused",
+  "limitations": "The new BLE Lab app is registered only on the physical target."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0217",
+  "date": "2026-11-05",
+  "firmware_version": "v0.17.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Version and engineering consistency",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Documentation checks pass.",
+  "actual": "Documentation consistency check passed.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0170-docs.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / Python",
+  "limitations": "Checks consistency only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0218",
+  "date": "2026-11-05",
+  "firmware_version": "v0.18.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Pairing payload initial regression",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py before implementing the builders",
+  "expected": "The new tests fail before implementation.",
+  "actual": "Compilation failed because BleAdvertisingPayload.h did not exist.",
+  "result": "FAIL",
+  "evidence": ["docs/evidence/2026-11-05-v0180-host-red.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / MSVC",
+  "limitations": "Expected RED regression."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0219",
+  "date": "2026-11-05",
+  "firmware_version": "v0.18.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Pairing payloads, UI selection and lifecycle",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "Payload and lifecycle tests pass.",
+  "actual": "Passed golden protocol markers, all ten model indices per profile, fifty mixed identities, dynamic Apple fields, variable payload lengths, connectability selection, Windows/All UI selection and existing timeout/cleanup/twenty-cycle regressions.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0180-host-final.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / MSVC",
+  "limitations": "Golden bytes do not establish notification compatibility."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0220",
+  "date": "2026-11-05",
+  "firmware_version": "v0.18.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "ESP32 release build",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build the pinned physical target.",
+  "actual": "Build passed with existing library warnings.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0180-build.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / PlatformIO",
+  "limitations": "Physical receiver and runtime resources remain unverified."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0221",
+  "date": "2026-11-05",
+  "firmware_version": "v0.18.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "STATIC",
+  "scope": "Actual image and generated partition fit",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_resources.py",
+  "expected": "The image fits app0.",
+  "actual": "1,589,984 B image fits app0 with 4,963,616 B remaining. Existing baseline growth warning retained.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0180-resources.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / Python",
+  "limitations": "No runtime resource inference."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0222",
+  "date": "2026-11-05",
+  "firmware_version": "v0.18.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Pairing profile simulator integration",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "Deferred at the owner request.",
+  "expected": "Resume only on explicit owner instruction.",
+  "actual": "Simulator registration, code and execution remain paused.",
+  "result": "SKIPPED",
+  "evidence": ["docs/BLE_LAB.md"],
+  "evidence_kind": "Owner instruction in this conversation",
+  "environment": "Desktop paused",
+  "limitations": "New profiles are validated through host tests and the physical target build."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0223",
+  "date": "2026-11-05",
+  "firmware_version": "v0.18.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Version and engineering consistency",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Documentation checks pass.",
+  "actual": "Documentation checks passed.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0180-docs.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / Python",
+  "limitations": "Checks consistency only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0224",
+  "date": "2026-11-05",
+  "firmware_version": "v0.19.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Target picker and Random initial regression",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py before implementation",
+  "expected": "New tests fail before the feature exists.",
+  "actual": "Compilation failed on the missing Random profile and target-picker API.",
+  "result": "FAIL",
+  "evidence": ["docs/evidence/2026-11-05-v0190-host-red.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / MSVC",
+  "limitations": "Expected RED test."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0225",
+  "date": "2026-11-05",
+  "firmware_version": "v0.19.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Picker, Random and existing regressions",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "Host tests pass.",
+  "actual": "Passed Windows/All/Random selection, opening-contact suppression, Back, BOOT next/activate, random payload bounds and fresh addresses, plus existing operation failure and twenty-cycle tests.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0190-host.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / MSVC",
+  "limitations": "Physical touch and Random receiver behavior remain pending."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0226",
+  "date": "2026-11-05",
+  "firmware_version": "v0.19.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "ESP32 target build",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build with pinned dependencies.",
+  "actual": "Build passed and the image contains the v0.19.0 boot marker.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0190-build.txt"],
+  "evidence_kind": "Captured output and image marker inspection",
+  "environment": "Windows / PlatformIO",
+  "limitations": "Compilation does not establish physical behavior."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0227",
+  "date": "2026-11-05",
+  "firmware_version": "v0.19.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "STATIC",
+  "scope": "Image and partition capacity",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_resources.py",
+  "expected": "The actual image fits app0.",
+  "actual": "1,590,992 B image fits with 4,962,608 B remaining. Existing accepted-baseline growth warning retained.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0190-resources.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / Python",
+  "limitations": "Runtime acceptance is separate."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0228",
+  "date": "2026-11-05",
+  "firmware_version": "v0.19.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Target picker desktop integration",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "Deferred at the owner instruction.",
+  "expected": "Resume on explicit owner request.",
+  "actual": "Simulator code, registration and execution remain paused.",
+  "result": "SKIPPED",
+  "evidence": ["docs/BLE_LAB.md"],
+  "evidence_kind": "Owner instruction in this conversation",
+  "environment": "Desktop paused",
+  "limitations": "Host tests and ESP32 build cover the current change."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0229",
+  "date": "2026-11-05",
+  "firmware_version": "v0.19.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Engineering and version consistency",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Documentation checks pass.",
+  "actual": "Documentation checks passed.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0190-docs.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / Python",
+  "limitations": "Consistency only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0230",
+  "date": "2026-11-05",
+  "firmware_version": "v0.20.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "BLE payload builders, target paging and lifecycle",
+  "hardware": "None (host MSVC tests with fake transport)",
+  "wiring": "None",
+  "procedure": "python tools/run_host_tests.py",
+  "expected": "Existing payload tests continue to pass; Apple Action, Not Your Device, Beacon, page-two selection and cleanup assertions pass.",
+  "actual": "All host suites passed, including 'Bruce pairing, Apple action, Not Your Device and beacon payload formats' and 'BLE Lab GAP sequence, payload, timeouts, cleanup and 20 host cycles'.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0200-host.txt"],
+  "evidence_kind": "Captured MSVC host-test output",
+  "environment": "Windows host; UNIT_TEST stubs",
+  "limitations": "Fake GAP transport; does not prove physical RF behavior, heap or latency."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0231",
+  "date": "2026-11-05",
+  "firmware_version": "v0.20.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "ESP32-S3 target build and app0 capacity",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Target compiles, links and fits the generated app0 partition.",
+  "actual": "SUCCESS. firmware.bin 1,592,096 B of 6,553,600 B app0, 4,961,504 B remaining, sha256 6dcaeb1827f6abd6bcef5c3489aeafe9a477cfb1c76ad40818f69ee2603a94fb. Static RAM 86,264 B (26.3%). The provisional >5% image-growth warning is retained.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0200-build.txt"],
+  "evidence_kind": "Captured PlatformIO output and resource report",
+  "environment": "PlatformIO 6.2.0; espressif32@6.5.0; Arduino-ESP32 2.0.14",
+  "limitations": "Build only; no upload, runtime heap, latency or power measurement."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0232",
+  "date": "2026-11-05",
+  "firmware_version": "v0.20.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Engineering and version consistency",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Documentation checks pass with synchronized v0.20.0 records.",
+  "actual": "Documentation checks passed.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0200-docs.txt"],
+  "evidence_kind": "Captured output",
+  "environment": "Windows / Python",
+  "limitations": "Consistency only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0233",
+  "date": "2026-11-05",
+  "firmware_version": "v0.20.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Desktop simulator coverage for the new BLE profiles",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "Simulator mirrors the new BLE targets.",
+  "actual": "Not executed; BLE Lab is not registered in the desktop simulator and simulator work remains paused by the owner.",
+  "result": "SKIPPED",
+  "evidence": ["docs/BLE_LAB.md"],
+  "evidence_kind": "Owner decision recorded in project documentation",
+  "environment": "Windows desktop target",
+  "limitations": "Simulator coverage is absent by decision, not by test failure."
+}
+```

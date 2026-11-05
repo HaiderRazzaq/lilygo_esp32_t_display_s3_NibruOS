@@ -1,0 +1,78 @@
+AppManager.cpp
+MemoryProfiler.cpp
+ResourceManager.cpp
+ButtonManager.cpp
+DisplayManager.cpp
+TouchManager.cpp
+HomeScreen.cpp
+AccountImportService.cpp
+ArabicReshaper.cpp
+BleAdvertisingPayload.cpp
+BleAdvertisingService.cpp
+BleHidService.cpp
+CryptoService.cpp
+LocalizationService.cpp
+SecurityService.cpp
+SettingsService.cpp
+TimeService.cpp
+TotpService.cpp
+UsbHidService.cpp
+VaultService.cpp
+Generating Code...
+Compiling...
+WebPortalService.cpp
+WifiDefenseService.cpp
+WiFiService.cpp
+BeaconLabApp.cpp
+BleLabApp.cpp
+BluetoothApp.cpp
+ClockApp.cpp
+GeneratorApp.cpp
+SettingsApp.cpp
+SystemInfoApp.cpp
+TotpApp.cpp
+TouchTestApp.cpp
+VaultApp.cpp
+WiFiApp.cpp
+WiFiChannelsApp.cpp
+WifiDefenseApp.cpp
+WiFiScannerApp.cpp
+test_main.cpp
+tests/host/test_main.cpp(118): error C2838: 'Random': illegal qualified name in member declaration
+tests/host/test_main.cpp(118): error C2065: 'Random': undeclared identifier
+tests/host/test_main.cpp(118): error C2737: 'length': const object must be initialized
+tests/host/test_main.cpp(119): error C3536: 'length': cannot be used before it is initialized
+tests/host/test_main.cpp(121): error C2838: 'Random': illegal qualified name in member declaration
+tests/host/test_main.cpp(121): error C2065: 'Random': undeclared identifier
+tests/host/test_main.cpp(246): error C2039: 'isSelectingTarget': is not a member of 'BleLabApp'
+src\apps/BleLabApp.h(5): note: see declaration of 'BleLabApp'
+tests/host/test_main.cpp(248): error C2039: 'isSelectingTarget': is not a member of 'BleLabApp'
+src\apps/BleLabApp.h(5): note: see declaration of 'BleLabApp'
+tests/host/test_main.cpp(248): error C2039: 'selectedProfile': is not a member of 'BleLabApp'
+src\apps/BleLabApp.h(5): note: see declaration of 'BleLabApp'
+tests/host/test_main.cpp(258): error C2039: 'selectedProfile': is not a member of 'BleLabApp'
+src\apps/BleLabApp.h(5): note: see declaration of 'BleLabApp'
+tests/host/test_main.cpp(274): error C2039: 'selectedProfile': is not a member of 'BleLabApp'
+src\apps/BleLabApp.h(5): note: see declaration of 'BleLabApp'
+tests/host/test_main.cpp(274): error C2838: 'Random': illegal qualified name in member declaration
+tests/host/test_main.cpp(274): error C2065: 'Random': undeclared identifier
+tests/host/test_main.cpp(276): error C2039: 'isSelectingTarget': is not a member of 'BleLabApp'
+src\apps/BleLabApp.h(5): note: see declaration of 'BleLabApp'
+tests/host/test_main.cpp(280): error C2039: 'isSelectingTarget': is not a member of 'BleLabApp'
+src\apps/BleLabApp.h(5): note: see declaration of 'BleLabApp'
+test_settings.cpp
+test_authenticator.cpp
+Generating Code...
+Compiling...
+test_account_import.cpp
+test_vault.cpp
+test_web_portal.cpp
+Generating Code...
+Traceback (most recent call last):
+  File "C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\tools\run_host_tests.py", line 25, in <module>
+    subprocess.run(cl_cmd, shell=True, check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command 'call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64 >nul 2>&1 && cl /nologo /std:c++17 /EHsc /utf-8 /W4 /wd4996 /wd4267 /wd4244 /wd4100 /I. /Itests/host/stubs /Iinclude /Isrc C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\core\AppManager.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\core\MemoryProfiler.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\core\ResourceManager.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\hardware\ButtonManager.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\hardware\DisplayManager.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\hardware\TouchManager.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\ui\HomeScreen.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\AccountImportService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\ArabicReshaper.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\BleAdvertisingPayload.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\BleAdvertisingService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\BleHidService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\CryptoService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\LocalizationService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\SecurityService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\SettingsService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\TimeService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\TotpService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\UsbHidService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\VaultService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\WebPortalService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\WifiDefenseService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\services\WiFiService.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\BeaconLabApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\BleLabApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\BluetoothApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\ClockApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\GeneratorApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\SettingsApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\SystemInfoApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\TotpApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\TouchTestApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\VaultApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\WiFiApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\WiFiChannelsApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\WifiDefenseApp.cpp C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\src\apps\WiFiScannerApp.cpp tests/host/test_main.cpp tests/host/test_settings.cpp tests/host/test_authenticator.cpp tests/host/test_account_import.cpp tests/host/test_vault.cpp tests/host/test_web_portal.cpp bcrypt.lib /Fe"C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\.testbuild\nibru_smoke.exe" /Fo"C:\Users\Haider\Desktop\lilygo_esp32_t_display_s3_NibruOS\.testbuild/"' returned non-zero exit status 2.

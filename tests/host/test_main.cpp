@@ -26,6 +26,9 @@
 #include "services/UsbHidService.h"
 #include "services/WebPortalService.h"
 #include "services/BleHidService.h"
+#include "services/BleAdvertisingService.h"
+#include "services/BleAdvertisingPayload.h"
+#include "apps/BleLabApp.h"
 #include "services/WifiDefenseService.h"
 #include "apps/WifiDefenseApp.h"
 #include <Arduino.h>
@@ -40,6 +43,329 @@ MockWiFi WiFi;
 void testSettings(AppContext& ctx);
 bool fakeTouchPending=false;
 TouchData fakeTouchData{};
+
+class TestBleAdvertiser final : public BleAdvertisingTransport {
+public:
+  bool beginOk = true, requestOk = true, endOk = true, lastConnectable = false;
+  unsigned begins = 0, ends = 0;
+  uint32_t seedValue = 0x12345678;
+  bool varySeed = false;
+  BleAdvertisingOperation requested = BleAdvertisingOperation::None;
+  BleAdvertisingEvent event{};
+  uint8_t address[6]{}, payload[31]{};
+  size_t payloadLength = 0;
+  bool begin() override { ++begins; return beginOk; }
+  bool setAddress(const uint8_t* bytes) override {
+    memcpy(address, bytes, sizeof(address));
+    requested = BleAdvertisingOperation::Address;
+    return requestOk;
+  }
+  bool setData(const uint8_t* bytes, size_t length) override {
+    payloadLength = length;
+    if (length <= sizeof(payload)) memcpy(payload, bytes, length);
+    requested = BleAdvertisingOperation::Data;
+    return requestOk;
+  }
+  bool start(bool connectable) override {
+    lastConnectable = connectable;
+    requested = BleAdvertisingOperation::Start;
+    return requestOk;
+  }
+  bool stop() override { requested = BleAdvertisingOperation::Stop; return requestOk; }
+  bool end() override { ++ends; return endOk; }
+  uint32_t randomSeed() override { return varySeed ? seedValue++ : seedValue; }
+  BleAdvertisingEvent poll() override {
+    const auto result = event;
+    event = {};
+    return result;
+  }
+  void complete(bool success = true) { event = {requested, success}; }
+};
+
+void testBlePairingPayloads() {
+  uint8_t payload[31]{};
+  assert(buildBleAdvertisingPayload(BleAdvertisingProfile::Android, 0, 123, payload) == 17);
+  assert(payload[5] == 0x2c && payload[6] == 0xfe);
+  assert(payload[9] == 0x2c && payload[10] == 0xfe);
+  assert(payload[11] == 0x00 && payload[12] == 0x01 && payload[13] == 0xf0);
+  const auto windowsLength = buildBleAdvertisingPayload(BleAdvertisingProfile::Windows, 0, 123, payload);
+  assert(windowsLength <= 31 && payload[4] == 0xff);
+  assert(payload[5] == 0x06 && payload[6] == 0x00 && payload[7] == 0x03);
+  assert(buildBleAdvertisingPayload(BleAdvertisingProfile::Apple, 0, 123, payload) == 31);
+  assert(payload[0] == 30 && payload[2] == 0x4c && payload[4] == 7 && payload[5] == 25);
+  assert(payload[6] == 7 && payload[7] == 0x0e && payload[8] == 0x20);
+  assert(buildBleAdvertisingPayload(BleAdvertisingProfile::AppleNotYourDevice, 0, 123, payload) == 31);
+  assert(payload[6] == 1 && payload[7] == 0x0e && payload[8] == 0x20);
+  const auto actionLength =
+      buildBleAdvertisingPayload(BleAdvertisingProfile::AppleAction, 0, 123, payload);
+  assert(actionLength == 14);
+  assert(payload[0] == 2 && payload[1] == 1 && payload[2] == 6);
+  assert(payload[3] == 10 && payload[4] == 0xff && payload[5] == 0x4c);
+  assert(payload[6] == 0x00 && payload[7] == 0x0f && payload[8] == 5);
+  assert(buildBleAdvertisingPayload(BleAdvertisingProfile::Beacon, 0, 123, payload) == 31);
+  assert(payload[3] == 3 && payload[4] == 3 && payload[5] == 0x12 && payload[6] == 0x18);
+  assert(payload[11] == 19 && payload[12] == 9);
+  assert(memcmp(payload + 13, "NeverGonnaGiveYoUp", 18) == 0);
+  assert(buildBleAdvertisingPayload(BleAdvertisingProfile::Beacon, 4, 123, payload) > 0);
+  assert(memcmp(payload + 13, "FBISurveillanceVan", 18) == 0);
+  uint8_t first[31];
+  memcpy(first, payload, sizeof(first));
+  buildBleAdvertisingPayload(BleAdvertisingProfile::Apple, 0, 124, payload);
+  assert(memcmp(first + 15, payload + 15, 16) != 0);
+  assert(buildBleAdvertisingPayload(BleAdvertisingProfile::SamsungBuds, 0, 123, payload) == 31);
+  assert(payload[0] == 27 && payload[2] == 0x75 && payload[4] == 0x42);
+  assert(payload[28] == 0x10 && payload[29] == 0xff && payload[30] == 0x75);
+  assert(buildBleAdvertisingPayload(BleAdvertisingProfile::SamsungWatch, 0, 123, payload) == 18);
+  assert(payload[5] == 0x75 && payload[17] == 0x1a);
+  assert(buildBleAdvertisingPayload(static_cast<BleAdvertisingProfile>(99), 0, 123, payload) == 0);
+  for (uint8_t profile = 0; profile < 6; ++profile) {
+    for (uint8_t identity = 0; identity < 10; ++identity) {
+      const auto length = buildBleAdvertisingPayload(static_cast<BleAdvertisingProfile>(profile),
+                                                      identity, 123, payload);
+      assert(length > 0 && length <= sizeof(payload));
+    }
+    assert(buildBleAdvertisingPayload(static_cast<BleAdvertisingProfile>(profile), 10, 123, payload) == 0);
+  }
+  for (uint8_t identity = 0; identity < 50; ++identity) {
+    assert(buildBleAdvertisingPayload(BleAdvertisingProfile::All, identity, 123, payload) > 0);
+  }
+  assert(buildBleAdvertisingPayload(BleAdvertisingProfile::All, 50, 123, payload) == 0);
+  for (uint32_t seed = 0; seed < 50; ++seed) {
+    const auto length = buildBleAdvertisingPayload(BleAdvertisingProfile::Random, 0, seed, payload);
+    assert(length > 0 && length <= 31);
+  }
+  assert(buildBleAdvertisingPayload(BleAdvertisingProfile::Random, 10, 123, payload) == 0);
+  assert(buildBleAdvertisingPayload(BleAdvertisingProfile::AppleAction, 10, 123, payload) == 0);
+  assert(buildBleAdvertisingPayload(BleAdvertisingProfile::Beacon, 10, 123, payload) == 0);
+  assert(buildBleAdvertisingPayload(static_cast<BleAdvertisingProfile>(99), 0, 123, payload) == 0);
+  puts("PASS: Bruce pairing, Apple action, Not Your Device and beacon payload formats");
+}
+
+void testBleLab(AppContext& ctx) {
+  TestBleAdvertiser transport;
+  BleAdvertisingService service(&transport);
+  ctx.bleAdvertising = &service;
+  ctx.wifi.shutdown();
+  assert(!service.start(0, 30, fakeMs, ctx));
+  assert(!service.start(11, 30, fakeMs, ctx));
+  assert(!service.start(5, 61, fakeMs, ctx));
+  assert(ctx.resources.acquireWiFi(ResourceOwner::BleKeyboard));
+  assert(!service.start(5, 30, fakeMs, ctx));
+  ctx.resources.releaseWiFi(ResourceOwner::BleKeyboard);
+
+  assert(service.start(2, 5, fakeMs, ctx));
+  assert(ctx.resources.ownsWiFi(ResourceOwner::BleAdvertising));
+  const auto firstAddress = transport.address[5];
+  for (int i = 0; i < 3; ++i) {
+    transport.complete();
+    service.tick(++fakeMs, ctx);
+  }
+  assert(service.advertisedCount() == 1);
+  assert(!transport.lastConnectable);
+  assert(transport.payloadLength == 31 && transport.payload[0] == 2);
+  assert(transport.payload[21] == 9 && transport.payload[22] == 9);
+  assert(memcmp(transport.payload + 23, "LabBLE01", 8) == 0);
+  assert((transport.address[0] & 0xc0) == 0xc0);
+  fakeMs += 400;
+  service.tick(fakeMs, ctx);
+  assert(transport.requested == BleAdvertisingOperation::Stop);
+  transport.complete();
+  service.tick(++fakeMs, ctx);
+  assert(transport.address[5] != firstAddress);
+  for (int i = 0; i < 3; ++i) {
+    transport.complete();
+    service.tick(++fakeMs, ctx);
+  }
+  assert(service.advertisedCount() == 2);
+  assert(memcmp(transport.payload + 23, "LabBLE02", 8) == 0);
+  fakeMs += 400;
+  service.tick(fakeMs, ctx);
+  transport.complete();
+  service.tick(++fakeMs, ctx);
+  assert(transport.address[5] == firstAddress && transport.begins == 1);
+  for (int i = 0; i < 3; ++i) {
+    transport.complete();
+    service.tick(++fakeMs, ctx);
+  }
+  assert(service.advertisedCount() == 2);
+  fakeMs += 5000;
+  service.tick(fakeMs, ctx);
+  assert(!service.isActive() && ctx.resources.wifiOwner() == ResourceOwner::None);
+
+  assert(service.start(1, 5, fakeMs, ctx));
+  transport.complete(false);
+  service.tick(++fakeMs, ctx);
+  assert(!service.isActive() && service.lastError()[0]);
+  assert(ctx.resources.wifiOwner() == ResourceOwner::None);
+
+  assert(service.start(1, 5, fakeMs, ctx));
+  fakeMs += 2001;
+  service.tick(fakeMs, ctx);
+  assert(!service.isActive() && service.lastError()[0]);
+
+  transport.beginOk = false;
+  assert(!service.start(1, 5, fakeMs, ctx));
+  assert(ctx.resources.wifiOwner() == ResourceOwner::None);
+  transport.beginOk = true;
+
+  transport.requestOk = false;
+  assert(!service.start(1, 5, fakeMs, ctx));
+  assert(!service.isActive() && ctx.resources.wifiOwner() == ResourceOwner::None);
+  transport.requestOk = true;
+
+  assert(service.start(10, 60, fakeMs, ctx));
+  for (unsigned device = 0; device < 10; ++device) {
+    for (unsigned operation = 0; operation < 3; ++operation) {
+      transport.complete();
+      service.tick(++fakeMs, ctx);
+    }
+    if (device < 9) {
+      fakeMs += 400;
+      service.tick(fakeMs, ctx);
+      transport.complete();
+      service.tick(++fakeMs, ctx);
+    }
+  }
+  assert(service.advertisedCount() == 10);
+  assert(memcmp(transport.payload + 23, "LabBLE10", 8) == 0);
+  service.stop(fakeMs, ctx);
+
+  assert(service.start(1, 30, fakeMs, ctx, BleAdvertisingProfile::All));
+  assert(service.identityCount() == 5);
+  const unsigned expectedLengths[] = {17, 26, 31, 31, 18};
+  for (unsigned profile = 0; profile < 5; ++profile) {
+    for (unsigned operation = 0; operation < 3; ++operation) {
+      transport.complete();
+      service.tick(++fakeMs, ctx);
+    }
+    assert(transport.lastConnectable);
+    assert(transport.payloadLength == expectedLengths[profile]);
+    if (profile < 4) {
+      fakeMs += 400;
+      service.tick(fakeMs, ctx);
+      transport.complete();
+      service.tick(++fakeMs, ctx);
+    }
+  }
+  assert(service.advertisedCount() == 5);
+  service.stop(fakeMs, ctx);
+
+  assert(service.start(1, 5, fakeMs, ctx));
+  transport.endOk = false;
+  service.stop(fakeMs, ctx);
+  assert(service.isActive() && ctx.resources.ownsWiFi(ResourceOwner::BleAdvertising));
+  transport.endOk = true;
+  fakeMs += 1000;
+  service.tick(fakeMs, ctx);
+  assert(!service.isActive() && ctx.resources.wifiOwner() == ResourceOwner::None);
+
+  transport.varySeed = true;
+  assert(service.start(1, 30, fakeMs, ctx, BleAdvertisingProfile::Random));
+  uint8_t randomAddress[6];
+  memcpy(randomAddress, transport.address, sizeof(randomAddress));
+  for (unsigned operation = 0; operation < 3; ++operation) {
+    transport.complete();
+    service.tick(++fakeMs, ctx);
+  }
+  fakeMs += 400;
+  service.tick(fakeMs, ctx);
+  transport.complete();
+  service.tick(++fakeMs, ctx);
+  assert(memcmp(randomAddress, transport.address, sizeof(randomAddress)) != 0);
+  assert((transport.address[0] & 0xc0) == 0xc0);
+  service.stop(fakeMs, ctx);
+
+  assert(service.start(1, 5, fakeMs, ctx, BleAdvertisingProfile::AppleAction));
+  for (unsigned operation = 0; operation < 3; ++operation) {
+    transport.complete();
+    service.tick(++fakeMs, ctx);
+  }
+  assert(transport.lastConnectable);
+  assert(transport.payloadLength == 14 && transport.payload[5] == 0x4c);
+  service.stop(fakeMs, ctx);
+  assert(!service.isActive() && ctx.resources.wifiOwner() == ResourceOwner::None);
+
+  assert(service.start(1, 5, fakeMs, ctx, BleAdvertisingProfile::Beacon));
+  for (unsigned operation = 0; operation < 3; ++operation) {
+    transport.complete();
+    service.tick(++fakeMs, ctx);
+  }
+  assert(!transport.lastConnectable);
+  assert(transport.payloadLength == 31 && transport.payload[5] == 0x12);
+  service.stop(fakeMs, ctx);
+  assert(!service.isActive() && ctx.resources.wifiOwner() == ResourceOwner::None);
+  transport.varySeed = false;
+
+  BleLabApp app;
+  app.onEnter(ctx);
+  app.onTouch(ctx, {140, 48, 0, 0, TouchGesture::Tap, 101});
+  assert(app.isSelectingTarget());
+  app.onTouch(ctx, {235, 50, 0, 0, TouchGesture::Tap, 101});
+  assert(app.isSelectingTarget()); // Ignore the contact which opened the picker.
+  app.onTouch(ctx, {235, 50, 0, 0, TouchGesture::Tap, 102});
+  assert(!app.isSelectingTarget() && app.selectedProfile() == BleAdvertisingProfile::Windows);
+  app.onPrimaryAction(ctx);
+  for (unsigned operation = 0; operation < 3; ++operation) {
+    transport.complete();
+    service.tick(++fakeMs, ctx);
+  }
+  assert(transport.payloadLength == 26 && transport.payload[5] == 0x06);
+  app.onExit(ctx);
+  app.onTouch(ctx, {140, 48, 0, 0, TouchGesture::Tap});
+  app.onTouch(ctx, {235, 105, 0, 0, TouchGesture::Tap});
+  assert(app.selectedProfile() == BleAdvertisingProfile::All);
+  app.onPrimaryAction(ctx); // All pairing types, five identities per type.
+  assert(service.identityCount() == 25);
+  app.onExit(ctx);
+  for (unsigned i = 0; i < 20; ++i) {
+    app.onEnter(ctx);
+    app.onPrimaryAction(ctx);
+    assert(service.isActive());
+    app.onTick(ctx, fakeMs);
+    app.render(ctx);
+    app.onExit(ctx);
+    assert(!service.isActive() && ctx.resources.wifiOwner() == ResourceOwner::None);
+  }
+  app.onEnter(ctx);
+  app.onTouch(ctx, {140, 48, 0, 0, TouchGesture::Tap});
+  app.onTouch(ctx, {235, 133, 0, 0, TouchGesture::Tap});
+  assert(app.selectedProfile() == BleAdvertisingProfile::Random);
+  app.onPrimaryAction(ctx);
+  assert(service.isActive() && service.identityCount() == 1);
+  app.onExit(ctx);
+
+  app.onEnter(ctx);
+  app.onTouch(ctx, {140, 48, 0, 0, TouchGesture::Tap, 201});
+  assert(app.isSelectingTarget());
+  app.onTouch(ctx, {295, 15, 0, 0, TouchGesture::Tap, 202});
+  app.onTouch(ctx, {235, 50, 0, 0, TouchGesture::Tap, 203});
+  assert(app.selectedProfile() == BleAdvertisingProfile::AppleNotYourDevice);
+  app.onExit(ctx);
+
+  app.onEnter(ctx);
+  app.onTouch(ctx, {140, 48, 0, 0, TouchGesture::Tap, 204});
+  app.onTouch(ctx, {295, 15, 0, 0, TouchGesture::Tap, 205});
+  app.onTouch(ctx, {20, 45, 0, 0, TouchGesture::Tap, 206});
+  assert(app.selectedProfile() == BleAdvertisingProfile::AppleAction);
+  app.onExit(ctx);
+
+  app.onEnter(ctx);
+  app.onTouch(ctx, {140, 48, 0, 0, TouchGesture::Tap, 207});
+  app.onTouch(ctx, {295, 15, 0, 0, TouchGesture::Tap, 208});
+  app.onTouch(ctx, {20, 73, 0, 0, TouchGesture::Tap, 209});
+  assert(app.selectedProfile() == BleAdvertisingProfile::Beacon);
+  app.onExit(ctx);
+
+  app.onTouch(ctx, {140, 48, 0, 0, TouchGesture::Tap});
+  assert(app.onBack(ctx) && !app.isSelectingTarget());
+  app.onTouch(ctx, {140, 48, 0, 0, TouchGesture::Tap});
+  app.onPrimaryAction(ctx);
+  app.onActivate(ctx);
+  assert(!app.isSelectingTarget());
+  app.onExit(ctx);
+  ctx.bleAdvertising = nullptr;
+  puts("PASS: BLE Lab GAP sequence, payload, timeouts, cleanup and 20 host cycles");
+}
 
 void testTouchPressCycles() {
   TouchManager driver;
@@ -298,6 +624,20 @@ int main() {
   wifi.tick(fakeMs+Board::kWiFiWarmupMs*2+2);
   assert(wifi.state()==ScanState::Failed && WiFi.modeValue==WIFI_OFF);
   WiFi.failComplete=false;
+  wifi.shutdown();
+  // Summaries include scan records beyond the twelve-entry connection list.
+  assert(wifi.startScan(fakeMs));
+  wifi.tick(fakeMs + Board::kWiFiWarmupMs);
+  WiFi.scans = 20;
+  WiFi.complete = true;
+  wifi.tick(fakeMs + Board::kWiFiWarmupMs + 1);
+  assert(wifi.count() == 12 && wifi.scanResultCount() == 20);
+  assert(wifi.channelSummary(6)->accessPoints == 20);
+  assert(wifi.channelSummary(6)->strongestRssi == -62);
+  assert(wifi.channelSummary(1)->accessPoints == 0);
+  assert(wifi.channelSummary(0) == nullptr && wifi.channelSummary(15) == nullptr);
+  assert(wifi.startScan(fakeMs));
+  assert(wifi.scanResultCount() == 0 && wifi.channelSummary(6)->accessPoints == 0);
   wifi.shutdown();
   // Protect from unauthorized resource release.
   assert(resources.acquireWiFi(ResourceOwner::WiFiScanner));
@@ -599,6 +939,9 @@ int main() {
   assert(!wifiDefense.hasIncident());
   wifiDefense.stop();
   assert(!wifiDefense.isRunning());
+
+  testBlePairingPayloads();
+  testBleLab(context);
 
   puts("PASS: host navigation/resource/async scan/timeout/connect/crypto/settings/defense smoke tests");
 }

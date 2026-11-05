@@ -24,6 +24,7 @@
 #include "services/WebPortalService.h"
 #include "services/BleHidService.h"
 #include "apps/WiFiApp.h"
+#include "apps/WiFiChannelsApp.h"
 #include "apps/BluetoothApp.h"
 #include "apps/BeaconLabApp.h"
 #include "apps/TotpApp.h"
@@ -272,6 +273,126 @@ void testWiFiSimulation(AppContext& ctx) {
   clearCustomMillis();
   MockWiFiService::instance().setSimulationMode(WiFiSimMode::Normal);
   std::printf("  -> Wi-Fi Simulation Tests PASS\n");
+}
+
+void testWiFiChannels(AppContext& ctx) {
+  std::printf("[Test] Wi-Fi channel summaries and lifecycle...\n");
+  auto& mock = MockWiFiService::instance();
+  ctx.wifi.shutdown();
+  mock.setSimulationMode(WiFiSimMode::Normal);
+  std::vector<SimulatedAP> aps;
+  for (int i = 0; i < 15; ++i) aps.push_back({"Channel6", static_cast<int16_t>(-90 + i), 6, true});
+  aps.push_back({"Strong6", -31, 6, false});
+  aps.push_back({"Channel14", -75, 14, true});
+  aps.push_back({"Invalid0", -20, 0, true});
+  aps.push_back({"Invalid15", -15, 15, true});
+  mock.setCustomNetworks(aps);
+
+  WiFiChannelsApp channels;
+  setCustomMillis(50000);
+  channels.onEnter(ctx);
+  assert(ctx.wifi.state() == ScanState::Idle);
+  channels.render(ctx);
+  channels.onPrimaryAction(ctx);
+  assert(ctx.resources.ownsWiFi(ResourceOwner::WiFiChannels));
+  assert(ctx.wifi.state() == ScanState::Preparing);
+  setCustomMillis(50700);
+  channels.onTick(ctx, millis());
+  assert(ctx.wifi.state() == ScanState::Scanning);
+  setCustomMillis(52000);
+  channels.onTick(ctx, millis());
+  assert(ctx.wifi.state() == ScanState::Complete && ctx.wifi.count() == 12);
+  assert(ctx.wifi.scanResultCount() == 19);
+  assert(ctx.wifi.channelSummary(6)->accessPoints == 16);
+  assert(ctx.wifi.channelSummary(6)->strongestRssi == -31);
+  assert(ctx.wifi.channelSummary(14)->accessPoints == 1);
+  assert(ctx.wifi.channelSummary(14)->strongestRssi == -75);
+  assert(ctx.wifi.channelSummary(1)->accessPoints == 0);
+  assert(!ctx.wifi.channelSummary(0) && !ctx.wifi.channelSummary(15));
+  channels.render(ctx);
+  channels.onTouch(ctx, {305, 105, 0, 0, TouchGesture::Tap});
+  assert(channels.selectedChannel() == 14);
+  channels.onTouch(ctx, {100, 105, 0, 0, TouchGesture::SwipeLeft});
+  assert(channels.selectedChannel() == 13);
+  channels.onExit(ctx);
+  assert(ctx.resources.wifiOwner() == ResourceOwner::None);
+
+  // Cached results from a scan are read without initiating another scan.
+  assert(ctx.wifi.startScan(millis()));
+  setCustomMillis(52700);
+  ctx.wifi.tick(millis());
+  setCustomMillis(54000);
+  ctx.wifi.tick(millis());
+  assert(ctx.wifi.state() == ScanState::Complete);
+  channels.onEnter(ctx);
+  assert(ctx.wifi.state() == ScanState::Complete);
+  channels.render(ctx);
+  channels.onPrimaryAction(ctx);
+  assert(ctx.wifi.scanResultCount() == 0);
+  assert(ctx.wifi.channelSummary(6)->accessPoints == 0);
+  mock.setSimulationMode(WiFiSimMode::Empty);
+  setCustomMillis(54700);
+  channels.onTick(ctx, millis());
+  setCustomMillis(56000);
+  channels.onTick(ctx, millis());
+  assert(ctx.wifi.state() == ScanState::Complete && ctx.wifi.scanResultCount() == 0);
+  channels.render(ctx);
+  channels.onExit(ctx);
+
+  // Dense scan summaries retain indices beyond 255.
+  aps.assign(260, {"Dense", -83, 1, true});
+  aps.push_back({"LastResult", -28, 11, false});
+  mock.setCustomNetworks(aps);
+  mock.setSimulationMode(WiFiSimMode::Normal);
+  channels.onEnter(ctx);
+  channels.onPrimaryAction(ctx);
+  setCustomMillis(56700);
+  channels.onTick(ctx, millis());
+  setCustomMillis(58000);
+  channels.onTick(ctx, millis());
+  assert(ctx.wifi.scanResultCount() == 261 && ctx.wifi.count() == 12);
+  assert(ctx.wifi.channelSummary(1)->accessPoints == 260);
+  assert(ctx.wifi.channelSummary(11)->accessPoints == 1);
+  assert(ctx.wifi.channelSummary(11)->strongestRssi == -28);
+  channels.render(ctx);
+  channels.onExit(ctx);
+
+  assert(ctx.resources.acquireWiFi(ResourceOwner::BeaconLab));
+  channels.onEnter(ctx);
+  channels.onPrimaryAction(ctx);
+  channels.render(ctx);
+  assert(ctx.resources.ownsWiFi(ResourceOwner::BeaconLab));
+  assert(ctx.wifi.state() == ScanState::Idle);
+  channels.onExit(ctx);
+  assert(ctx.resources.ownsWiFi(ResourceOwner::BeaconLab));
+  ctx.resources.releaseWiFi(ResourceOwner::BeaconLab);
+
+  mock.setSimulationMode(WiFiSimMode::StaError);
+  channels.onEnter(ctx);
+  channels.onPrimaryAction(ctx);
+  assert(ctx.wifi.state() == ScanState::Failed);
+  channels.render(ctx);
+  channels.onExit(ctx);
+
+  mock.setSimulationMode(WiFiSimMode::Normal);
+  AppManager channelLauncher(ctx);
+  assert(channelLauncher.registerApp(channels));
+  channelLauncher.begin();
+  for (unsigned cycle = 0; cycle < 20; ++cycle) {
+    assert(channelLauncher.open(0));
+    channelLauncher.handleButton(ButtonAction::Activate);
+    assert(ctx.wifi.state() == ScanState::Preparing);
+    setCustomMillis(millis() + 700);
+    channels.onTick(ctx, millis());
+    assert(ctx.wifi.state() == ScanState::Scanning);
+    channelLauncher.handleButton(ButtonAction::Back);
+    assert(channelLauncher.isHome());
+    assert(ctx.resources.wifiOwner() == ResourceOwner::None);
+    assert(ctx.wifi.state() == ScanState::Idle);
+  }
+  mock.resetDefaultNetworks();
+  clearCustomMillis();
+  std::printf("  -> Channel analysis and 20 cancellation cycles PASS (HOST)\n");
 }
 
 void testSettingsPersistence(AppContext& ctx) {
@@ -817,6 +938,7 @@ int main() {
   testCoreLifecycle(context, launcher, wifiApp, totpApp, settingsApp);
   testUITransformationsAndGestures();
   testWiFiSimulation(context);
+  testWiFiChannels(context);
   wifi.shutdown();
   BeaconLabApp beaconLab;
   beaconLab.onEnter(context);
