@@ -30,6 +30,7 @@
 #include "apps/ClockApp.h"
 #include "services/WifiDefenseService.h"
 #include "apps/WifiDefenseApp.h"
+#include "apps/SecurityLabApp.h"
 
 namespace {
 DisplayManager display;
@@ -56,6 +57,7 @@ BleLabApp bleLabApp;
 BluetoothApp bluetoothApp;
 WifiDefenseApp wifiDefenseApp;
 BeaconLabApp beaconLabApp;
+SecurityLabApp securityLabApp(bleLabApp, beaconLabApp, wifiDefenseApp, wifiChannelsApp);
 TotpApp totpApp;
 VaultApp vaultApp;
 GeneratorApp generatorApp;
@@ -66,7 +68,7 @@ WakeInputGate wakeInput;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n[NibruOS] boot v0.20.0");
+  Serial.println("\n[NibruOS] boot v0.21.0");
   MemoryProfiler::checkpoint("startup-basic");
   display.begin();
   touch.begin();
@@ -85,15 +87,12 @@ void setup() {
   wifiDefense.begin();
   launcher.registerApp(wifiApp);
   launcher.registerApp(bluetoothApp);
-  launcher.registerApp(wifiDefenseApp);
+  launcher.registerApp(securityLabApp);
   launcher.registerApp(totpApp);
   launcher.registerApp(vaultApp);
   launcher.registerApp(generatorApp);
   launcher.registerApp(clockApp);
   launcher.registerApp(settingsApp);
-  launcher.registerApp(beaconLabApp);
-  launcher.registerApp(wifiChannelsApp);
-  launcher.registerApp(bleLabApp);
   launcher.begin();
   launcher.tick(millis());
   MemoryProfiler::checkpoint("home-services-ready");
@@ -174,7 +173,7 @@ void loop() {
     usbHid.cancel();
   }
   if (display.isSleeping() || display.isScreensaverActive() || security.isLocked()) {
-    beaconLabApp.onExit(context);
+    securityLabApp.onExit(context);
     bleAdvertising.stop(now, context);
   }
   bleAdvertising.tick(now, context);

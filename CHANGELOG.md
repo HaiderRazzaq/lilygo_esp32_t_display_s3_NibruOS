@@ -1,5 +1,18 @@
 # Changelog
 
+## [v0.21.0] - 2026-11-05
+
+### Added
+
+- Security Lab Hub (`SecurityLabApp`) consolidating wireless security and audit tools into a unified 4-card submenu.
+- Sub-tools included: BLE Lab (`BleLabApp`), Beacon Lab (`BeaconLabApp`), WiFi Defense (`WifiDefenseApp`), and WiFi Channels (`WiFiChannelsApp`).
+- Nested navigation with hierarchical `onBack`: child tool escape returns to Security Lab hub, while hub escape returns to HomeScreen.
+- Automated desktop simulator tests for Security Lab navigation, selection cycling, touch launch, and clean lifecycle exit.
+
+### Changed
+
+- Home launcher replaces individual lab tiles with a single polished `Security Lab` tile, reducing Home clutter to 8 core apps.
+
 ## [v0.20.0] - 2026-11-05
 
 ### Added

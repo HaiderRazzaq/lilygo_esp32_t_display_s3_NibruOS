@@ -31,6 +31,9 @@
 #include "apps/BleLabApp.h"
 #include "services/WifiDefenseService.h"
 #include "apps/WifiDefenseApp.h"
+#include "apps/WiFiChannelsApp.h"
+#include "apps/BeaconLabApp.h"
+#include "apps/SecurityLabApp.h"
 #include <Arduino.h>
 #include <WiFi.h>
 #include <cassert>
@@ -942,6 +945,38 @@ int main() {
 
   testBlePairingPayloads();
   testBleLab(context);
+
+  {
+    BleLabApp ble;
+    BeaconLabApp bcn;
+    WifiDefenseApp def;
+    WiFiChannelsApp ch;
+    SecurityLabApp hub(ble, bcn, def, ch);
+
+    hub.onEnter(context);
+    assert(hub.activeTool() == nullptr);
+    assert(hub.selectedIndex() == 0);
+
+    hub.onPrimaryAction(context);
+    assert(hub.selectedIndex() == 1);
+    hub.onPrimaryAction(context);
+    assert(hub.selectedIndex() == 2);
+    hub.onPrimaryAction(context);
+    assert(hub.selectedIndex() == 3);
+    hub.onPrimaryAction(context);
+    assert(hub.selectedIndex() == 0);
+
+    hub.onActivate(context);
+    assert(hub.activeTool() == &ble);
+    assert(hub.onBack(context) == true);
+    assert(hub.activeTool() == nullptr);
+    assert(hub.onBack(context) == false);
+
+    hub.onTouch(context, {50, 120, 0, 0, TouchGesture::Tap});
+    assert(hub.activeTool() == &def);
+    hub.onExit(context);
+    assert(hub.activeTool() == nullptr);
+  }
 
   puts("PASS: host navigation/resource/async scan/timeout/connect/crypto/settings/defense smoke tests");
 }

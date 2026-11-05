@@ -7,11 +7,11 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
 {
   "record_type": "state",
   "date": "2026-11-05",
-  "runtime_version": "v0.20.0",
+  "runtime_version": "v0.21.0",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
-  "working_tree": "BLE advertising lab with Apple Action, Not Your Device and Beacon modes; physical verification pending; simulator work paused by the owner",
+  "working_tree": "Security Lab Hub consolidating BLE Lab, Beacon Lab, WiFi Defense and WiFi Channels into a unified launcher",
   "implemented_features": [
     "FEAT-0024",
     "FEAT-0001",
@@ -38,7 +38,8 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "FEAT-0023",
     "FEAT-0025",
     "FEAT-0026",
-    "FEAT-0027"
+    "FEAT-0027",
+    "FEAT-0028"
   ],
   "planned_features": [
     "FEAT-0007"

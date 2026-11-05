@@ -969,8 +969,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "DEV-0061",
     "DEV-0062",
     "DEV-0063"
-  ],
-  "registration": "beaconLabApp"
+  ]
 }
 ```
 
@@ -1003,8 +1002,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "issues": [],
   "history": [
     "DEV-0065"
-  ],
-  "registration": "wifiDefenseApp"
+  ]
 }
 ```
 ```json
@@ -1035,8 +1033,7 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "issues": [],
   "history": [
     "DEV-0066"
-  ],
-  "registration": "wifiChannelsApp"
+  ]
 }
 ```
 
@@ -1069,7 +1066,36 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
     "desktop": "VER-0216/VER-0222/VER-0228 SKIPPED by owner"
   },
   "issues": [],
-  "history": ["DEV-0067", "DEV-0068", "DEV-0069", "DEV-0070"],
-  "registration": "bleLabApp"
+  "history": ["DEV-0067", "DEV-0068", "DEV-0069", "DEV-0070"]
+}
+```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0028",
+  "name": "Security Lab Hub",
+  "purpose": "Consolidate wireless security and audit laboratory tools (BLE Lab, Beacon Lab, WiFi Defense, WiFi Channels) under a unified launcher and sub-menu.",
+  "module": "src/apps/SecurityLabApp",
+  "files": [
+    "src/apps/SecurityLabApp.h",
+    "src/apps/SecurityLabApp.cpp",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp"
+  ],
+  "dependencies": ["FEAT-0001", "FEAT-0023", "FEAT-0025", "FEAT-0026", "FEAT-0027"],
+  "hardware": "Integrated TFT display, CST816S touch, BOOT button",
+  "gpio": "No extra GPIO",
+  "lifecycle": "Launcher tile routes into a 4-card grid. Opening a tool delegates full App lifecycle (onEnter, onTick, onTouch, onPrimaryAction, onActivate, render). Nested onBack returns to hub; hub onBack returns to Home. Clean exit releases active tool and any radio lease.",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0234",
+    "host": "VER-0233 GREEN",
+    "hardware": "HWT-0087 NOT RUN",
+    "desktop": "VER-0235 GREEN"
+  },
+  "issues": [],
+  "history": ["DEV-0072"],
+  "registration": "securityLabApp"
 }
 ```

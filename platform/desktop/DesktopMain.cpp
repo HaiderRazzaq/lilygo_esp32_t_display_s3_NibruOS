@@ -27,8 +27,11 @@
 #include "apps/GeneratorApp.h"
 #include "apps/ClockApp.h"
 #include "services/BleHidService.h"
+#include "services/BleAdvertisingService.h"
 #include "services/WifiDefenseService.h"
 #include "apps/WifiDefenseApp.h"
+#include "apps/BleLabApp.h"
+#include "apps/SecurityLabApp.h"
 
 #include "platform/desktop/SDLDisplay.h"
 #include "platform/desktop/DesktopInput.h"
@@ -100,15 +103,18 @@ int main(int argc, char* argv[]) {
   WebPortalService webPortal;
   BleHidService bleHid;
   WifiDefenseService wifiDefense;
+  BleAdvertisingService bleAdvertising;
 
-  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid, wifiDefense};
+  AppContext context{display, resources, wifi, security, settings, timeService, totp, usbHid, accountImport, vault, webPortal, bleHid, wifiDefense, &bleAdvertising};
   AppManager launcher(context);
 
   WiFiApp wifiApp;
   WiFiChannelsApp wifiChannelsApp;
+  BleLabApp bleLabApp;
   BluetoothApp bluetoothApp;
   WifiDefenseApp wifiDefenseApp;
   BeaconLabApp beaconLabApp;
+  SecurityLabApp securityLabApp(bleLabApp, beaconLabApp, wifiDefenseApp, wifiChannelsApp);
   TotpApp totpApp;
   VaultApp vaultApp;
   GeneratorApp generatorApp;
@@ -134,14 +140,12 @@ int main(int argc, char* argv[]) {
     // Register applications exactly matching physical device baseline (src/main.cpp)
     launcher.registerApp(wifiApp);
     launcher.registerApp(bluetoothApp);
-    launcher.registerApp(wifiDefenseApp);
+    launcher.registerApp(securityLabApp);
     launcher.registerApp(totpApp);
     launcher.registerApp(vaultApp);
     launcher.registerApp(generatorApp);
     launcher.registerApp(clockApp);
     launcher.registerApp(settingsApp);
-    launcher.registerApp(beaconLabApp);
-    launcher.registerApp(wifiChannelsApp);
 
     launcher.begin();
     launcher.tick(millis());
@@ -239,7 +243,7 @@ int main(int argc, char* argv[]) {
       usbHid.cancel();
     }
     if (display.isSleeping() || display.isScreensaverActive() || security.isLocked()) {
-      beaconLabApp.onExit(context);
+      securityLabApp.onExit(context);
     }
     wifi.tick(tickNow);
     timeService.tick(tickNow, wifi.isConnected());

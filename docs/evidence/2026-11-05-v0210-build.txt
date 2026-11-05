@@ -1,0 +1,7 @@
+Processing lilygo-t-display-s3 (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+RAM:   [===       ]  26.3% (used 86312 bytes from 327680 bytes)
+Flash: [==        ]  24.3% (used 1593409 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+esptool.py v4.5.1
+Successfully created esp32s3 image.
+========================= [SUCCESS] Took 59.85 seconds =========================

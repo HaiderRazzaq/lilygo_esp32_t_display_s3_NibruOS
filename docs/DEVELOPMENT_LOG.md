@@ -2579,3 +2579,30 @@ Corrections must be appended with the original ID reference.
   "follow_up": "After a physical reset, capture the v0.20.0 boot banner and run HWT-0084 plus resource scenarios A-E."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0072",
+  "date": "2026-11-05",
+  "related": ["FEAT-0028", "VER-0233", "VER-0234", "VER-0235"],
+  "action": "Add Security Lab hub consolidating wireless audit and defense tools in v0.21.0",
+  "files": [
+    "src/apps/SecurityLabApp.h",
+    "src/apps/SecurityLabApp.cpp",
+    "src/main.cpp",
+    "platform/desktop/DesktopMain.cpp",
+    "CMakeLists.txt",
+    "tests/desktop/test_simulator.cpp",
+    "tests/host/test_main.cpp"
+  ],
+  "description": "Consolidate BLE Lab, Beacon Lab, WiFi Defense and WiFi Channels into SecurityLabApp. Provide 4-card submenu navigation, BOOT cycling, direct touch opening, hierarchical onBack navigation, and automatic sub-tool lifecycle cleanup.",
+  "reason": "The owner requested grouping all lab tools (e.g. bluetooth lab, wifi) into a unified primary menu called Security Lab.",
+  "expected": "Reduced Home launcher clutter from 11 apps to 8 apps, responsive navigation, hierarchical Back escape and zero resource leaks on exit.",
+  "actual": "Desktop simulator tests and host unit tests passed. PlatformIO ESP32-S3 build succeeded at 1,593,409 B Flash (+1,313 B) and 86,312 B RAM with code 0.",
+  "verification": "VER-0233 host PASS, VER-0234 build PASS, VER-0235 desktop PASS; HWT-0087 upload pending",
+  "risks": "Sub-tool delegation requires clean onExit handling to avoid orphaned radio leases when transitioning between tools or returning Home.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Upload v0.21.0 to hardware and verify touch navigation and sub-tool entry on the physical display."
+}
+```

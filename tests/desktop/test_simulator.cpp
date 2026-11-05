@@ -35,6 +35,9 @@
 #include "apps/GeneratorApp.h"
 #include "apps/ClockApp.h"
 #include "services/WifiDefenseService.h"
+#include "apps/WifiDefenseApp.h"
+#include "apps/BleLabApp.h"
+#include "apps/SecurityLabApp.h"
 
 #include "platform/desktop/SDLDisplay.h"
 #include "platform/desktop/DesktopInput.h"
@@ -879,6 +882,55 @@ void testNewMvpFeatures(AppContext& ctx, GeneratorApp& genApp, ClockApp& clockAp
 
   std::printf("  -> PASS: New MVP Features verified successfully.\n");
 }
+
+void testSecurityLabHub(AppContext& ctx) {
+  std::printf("[TEST] Running Security Lab Hub Navigation & Lifecycle Tests...\n");
+  BleLabApp bleLab;
+  BeaconLabApp beaconLab;
+  WifiDefenseApp wifiDefense;
+  WiFiChannelsApp wifiChannels;
+  SecurityLabApp secLab(bleLab, beaconLab, wifiDefense, wifiChannels);
+
+  // 1. Initial State & Enter
+  secLab.onEnter(ctx);
+  assert(secLab.activeTool() == nullptr);
+  assert(secLab.selectedIndex() == 0);
+
+  // 2. Cycling selection via BOOT / onPrimaryAction
+  secLab.onPrimaryAction(ctx);
+  assert(secLab.selectedIndex() == 1);
+  secLab.onPrimaryAction(ctx);
+  assert(secLab.selectedIndex() == 2);
+  secLab.onPrimaryAction(ctx);
+  assert(secLab.selectedIndex() == 3);
+  secLab.onPrimaryAction(ctx);
+  assert(secLab.selectedIndex() == 0);
+
+  // 3. Open Tool via Activate (BOOT Hold) -> opens BLE Lab
+  secLab.onActivate(ctx);
+  assert(secLab.activeTool() == &bleLab);
+
+  // 4. Back inside tool returns to SecurityLabApp menu
+  assert(secLab.onBack(ctx) == true);
+  assert(secLab.activeTool() == nullptr);
+
+  // 5. Back at menu level returns false (so AppManager goes Home)
+  assert(secLab.onBack(ctx) == false);
+
+  // 6. Direct Touch Open (Card 2: WiFi Defense at x: 50, y: 120)
+  secLab.onTouch(ctx, {50, 120, 0, 0, TouchGesture::Tap});
+  assert(secLab.activeTool() == &wifiDefense);
+  assert(secLab.onBack(ctx) == true);
+  assert(secLab.activeTool() == nullptr);
+
+  // 7. Clean exit releases any sub-tool
+  secLab.openTool(1, ctx); // Beacon Lab
+  assert(secLab.activeTool() == &beaconLab);
+  secLab.onExit(ctx);
+  assert(secLab.activeTool() == nullptr);
+
+  std::printf("  -> PASS: Security Lab Hub Navigation & Lifecycle verified.\n");
+}
 namespace {
 bool simUsbReady() { return true; }
 bool simUsbSend(uint8_t, uint8_t) { return true; }
@@ -988,6 +1040,7 @@ int main() {
   testVaultAppUI(context, vaultApp, launcher);
   testWebPortalSimulation(context);
   testNewMvpFeatures(context, generatorApp, clockApp, launcher);
+  testSecurityLabHub(context);
   testRepeatedLifecycleCycles(launcher);
   // Shared application UI, real Windows crypto, disk-backed test-only NVS.
   Preferences::resetMock();

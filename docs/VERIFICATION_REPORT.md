@@ -5684,3 +5684,47 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Simulator coverage is absent by decision, not by test failure."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0234",
+  "date": "2026-11-05",
+  "firmware_version": "v0.21.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "ESP32-S3 compilation with SecurityLabApp and consolidated lab suite",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (target toolchain)",
+  "wiring": "Default parallel ST7789 + CST816S pin definitions",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build finishes with code 0 and fits in app0 partition.",
+  "actual": "Flash 1,593,409 B (24.3%), RAM 86,312 B (26.3%), code 0.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0210-build.txt"],
+  "evidence_kind": "Captured compiler output",
+  "environment": "Windows / PlatformIO espressif32@6.5.0",
+  "limitations": "Does not prove physical display or radio execution."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0235",
+  "date": "2026-11-05",
+  "firmware_version": "v0.21.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Security Lab Hub navigation, card selection, touch opening, and lifecycle cleanup",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "All 26 desktop units pass including Security Lab Hub tests.",
+  "actual": "ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0210-desktop.txt"],
+  "evidence_kind": "Automated unit test execution",
+  "environment": "Windows / MSVC x64 Native",
+  "limitations": "Host simulation only."
+}
+```
