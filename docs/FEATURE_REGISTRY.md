@@ -1101,3 +1101,35 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "registration": "securityLabApp"
 }
 ```
+
+```json
+{
+  "record_type": "feature",
+  "id": "FEAT-0029",
+  "name": "HOTP & SHA-256/512 Multi-Algo 2FA & Authenticator Web Control Panel",
+  "purpose": "Provide RFC 4226 counter-based HOTP, SHA-1/256/512 multi-algorithm TOTP, USB HID injection, and a single-page Authenticator Control Panel web dashboard matching SecureGen capability.",
+  "module": "src/services/TotpService + src/apps/TotpApp + src/services/WebPortalService",
+  "files": [
+    "src/services/CryptoService.h",
+    "src/services/CryptoService.cpp",
+    "src/services/TotpService.h",
+    "src/services/TotpService.cpp",
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "src/services/WebPortalService.h",
+    "src/services/WebPortalService.cpp"
+  ],
+  "dependencies": ["FEAT-0008", "FEAT-0010", "FEAT-0013"],
+  "hardware": "Integrated TFT display, CST816S touch, USB HID, Wi-Fi SoftAP",
+  "gpio": "No extra GPIO",
+  "lifecycle": "HOTP operates independently of RTC/NTP time sync using counter increments; Web Portal operates on an ephemeral SoftAP session with random WPA2 and Web PIN, automatically terminating on timeout.",
+  "implementation": "IMPLEMENTED",
+  "verification": {
+    "build": "VER-0240",
+    "host": "NOT RUN",
+    "hardware": "NOT RUN"
+  },
+  "issues": [],
+  "history": ["DEV-0074"]
+}
+```

@@ -34,6 +34,7 @@ void TotpApp::clearSession(AppContext& ctx) {
   status_ = "";
   capitals_ = true; symbols_ = false; keyboardDirty_ = true;
   feedbackUntilMs_ = 0;
+  useBle_ = false;
   view_ = View::Card;
   fullRedraw_ = true;
   cardDirty_ = true;
@@ -92,7 +93,9 @@ void TotpApp::onTick(AppContext& ctx, uint32_t nowMs) {
       importSent_ = true;
     }
   }
-  if (sending_ && !ctx.time.getEpoch()) {
+  const TotpAccount* curAcc = ctx.totp.getAccount(accountIndex_);
+  const bool curHotp = curAcc && (static_cast<OtpType>(curAcc->type) == OtpType::Hotp);
+  if (sending_ && !curHotp && !ctx.time.getEpoch()) {
     ctx.usbHid.cancel(); sending_ = false;
     status_ = "Sync time via Wi-Fi"; invalidate();
   }
@@ -100,7 +103,7 @@ void TotpApp::onTick(AppContext& ctx, uint32_t nowMs) {
     const UsbTransferState state = ctx.usbHid.transferState();
     if (state == UsbTransferState::Sent || state == UsbTransferState::Failed) {
       sending_ = false;
-      status_ = state == UsbTransferState::Sent ? "HID reports sent" : "USB send failed";
+      status_ = state == UsbTransferState::Sent ? "Code sent to PC (USB)!" : "USB send failed";
       feedbackUntilMs_ = nowMs + 2000;
       cardDirty_ = true;
       invalidate();
@@ -129,16 +132,35 @@ void TotpApp::sendCurrentCode(AppContext& ctx) {
   if (sending_) return;
   const uint8_t count = ctx.totp.accountCount();
   if (!count) return;
+  const TotpAccount* acc = ctx.totp.getAccount(accountIndex_);
+  if (!acc) return;
+  const bool isHotp = (static_cast<OtpType>(acc->type) == OtpType::Hotp);
   const uint32_t epoch = ctx.time.getEpoch();
   char code[10]{};
   uint8_t remaining = 0;
-  if (!epoch) {
+  if (!isHotp && !epoch) {
     status_ = "Sync time via Wi-Fi/USB";
     feedbackUntilMs_ = millis() + 2000;
   } else if (!ctx.totp.getAccountCode(accountIndex_, epoch, code, sizeof(code), remaining)) {
     status_ = "Code unavailable";
     feedbackUntilMs_ = millis() + 2000;
-  } else if (useBle_) {
+  } else if (!useBle_) {
+    // Primary path: USB HID
+    if (!ctx.usbHid.isReady()) {
+      status_ = "Connect USB to PC";
+      feedbackUntilMs_ = millis() + 2000;
+    } else if (ctx.usbHid.typeCode(code)) {
+      sending_ = true;
+      status_ = "Typing to PC (USB)...";
+      if (isHotp) {
+        ctx.totp.incrementHotp(ctx.security.getActiveVaultKey(), accountIndex_);
+      }
+    } else {
+      status_ = "USB send failed";
+      feedbackUntilMs_ = millis() + 2000;
+    }
+  } else {
+    // Secondary path: BLE HID (when explicitly requested)
     if (!ctx.bleHid.isEnabled()) {
       status_ = "Enable BLE in Settings";
       feedbackUntilMs_ = millis() + 2000;
@@ -150,16 +172,10 @@ void TotpApp::sendCurrentCode(AppContext& ctx) {
       status_ = "Typing BLE...";
       ctx.bleHid.typeText(code);
       ctx.bleHid.sendKey(0x28);
+      if (isHotp) {
+        ctx.totp.incrementHotp(ctx.security.getActiveVaultKey(), accountIndex_);
+      }
     }
-  } else if (!ctx.usbHid.isReady()) {
-    status_ = "USB unavailable";
-    feedbackUntilMs_ = millis() + 2000;
-  } else if (ctx.usbHid.typeCode(code)) {
-    sending_ = true;
-    status_ = "Sending...";
-  } else {
-    status_ = "USB send failed";
-    feedbackUntilMs_ = millis() + 2000;
   }
   CryptoService::secureZero(code, sizeof(code));
   cardDirty_ = true;
@@ -308,31 +324,23 @@ void TotpApp::onTouch(AppContext& ctx, const TouchEvent& ev) {
       view_ = View::ConfirmDelete; confirmAfterMs_ = millis() + 350;
       status_ = ""; fullRedraw_ = true;
     }
-  } else if (ev.gesture == TouchGesture::Tap && count && ev.x >= 58 && ev.x <= 262 && ev.y >= 65 && ev.y <= 98 && !ctx.time.getEpoch()) {
-    if (ctx.wifi.isConnected()) {
-      ctx.time.requestNtpSync();
-      status_ = "NTP sync requested...";
-    } else {
-      status_ = "Connect Wi-Fi or USB";
-    }
-    cardDirty_ = true;
-  } else if (count && ev.x >= 40 && ev.x <= 280 && ev.y >= 100 && ev.y <= 142) {
-    if (ev.gesture == TouchGesture::Tap && ev.x <= 95) {
-      useBle_ = !useBle_;
-      status_ = useBle_ ? "Switched to BLE mode" : "Switched to USB mode";
-      feedbackUntilMs_ = millis() + 1800;
-      cardDirty_ = true;
-      invalidate();
-      return;
-    }
-    if (ev.gesture == TouchGesture::LongPress) {
+  } else if (ev.gesture == TouchGesture::Tap && count && ev.x >= 58 && ev.x <= 262 && ev.y >= 65 && ev.y <= 98) {
+    const TotpAccount* acc = ctx.totp.getAccount(accountIndex_);
+    const bool isHotp = acc && (static_cast<OtpType>(acc->type) == OtpType::Hotp);
+    if (isHotp || ctx.time.getEpoch()) {
       sendCurrentCode(ctx);
-    } else if (ev.gesture == TouchGesture::Tap) {
-      if (!sending_) {
-        status_ = "Hold touch or press BTN";
-        feedbackUntilMs_ = millis() + 1500;
-        cardDirty_ = true;
+    } else {
+      if (ctx.wifi.isConnected()) {
+        ctx.time.requestNtpSync();
+        status_ = "NTP sync requested...";
+      } else {
+        status_ = "Connect Wi-Fi or USB";
       }
+      cardDirty_ = true;
+    }
+  } else if (count && ev.x >= 40 && ev.x <= 280 && ev.y >= 100 && ev.y <= 142) {
+    if (ev.gesture == TouchGesture::LongPress || ev.gesture == TouchGesture::Tap) {
+      sendCurrentCode(ctx);
     }
   }
   invalidate();
@@ -451,39 +459,35 @@ void TotpApp::render(AppContext& ctx) {
     } else {
       if (accountIndex_ >= count) accountIndex_ = count - 1;
       const TotpAccount* account = ctx.totp.getAccount(accountIndex_);
-      screen.label(60, 39, account->name, Colors::Cyan, strlen(account->name) > 16 ? 1 : 2);
+      const bool isHotp = account && (static_cast<OtpType>(account->type) == OtpType::Hotp);
+      const OtpAlgo algo = account ? static_cast<OtpAlgo>(account->algo) : OtpAlgo::Sha1;
+      const char* algoTag = (algo == OtpAlgo::Sha256) ? "256" : ((algo == OtpAlgo::Sha512) ? "512" : "");
+      char headerLine[40]{};
+      if (isHotp) {
+        if (algoTag[0]) snprintf(headerLine, sizeof(headerLine), "%.16s [H-%s]", account->name, algoTag);
+        else snprintf(headerLine, sizeof(headerLine), "%.18s [HOTP]", account->name);
+      } else if (algoTag[0]) {
+        snprintf(headerLine, sizeof(headerLine), "%.18s [%s]", account->name, algoTag);
+      } else {
+        snprintf(headerLine, sizeof(headerLine), "%.22s", account ? account->name : "");
+      }
+      screen.label(60, 39, headerLine, Colors::Cyan, strlen(headerLine) > 16 ? 1 : 2);
       // Modern Cyber USB Action Capsule Button
       const bool usbReady = ctx.usbHid.isReady();
-      const bool hasTime = epoch != 0;
+      const bool hasTime = isHotp || (epoch != 0);
       if (sending_) {
-        t.fillRoundRect(45, 104, 230, 34, 7, useBle_ ? Colors::Green : Colors::Cyan);
-        screen.label(85, 115, useBle_ ? "TYPING VIA BLE..." : "TYPING TO PC...", Colors::Bg, 1, useBle_ ? Colors::Green : Colors::Cyan);
+        t.fillRoundRect(45, 104, 230, 34, 7, Colors::Cyan);
+        screen.label(70, 115, "TYPING USB TO PC...", Colors::Bg, 1, Colors::Cyan);
       } else if (status_[0] != '\0') {
         t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
         t.drawRoundRect(45, 104, 230, 34, 7, Colors::Amber);
-        screen.label(70, 115, status_, Colors::Amber, 1, Colors::Panel);
-      } else if (useBle_) {
-        const bool bleConn = ctx.bleHid.isConnected();
-        const bool bleEnabled = ctx.bleHid.isEnabled();
-        t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
-        t.drawRoundRect(45, 104, 230, 34, 7, bleConn ? Colors::Green : (bleEnabled ? Colors::Cyan : Colors::Border));
-        t.fillRoundRect(49, 108, 42, 26, 5, bleConn ? Colors::Green : (bleEnabled ? Colors::Cyan : Colors::Border));
-        screen.label(56, 116, "BLE", Colors::Bg, 1, bleConn ? Colors::Green : (bleEnabled ? Colors::Cyan : Colors::Border));
-        if (bleConn && hasTime) {
-          screen.label(102, 116, "HOLD OR BTN TO SEND", Colors::White, 1, Colors::Panel);
-        } else if (!hasTime) {
-          screen.label(102, 116, "SYNC TIME TO SEND", Colors::Muted, 1, Colors::Panel);
-        } else if (bleEnabled) {
-          screen.label(102, 116, "WAITING FOR PAIR...", Colors::Amber, 1, Colors::Panel);
-        } else {
-          screen.label(102, 116, "ENABLE IN SETTINGS", Colors::Muted, 1, Colors::Panel);
-        }
+        screen.label(60, 115, status_, Colors::Amber, 1, Colors::Panel);
       } else if (usbReady && hasTime) {
         t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
         t.drawRoundRect(45, 104, 230, 34, 7, Colors::Cyan);
         t.fillRoundRect(49, 108, 42, 26, 5, Colors::Cyan);
         screen.label(56, 116, "USB", Colors::Bg, 1, Colors::Cyan);
-        screen.label(102, 116, "HOLD OR BTN TO SEND", Colors::White, 1, Colors::Panel);
+        screen.label(102, 116, "TAP/HOLD TO SEND", Colors::White, 1, Colors::Panel);
       } else if (!hasTime) {
         t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
         t.drawRoundRect(45, 104, 230, 34, 7, Colors::Border);
@@ -491,7 +495,7 @@ void TotpApp::render(AppContext& ctx) {
       } else {
         t.fillRoundRect(45, 104, 230, 34, 7, Colors::Panel);
         t.drawRoundRect(45, 104, 230, 34, 7, Colors::Border);
-        screen.label(75, 116, "USB DISCONNECTED", Colors::Muted, 1, Colors::Panel);
+        screen.label(70, 116, "CONNECT USB TO PC", Colors::Muted, 1, Colors::Panel);
       }
       screen.label(12, 75, "<", Colors::Cyan, 2);
       screen.label(290, 75, ">", Colors::Cyan, 2);
@@ -506,12 +510,17 @@ void TotpApp::render(AppContext& ctx) {
   // Live dynamic update on every tick - ZERO fillRect, ZERO flicker!
   if (unlocked && count) {
     if (accountIndex_ >= count) accountIndex_ = count - 1;
+    const TotpAccount* account = ctx.totp.getAccount(accountIndex_);
+    const bool isHotp = account && (static_cast<OtpType>(account->type) == OtpType::Hotp);
     char code[10] = "------"; uint8_t remaining = 0;
-    if (epoch) ctx.totp.getAccountCode(accountIndex_, epoch, code, sizeof(code), remaining);
+    if (isHotp || epoch) ctx.totp.getAccountCode(accountIndex_, epoch, code, sizeof(code), remaining);
     screen.label(105, 69, code, Colors::White, 2, Colors::Bg);
     CryptoService::secureZero(code, sizeof(code));
     char timer[32]{};
-    if (epoch) {
+    if (isHotp) {
+      snprintf(timer, sizeof(timer), "HOTP #%lu (Counter)", static_cast<unsigned long>(account ? account->counter : 0));
+      screen.labelPadded(75, 90, timer, 24, Colors::Cyan, 1, Colors::Bg);
+    } else if (epoch) {
       snprintf(timer, sizeof(timer), "%2u sec  [%s]", remaining, ctx.time.sourceName());
       screen.labelPadded(85, 90, timer, 20, ctx.time.source() == TimeSource::Ntp ? Colors::Green : Colors::Cyan, 1, Colors::Bg);
     } else {

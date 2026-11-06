@@ -51,31 +51,47 @@ int TotpService::decodeBase32(const char* str, uint8_t* out, size_t maxOut) {
   return static_cast<int>(count);
 }
 
-bool TotpService::computeTotp(const uint8_t* secret, size_t secretLen,
-                              uint32_t epoch, uint8_t periodSec, uint8_t digits,
-                              char* outCode, size_t maxCodeLen, uint8_t& outRemainingSec) {
-  if (!secret || secretLen == 0 || periodSec == 0 || digits < 6 || digits > 8 || !outCode || maxCodeLen <= digits) {
+bool TotpService::computeOtp(const uint8_t* secret, size_t secretLen,
+                             uint64_t step, OtpAlgo algo, uint8_t digits,
+                             char* outCode, size_t maxCodeLen) {
+  if (!secret || secretLen == 0 || digits < 6 || digits > 8 || !outCode || maxCodeLen <= digits) {
     return false;
   }
 
-  outRemainingSec = periodSec - (epoch % periodSec);
-
-  // Time step counter in big-endian 64-bit integer
-  uint64_t step = epoch / periodSec;
+  // Time / counter step counter in big-endian 64-bit integer
   uint8_t msg[8];
   for (int i = 7; i >= 0; --i) {
     msg[i] = static_cast<uint8_t>(step & 0xFF);
     step >>= 8;
   }
 
-  // HMAC-SHA1 produces a 20-byte MAC
-  uint8_t mac[20]{};
-  if (!CryptoService::hmacSha1(secret, secretLen, msg, sizeof(msg), mac)) {
+  uint8_t mac[64]{};
+  size_t hashLen = 20;
+  bool ok = false;
+
+  switch (algo) {
+    case OtpAlgo::Sha256:
+      hashLen = 32;
+      ok = CryptoService::hmacSha256(secret, secretLen, msg, sizeof(msg), mac);
+      break;
+    case OtpAlgo::Sha512:
+      hashLen = 64;
+      ok = CryptoService::hmacSha512(secret, secretLen, msg, sizeof(msg), mac);
+      break;
+    case OtpAlgo::Sha1:
+    default:
+      hashLen = 20;
+      ok = CryptoService::hmacSha1(secret, secretLen, msg, sizeof(msg), mac);
+      break;
+  }
+
+  if (!ok) {
+    CryptoService::secureZero(mac, sizeof(mac));
     return false;
   }
 
   // Dynamic truncation (RFC 4226 / RFC 6238)
-  const int offset = mac[19] & 0x0F;
+  const int offset = mac[hashLen - 1] & 0x0F;
   const uint32_t binary = ((mac[offset] & 0x7F) << 24) |
                           ((mac[offset + 1] & 0xFF) << 16) |
                           ((mac[offset + 2] & 0xFF) << 8) |
@@ -101,6 +117,22 @@ bool TotpService::computeTotp(const uint8_t* secret, size_t secretLen,
   return true;
 }
 
+bool TotpService::computeTotp(const uint8_t* secret, size_t secretLen,
+                              uint32_t epoch, uint8_t periodSec, uint8_t digits,
+                              OtpAlgo algo, char* outCode, size_t maxCodeLen,
+                              uint8_t& outRemainingSec) {
+  if (periodSec == 0) return false;
+  outRemainingSec = periodSec - (epoch % periodSec);
+  const uint64_t step = epoch / periodSec;
+  return computeOtp(secret, secretLen, step, algo, digits, outCode, maxCodeLen);
+}
+
+bool TotpService::computeHotp(const uint8_t* secret, size_t secretLen,
+                              uint32_t counter, uint8_t digits, OtpAlgo algo,
+                              char* outCode, size_t maxCodeLen) {
+  return computeOtp(secret, secretLen, static_cast<uint64_t>(counter), algo, digits, outCode, maxCodeLen);
+}
+
 const TotpAccount* TotpService::getAccount(uint8_t index) const {
   return loaded_ && index < accountCount_ ? &accounts_[index] : nullptr;
 }
@@ -113,16 +145,33 @@ void TotpService::lock() {
 }
 
 namespace {
+struct TotpAccountV1 {
+  char name[24]{};
+  char user[24]{};
+  uint8_t secret[32]{};
+  uint8_t secretLen = 0;
+  uint8_t digits = 6;
+  uint8_t period = 30;
+};
+static_assert(sizeof(TotpAccountV1) == 83, "Vault v1 uses fixed 83-byte records");
+
 constexpr size_t kHeaderSize = 4;
 constexpr size_t kPrefixSize = kHeaderSize + 12 + 16;
 constexpr size_t kMaxBlobSize = kPrefixSize + sizeof(TotpAccount) * kMaxTotpAccounts;
-static_assert(sizeof(TotpAccount) == 83, "Vault v1 uses fixed 83-byte records");
 
 bool validAccount(const TotpAccount& a) {
   return a.name[0] && memchr(a.name, 0, sizeof(a.name)) &&
          memchr(a.user, 0, sizeof(a.user)) && a.secretLen > 0 &&
+         a.secretLen <= sizeof(a.secret) && a.digits >= 6 && a.digits <= 8 &&
+         (a.type == 1 || a.period > 0) && a.algo <= 2;
+}
+
+bool validAccountV1(const TotpAccountV1& a) {
+  return a.name[0] && memchr(a.name, 0, sizeof(a.name)) &&
+         memchr(a.user, 0, sizeof(a.user)) && a.secretLen > 0 &&
          a.secretLen <= sizeof(a.secret) && a.digits >= 6 && a.digits <= 8 && a.period > 0;
 }
+
 bool hasRecords(Preferences& prefs) {
   return prefs.isKey("vault") || prefs.isKey("cnt") || prefs.isKey("data") ||
          prefs.isKey("iv") || prefs.isKey("tag");
@@ -138,18 +187,25 @@ bool TotpService::canChangeCredentials() {
 }
 
 bool TotpService::addAccount(const uint8_t* key, const char* name, const char* user,
-                             const char* base32, uint8_t digits, uint8_t period) {
+                             const char* base32, uint8_t digits, uint8_t period,
+                             OtpType type, OtpAlgo algo, uint32_t initialCounter) {
   if (!key || !loaded_ || accountCount_ >= kMaxTotpAccounts || !name || !name[0] ||
       strlen(name) >= sizeof(TotpAccount::name) || (user && strlen(user) >= sizeof(TotpAccount::user)) ||
-      !base32 || digits < 6 || digits > 8 || !period) return false;
+      !base32 || digits < 6 || digits > 8) return false;
+  if (type == OtpType::Totp && !period) return false;
+
   TotpAccount candidate{};
   const int length = decodeBase32(base32, candidate.secret, sizeof(candidate.secret));
   if (length <= 0) { CryptoService::secureZero(&candidate, sizeof(candidate)); return false; }
-  strcpy(candidate.name, name);
-  if (user) strcpy(candidate.user, user);
+  strncpy(candidate.name, name, sizeof(candidate.name) - 1);
+  if (user) strncpy(candidate.user, user, sizeof(candidate.user) - 1);
   candidate.secretLen = static_cast<uint8_t>(length);
   candidate.digits = digits;
-  candidate.period = period;
+  candidate.period = period ? period : 30;
+  candidate.type = static_cast<uint8_t>(type);
+  candidate.algo = static_cast<uint8_t>(algo);
+  candidate.counter = initialCounter;
+
   accounts_[accountCount_++] = candidate;
   CryptoService::secureZero(&candidate, sizeof(candidate));
   if (saveVault(key)) return true;
@@ -169,11 +225,25 @@ bool TotpService::removeAccount(const uint8_t* key, uint8_t index) {
   return saved;
 }
 
+bool TotpService::incrementHotp(const uint8_t* vaultKey, uint8_t index) {
+  if (!vaultKey || !loaded_ || index >= accountCount_) return false;
+  if (accounts_[index].type != static_cast<uint8_t>(OtpType::Hotp)) return false;
+  accounts_[index].counter++;
+  return saveVault(vaultKey);
+}
+
 bool TotpService::getAccountCode(uint8_t index, uint32_t epoch, char* code,
-                                size_t capacity, uint8_t& remaining) const {
+                                 size_t capacity, uint8_t& remaining) const {
   const TotpAccount* account = getAccount(index);
-  return account && computeTotp(account->secret, account->secretLen, epoch,
-      account->period, account->digits, code, capacity, remaining);
+  if (!account) return false;
+  if (account->type == static_cast<uint8_t>(OtpType::Hotp)) {
+    remaining = 0;
+    return computeHotp(account->secret, account->secretLen, account->counter,
+                       account->digits, static_cast<OtpAlgo>(account->algo), code, capacity);
+  }
+  return computeTotp(account->secret, account->secretLen, epoch,
+                     account->period, account->digits, static_cast<OtpAlgo>(account->algo),
+                     code, capacity, remaining);
 }
 
 bool TotpService::loadVault(const uint8_t* key) {
@@ -186,46 +256,91 @@ bool TotpService::loadVault(const uint8_t* key) {
     prefs.end(); loaded_ = true; storageError_ = false; return true;
   }
   uint8_t blob[kMaxBlobSize]{};
-  TotpAccount plain[kMaxTotpAccounts]{};
   uint8_t count = 0;
   bool ok = false;
   if (prefs.isKey("vault")) {
     const size_t length = prefs.getBytesLength("vault");
     if (length >= kPrefixSize && length <= sizeof(blob) &&
-        prefs.getBytes("vault", blob, length) == length && blob[0] == 'N' &&
-        blob[1] == 'T' && blob[2] == 1 && blob[3] <= kMaxTotpAccounts &&
-        length == kPrefixSize + sizeof(TotpAccount) * blob[3]) {
+        prefs.getBytes("vault", blob, length) == length && blob[0] == 'N' && blob[1] == 'T') {
       count = blob[3];
-      ok = CryptoService::aesGcmDecrypt(key, 256, blob + kHeaderSize, 12,
-          blob, kHeaderSize, blob + kPrefixSize, sizeof(TotpAccount) * count,
-          blob + kHeaderSize + 12, 16, reinterpret_cast<uint8_t*>(plain));
+      if (blob[2] == 2 && count <= kMaxTotpAccounts &&
+          length == kPrefixSize + sizeof(TotpAccount) * count) {
+        TotpAccount plain[kMaxTotpAccounts]{};
+        ok = CryptoService::aesGcmDecrypt(key, 256, blob + kHeaderSize, 12,
+            blob, kHeaderSize, blob + kPrefixSize, sizeof(TotpAccount) * count,
+            blob + kHeaderSize + 12, 16, reinterpret_cast<uint8_t*>(plain));
+        if (ok) {
+          for (uint8_t i = 0; i < count; ++i) if (!validAccount(plain[i])) ok = false;
+        }
+        if (ok) {
+          memcpy(accounts_, plain, sizeof(accounts_));
+          accountCount_ = count;
+        }
+        CryptoService::secureZero(plain, sizeof(plain));
+      } else if (blob[2] == 1 && count <= kMaxTotpAccounts &&
+                 length == kPrefixSize + sizeof(TotpAccountV1) * count) {
+        TotpAccountV1 plainV1[kMaxTotpAccounts]{};
+        ok = CryptoService::aesGcmDecrypt(key, 256, blob + kHeaderSize, 12,
+            blob, kHeaderSize, blob + kPrefixSize, sizeof(TotpAccountV1) * count,
+            blob + kHeaderSize + 12, 16, reinterpret_cast<uint8_t*>(plainV1));
+        if (ok) {
+          for (uint8_t i = 0; i < count; ++i) if (!validAccountV1(plainV1[i])) ok = false;
+        }
+        if (ok) {
+          accountCount_ = count;
+          for (uint8_t i = 0; i < count; ++i) {
+            strncpy(accounts_[i].name, plainV1[i].name, sizeof(accounts_[i].name) - 1);
+            strncpy(accounts_[i].user, plainV1[i].user, sizeof(accounts_[i].user) - 1);
+            memcpy(accounts_[i].secret, plainV1[i].secret, plainV1[i].secretLen);
+            accounts_[i].secretLen = plainV1[i].secretLen;
+            accounts_[i].digits = plainV1[i].digits;
+            accounts_[i].period = plainV1[i].period;
+            accounts_[i].type = static_cast<uint8_t>(OtpType::Totp);
+            accounts_[i].algo = static_cast<uint8_t>(OtpAlgo::Sha1);
+            accounts_[i].counter = 0;
+          }
+        }
+        CryptoService::secureZero(plainV1, sizeof(plainV1));
+      }
     }
   } else if (prefs.isKey("cnt") && prefs.getBytesLength("iv") == 12 &&
              prefs.getBytesLength("tag") == 16) {
-    // Read-only compatibility with the previous multi-key encrypted format.
-    // The next successful edit writes v1; failures never overwrite old records.
+    // Read-only compatibility with previous multi-key encrypted format (v1).
     count = prefs.getUChar("cnt", 255);
-    const size_t bytes = sizeof(TotpAccount) * count;
+    const size_t bytes = sizeof(TotpAccountV1) * count;
     if (count <= kMaxTotpAccounts && prefs.getBytesLength("data") == bytes &&
         prefs.getBytes("iv", blob + kHeaderSize, 12) == 12 &&
         prefs.getBytes("tag", blob + kHeaderSize + 12, 16) == 16 &&
         prefs.getBytes("data", blob + kPrefixSize, bytes) == bytes) {
+      TotpAccountV1 plainV1[kMaxTotpAccounts]{};
       ok = CryptoService::aesGcmDecrypt(key, 256, blob + kHeaderSize, 12, nullptr, 0,
           blob + kPrefixSize, bytes, blob + kHeaderSize + 12, 16,
-          reinterpret_cast<uint8_t*>(plain));
+          reinterpret_cast<uint8_t*>(plainV1));
+      if (ok) {
+        for (uint8_t i = 0; i < count; ++i) if (!validAccountV1(plainV1[i])) ok = false;
+      }
+      if (ok) {
+        accountCount_ = count;
+        for (uint8_t i = 0; i < count; ++i) {
+          strncpy(accounts_[i].name, plainV1[i].name, sizeof(accounts_[i].name) - 1);
+          strncpy(accounts_[i].user, plainV1[i].user, sizeof(accounts_[i].user) - 1);
+          memcpy(accounts_[i].secret, plainV1[i].secret, plainV1[i].secretLen);
+          accounts_[i].secretLen = plainV1[i].secretLen;
+          accounts_[i].digits = plainV1[i].digits;
+          accounts_[i].period = plainV1[i].period;
+          accounts_[i].type = static_cast<uint8_t>(OtpType::Totp);
+          accounts_[i].algo = static_cast<uint8_t>(OtpAlgo::Sha1);
+          accounts_[i].counter = 0;
+        }
+      }
+      CryptoService::secureZero(plainV1, sizeof(plainV1));
     }
   }
   prefs.end();
   if (ok) {
-    for (uint8_t i = 0; i < count; ++i) if (!validAccount(plain[i])) ok = false;
-  }
-  if (ok) {
-    memcpy(accounts_, plain, sizeof(accounts_));
-    accountCount_ = count;
     loaded_ = true;
     storageError_ = false;
   }
-  CryptoService::secureZero(plain, sizeof(plain));
   CryptoService::secureZero(blob, sizeof(blob));
   return ok;
 }
@@ -234,10 +349,9 @@ bool TotpService::saveVault(const uint8_t* key) {
   if (!key || !loaded_) return false;
   Preferences prefs;
   if (!prefs.begin(kTotpNamespace, false)) return false;
-  // Explicit deletion of the last account removes only the TOTP namespace.
   if (!accountCount_) { const bool ok = prefs.clear(); prefs.end(); return ok; }
   uint8_t blob[kMaxBlobSize]{};
-  blob[0] = 'N'; blob[1] = 'T'; blob[2] = 1; blob[3] = accountCount_;
+  blob[0] = 'N'; blob[1] = 'T'; blob[2] = 2; blob[3] = accountCount_;
   CryptoService::fillRandom(blob + kHeaderSize, 12);
   const size_t bytes = sizeof(TotpAccount) * accountCount_;
   bool ok = CryptoService::aesGcmEncrypt(key, 256, blob + kHeaderSize, 12,

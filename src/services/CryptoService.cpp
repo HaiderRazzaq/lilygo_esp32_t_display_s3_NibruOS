@@ -5,24 +5,10 @@
 #include <mbedtls/gcm.h>
 #include <mbedtls/platform_util.h>
 #include <string.h>
-#if defined(ARDUINO_ARCH_ESP32)
-#include <bootloader_random.h>
-#include <esp_wifi.h>
-#endif
 
 void CryptoService::fillRandom(uint8_t* buf, size_t len) {
   if (!buf || len == 0) return;
-#if defined(ARDUINO_ARCH_ESP32)
-  // Current firmware has no BLE/ADC service. With Wi-Fi off, briefly own the
-  // documented SAR entropy source; release it before later radio/ADC use.
-  wifi_mode_t mode = WIFI_MODE_NULL;
-  const bool ownEntropy = esp_wifi_get_mode(&mode) != ESP_OK || mode == WIFI_MODE_NULL;
-  if (ownEntropy) bootloader_random_enable();
-#endif
   esp_fill_random(buf, len);
-#if defined(ARDUINO_ARCH_ESP32)
-  if (ownEntropy) bootloader_random_disable();
-#endif
 }
 
 void CryptoService::secureZero(void* ptr, size_t len) {
@@ -60,6 +46,15 @@ bool CryptoService::hmacSha1(const uint8_t* key, size_t keyLen,
                              uint8_t* outMac) {
   if (!key || !msg || !outMac) return false;
   const mbedtls_md_info_t* mdInfo = mbedtls_md_info_from_type(MBEDTLS_MD_SHA1);
+  if (!mdInfo) return false;
+  return (mbedtls_md_hmac(mdInfo, key, keyLen, msg, msgLen, outMac) == 0);
+}
+
+bool CryptoService::hmacSha512(const uint8_t* key, size_t keyLen,
+                               const uint8_t* msg, size_t msgLen,
+                               uint8_t* outMac) {
+  if (!key || !msg || !outMac) return false;
+  const mbedtls_md_info_t* mdInfo = mbedtls_md_info_from_type(MBEDTLS_MD_SHA512);
   if (!mdInfo) return false;
   return (mbedtls_md_hmac(mdInfo, key, keyLen, msg, msgLen, outMac) == 0);
 }

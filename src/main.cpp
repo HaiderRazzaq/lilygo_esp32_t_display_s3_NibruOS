@@ -68,7 +68,7 @@ WakeInputGate wakeInput;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n[NibruOS] boot v0.22.0");
+  Serial.println("\n[NibruOS] boot v0.23.6");
   MemoryProfiler::checkpoint("startup-basic");
   display.begin();
   touch.begin();
@@ -111,6 +111,12 @@ void loop() {
   const bool hasTouch = touch.poll(ev);
   const ButtonAction action = buttons.poll(now);
 
+  static bool wasScreensaver = false;
+  if (!wasScreensaver && display.isScreensaverActive()) {
+    clockApp.resetScreensaver();
+  }
+  wasScreensaver = display.isScreensaverActive();
+
   if (display.isSleeping()) {
     if (hasTouch || touch.isPressed() || action != ButtonAction::None) {
       display.wake();
@@ -126,7 +132,7 @@ void loop() {
     if (hasTouch || touch.isPressed() || action != ButtonAction::None) {
       display.stopScreensaver();
       wakeInput.arm(now);
-      if (security.isPinEnabled()) {
+      if (security.isPinEnabled() && !webPortal.isActive()) {
         security.lock();
         security.invalidateFull();
       } else {
@@ -165,11 +171,12 @@ void loop() {
 
   now = millis();
   display.tick(now);
-  if (display.isSleeping() && security.isPinEnabled() && !security.isLocked()) security.lock();
+  if (display.isSleeping() && security.isPinEnabled() && !security.isLocked() && !webPortal.isActive()) {
+    security.lock();
+  }
   if (display.isSleeping() || security.isLocked()) {
     if (totp.isLoaded()) totpApp.clearSession(context);
     if (vault.isLoaded()) vaultApp.clearSession(context);
-    webPortal.stop(context);
     usbHid.cancel();
   }
   if (display.isSleeping() || display.isScreensaverActive() || security.isLocked()) {

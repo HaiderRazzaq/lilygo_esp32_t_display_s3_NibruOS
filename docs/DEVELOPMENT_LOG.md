@@ -2634,3 +2634,201 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Flash v0.22.0 to physical LILYGO T-Display-S3 Touch Glass and capture profiling scenarios A-E."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0074",
+  "date": "2026-11-06",
+  "related": ["FEAT-0029", "FEAT-0008", "FEAT-0010", "FEAT-0013", "VER-0239", "VER-0240"],
+  "action": "Implement SecureGen feature parity: HOTP RFC 4226, SHA-256/512 OTP, and Authenticator Control Panel in v0.23.0",
+  "files": [
+    "src/services/CryptoService.h",
+    "src/services/CryptoService.cpp",
+    "src/services/TotpService.h",
+    "src/services/TotpService.cpp",
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "src/services/WebPortalService.h",
+    "src/services/WebPortalService.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Implemented full feature parity with makepkg/SecureGen: upgraded TotpService with RFC 4226 HOTP counter-based engine and SHA-1/256/512 algorithms using mbedTLS HMAC primitives; upgraded TotpAccount schema to v2 (124 bytes) with backward compatibility for v1 blobs; updated TotpApp on 320x170 display with HOTP badge, counter status, offline USB HID keystroke injection without NTP requirement; built single-page Authenticator Control Panel web dashboard matching user's screenshot with tabs (Keys, Passwords, Display, PIN, Settings, Instructions), dynamic pink progress bar, live countdown, and client-side password generator; paused desktop simulator as instructed; bumped firmware version sequentially to v0.23.0.",
+  "reason": "User request for SecureGen feature parity (HOTP, multi-algorithm TOTP, Web Authenticator Control Panel) while halting simulator tasks and targeting physical ESP32-S3.",
+  "expected": "HOTP and SHA-256/512 OTP generation working offline, Web Portal matching screenshot, PlatformIO compilation success, zero memory leaks, firmware within app0 partition.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,608,208 B Flash (24.5% of 6.25 MB partition, 4,945,392 B free capacity) and 87,128 B RAM (26.6%). Documentation checks pass.",
+  "verification": "VER-0239 (Crypto/Totp build PASS), VER-0240 (Full WebPortal build PASS); desktop simulator paused per user order",
+  "risks": "HOTP counter desynchronization if server-side window exceeds lookahead; mitigated by on-device counter visibility and USB send.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Flash v0.23.0 to physical LILYGO T-Display-S3 Touch Glass, verify HOTP counter advancement on screen, and test Authenticator Control Panel in browser over SoftAP."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0075",
+  "date": "2026-11-06",
+  "related": ["FEAT-0029", "FEAT-0008", "VER-0241", "HWT-0089"],
+  "action": "Fix USB HID primary transport readiness and simplify 2FA touch send gestures in v0.23.1",
+  "files": [
+    "src/services/UsbHidService.cpp",
+    "src/apps/TotpApp.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Fixed UsbHidService native transport probe to use tud_mounted() && !tud_suspended() directly, ensuring reliable readiness detection when plugged into a PC. Updated TotpApp to make USB HID the permanent primary transport: eliminated confusing accidental BLE mode toggles, enabled direct USB code injection on both single Tap and LongPress (Hold) of the capsule button, code area, or physical BOOT button. Updated capsule button label to '[USB] TAP/HOLD TO SEND'. Incremented firmware version sequentially to v0.23.1.",
+  "reason": "User feedback inquiring why hold was restricted to Bluetooth; resolved by establishing USB HID as the primary keystroke transport on all gestures.",
+  "expected": "USB HID recognized immediately on PC connection; touching or holding capsule button or pressing BOOT button immediately types code into active PC field.",
+  "actual": "PlatformIO build succeeded at 1,607,728 B Flash (24.5%) and 87,128 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.8 seconds with verified SHA-256 hash. Documentation checks pass.",
+  "verification": "VER-0241 (build PASS), HWT-0089 (upload PASS)",
+  "risks": "None; BLE remains available via dedicated configuration without obstructing the primary USB workflow.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Test on physical PC: verify that tapping or holding the USB capsule on the device types the OTP code into an active text field on the PC."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0076",
+  "date": "2026-11-06",
+  "related": ["FEAT-0029", "FEAT-0022", "VER-0242", "HWT-0090"],
+  "action": "Resolve Web Portal SoftAP radio contention with BLE Keyboard in v0.23.2",
+  "files": [
+    "src/services/WebPortalService.h",
+    "src/services/WebPortalService.cpp",
+    "src/apps/SettingsApp.cpp",
+    "tests/host/test_web_portal.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Resolved 2.4GHz radio resource lock contention preventing Web Portal from launching when BLE Keyboard was active. When user activates Web Portal in Settings, WebPortalService::start() now detects active BLE Keyboard leases, gracefully suspends BLE during the ephemeral 3-minute SoftAP administration session, acquires the Wi-Fi resource, starts SoftAP with verified status, and serves the control panel with dedicated RF bandwidth and heap headroom. On portal closure (via Back, exit, or timeout), WebPortalService::stop() automatically restores BLE Keyboard and resumes advertising seamlessly. Added automated host unit tests and bumped firmware version sequentially to v0.23.2.",
+  "reason": "User reported that selecting Web Portal in Settings failed to open on second click whenever BLE was enabled, but worked after manually disabling BLE.",
+  "expected": "Web Portal AP opens reliably on second click regardless of BLE state; BLE Keyboard resumes automatically upon exiting Web Portal.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,608,112 B Flash (24.5%) and 87,144 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.7 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0242 (build PASS), HWT-0090 (upload PASS)",
+  "risks": "None; BLE is paused only during active administrative SoftAP sessions and restored cleanly on exit.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Verify on hardware: open Settings, enable Bluetooth, navigate to Web Portal (AP Mode), tap second click to open, verify AP broadcast and web dashboard, tap Back, and verify Bluetooth re-engages."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0077",
+  "date": "2026-11-06",
+  "related": ["FEAT-0006", "FEAT-0022", "VER-0243", "HWT-0091"],
+  "action": "Eliminate bootloader SAR entropy calls in CryptoService and clarify reset diagnostics in v0.23.3",
+  "files": [
+    "src/services/CryptoService.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Removed bootloader_random_enable() and bootloader_random_disable() from CryptoService::fillRandom(). On ESP32-S3, manipulating SAR ADC clocks at runtime while BLE or FreeRTOS is active causes hardware collisions and triggers ESP_RST_PANIC ('Software Crash/Panic'). Replaced with standard ESP-IDF runtime esp_fill_random(). Clarified in documentation that MemoryProfiler::resetReasonString() displays the hardware RTC register of the previous boot, and that historical crash reasons persist until a software restart (ESP_RST_SW) or power cycle (ESP_RST_POWERON). Bumped firmware version sequentially to v0.23.3.",
+  "reason": "User inquiry regarding 'Reset: Software Crash/Panic' shown in System Info.",
+  "expected": "Safe runtime entropy generation without bootloader register manipulation; clean reset diagnostic reporting.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,607,248 B Flash (24.5%) and 87,144 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.7 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0243 (build PASS), HWT-0091 (upload PASS)",
+  "risks": "None; esp_fill_random is the recommended ESP-IDF runtime RNG.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Confirm on hardware: reboot via Settings -> Device -> Reboot or power-cycle to observe the updated reset reason (Software Restart or Power-on)."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0078",
+  "date": "2026-11-06",
+  "related": ["FEAT-0022", "FEAT-0019", "VER-0244", "HWT-0092"],
+  "action": "Implement Web Portal display keep-alive and prevent premature sleep/lock session drop in v0.23.4",
+  "files": [
+    "src/services/WebPortalService.cpp",
+    "src/apps/SettingsApp.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Fixed an issue where the device's 30-second screen inactivity timeout triggered display.sleep(), which in turn invoked security.lock() and stopped webPortal.stop(context), terminating active user web portal connections unexpectedly. Integrated continuous display keep-alive notifications (ctx.display.notifyActivity(nowMs)) inside WebPortalService::tick() and SettingsApp::onTick() while the WebPortal subview or service is active. This keeps the LCD backlight illuminated, the connection credentials (SSID/Password/PIN) visible to the user, and prevents security auto-lock from killing the web server before the 3-minute session expires or the user explicitly exits. Bumped firmware version sequentially to v0.23.4.",
+  "reason": "User reported that the device enters sleep or lock mode automatically, which immediately exits and stops the Web Portal service.",
+  "expected": "Web Portal keeps the screen awake and unlocked throughout the administrative session without premature termination.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,607,264 B Flash (24.5%) and 87,144 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.8 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0244 (build PASS), HWT-0092 (upload PASS)",
+  "risks": "None; display activity timer is kept active only while the Web Portal is explicitly running and reverts to normal sleep timeout once stopped.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Verify on hardware: open Web Portal (AP Mode), connect phone/PC without touching the ESP32 screen, and confirm the connection remains active and the screen stays on for the full 3 minutes."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0079",
+  "date": "2026-11-06",
+  "related": ["FEAT-0024", "FEAT-0010", "VER-0245", "HWT-0093"],
+  "action": "Eliminate full-screen redraw flicker in Clock Screensaver and ClockApp via differential rendering in v0.23.5",
+  "files": [
+    "src/apps/ClockApp.h",
+    "src/apps/ClockApp.cpp",
+    "src/main.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Resolved an issue where the LCD screen noticeably flashed/flickered black every second in screensaver mode and in ClockApp. The previous implementation executed a full 304x158 fillRoundRect() background wipe on every 1-second tick before redrawing borders, pills, badges, and text. Replaced with true differential rendering: the static frame, cyber borders, header pills, badges, date strings, and seconds track are rendered once upon screensaver activation or app entry. Subsequent per-second ticks overwrite only the fixed-pitch digital time characters in-place using TFT_eSPI setTextColor(accent, bg) and update the incremental 4-pixel seconds bar without clearing the surrounding UI. Added ClockApp::resetScreensaver() triggered in main.cpp on screensaver transition to initialize the layout cleanly. Bumped firmware version sequentially to v0.23.5.",
+  "reason": "User reported that in screen saver mode, the LCD was flashing every second while updating the clock.",
+  "expected": "Completely flicker-free, rock-solid 1-second clock updates in both Screensaver mode and ClockApp.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,607,749 B Flash (24.5%) and 87,144 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.7 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0245 (build PASS), HWT-0093 (upload PASS)",
+  "risks": "None; differential rendering reduces bus traffic and CPU load on every 1-second tick.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Verify on physical device: allow the screensaver to activate and observe that the digital time updates cleanly every second with zero black flashing or flicker."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0080",
+  "date": "2026-11-06",
+  "related": ["FEAT-0022", "FEAT-0024", "VER-0246", "HWT-0094"],
+  "action": "Enable continuous background Web Portal broadcast during screensaver and decouple from display power in v0.23.6",
+  "files": [
+    "src/main.cpp",
+    "src/services/WebPortalService.cpp",
+    "src/apps/SettingsApp.cpp",
+    "src/apps/ClockApp.h",
+    "src/apps/ClockApp.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Decoupled WebPortalService lifecycle from display power and security lock states in src/main.cpp. Previously, display.isSleeping() or security.isLocked() erroneously invoked webPortal.stop(context), terminating active user Wi-Fi SoftAP connections whenever the device entered screensaver, sleep, or auto-lock. Removed webPortal.stop() from the display sleep block so that the Web Portal operates strictly according to its dedicated 3-minute session timer (remainingSeconds). Removed artificial notifyActivity() locks to allow the screen to transition naturally into Clock Screensaver after 30 seconds of inactivity to protect the display. Extended ClockApp::renderScreensaver() with live detection of active Web Portal sessions, rendering a vibrant green PORTAL BROADCASTING header and live countdown badge directly on the clock screensaver. Updated screensaver wake handling to return directly to the Web Portal view without abrupt session termination. Bumped firmware version sequentially to v0.23.6.",
+  "reason": "User reported that when entering screensaver mode, the web portal broadcast stopped.",
+  "expected": "Web Portal continues broadcasting SoftAP and serving web requests without interruption even when Clock Screensaver is active.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,607,977 B Flash (24.5%) and 87,160 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.8 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0246 (build PASS), HWT-0094 (upload PASS)",
+  "risks": "None; Web Portal retains its 3-minute session timeout safety boundary and automatic BLE restoration upon stop.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Verify on hardware: start Web Portal, connect phone, let device sit idle for 30s until Clock Screensaver activates, observe green PORTAL BROADCASTING indicator on screensaver, and verify web dashboard continues responding smoothly on phone."
+}
+```

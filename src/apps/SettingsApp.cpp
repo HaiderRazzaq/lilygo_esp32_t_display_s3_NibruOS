@@ -165,7 +165,12 @@ void SettingsApp::onActivate(AppContext& ctx) {
     if (subView_ == SettingsSubView::TouchTest) touchTest_.onEnter(ctx);
     else if (subView_ == SettingsSubView::Bluetooth) bluetooth_.onEnter(ctx);
     else if (subView_ == SettingsSubView::WebPortal) {
-      ctx.webPortal.start(millis(), ctx);
+      if (!ctx.webPortal.start(millis(), ctx)) {
+        subView_ = SettingsSubView::Menu;
+        fullRedraw_ = true;
+        invalidate();
+        return;
+      }
       webPortalTyped_ = false;
       drawnWebPortalSec_ = 9999;
     }

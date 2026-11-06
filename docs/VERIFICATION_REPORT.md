@@ -5794,3 +5794,179 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Validates schema and references only."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0239",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of CryptoService SHA-512, TotpService RFC 4226 HOTP, and multi-algo dynamic truncation",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; mbedTLS SHA-512 and HOTP compile cleanly.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,595,641 B (24.3%), RAM: 87,128 B (26.6%).",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0230-pio-build-crypto.txt"],
+  "evidence_kind": "PlatformIO build log",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Does not prove physical display or radio execution."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0240",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of WebPortalService Authenticator Control Panel single-page application and REST API endpoints",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Full firmware compiles and links within partition capacity with zero errors.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,608,208 B Flash (24.5% of 6.25 MB partition, 4,945,392 B free capacity) and 87,128 B RAM (26.6%).",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0230-pio-build-webportal.txt"],
+  "evidence_kind": "PlatformIO build log",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Desktop simulator paused per explicit user directive; hardware RF validation pending."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0241",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of UsbHidService transport readiness fix and TotpApp primary USB send gestures",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; TinyUSB native transport compiles cleanly.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,607,361 B (24.5%), RAM: 87,128 B (26.6%).",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0231-pio-build.txt"],
+  "evidence_kind": "PlatformIO build log",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Does not prove physical display or radio execution."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0242",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of WebPortalService BLE coexistence suspension, automatic restoration, and SoftAP verification",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; WebPortalService and SettingsApp compile cleanly with full resource tracking.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,607,753 B (24.5%), RAM: 87,144 B (26.6%). Binary image 1,608,112 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0232-pio-build.txt"],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0090."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0243",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.3",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of CryptoService bootloader SAR entropy cleanup and runtime RNG safety",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; CryptoService compiles with standard esp_fill_random().",
+  "actual": "Compilation succeeded with code 0. Flash: 1,606,877 B (24.5%), RAM: 87,144 B (26.6%). Binary image 1,607,248 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0233-pio-build.txt"],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0091."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0244",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.4",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of Web Portal display keep-alive and sleep lock prevention in v0.23.4",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; WebPortalService and SettingsApp compile with display keep-alive notifications.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,606,893 B (24.5%), RAM: 87,144 B (26.6%). Binary image 1,607,264 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0234-pio-build.txt"],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0092."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0245",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.5",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of flicker-free differential rendering for Clock Screensaver and ClockApp in v0.23.5",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; ClockApp compiles with differential rendering cache and reset logic.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,607,749 B (24.5%), RAM: 87,144 B (26.6%). Binary image 1,608,112 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0235-pio-build.txt"],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0093."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0246",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.6",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of continuous background Web Portal broadcast during screensaver in v0.23.6",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; WebPortalService and ClockApp compile with background SoftAP persistence and screensaver portal indicators.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,607,977 B (24.5%), RAM: 87,160 B (26.6%). Binary image 1,608,336 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0236-pio-build.txt"],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0094."
+}
+```

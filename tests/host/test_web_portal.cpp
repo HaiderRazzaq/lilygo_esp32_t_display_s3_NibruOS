@@ -48,6 +48,32 @@ void runWebPortalHostTests() {
   assert(webPortal.state() == WebPortalState::Active);
   assert(resources.ownsWiFi(ResourceOwner::WebPortal));
 
+  // 2b. Test Portal coexistence with BLE Keyboard:
+  // If BLE is enabled, starting Web Portal must suspend BLE gracefully,
+  // acquire Wi-Fi for SoftAP, and when stopped, restore BLE automatically.
+  webPortal.stop(ctx);
+  assert(!webPortal.isActive());
+  assert(ctx.bleHid.setEnabled(true, ctx));
+  assert(ctx.bleHid.isEnabled());
+  assert(resources.ownsWiFi(ResourceOwner::BleKeyboard));
+
+  assert(webPortal.start(nowMs + 100, ctx));
+  assert(webPortal.isActive());
+  assert(resources.ownsWiFi(ResourceOwner::WebPortal));
+  assert(webPortal.isBleSuspended());
+  assert(!ctx.bleHid.isEnabled());
+
+  webPortal.stop(ctx);
+  assert(!webPortal.isActive());
+  assert(!webPortal.isBleSuspended());
+  assert(ctx.bleHid.isEnabled());
+  assert(resources.ownsWiFi(ResourceOwner::BleKeyboard));
+  ctx.bleHid.setEnabled(false, ctx);
+  assert(!resources.ownsWiFi(ResourceOwner::BleKeyboard));
+
+  // Re-start portal for subsequent endpoint tests
+  assert(webPortal.start(nowMs + 200, ctx));
+
   // Check generated credentials
   assert(std::strncmp(webPortal.ssid(), "NibruOS-", 8) == 0);
   assert(std::strlen(webPortal.password()) == 8);

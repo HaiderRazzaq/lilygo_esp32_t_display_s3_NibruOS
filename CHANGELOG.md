@@ -1,5 +1,62 @@
 # Changelog
 
+## [v0.23.6] - 2026-11-06
+
+### Fixed
+
+- **Web Portal Continuous Background Broadcast During Screensaver & Sleep**: Decoupled Web Portal lifecycle from display power and security lock states in `src/main.cpp`. Previously, entering screensaver or display sleep erroneously invoked `webPortal.stop()`, terminating the active Wi-Fi SoftAP and web server abruptly. Web Portal now maintains its independent 3-minute session lifecycle, continuing full-speed background SoftAP broadcasting and HTTP request handling while the screen enters Clock Screensaver or sleep.
+- **Screensaver Portal Status Indicator**: Updated `ClockApp::renderScreensaver()` to detect active Web Portal sessions in real-time, displaying a vibrant green header pill `PORTAL BROADCASTING` and live countdown badge `[ PORTAL AP ACTIVE (X s) * TAP ]` directly on the clock screensaver.
+- **Seamless Wake from Screensaver**: When tapping the screen while Web Portal is broadcasting, waking up restores the Web Portal view immediately without forcing a PIN lock or stopping the SoftAP.
+
+### Fixed
+
+- **Flicker-Free Differential Rendering for Clock Screensaver & ClockApp**: Fixed full-screen display flashing/flickering every second when the digital clock updates. In both `ClockApp::renderScreensaver()` and `ClockApp::render()`, eliminated redundant `fillRoundRect()` full card/screen background wipes on every 1-second tick. The cyber frame, header pills, badges, date strings, and progress bar tracks are now drawn once on entry/reset, while per-second ticks update only the digital time glyphs and incremental seconds bar in-place. Added `ClockApp::resetScreensaver()` to trigger full setup on initial screensaver activation.
+
+### Fixed
+
+- **Web Portal Display Keep-Alive & Sleep Prevention**: Added `DisplayManager::notifyActivity()` to `WebPortalService::tick()` and `SettingsApp::onTick()`. Prevents the screen from entering sleep/screensaver or locking while the user is actively working on the 3-minute Web Portal session, ensuring the AP SSID, password, web PIN, and live countdown remain visible and the SoftAP web server is not abruptly terminated by the display inactivity timer.
+
+## [v0.23.3] - 2026-11-06
+
+### Fixed
+
+- **CryptoService SAR Entropy & Panic Elimination**: Removed legacy `bootloader_random_enable()` and `bootloader_random_disable()` calls from `CryptoService::fillRandom()`. On ESP32-S3, re-initializing the bootloader SAR ADC during runtime while Bluetooth/Wi-Fi or FreeRTOS is active creates hardware clock register collisions and triggers `ESP_RST_PANIC` ("Software Crash/Panic"). Replaced with direct, thread-safe ESP-IDF runtime `esp_fill_random()` hardware RNG.
+- **Diagnostics Clarification for Reset Reason**: Documented how `MemoryProfiler::resetReasonString()` displays the last recorded hardware RTC reset reason on the System Info screen, explaining why previous crash reasons persist until a software reboot (`ESP_RST_SW`) or cold power cycle (`ESP_RST_POWERON`).
+
+## [v0.23.2] - 2026-11-06
+
+### Fixed
+
+- **Web Portal SoftAP Coexistence with BLE**: Resolved radio resource lock contention preventing Web Portal from starting when BLE Keyboard was enabled. In `WebPortalService::start()`, active BLE Keyboard leases are now gracefully suspended during the ephemeral 3-minute SoftAP administration session to ensure dedicated 2.4GHz RF bandwidth and full internal SRAM headroom.
+- **Automatic BLE Restoration**: When exiting the Web Portal (via Back gesture, UI exit, or session timeout), `WebPortalService::stop()` automatically restores the prior BLE Keyboard state and re-enables advertising without requiring manual intervention in Bluetooth settings.
+- **SoftAP Verification & Error Guard**: Added return status verification for `WiFi.softAP()` in `WebPortalService.cpp` and safe rollback logic in `SettingsApp::onActivate()`, ensuring the view transitions cleanly without silent resets.
+- **Host Test Suite**: Added automated unit test coverage in `tests/host/test_web_portal.cpp` verifying BLE suspension during active Web Portal sessions and seamless automatic restoration upon portal closure.
+
+## [v0.23.1] - 2026-11-06
+
+### Fixed
+
+- **USB HID Primary Keystroke Transport**: Fixed USB HID transport readiness probe in `UsbHidService.cpp` to use TinyUSB `tud_mounted() && !tud_suspended()` instead of an uninitialized instance, ensuring USB connection is reliably recognized as soon as the cable is connected to a PC.
+- **2FA Single-Touch & Hold USB Send**: Removed accidental BLE mode toggle in `TotpApp`; simplified input handling so that both short Tap, LongPress (Hold), and physical BOOT button immediately inject the active 2FA code over USB HID to the PC.
+- **Capsule Button UI**: Updated action button to clearly display `[USB] TAP/HOLD TO SEND` in vibrant cyan with immediate live feedback (`TYPING USB TO PC...` and `Code sent to PC (USB)!`).
+
+## [v0.23.0] - 2026-11-06
+
+### Added
+
+- **HOTP (RFC 4226) Engine & Counter-Based 2FA**: Counter-based one-time password generation operating fully offline without NTP/RTC clock requirements.
+- **SHA-256 and SHA-512 Multi-Algorithm TOTP/HOTP**: Added `CryptoService::hmacSha512` primitive and upgraded `TotpService::computeOtp` to support SHA-1 (20B), SHA-256 (32B), and SHA-512 (64B) HMACs with standard RFC 4226 dynamic truncation.
+- **Authenticator Web Control Panel**: Integrated single-page web dashboard (`WebPortalService`) matching SecureGen architecture with tabs: `Keys`, `Passwords`, `Display`, `PIN`, `Settings`, and `Instructions`.
+- **Live Visual Countdown & Progress Bar**: Table display for 2FA keys with live remaining-time countdown and animated pink progress bar (`#f43f5e`), code display, and instant key removal.
+- **Client-Side Password Generator**: Integrated into the Passwords tab with configurable length (8–32) and character sets (A–Z, a–z, 0–9, symbols), with instant "Use in Form" insertion.
+- **HOTP USB HID Keystroke Injection**: Advancing HOTP counter automatically sends code over USB HID and immediately commits incremented counter into AES-256-GCM encrypted NVS storage.
+
+### Changed
+
+- Upgraded `TotpAccount` struct schema to v2 (124 bytes) supporting extended 64-byte secrets for SHA-512, account type (`Totp` / `Hotp`), algorithm enum, and counter, maintaining automatic decryption and in-memory upgrade for v1 blobs.
+- Display UI in `TotpApp` now displays `[HOTP]` and algorithm badges (`256`/`512`), counter state (`HOTP #<counter>`), and supports direct tap on card or physical BOOT button to generate/send next code without requiring time sync.
+- Synchronized firmware runtime version across configuration headers, main, and engineering records to `v0.23.0`.
+
 ## [v0.22.0] - 2026-11-06
 
 ### Added

@@ -31,6 +31,11 @@ public:
                        const uint8_t* msg, size_t msgLen,
                        uint8_t* outMac);
 
+  // HMAC-SHA512 calculation (required for SHA-512 TOTP/HOTP; outMac must be 64 bytes)
+  static bool hmacSha512(const uint8_t* key, size_t keyLen,
+                         const uint8_t* msg, size_t msgLen,
+                         uint8_t* outMac);
+
   // PBKDF2-HMAC-SHA256 key derivation from PIN / passphrase
   static bool deriveKey(const char* password, size_t passLen,
                         const uint8_t* salt, size_t saltLen,

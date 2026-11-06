@@ -16,10 +16,23 @@ public:
   bool onBack(AppContext& ctx) override;
   void render(AppContext& ctx) override;
   void renderScreensaver(AppContext& ctx, uint32_t nowMs);
+  void resetScreensaver();
 
 private:
   uint32_t lastEpoch_ = 0;
   uint32_t lastScreensaverEpoch_ = 0;
   uint8_t themeIdx_ = 0;
   bool fullRedraw_ = true;
+  bool screensaverFullRedraw_ = true;
+
+  // Differential cache for Screensaver
+  bool lastScreensaverSynced_ = false;
+  uint32_t lastScreensaverDay_ = 0;
+  bool lastScreensaverPortalOn_ = false;
+  uint32_t lastScreensaverPortalRem_ = 0;
+
+  // Differential cache for ClockApp
+  bool lastClockSynced_ = false;
+  bool lastClockSaverOn_ = false;
+  uint32_t lastClockDay_ = 0;
 };

@@ -7,11 +7,11 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
 {
   "record_type": "state",
   "date": "2026-11-06",
-  "runtime_version": "v0.22.0",
+  "runtime_version": "v0.23.6",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
-  "working_tree": "Essential Settings v0.1 & Permanent Engineering Resource Policy consolidation and verification",
+  "working_tree": "Web Portal continuous background broadcast during screensaver and sleep",
   "implemented_features": [
     "FEAT-0024",
     "FEAT-0001",
@@ -39,7 +39,8 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "FEAT-0025",
     "FEAT-0026",
     "FEAT-0027",
-    "FEAT-0028"
+    "FEAT-0028",
+    "FEAT-0029"
   ],
   "planned_features": [
     "FEAT-0007"

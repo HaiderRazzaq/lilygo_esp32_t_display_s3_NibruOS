@@ -31,6 +31,7 @@ public:
 
   bool isActive() const { return state_ == WebPortalState::Active; }
   WebPortalState state() const { return state_; }
+  bool isBleSuspended() const { return bleSuspended_; }
 
   const char* ssid() const { return ssid_; }
   const char* password() const { return password_; }
@@ -45,6 +46,7 @@ private:
   WebPortalState state_ = WebPortalState::Idle;
   uint32_t startedMs_ = 0;
   uint32_t timeoutSec_ = kDefaultTimeoutSec;
+  bool bleSuspended_ = false;
 
   char ssid_[24]{};
   char password_[16]{};
@@ -52,8 +54,15 @@ private:
 
   void generateCredentials();
   int handleStatus(AppContext& ctx, char* outResponse, size_t maxLen);
-  int handleAddVault(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
+  int handleTotpList(AppContext& ctx, char* outResponse, size_t maxLen);
   int handleAddTotp(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
+  int handleRemoveTotp(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
+  int handleNextHotp(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
+  int handleVaultList(AppContext& ctx, char* outResponse, size_t maxLen);
+  int handleAddVault(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
+  int handleRemoveVault(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
   int handleBackup(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
   int handleRestore(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
+  int handleDeviceDisplay(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
+  int handleDeviceLock(AppContext& ctx, const char* body, char* outResponse, size_t maxLen);
 };

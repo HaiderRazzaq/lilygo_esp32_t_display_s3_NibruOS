@@ -1,0 +1,41 @@
+PlatformIO Target Build & Upload Log - v0.23.4
+Date: 2026-11-06
+Target: LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2)
+Upload Port: COM3
+Baud: 460800
+
+RAM:   [===       ]  26.6% (used 87144 bytes from 327680 bytes)
+Flash: [==        ]  24.5% (used 1606893 bytes from 6553600 bytes)
+
+check_image:
+{
+  "binary_bytes": 1607264,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 4946336,
+  "sha256": "abcef862c78a778b6365346d59e62e3257ef9e543c6541dc8b4c32edbfe0efd9",
+  "growth_percent": 90.94451519701953,
+  "warnings": [
+    "Image growth exceeds provisional 5% review trigger"
+  ],
+  "runtime_metrics": "NOT MEASURED"
+}
+
+esptool.py v4.5.1
+Serial port COM3
+Connecting...
+Chip is ESP32-S3 (revision v0.2)
+Features: WiFi, BLE
+Crystal is 40MHz
+MAC: 44:1b:f6:d3:aa:bc
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Wrote 1607264 bytes (1000543 compressed) at 0x00010000 in 13.8 seconds (effective 932.8 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
+SUCCESS Took 34.63 seconds
+
