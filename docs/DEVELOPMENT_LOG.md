@@ -2832,3 +2832,58 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Verify on hardware: start Web Portal, connect phone, let device sit idle for 30s until Clock Screensaver activates, observe green PORTAL BROADCASTING indicator on screensaver, and verify web dashboard continues responding smoothly on phone."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0081",
+  "date": "2026-11-06",
+  "related": ["FEAT-0024", "VER-0247", "HWT-0095"],
+  "action": "Clarify System Info Boot Cause telemetry label and document RTC reset reason persistence in v0.23.7",
+  "files": [
+    "src/apps/SettingsApp.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Updated the telemetry metric label in SettingsApp::renderMemory() from 'Reset: %.36s' to 'Boot cause: %.32s'. The previous label led users viewing System Info to believe the device was currently experiencing an active software crash or panic error. Clarified that esp_reset_reason() reads the hardware RTC register (RTC_CNTL_RESET_CAUSE_REG), which records the cause of the initial boot sequence rather than an active crash. In ESP32-S3, soft flashing via RTS does not clear RTC slow memory, causing historical panic reasons from earlier development to persist until the user initiates a software restart (Settings -> Device -> REBOOT, setting reason to Software Restart) or a cold power cycle (unplugging USB, setting reason to Power-on). Bumped firmware version sequentially to v0.23.7.",
+  "reason": "User inquired about 'software crash panic' after observing the label on the System Info screen.",
+  "expected": "Clear UI wording indicating 'Boot cause' so users understand it is an initial boot telemetry record, not an active error.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,607,977 B Flash (24.5%) and 87,160 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.9 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0247 (build PASS), HWT-0095 (upload PASS)",
+  "risks": "None; cosmetic string adjustment with zero impact on system logic or memory footprint.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Advise user that tapping REBOOT in Settings -> Device will clear the old crash record and update Boot Cause to 'Software Restart'."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0082",
+  "date": "2026-11-06",
+  "related": ["FEAT-0022", "VER-0248", "HWT-0096"],
+  "action": "Eliminate Web Portal client connection crash/panic via Gzip PROGMEM streaming, captive portal 302 redirects, and 16KB loop stack in v0.23.8",
+  "files": [
+    "src/services/WebPortalService.cpp",
+    "src/services/WebPortalHtml.h",
+    "tools/compress_portal_html.py",
+    "tools/patch_webportal.py",
+    "src/main.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Resolved a critical ESP_RST_PANIC crash occurring specifically when a smartphone or browser connected to the Web Portal SoftAP. Diagnosed two compounding failure modes: 1) The 33.7 KB HTML dashboard was passed to server.send() which forced a 33.7 KB heap String allocation, and onNotFound dumped this huge payload onto every simultaneous captive portal probe (/generate_204, /hotspot-detect.html, etc.), exhausting internal heap and lwIP socket buffers. 2) Route handler lambdas allocated char resp[3072] on the stack, which combined with loadVault() (3.5 KB) blew through the default 8KB loopTask stack. Fixed by: 1) Compressing HTML dashboard into an 8,036-byte Gzip PROGMEM byte array in WebPortalHtml.h and streaming it via server.send_P(..., Content-Encoding: gzip), eliminating heap allocations. 2) Adding lightweight 50-byte 302 redirects for all OS captive portal probes. 3) Moving response buffers to a shared static buffer (s_apiResp). 4) Increasing loopTask stack from 8KB to 16KB via getArduinoLoopTaskStackSize(). 5) Guarding route registration against duplicate handler leaks with s_routesRegistered. Bumped firmware version sequentially to v0.23.8.",
+  "reason": "User reported that the 'Reset: Software Crash/Panic' occurs specifically after activating the Web Portal and connecting to it, but does not occur when no client connects.",
+  "expected": "Web Portal handles client connections, captive portal detection, and web dashboard browsing rock-solid without crashing or panicking.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,583,669 B Flash (24.2%) and 90,240 B RAM (27.5%). Firmware uploaded cleanly to COM3 in 13.6 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0248 (build PASS), HWT-0096 (upload PASS)",
+  "risks": "None; Gzip compression is universally supported across modern smartphone and desktop browsers.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Verify on hardware: start Web Portal, connect smartphone to SoftAP, verify captive portal opens without reboot, and manage keys/vault successfully."
+}
+```

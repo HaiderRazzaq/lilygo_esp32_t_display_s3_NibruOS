@@ -630,7 +630,7 @@ void SettingsApp::renderMemory(AppContext& ctx) {
     metricLabel(screen, 10, 70, line);
     snprintf(line, sizeof(line), "Uptime: %lu s", (unsigned long)m.uptimeSec);
     metricLabel(screen, 10, 86, line);
-    snprintf(line, sizeof(line), "Reset: %.36s", m.resetReason);
+    snprintf(line, sizeof(line), "Boot cause: %.32s", m.resetReason);
     metricLabel(screen, 10, 102, line);
   } else {
     snprintf(line, sizeof(line), "Internal free: %lu B", (unsigned long)m.freeInternalHeap); metricLabel(screen, 10,38,line);

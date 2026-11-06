@@ -7,11 +7,11 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
 {
   "record_type": "state",
   "date": "2026-11-06",
-  "runtime_version": "v0.23.6",
+  "runtime_version": "v0.23.8",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
-  "working_tree": "Web Portal continuous background broadcast during screensaver and sleep",
+  "working_tree": "Web Portal Gzip stream and stack overflow panic elimination",
   "implemented_features": [
     "FEAT-0024",
     "FEAT-0001",

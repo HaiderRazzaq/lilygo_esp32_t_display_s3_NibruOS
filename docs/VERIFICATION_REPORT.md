@@ -5970,3 +5970,47 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Build verification only; physical flash upload tracked in HWT-0094."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0247",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.7",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of clarified System Info Boot Cause telemetry label in v0.23.7",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; SettingsApp compiles with Boot Cause label.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,607,977 B (24.5%), RAM: 87,160 B (26.6%). Binary image 1,608,336 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0237-pio-build.txt"],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0095."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0248",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.8",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of Gzip Web Portal streaming and crash elimination in v0.23.8",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; WebPortalService compiles with Gzip streaming and 16KB loop stack.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,583,669 B (24.2%), RAM: 90,240 B (27.5%). Binary image 1,584,032 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0238-pio-build.txt"],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0096."
+}
+```

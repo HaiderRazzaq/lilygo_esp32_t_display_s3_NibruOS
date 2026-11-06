@@ -1,5 +1,24 @@
 # Changelog
 
+## [v0.23.8] - 2026-11-06
+
+### Fixed
+
+- **Web Portal Client Connection Crash/Panic (`ESP_RST_PANIC`) Elimination**: Resolved a critical panic occurring immediately when a smartphone or browser connects to the Web Portal SoftAP:
+  1. **Gzip Compressed PROGMEM Payload**: Converted the 33,786-byte raw HTML dashboard into an 8,036-byte Gzip-compressed byte array (`kIndexHtmlGz`) in `src/services/WebPortalHtml.h`. Served with `Content-Encoding: gzip` via `server.send_P(200, "text/html", kIndexHtmlGz, sizeof(kIndexHtmlGz))`. This completely eliminates the previous 33.7 KB heap `String` allocation and prevents TCP socket buffer congestion and lwIP pbuf exhaustion.
+  2. **Captive Portal Probe Redirection**: Implemented dedicated 302 redirection for Android (`/generate_204`, `/gen_204`), Apple iOS (`/hotspot-detect.html`, `/canonical.html`), and Windows (`/ncsi.txt`, `/connecttest.txt`). Previously, every background OS connectivity probe hit `onNotFound`, triggering simultaneous 33 KB HTML dumps that overwhelmed internal SRAM. Probes now receive instant, lightweight 50-byte 302 redirects to `http://192.168.4.1/`.
+  3. **Stack Buffer Elimination in API Routes**: Replaced per-lambda stack allocations (`char resp[3072]`) with a shared static response buffer (`s_apiResp[3072]`).
+  4. **Doubled FreeRTOS Loop Task Stack**: Increased Arduino-ESP32 `loopTask` stack size from 8,192 bytes (8KB) to 16,384 bytes (16KB) by overriding `getArduinoLoopTaskStackSize()` in `src/main.cpp`.
+  5. **One-Time WebServer Route Registration**: Protected route registration in `WebPortalService::start()` with `s_routesRegistered` flag to prevent memory leaks and handler duplication across sessions.
+  6. **Software ROM Download Mode Trigger**: Added serial command `'~'` in `src/main.cpp` to programmatically enter the ESP32-S3 ROM bootloader download mode via `RTC_CNTL_FORCE_DOWNLOAD_BOOT`.
+
+## [v0.23.7] - 2026-11-06
+
+### Changed
+
+- **System Info Boot Cause Clarification**: Updated telemetry label in `SettingsApp::renderMemory()` from `Reset: %.36s` to `Boot cause: %.32s`. Clarifies that this value displays the historical hardware RTC reset reason from the initial boot sequence (`esp_reset_reason()`), rather than indicating an active system error or current panic condition.
+- **Diagnostics & User Guidance**: Clarified that historical `Software Crash/Panic` statuses from earlier sessions persist in the ESP32-S3 RTC slow-memory register across RTS soft-resets until cleared by a normal user reboot (**Settings -> Device -> REBOOT**, resetting to `Software Restart`) or a cold power cycle (unplugging and reattaching USB, resetting to `Power-on`).
+
 ## [v0.23.6] - 2026-11-06
 
 ### Fixed

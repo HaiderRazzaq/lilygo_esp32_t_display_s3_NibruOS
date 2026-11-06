@@ -31,6 +31,14 @@
 #include "services/WifiDefenseService.h"
 #include "apps/WifiDefenseApp.h"
 #include "apps/SecurityLabApp.h"
+#if defined(ARDUINO_ARCH_ESP32)
+#include "soc/rtc_cntl_reg.h"
+#endif
+
+// Override Arduino-ESP32 weak loopTask stack size from 8KB to 16KB for deep crypto & WebServer frames
+size_t getArduinoLoopTaskStackSize(void) {
+  return 16384;
+}
 
 namespace {
 DisplayManager display;
@@ -68,7 +76,7 @@ WakeInputGate wakeInput;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n[NibruOS] boot v0.23.6");
+  Serial.println("\n[NibruOS] boot v0.23.8");
   MemoryProfiler::checkpoint("startup-basic");
   display.begin();
   touch.begin();
@@ -187,6 +195,14 @@ void loop() {
   wifi.tick(now);
   while (Serial.available() > 0) {
     char c = static_cast<char>(Serial.read());
+#if defined(ARDUINO_ARCH_ESP32)
+    if (c == '~') {
+      Serial.println("[NibruOS] Entering ROM Download Mode...");
+      Serial.flush();
+      REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
+      esp_restart();
+    }
+#endif
     if (timeService.processSerialInput(c)) {
       launcher.invalidate();
     }
