@@ -1,17 +1,17 @@
 # Current state
 
-Snapshot: 2026-11-05, Asia/Baghdad. Implementation and physical acceptance are
+Snapshot: 2026-11-06, Asia/Baghdad. Implementation and physical acceptance are
 separate; [history](DEVELOPMENT_LOG.md) is append-only.
 
 ```json
 {
   "record_type": "state",
-  "date": "2026-11-05",
-  "runtime_version": "v0.21.0",
+  "date": "2026-11-06",
+  "runtime_version": "v0.22.0",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
-  "working_tree": "Security Lab Hub consolidating BLE Lab, Beacon Lab, WiFi Defense and WiFi Channels into a unified launcher",
+  "working_tree": "Essential Settings v0.1 & Permanent Engineering Resource Policy consolidation and verification",
   "implemented_features": [
     "FEAT-0024",
     "FEAT-0001",
@@ -59,10 +59,10 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "BUG-0016",
     "BUG-0018"
   ],
-  "latest_build": "VER-0231",
+  "latest_build": "VER-0236",
   "latest_upload": "HWT-0085",
-  "documentation_verification": "VER-0232",
-  "current_host_attempt": "VER-0230",
+  "documentation_verification": "VER-0237",
+  "current_host_attempt": "VER-0236",
   "source_constants": {
     "kTouchSda": 18,
     "kTouchScl": 17,

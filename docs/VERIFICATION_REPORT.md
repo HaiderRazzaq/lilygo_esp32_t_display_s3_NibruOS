@@ -5728,3 +5728,69 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Host simulation only."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0236",
+  "date": "2026-11-06",
+  "firmware_version": "v0.22.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "ESP32-S3 compilation with Settings v0.1 consolidation, version bump to v0.22.0, and PWM compilation warning cleanup",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (target toolchain)",
+  "wiring": "Default parallel ST7789 + CST816S pin definitions",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build finishes with code 0 and fits in app0 partition.",
+  "actual": "Flash 1,593,385 B (24.3%), RAM 86,312 B (26.3%), code 0.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0220-build.txt"],
+  "evidence_kind": "Captured compiler output",
+  "environment": "Windows / PlatformIO espressif32@6.5.0",
+  "limitations": "Does not prove physical display or radio execution."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0237",
+  "date": "2026-11-06",
+  "firmware_version": "v0.22.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "SettingsApp navigation, subviews (Display, Theme, Memory, WiFiDiag, Device), modal confirmation, and lifecycle exit",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "All desktop test cases pass including SettingsApp navigation tests.",
+  "actual": "ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0220-desktop.txt"],
+  "evidence_kind": "Automated unit test execution",
+  "environment": "Windows / MSVC x64 Native",
+  "limitations": "Host simulation only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0238",
+  "date": "2026-11-06",
+  "firmware_version": "v0.22.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Repository consistency and documentation validation",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "All documentation checks pass with 0 errors.",
+  "actual": "Documentation checks: PASS",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0220-docs.txt"],
+  "evidence_kind": "Automated documentation validation tool",
+  "environment": "Windows / Python 3.12",
+  "limitations": "Validates schema and references only."
+}
+```

@@ -68,7 +68,7 @@ WakeInputGate wakeInput;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("\n[NibruOS] boot v0.21.0");
+  Serial.println("\n[NibruOS] boot v0.22.0");
   MemoryProfiler::checkpoint("startup-basic");
   display.begin();
   touch.begin();

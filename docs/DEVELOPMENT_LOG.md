@@ -2606,3 +2606,31 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Upload v0.21.0 to hardware and verify touch navigation and sub-tool entry on the physical display."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0073",
+  "date": "2026-11-06",
+  "related": ["FEAT-0010", "FEAT-0008", "VER-0236", "VER-0237", "VER-0238"],
+  "action": "Consolidate Essential Settings v0.1 and permanent engineering resource policy in v0.22.0",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/hardware/DisplayManager.h",
+    "tests/desktop/test_simulator.cpp",
+    "docs/CURRENT_STATE.md",
+    "docs/RESOURCE_BUDGET.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Consolidate and verify Essential Settings v0.1 functionality (Display, Theme, Memory/System Info, Wi-Fi Diagnostics, Device Controls) and permanent project-wide Memory Profiling & Resource Budget policy. Added comprehensive desktop navigation tests for all Settings subviews, cleaned up unused PWM field in DisplayManager.h when LEDC is disabled, and incremented runtime version to v0.22.0.",
+  "reason": "Satisfy project requirement for Essential Settings v0.1 verification and permanent resource budgeting policy enforcement across all future changes.",
+  "expected": "All settings subviews navigable, responsive, non-blocking, zero resource leaks on exit, firmware image within app0 capacity, and desktop/host tests passing.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,593,385 B Flash (24.3%, 4,959,856 B headroom) and 86,312 B RAM (26.3%). Desktop simulator tests passed with all 19 test suites including SettingsApp navigation.",
+  "verification": "VER-0236 build PASS, VER-0237 desktop PASS, VER-0238 documentation PASS; physical hardware acceptance pending",
+  "risks": "Physical dimming and power consumption on AW9364 pulse controller require physical device verification.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Flash v0.22.0 to physical LILYGO T-Display-S3 Touch Glass and capture profiling scenarios A-E."
+}
+```

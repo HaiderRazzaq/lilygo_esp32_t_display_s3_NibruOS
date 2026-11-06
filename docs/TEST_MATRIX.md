@@ -147,3 +147,4 @@ Current easier-entry default upload HWT-0019 PASS for write/hash/reset only; mat
 | v0.19.0 simulator integration | VER-0228 SKIPPED by owner | Paused |
 | Apple Action, Apple Not Your Device, Beacon payloads and page-two picker | VER-0230 HOST, VER-0231 BUILD, VER-0232 DOCS | HWT-0085 upload/hash PASS; HWT-0086 runtime boot BLOCKED until a physical reset; HWT-0084 receiver alerts, twenty cycles and resource scenarios A–E NOT RUN. |
 | v0.20.0 simulator integration | VER-0233 SKIPPED by owner | BLE Lab remains absent from the paused simulator |
+| Essential Settings v0.1 subview navigation and v0.22.0 build | VER-0236 BUILD, VER-0237 HOST/SIMULATOR, VER-0238 DOCS | NOT RUN. Verify physical dimming, timeout wake, and memory profiling on physical hardware. |

@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.22.0] - 2026-11-06
+
+### Added
+
+- Automated desktop simulator test suite covering `SettingsApp` UI subviews, navigation, brightness/timeout cycling, theme switching, memory monitor pagination, Wi-Fi diagnostics telemetry inspection, modal confirmation cancellation, and lifecycle exit (`testSettingsAppNavigation`).
+- Backlight PWM compilation warning cleanup in `DisplayManager.h` when `NIBRU_BACKLIGHT_LEDC` is disabled.
+
+### Changed
+
+- Consolidated Essential Settings v0.1 and permanent engineering resource policy documentation and baselines across all project records.
+- Synchronized firmware runtime version across configuration headers, main, and engineering records to `v0.22.0`.
+
 ## [v0.21.0] - 2026-11-05
 
 ### Added

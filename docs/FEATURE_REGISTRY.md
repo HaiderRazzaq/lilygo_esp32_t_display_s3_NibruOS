@@ -295,7 +295,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "history": [
     "DEV-0004",
     "DEV-0005",
-    "DEV-0029"
+    "DEV-0029",
+    "DEV-0073"
   ]
 }
 ```
@@ -357,8 +358,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "lifecycle": "No owned radio/task/buffer; short BOOT focuses, hold activates; Back cancels then menu/Home; current SettingsService owns preference blob",
   "implementation": "IMPLEMENTED",
   "verification": {
-    "build": "VER-0024",
-    "host": "VER-0023",
+    "build": "VER-0236",
+    "host": "VER-0237",
     "hardware": "HWT-0010 owner touch/flicker FAIL before repair; HWT-0012 repaired acceptance NOT RUN"
   },
   "issues": [
@@ -368,7 +369,8 @@ See [workflow](ENGINEERING_WORKFLOW.md), [matrix](TEST_MATRIX.md),
   "history": [
     "DEV-0007",
     "DEV-0014",
-    "DEV-0017"
+    "DEV-0017",
+    "DEV-0073"
   ],
   "registration": "settingsApp"
 }
