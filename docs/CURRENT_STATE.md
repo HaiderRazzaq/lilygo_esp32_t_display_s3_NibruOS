@@ -7,11 +7,11 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
 {
   "record_type": "state",
   "date": "2026-11-06",
-  "runtime_version": "v0.23.8",
+  "runtime_version": "v0.23.9",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
   "branch_at_baseline": "main",
   "baseline_commit": "8239bb6",
-  "working_tree": "Web Portal Gzip stream and stack overflow panic elimination",
+  "working_tree": "Web Portal official Nibru visual identity and branding styling",
   "implemented_features": [
     "FEAT-0024",
     "FEAT-0001",

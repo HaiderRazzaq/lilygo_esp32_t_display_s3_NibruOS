@@ -2887,3 +2887,31 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Verify on hardware: start Web Portal, connect smartphone to SoftAP, verify captive portal opens without reboot, and manage keys/vault successfully."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0083",
+  "date": "2026-11-06",
+  "related": ["FEAT-0022", "VER-0249", "HWT-0097"],
+  "action": "Adopt official Nibru visual identity, SVG logo, Arabic typography, and branding in Web Portal for v0.23.9",
+  "files": [
+    "src/services/web_portal/index.html",
+    "src/services/WebPortalHtml.h",
+    "tools/compress_portal_html.py",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Completely redesigned the Web Portal interface (src/services/web_portal/index.html) based on the official Nibru visual identity and assets in tools/account_setup. Adopted brand navy (#0F1954), brand aqua (#38FFE1), offwhite (#F1FFFD), deep background (#080F2C), and panel styling (#101B42). Embedded the authentic geometric vector SVG logo with teal-to-aqua gradient. Added RTL Arabic layout with Fustat/Segoe UI fonts, side column quick-start guide with step badges, session live countdown, and footer with contact phone 07838844400, LinkedIn badges, and Haider Razaq credentials. Preserved full TOTP key management, password vault, encrypted backup/restore, and device settings. Compressed via tools/compress_portal_html.py into a 12,308-byte Gzip PROGMEM byte array in WebPortalHtml.h. Bumped firmware version sequentially to v0.23.9.",
+  "reason": "User requested applying the visual identity, style, and branding information from tools/account_setup to the Web Portal.",
+  "expected": "Web Portal serves an authentic, polished Nibru-branded RTL Arabic dashboard with official colors, SVG logo, and developer credentials, operating reliably within memory budget.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,587,941 B Flash (24.2%) and 90,240 B RAM (27.5%). Firmware uploaded cleanly to COM3 in 13.5 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0249 (build PASS), HWT-0097 (upload PASS)",
+  "risks": "None; HTML is compressed into Flash PROGMEM (12.3 KB Gzip) and streamed directly without heap String overhead.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Connect smartphone or browser to NibruOS-Portal AP, browse to 192.168.4.1, and verify the new Nibru visual branding, SVG logo, RTL Arabic layout, and credentials."
+}
+```

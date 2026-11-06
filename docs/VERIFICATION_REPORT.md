@@ -6014,3 +6014,47 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Build verification only; physical flash upload tracked in HWT-0096."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0249",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.9",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of official Nibru visual identity and branding in Web Portal for v0.23.9",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; WebPortalService compiles with updated Gzip PROGMEM payload.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,587,941 B (24.2%), RAM: 90,240 B (27.5%). Binary image 1,588,304 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0239-pio-build.txt"],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0097."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0250",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.9",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.23.9",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-06-v0239-docs-check.txt"],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / Python 3.12",
+  "limitations": "Scope limited to documentation schema"
+}
+```

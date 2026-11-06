@@ -2333,3 +2333,27 @@ application answered the serial TIME command. See HWT-0087.
   "limitations": "Physical flash upload verified. Interactive verification of phone connection to Web Portal SoftAP."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0097",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.9",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.23.9 firmware image with official Nibru visual identity for Web Portal",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2, MAC 44:1b:f6:d3:aa:bc)",
+  "wiring": "Direct USB-C on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool connected to ESP32-S3 on COM3 at 460800 baud, programmed 1,588,304 bytes in 13.5 seconds with verified data hash, and hard-reset via RTS pin. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0239-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO 6.1.18 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Interactive verification of Web Portal dashboard on smartphone."
+}
+```

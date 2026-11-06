@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.23.9] - 2026-11-06
+
+### Added
+
+- **Official Nibru Visual Identity & Branding for Web Portal**: Re-engineered `src/services/web_portal/index.html` and regenerated `src/services/WebPortalHtml.h` utilizing the exact styling, color palette, logo, typography, and content from `tools/account_setup`:
+  1. **Visual Branding & Palette**: Integrated brand-navy (`#0F1954`), brand-aqua (`#38FFE1`), brand-offwhite (`#F1FFFD`), dark background (`#080F2C`), card panels (`#101B42`), and subtle cyan neon borders (`rgba(56, 255, 225, 0.18)`).
+  2. **Official Vector Logo**: Embedded the authentic Nibru geometric vector SVG mark with linear gradient (`#1FB6C9` to `#38FFE1`) into topbar and auth modal.
+  3. **Arabic RTL Typography & Layout**: Configured responsive RTL layout with Fustat and Segoe UI fonts, Arabic labels, and directionality.
+  4. **Side Column Quick Guide**: Added a step-by-step connection badge guide (Connect to AP -> Open 192.168.4.1 -> Enter PIN -> Manage Vault & TOTP) with an animated shield icon.
+  5. **Footer & Credentials**: Added official contact details (Phone `07838844400` / `tel:+9647838844400`), Nibru and Haider Razaq LinkedIn badges, and "Developed by Haider Razaq".
+  6. **Automated Compression Pipeline**: Maintained the Gzip compression workflow via `tools/compress_portal_html.py`, compressing 54.6 KB raw HTML down to 12.3 KB (22%) stored in Flash PROGMEM.
+
 ## [v0.23.8] - 2026-11-06
 
 ### Fixed
