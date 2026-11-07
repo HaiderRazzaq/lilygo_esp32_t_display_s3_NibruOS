@@ -1,0 +1,8 @@
+[2026-11-06] PlatformIO build v0.23.8
+pio run -e lilygo-t-display-s3
+RAM:   [===       ]  27.5% (used 90240 bytes from 327680 bytes)
+Flash: [==        ]  24.2% (used 1583669 bytes from 6553600 bytes)
+Binary size: 1584032 bytes
+sha256: d0eefb09e1ce7c9916654479f0cd070e16803d16ae8b3fc69c04241c116b1965
+Result: SUCCESS
+

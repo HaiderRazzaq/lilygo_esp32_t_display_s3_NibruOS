@@ -14,17 +14,25 @@
 #include <cstring>
 
 namespace NativeCrypto {
-inline int hash(bool sha1, const uint8_t* key, size_t keyLen,
+inline int hash(int algo, const uint8_t* key, size_t keyLen,
                 const uint8_t* data, size_t size, uint8_t* out) {
+  LPCWSTR algId = BCRYPT_SHA256_ALGORITHM;
+  ULONG outLen = 32;
+  if (algo == 1) {
+    algId = BCRYPT_SHA1_ALGORITHM;
+    outLen = 20;
+  } else if (algo == 2) {
+    algId = BCRYPT_SHA512_ALGORITHM;
+    outLen = 64;
+  }
   BCRYPT_ALG_HANDLE alg = nullptr;
   BCRYPT_HASH_HANDLE hash = nullptr;
-  NTSTATUS status = BCryptOpenAlgorithmProvider(&alg,
-      sha1 ? BCRYPT_SHA1_ALGORITHM : BCRYPT_SHA256_ALGORITHM, nullptr,
+  NTSTATUS status = BCryptOpenAlgorithmProvider(&alg, algId, nullptr,
       key ? BCRYPT_ALG_HANDLE_HMAC_FLAG : 0);
   if (status >= 0) status = BCryptCreateHash(alg, &hash, nullptr, 0,
       const_cast<PUCHAR>(key), static_cast<ULONG>(keyLen), 0);
   if (status >= 0) status = BCryptHashData(hash, const_cast<PUCHAR>(data), static_cast<ULONG>(size), 0);
-  if (status >= 0) status = BCryptFinishHash(hash, out, sha1 ? 20 : 32, 0);
+  if (status >= 0) status = BCryptFinishHash(hash, out, outLen, 0);
   if (hash) BCryptDestroyHash(hash);
   if (alg) BCryptCloseAlgorithmProvider(alg, 0);
   return status >= 0 ? 0 : -1;

@@ -1,0 +1,20 @@
+Processing lilygo-t-display-s3 (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+RAM:   [===       ]  26.6% (used 87128 bytes from 327680 bytes)
+Flash: [==        ]  24.5% (used 1607361 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+Successfully created esp32s3 image.
+check_image([".pio\build\lilygo-t-display-s3\firmware.bin"], [".pio\build\lilygo-t-display-s3\firmware.elf"])
+{
+  "binary_bytes": 1607728,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 4945872,
+  "sha256": "6945142b537747af3f0440d731b5250b75f878ded4e1bcd64e64efd00d5a8e81",
+  "growth_percent": 90.99963884506454,
+  "warnings": [
+    "Image growth exceeds provisional 5% review trigger"
+  ],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 40.27 seconds =========================
+

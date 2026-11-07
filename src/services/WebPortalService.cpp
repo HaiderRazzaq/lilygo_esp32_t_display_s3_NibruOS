@@ -1,21 +1,32 @@
 #include "services/WebPortalService.h"
+#include <Arduino.h>
 #include "core/AppContext.h"
 #include "core/ResourceManager.h"
 #include "services/VaultService.h"
 #include "services/TotpService.h"
 #include "services/SecurityService.h"
 #include "services/CryptoService.h"
+#include "services/SettingsService.h"
+#include "services/TimeService.h"
+#include "services/BleHidService.h"
+#include "hardware/DisplayManager.h"
+#include "NibruConfig.h"
 #include <cstdio>
 #include <cstring>
+#include <cstdlib>
 
 #if defined(ARDUINO_ARCH_ESP32)
 #include <WiFi.h>
 #include <WebServer.h>
 #include <DNSServer.h>
+#include "services/WebPortalHtml.h"
 
 namespace {
 WebServer server(WebPortalService::kHttpPort);
 DNSServer dnsServer;
+static char s_apiResp[3072];
+static AppContext* s_appContext = nullptr;
+static bool s_routesRegistered = false;
 }
 #endif
 
@@ -39,6 +50,18 @@ static bool extractJsonString(const char* json, const char* key, char* out, size
   }
   out[idx] = '\0';
   return true;
+}
+
+static int extractJsonInt(const char* json, const char* key, int defaultValue = 0) {
+  if (!json || !key) return defaultValue;
+  char needle[36];
+  snprintf(needle, sizeof(needle), "\"%s\"", key);
+  const char* pos = strstr(json, needle);
+  if (!pos) return defaultValue;
+  pos += strlen(needle);
+  while (*pos && (*pos == ' ' || *pos == '\t' || *pos == '\r' || *pos == '\n' || *pos == ':')) ++pos;
+  if (*pos == '"') ++pos;
+  return atoi(pos);
 }
 
 static void toHex(const uint8_t* in, size_t inLen, char* out, size_t maxOut) {
@@ -69,446 +92,7 @@ static size_t fromHex(const char* in, uint8_t* out, size_t maxOut) {
   return len;
 }
 
-const char kIndexHtml[] =
-R"h0(
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0F1954">
-<title>بوابة التحكم | NibruOS Portal</title>
-<style>
-:root {
-color-scheme: dark;
---brand-navy: #0f1954;
---brand-aqua: #38ffe1;
---brand-offwhite: #f1fffd;
---bg: #080f2c;
---panel: #101b42;
---panel-elevated: #15234d;
---line: rgba(186, 212, 250, .14);
---line-strong: rgba(186, 212, 250, .24);
---text: #f1fffd;
---muted: #afc2d9;
---subtle: #8198b4;
---radius-xl: 22px;
-font-family: Fustat, "Segoe UI", Tahoma, Arial, sans-serif;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-min-width: 320px;
-color: var(--text);
-background: radial-gradient(ellipse 48% 32% at 9% 2%, rgba(30, 214, 208, .095), transparent 80%),
-radial-gradient(ellipse 62% 47% at 100% 0%, rgba(25, 49, 131, .44), transparent 72%),
-var(--bg);
-font-size: 14px;
-line-height: 1.65;
-}
-button, input, select { font: inherit; }
-button { cursor: pointer; }
-button:disabled { opacity: .58; cursor: wait; }
-a { color: inherit; text-decoration: none; }
-:focus-visible { outline: 2px solid var(--brand-aqua); outline-offset: 3px; }
-::selection { color: #071d2b; background: var(--brand-aqua); }
-.page-shell { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding-bottom: 40px; }
-.topbar {
-min-height: 90px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: 16px;
-border-bottom: 1px solid rgba(186, 212, 250, .11);
-margin-bottom: 30px;
-}
-.brand { display: inline-flex; align-items: center; gap: 12px; }
-.brand-icon { width: 48px; height: 48px; border: 1px solid rgba(56, 255, 225, .22); border-radius: 14px; display: grid; place-items: center; background: linear-gradient(155deg, #172967, var(--brand-navy)); box-shadow: 0 8px 25px rgba(0, 0, 0, .2); }
-.brand-icon svg { display: block; width: 40px; height: 36px; }
-.brand-names { display: flex; flex-direction: column; align-items: flex-start; direction: ltr; }
-.brand-word { font: 800 23px/1.1 "Segoe UI", Arial, sans-serif; letter-spacing: .045em; }
-.brand-dot { color: var(--brand-aqua); }
-.brand-system { font: 700 8.5px/1.8 "Segoe UI", Arial, sans-serif; letter-spacing: .16em; color: #9ab5d2; }
-.brand-separator { color: var(--brand-aqua); margin: 0 3px; }
-.topbar-chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; color: #c8e9e4; background: rgba(56, 255, 225, .045); font-size: 11.5px; }
-.chip-dot { width: 7px; height: 7px; background: var(--brand-aqua); border-radius: 50%; box-shadow: 0 0 0 4px rgba(56, 255, 225, .09); }
-.layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; column-gap: 28px; align-items: start; }
-.content-column { min-width: 0; }
-.hero { margin-bottom: 24px; }
-.eyebrow { display: flex; align-items: center; gap: 8px; color: var(--brand-aqua); font: 700 10px/1.3 "Segoe UI", Arial, sans-serif; letter-spacing: .2em; margin-bottom: 6px; }
-.eyebrow-line { height: 2px; width: 20px; display: inline-block; background: var(--brand-aqua); border-radius: 4px; }
-h1 { font-size: clamp(28px, 4vw, 42px); letter-spacing: -.04em; line-height: 1.25; margin: 8px 0; font-weight: 800; }
-h1 span { color: var(--brand-aqua); }
-.intro { color: #b6c7dd; font-size: 13.5px; line-height: 1.8; margin-top: 6px; }
-.setup-card { border: 1px solid var(--line); border-radius: var(--radius-xl); background: linear-gradient(144deg, rgba(22, 34, 75, .92), rgba(15, 25, 61, .98)); box-shadow: 0 20px 60px rgba(0, 3, 18, .25); overflow: hidden; }
-.form-section { padding: 24px 26px; border-bottom: 1px solid var(--line); }
-.form-section:last-child { border-bottom: 0; }
-.section-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
-.section-number { color: var(--brand-aqua); display: grid; place-items: center; width: 36px; height: 36px; background: rgba(56, 255, 225, .07); border: 1px solid rgba(56, 255, 225, .17); border-radius: 11px; font: 700 13px/1 "Segoe UI", Arial, sans-serif; flex-shrink: 0; }
-.section-header h2 { margin: -2px 0 2px; font-size: 17px; font-weight: 800; }
-.section-header p { margin: 0; font-size: 12px; color: #a6bdd3; }
-.pin-box { background: rgba(4, 13, 37, .45); border: 1px solid rgba(156, 188, 235, .15); border-radius: 14px; padding: 18px; margin-top: 4px; }
-.pin-input { font-size: 20px !important; font-weight: 800 !important; letter-spacing: 8px !important; text-align: center !important; color: var(--brand-aqua) !important; background: #060e26 !important; }
-.tab-nav { display: flex; gap: 8px; margin-bottom: 20px; }
-.tab-btn { flex: 1; padding: 12px; font-size: 13px; font-weight: 750; background: #0c173b; border: 1px solid #23345d; border-radius: 11px; color: #a4b9d4; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.tab-btn:hover { border-color: rgba(56, 255, 225, .35); color: #fff; }
-.tab-btn.active { background: #182859; border-color: var(--brand-aqua); color: var(--brand-aqua); box-shadow: 0 4px 15px rgba(56, 255, 225, .1); }
-.field { margin-bottom: 16px; }
-.field:last-child { margin-bottom: 0; }
-label { display: block; margin-bottom: 7px; font-size: 12.5px; font-weight: 700; color: #e8f4ff; }
-.label-optional { font-size: 11px; font-weight: 400; color: #9db1cb; }
-input { width: 100%; height: 46px; padding: 0 14px; background: #0b1534; border: 1px solid #344566; border-radius: 10px; color: var(--brand-offwhite); outline: 0; transition: border-color .2s, box-shadow .2s; }
-input::placeholder { color: #6b82a3; }
-input[dir="ltr"] { text-align: left; font-family: "Segoe UI", Arial, sans-serif; }
-input:focus { border-color: var(--brand-aqua); box-shadow: 0 0 0 3px rgba(56, 255, 225, .1); }
-.input-row { display: flex; gap: 6px; }
-.input-row input { flex: 1; }
-.btn-icon { background: #1d3158; color: #dcf5f3; min-width: 46px; height: 46px; border: 1px solid #385477; border-radius: 10px; font-size: 14px; display: grid; place-items: center; transition: 0.2s; }
-.btn-icon:hover { background: #294268; border-color: var(--brand-aqua); color: #fff; }
-.button { min-height: 48px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px; border-radius: 10px; padding: 12px 18px; font-size: 13.5px; font-weight: 800; border: 1px solid transparent; transition: 0.2s; text-align: center; }
-.button:not(:disabled):active { transform: translateY(1px); }
-.button-primary { background: var(--brand-aqua); color: #071e32; box-shadow: 0 8px 25px rgba(56, 255, 225, .15); margin-top: 10px; }
-.button-primary:hover:not(:disabled) { background: #8affef; }
-.status-panel { padding: 13px 16px; background: rgba(3, 13, 35, .54); border-radius: 10px; border: 1px solid #304566; color: #c8d9ed; font-size: 12px; line-height: 1.8; border-inline-start: 3px solid #607d9f; margin-bottom: 16px; display: none; }
-.status-panel.active { display: block; }
-.status-panel[data-state="success"] { border-inline-start-color: var(--brand-aqua); color: #c6f8ee; background: rgba(56, 255, 225, .08); }
-.status-panel[data-state="error"] { border-inline-start-color: #f4aa8c; color: #ffdacc; background: rgba(244, 170, 140, .08); }
-.side-column { min-width: 0; padding-top: 20px; }
-.guide-card { border-radius: 18px; border: 1px solid rgba(56, 255, 225, .11); background: linear-gradient(148deg, #162766, #0f1954 67%, #111f51); padding: 22px 20px; margin-bottom: 16px; }
-.guide-icon { width: 34px; height: 
-)h0"
-R"h1(
-34px; display: grid; place-items: center; background: rgba(56, 255, 225, .10); color: var(--brand-aqua); border-radius: 10px; margin-bottom: 12px; font-size: 18px; }
-.guide-kicker { display: block; color: var(--brand-aqua); font: 700 9.5px/1.4 Arial, sans-serif; letter-spacing: .2em; direction: ltr; text-align: right; }
-.guide-card h2 { font-size: 18px; margin: 8px 0 6px; font-weight: 800; }
-.guide-intro { color: #bfcee5; font-size: 11.5px; line-height: 1.8; margin: 0; }
-.guide-steps { list-style: none; margin: 18px 0 16px; padding: 0; }
-.guide-steps li { display: flex; align-items: flex-start; gap: 10px; padding: 0 0 14px; position: relative; color: #dbe7f5; font-size: 11.5px; line-height: 1.7; }
-.guide-step { font: 700 10px/1 Arial, sans-serif; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid rgba(56, 255, 225, .24); background: rgba(56, 255, 225, .05); color: var(--brand-aqua); border-radius: 50%; flex-shrink: 0; }
-.guide-foot { display: flex; align-items: flex-start; gap: 9px; border-top: 1px solid rgba(202, 224, 250, .12); padding-top: 14px; }
-.guide-shield { color: var(--brand-aqua); background: rgba(56, 255, 225, .12); border-radius: 50%; display: grid; place-items: center; font: bold 11px Arial, sans-serif; width: 20px; height: 20px; flex-shrink: 0; }
-.guide-foot strong { font-size: 11.5px; }
-.guide-foot p { color: #aebfda; font-size: 10.5px; margin: 3px 0 0; line-height: 1.7; }
-.site-footer { border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 24px 0 10px; margin-top: 40px; }
-.footer-brand { display: flex; align-items: center; gap: 10px; color: #e4f9f4; }
-.footer-mark { color: var(--brand-aqua); font-size: 11px; }
-.footer-brand strong, .footer-brand small { display: block; direction: ltr; text-align: right; }
-.footer-brand strong { font: 700 12px/1.3 "Segoe UI", Arial, sans-serif; letter-spacing: .10em; }
-.footer-brand small { font: 600 8.5px/1.8 "Segoe UI", Arial, sans-serif; color: #8ea8c6; letter-spacing: .12em; }
-.footer-contact { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #a8bad1; }
-.footer-contact a { color: #d9fffa; font-weight: 700; letter-spacing: .025em; direction: ltr; }
-.footer-contact a:hover { text-decoration: underline; text-decoration-color: var(--brand-aqua); }
-.developer-credit { color: #a1b8d0; font: 12px/1.6 "Segoe UI", Arial, sans-serif; }
-.developer-credit strong { color: #e8f5f7; font-weight: 700; }
-.footer-links { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.footer-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: #b8cde6; padding: 4px 10px; border-radius: 8px; background: rgba(56, 255, 225, .06); border: 1px solid rgba(56, 255, 225, .18); text-decoration: none; transition: 0.2s; }
-.footer-link:hover { color: var(--brand-aqua); border-color: var(--brand-aqua); background: rgba(56, 255, 225, .14); }
-.footer-link svg { flex-shrink: 0; fill: currentColor; }
-.developer-credit a { color: #e8f5f7; font-weight: 700; text-decoration: underline; text-decoration-color: rgba(56, 255, 225, .4); }
-.developer-credit a:hover { color: var(--brand-aqua); text-decoration-color: var(--brand-aqua); }
-
-@media (max-width: 860px) {
-.layout { grid-template-columns: 1fr; }
-.side-column { padding-top: 0; }
-}
-</style>
-</head>
-<body>
-<div class="page-shell">
-<header class="topbar">
-<div class="brand">
-<span class="brand-icon" aria-hidden="true">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="155 92 560 460" fill="none"><path d="M359.332 255.166V343C359.332 377.257 372.941 410.111 397.164 434.335C421.388 458.558 454.242 472.167 488.499 472.167C522.756 472.167 555.611 458.558 579.834 434.335C604.058 410.111 617.666 377.257 617.666 343V255.166" stroke="url(#p0)" stroke-width="65" /><path d="M359.332 430.834V492.834H297.332" stroke="url(#p1)" stroke-width="58" /><path d="M560.831 358.5H416.164V381.75H560.831V358.5Z" fill="white" /><path d="M542.75 324.916H434.25V348.166H542.75V324.916Z" fill="white" /><path d="M524.67 291.334H452.336V314.584H524.67V291.334Z" fill="white" /><path d="M509.169 257.75H467.836V281H509.169V257.75Z" fill="white" /><path d="M628.001 126H586.668V167.333H628.001V126Z" fill="url(#p2)" /><path d="M674.501 167.334H633.168V208.667H674.501V167.334Z" fill="url(#p3)" /><path d="M281.833 456.666H240.5V497.999H281.833V456.666Z" fill="url(#p4)" /><defs><linearGradient id="p0" x1="359.332" y1="472.167" x2="573.076" y2="217.71" gradientUnits="userSpaceOnUse"><stop stop-color="#1FB6C9" /><stop offset="1" stop-color="#38FFE1" /></linearGradient><linearGradient id="p1" x1="297.332" y1="492.834" x2="359.332" y2="430.834" gradientUnits="userSpaceOnUse"><stop stop-color="#1FB6C9" /><stop offset="1" stop-color="#38FFE1" /></linearGradient><linearGradient id="p2" x1="586.668" y1="167.333" x2="628.001" y2="126" gradientUnits="userSpaceOnUse"><stop stop-color="#1FB6C9" /><stop offset="1" stop-color="#38FFE1" /></linearGradient><linearGradient id="p3" x1="633.168" y1="208.667" x2="674.501" y2="167.334" gradientUnits="userSpaceOnUse"><stop stop-color="#1FB6C9" /><stop offset="1" stop-color="#38FFE1" /></linearGradient><linearGradient id="p4" x1="240.5" y1="497.999" x2="281.833" y2="456.666" gradientUnits="userSpaceOnUse"><stop stop-color="#1FB6C9" /><stop offset="1" stop-color="#38FFE1" /></linearGradient></defs></svg>
-</span>
-<span class="brand-names">
-<span class="brand-word">NIBRU<span class="brand-dot">.</span></span>
-<span class="brand-system">NIBRU OS <span class="brand-separator">/</span> CONTROL CENTER</span>
-</span>
-</div>
-<span class="topbar-chip"><span class="chip-dot"></span><span>بوابة التحكم المحلية</span></span>
-</header>
-<div class="layout">
-<div class="content-column">
-<div class="hero">
-<div class="eyebrow"><span class="eyebrow-line"></span><span dir="ltr">LOCAL DEVICE PORTAL</span></div>
-<h1>حساباتك بأمان،<br><span>على جهازك.</span></h1>
-<p class="intro">أضف كلمات المرور وحسابات المصادقة الثنائية (2FA) إلى جهاز <strong>NibruOS</strong> مباشرة وبشكل مشفّر عبر الاتصال المحلي.</p>
-</div>
-<div id="status" class="status-panel"></div>
-<section class="setup-card">
-<div class="form-section">
-<div class="section-header">
-<div class="section-number">01</div>
-<div>
-<h2>رمز الجلسة المؤقت (Web PIN)</h2>
-<p>أدخل الرمز المكون من 4 أرقام الظاهر على شاشة جهاز NibruOS لتأكيد هويتك.</p>
-</div>
-</div>
-<div class="pin-box">
-<input type="password" id="pin" class="pin-input" maxlength="8" placeholder="••••" autocomplete="off">
-</div>
-</div>
-<div class="form-section">
-<div class="section-header">
-<div class="section-number">02</div>
-<div>
-<h2>اختيار نوع الحساب</h2>
-<p>حدّد ما إذا كنت تريد إضافة كلمة سر إلى الخزنة أو حساب مصادقة ثنائية.</p>
-</div>
-</div>
-<div class="tab-nav">
-<button type="button" class="tab-btn active" id="btn-tab-vault" onclick="switchTab('vault')">🔑 خزنة كلمات المرور (Vault)</button>
-<button type="button" class="tab-btn" id="btn-tab-totp" onclick="switchTab('totp')">🛡️ المصادقة الثنائية (2FA)</button>
-<button type="button" class="tab-btn" id="btn-tab-backup" onclick="switchTab('backup')">💾 النسخ والاستعادة (Backup)</button>
-</div>
-<div id="tab-vault">
-<div class="field">
-<label for="v_title">اسم الخدمة أو الموقع <span class="label-optional">(مثل: Google, GitHub, البنك)</span></label>
-<input type="text" id="v_title" maxlength="23" placeholder="Google / GitHub" autocomplete="off">
-</div>
-<div class="field">
-<label for="v_user">اسم المستخدم أو البريد الإلكتروني</label>
-<input type="text" id="v_user" maxlength="31" dir="ltr" placeholder="user@example.com" autocomplete="off">
-</div>
-<div class="field">
-<label for="v_pass">كلمة السر</label>
-<div class="input-row">
-<input type="password" id="v_pass" maxlength="47" dir="ltr" placeholder="••••••••••••" autocomplete="off">
-<button type="button" class="btn-icon" onclick="togglePass()" title="إظهار / إخفاء">👁️</button>
-<button type="button" class="btn-icon" onclick="genPass()" title="توليد كلمة سر عشوائية قوية">🎲</button>
-</div>
-</div>
-<div class="field">
-<label for="v_notes">ملاحظات إضافية <span class="label-optional">(اختياري)</span></label>
-<input type="text" id="v_notes" maxlength="23" placeholder="حساب العمل / شخصي" autocomplete="off">
-</div>
-<button type="button" class="button button-primary" onclick="submitVault()">حفظ في خزنة الجهاز 🔒</button>
-</div>
-<div i
-)h1"
-R"h2(
-d="tab-totp" style="display:none;">
-<div class="field">
-<label for="t_name">اسم المنصة أو الخدمة <span class="label-optional">(مثل: AWS, Binance)</span></label>
-<input type="text" id="t_name" maxlength="23" placeholder="AWS / GitHub" autocomplete="off">
-</div>
-<div class="field">
-<label for="t_user">اسم المستخدم أو الحساب <span class="label-optional">(اختياري)</span></label>
-<input type="text" id="t_user" maxlength="31" dir="ltr" placeholder="user@example.com" autocomplete="off">
-</div>
-<div class="field">
-<label for="t_secret">مفتاح الإعداد السري (Base32 Secret)</label>
-<input type="text" id="t_secret" maxlength="52" dir="ltr" style="text-transform:uppercase; letter-spacing:1px;" placeholder="JBSWY3DPEHPK3PXP" autocomplete="off">
-</div>
-<button type="button" class="button button-primary" onclick="submitTotp()">حفظ حساب 2FA في الجهاز 🛡️</button>
-</div>
-<div id="tab-backup" style="display:none">
-<div class="field">
-<label for="bk_pass_export">كلمة سر تشفير النسخة الاحتياطية (AES-256)</label>
-<input type="password" id="bk_pass_export" placeholder="أدخل كلمة مرور لتأمين ملف النسخة">
-<button type="button" class="button button-primary" style="margin-top:14px" onclick="downloadBackup()">تنزيل النسخة المشفرة 📥</button>
-</div>
-<hr style="border:0;border-top:1px solid rgba(186,212,250,.15);margin:24px 0">
-<div class="field">
-<label for="bk_file_import">استعادة نسخة احتياطية من ملف (.bin)</label>
-<input type="file" id="bk_file_import" accept=".bin">
-</div>
-<div class="field" style="margin-top:12px">
-<label for="bk_pass_import">كلمة سر فك تشفير النسخة</label>
-<input type="password" id="bk_pass_import" placeholder="كلمة المرور الأصلية للنسخة">
-<button type="button" class="button button-primary" style="margin-top:14px" onclick="uploadRestore()">استعادة الحسابات إلى الخزنة 🔄</button>
-</div>
-</div>
-</div>
-</section>
-</div>
-<aside class="side-column">
-<div class="guide-card">
-<div class="guide-icon">✦</div>
-<span class="guide-kicker">QUICK GUIDE</span>
-<h2>إعداد فوري وآمن</h2>
-<p class="guide-intro">اتصال محلي مباشر ومحمي بين هاتفك أو حاسوبك وجهاز NibruOS.</p>
-<ol class="guide-steps">
-<li><span class="guide-step">01</span><span>تأكد من رمز Web PIN المعروض على شاشة الجهاز.</span></li>
-<li><span class="guide-step">02</span><span>اختر التبويب المطلوب وأدخل بيانات الحساب وكلمة السر.</span></li>
-<li><span class="guide-step">03</span><span>اضغط حفظ ليتم تشفير البيانات فوراً وتخزينها بالجهاز.</span></li>
-</ol>
-<div class="guide-foot">
-<span class="guide-shield">✓</span>
-<div>
-<strong>تشفير محلي فوري</strong>
-<p>تُشفَّر البيانات بخوارزمية AES-256-GCM بمفتاح الجلسة النشط ولا تمر بأي خادم سحابي.</p>
-</div>
-</div>
-</div>
-</aside>
-</div>
-<footer class="site-footer">
-<div class="footer-brand">
-<span class="footer-mark">◆</span>
-<span><strong>NIBRU OS</strong><small>LOCAL CONTROL CENTER</small></span>
-</div>
-<div class="footer-contact">
-<span>للتواصل:</span>
-<a href="tel:+9647838844400" dir="ltr">07838844400</a>
-</div>
-<div class="footer-links" dir="ltr">
-<a href="https://www.linkedin.com/company/nibruiq/" target="_blank" rel="noopener noreferrer" class="footer-link">
-<svg viewBox="0 0 24 24" width="13" height="13"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.64a1.64 1.64 0 1 0 0 3.28 1.64 1.64 0 0 0 0-3.28Z"/></svg>
-<span>Nibru LinkedIn</span>
-</a>
-<a href="https://www.linkedin.com/in/haiderrazaq/" target="_blank" rel="noopener noreferrer" class="footer-link">
-<svg viewBox="0 0 24 24" width="13" height="13"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.64a1.64 1.64 0 1 0 0 3.28 1.64 1.64 0 0 0 0-3.28Z"/></svg>
-<span>Haider Razaq</span>
-</a>
-</div>
-<div class="developer-credit" dir="ltr">Developed by <a href="https://www.linkedin.com/in/haiderrazaq/" target="_blank" rel="noopener noreferrer">Haider Razaq</a></div>
-</footer>
-</div>
-<script>
-function switchTab(t) {
-document.getElementById('btn-tab-vault').classList.toggle('active', t === 'vault');
-document.getElementById('btn-tab-totp').classList.toggle('active', t === 'totp');
-document.getElementById('btn-tab-backup').classList.toggle('active', t === 'backup');
-document.getElementById('tab-vault').style.display = t === 'vault' ? 'block' : 'none';
-document.getElementById('tab-totp').style.display = t === 'totp' ? 'block' : 'none';
-document.getElementById('tab-backup').style.display = t === 'backup' ? 'block' : 'none';
-}
-async function downloadBackup() {
-const pin = document.getElementById('pin').value.trim();
-const pass = document.getElementById('bk_pass_export').value;
-if (!pin) { showStatus('يرجى إدخال رمز Web PIN أولاً', true); return; }
-if (!pass) { showStatus('يرجى تحديد كلمة مرور لتشفير النسخة الاحتياطية', true); return; }
-try {
-const res = await fetch('/api/vault/backup', {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ pin, passphrase: pass })
-});
-const d = await res.json();
-if (res.ok && d.success && d.payload) {
-const bytes = new Uint8Array(d.payload.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-const blob = new Blob([bytes], { type: 'application/octet-stream' });
-const a = document.createElement('a');
-a.href = URL.createObjectURL(blob);
-a.download = 'nibru-vault-backup.bin';
-a.click();
-showStatus('تم تنزيل النسخة الاحتياطية المشفرة بنجاح!', false);
-} else {
-showStatus(d.error || 'فشل تصدير النسخة الاحتياطية', true);
-}
-} catch (e) {
-showStatus('خطأ في تصدير النسخة: ' + e.message, true);
-}
-}
-async function uploadRestore() {
-const pin = document.getElementById('pin').value.trim();
-const pass = document.getElementById('bk_pass_import').value;
-const fileInput = document.getElementById('bk_file_import');
-if (!pin) { showStatus('يرجى إدخال رمز Web PIN أولاً', true); return; }
-if (!pass) { showStatus('يرجى إدخال كلمة سر فك التشفير', true); return; }
-if (!fileInput.files || !fileInput.files[0]) { showStatus('يرجى اختيار ملف النسخة الاحتياطية', true); return; }
-const file = fileInput.files[0];
-const reader = new FileReader();
-reader.onload = async function() {
-try {
-const arr = new Uint8Array(reader.result);
-let hex = '';
-for (let b of arr) hex += b.toString(16).padStart(2, '0');
-const res = await fetch('/api/vault/restore', {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ pin, passphrase: pass, payload: hex })
-});
-const d = await res.json();
-if (res.ok && d.success) {
-showStatus('تمت استعادة ' + d.count + ' حساب بنجاح إلى الخزنة!', false);
-} else {
-showStatus(d.error || 'فشلت الاستعادة: كلمة المرور خاطئة أو الملف تالف', true);
-}
-} catch (e) {
-showStatus('خطأ أثناء الاستعادة: ' + e.message, true);
-}
-};
-reader.readAsArrayBuffer(file);
-}
-function togglePass() {
-const p = document.getElementById('v_pass');
-p.type = p.type === 'password' ? 'text' : 'password';
-}
-function genPass() {
-const chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%^&*';
-let s = '';
-for (let i = 0; i < 16; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
-const p = document.getElementById('v_pass');
-p.type = 'text';
-p.value = s;
-}
-function showStatus(msg, isErr) {
-const el = document.getElementById('status');
-el.textContent = msg;
-el.setAttribute('data-state', isErr ? 'error' : 'success');
-el.className = 'status-panel active';
-window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-async function submitVault() {
-const pin = document.getElementById('pin').value.trim();
-const title = document.getElementById('v_title').value.trim();
-const user = document.getElementById('v_user').value.trim();
-const pass = document.getElementById('v_pass').value;
-const notes = document.getElementById('v_notes').value.trim();
-if (!pin) { showStatus('يرجى إدخال رمز Web PIN المعروض على شاشة الجهاز أولاً', true); return; }
-if (!title || !pass) { showStatus('اسم الخدمة وكلمة السر مطلوبان لإتمام الحفظ', true); return; }
-try {
-const res = await fetch('/api/vault/add', {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ pin, title, username: user, password: pass, notes })
-});
-const d = await res.json();
-if (res.ok && d.success) {
-showStatus('تم تشفير وحفظ الحساب بنجاح في خزنة NibruOS! (' + title + ')', false);
-document.getElementById('v_title').value = '';
-document.getElementById('v_user').value = '';
-document.getElementById('v_pass').value = '';
-document.getElementById('v_notes').value = '';
-} else {
-showStatus(d.error || 'فشل في حفظ الحساب، تأكد من صحة رمز PIN وأن الجهاز غير مقفل', true);
-}
-} catch (e) {
-showStatus('خطأ في الاتصال بالجهاز: ' + e.message, true);
-}
-}
-async function submitTotp() {
-const pin = document.getElementById('pin').value.trim();
-const name = document.getElementById('t_name').value.trim();
-const user = document.getElementById('t_user').value.trim();
-const secret = document.getElementById('t_secret').value.trim().toUpperCase();
-if (!pin) { showStatus('يرجى إدخال رمز Web PIN المعروض على شاشة الجهاز أولاً', true); return; }
-if (!name || !secret) { showStatus('اسم الخدمة ومفتاح الإعداد (Base32) مطلوبان', true); return; }
-try {
-const res = await fetch('/api/totp/add', {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ pin, name, user, secret })
-});
-const d = await res.json();
-if (res.ok && d.success) {
-showStatus('تم حفظ وتفعيل حساب المصادقة الثنائية (2FA) بنجاح! (' + name + ')', false);
-document.getElementById('t_name').value = '';
-document.getElementById('t_user').value = '';
-document.getElementById('t_secret').value = '';
-} else {
-showStatus(d.error || 'فشل في حفظ حساب 2FA، تأكد من المفتاح السري ورمز PIN', true);
-}
-} catch (e) {
-showStatus('خطأ في الاتصال بالجهاز: ' + e.message, true);
-}
-}
-</script>
-</body>
-</html>
-)h2";
+// kIndexHtml replaced by gzipped PROGMEM payload in WebPortalHtml.h
 
 } // namespace
 
@@ -541,7 +125,21 @@ uint32_t WebPortalService::remainingSeconds(uint32_t nowMs) const {
 
 bool WebPortalService::start(uint32_t nowMs, AppContext& ctx) {
   if (state_ == WebPortalState::Active) return true;
+
+  // If BLE Keyboard is currently holding the radio lease or enabled, suspend it temporarily
+  // so that SoftAP gets dedicated, non-interfering radio bandwidth and full heap headroom.
+  if (ctx.bleHid.isEnabled() || ctx.resources.ownsWiFi(ResourceOwner::BleKeyboard)) {
+    bleSuspended_ = true;
+    ctx.bleHid.setEnabled(false, ctx);
+  } else {
+    bleSuspended_ = false;
+  }
+
   if (!ctx.resources.acquireWiFi(ResourceOwner::WebPortal)) {
+    if (bleSuspended_) {
+      ctx.bleHid.setEnabled(true, ctx);
+      bleSuspended_ = false;
+    }
     state_ = WebPortalState::Error;
     return false;
   }
@@ -551,46 +149,137 @@ bool WebPortalService::start(uint32_t nowMs, AppContext& ctx) {
 
 #if defined(ARDUINO_ARCH_ESP32)
   WiFi.mode(WIFI_AP);
-  WiFi.softAP(ssid_, password_);
+  const bool apOk = WiFi.softAP(ssid_, password_);
   IPAddress apIp = WiFi.softAPIP();
+  if (!apOk) {
+    Serial.println("[WebPortal] Failed to start SoftAP!");
+    ctx.resources.releaseWiFi(ResourceOwner::WebPortal);
+    if (bleSuspended_) {
+      ctx.bleHid.setEnabled(true, ctx);
+      bleSuspended_ = false;
+    }
+    state_ = WebPortalState::Error;
+    return false;
+  }
+  Serial.printf("[WebPortal] SoftAP started successfully. IP: %s\n", apIp.toString().c_str());
 
+  s_appContext = &ctx;
   dnsServer.start(53, "*", apIp);
 
-  server.on("/", HTTP_GET, []() {
-    server.send(200, "text/html", kIndexHtml);
-  });
-  server.on("/api/status", HTTP_GET, [this, &ctx]() {
-    char resp[128];
-    handleStatus(ctx, resp, sizeof(resp));
-    server.send(200, "application/json", resp);
-  });
-  server.on("/api/vault/add", HTTP_POST, [this, &ctx]() {
-    char resp[128];
-    String body = server.arg("plain");
-    int code = handleAddVault(ctx, body.c_str(), resp, sizeof(resp));
-    server.send(code, "application/json", resp);
-  });
-  server.on("/api/totp/add", HTTP_POST, [this, &ctx]() {
-    char resp[128];
-    String body = server.arg("plain");
-    int code = handleAddTotp(ctx, body.c_str(), resp, sizeof(resp));
-    server.send(code, "application/json", resp);
-  });
-  server.on("/api/vault/backup", HTTP_POST, [this, &ctx]() {
-    char resp[2048];
-    String body = server.arg("plain");
-    int code = handleBackup(ctx, body.c_str(), resp, sizeof(resp));
-    server.send(code, "application/json", resp);
-  });
-  server.on("/api/vault/restore", HTTP_POST, [this, &ctx]() {
-    char resp[512];
-    String body = server.arg("plain");
-    int code = handleRestore(ctx, body.c_str(), resp, sizeof(resp));
-    server.send(code, "application/json", resp);
-  });
-  server.onNotFound([]() {
-    server.send(200, "text/html", kIndexHtml);
-  });
+  if (!s_routesRegistered) {
+    s_routesRegistered = true;
+
+    server.on("/", HTTP_GET, []() {
+      server.sendHeader("Content-Encoding", "gzip");
+      server.send_P(200, "text/html", reinterpret_cast<PGM_P>(kIndexHtmlGz), sizeof(kIndexHtmlGz));
+    });
+
+    // Captive portal probes for Android, iOS, Windows
+    auto handleRedirect = []() {
+      server.sendHeader("Location", String("http://") + WiFi.softAPIP().toString() + "/", true);
+      server.send(302, "text/plain", "");
+    };
+
+    server.on("/generate_204", HTTP_GET, handleRedirect);
+    server.on("/gen_204", HTTP_GET, handleRedirect);
+    server.on("/hotspot-detect.html", HTTP_GET, handleRedirect);
+    server.on("/canonical.html", HTTP_GET, handleRedirect);
+    server.on("/ncsi.txt", HTTP_GET, handleRedirect);
+    server.on("/connecttest.txt", HTTP_GET, handleRedirect);
+
+    server.on("/api/status", HTTP_GET, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      handleStatus(*s_appContext, s_apiResp, sizeof(s_apiResp));
+      server.send(200, "application/json", s_apiResp);
+    });
+
+    server.on("/api/totp/list", HTTP_GET, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      int code = handleTotpList(*s_appContext, s_apiResp, sizeof(s_apiResp));
+      server.send(code, "application/json", s_apiResp);
+    });
+
+    server.on("/api/totp/add", HTTP_POST, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      String body = server.arg("plain");
+      int code = handleAddTotp(*s_appContext, body.c_str(), s_apiResp, sizeof(s_apiResp));
+      server.send(code, "application/json", s_apiResp);
+    });
+
+    server.on("/api/totp/remove", HTTP_POST, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      String body = server.arg("plain");
+      int code = handleRemoveTotp(*s_appContext, body.c_str(), s_apiResp, sizeof(s_apiResp));
+      server.send(code, "application/json", s_apiResp);
+    });
+
+    server.on("/api/totp/next_hotp", HTTP_POST, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      String body = server.arg("plain");
+      int code = handleNextHotp(*s_appContext, body.c_str(), s_apiResp, sizeof(s_apiResp));
+      server.send(code, "application/json", s_apiResp);
+    });
+
+    server.on("/api/vault/list", HTTP_GET, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      int code = handleVaultList(*s_appContext, s_apiResp, sizeof(s_apiResp));
+      server.send(code, "application/json", s_apiResp);
+    });
+
+    server.on("/api/vault/add", HTTP_POST, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      String body = server.arg("plain");
+      int code = handleAddVault(*s_appContext, body.c_str(), s_apiResp, sizeof(s_apiResp));
+      server.send(code, "application/json", s_apiResp);
+    });
+
+    server.on("/api/vault/remove", HTTP_POST, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      String body = server.arg("plain");
+      int code = handleRemoveVault(*s_appContext, body.c_str(), s_apiResp, sizeof(s_apiResp));
+      server.send(code, "application/json", s_apiResp);
+    });
+
+    server.on("/api/vault/backup", HTTP_POST, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      String body = server.arg("plain");
+      int code = handleBackup(*s_appContext, body.c_str(), s_apiResp, sizeof(s_apiResp));
+      server.send(code, "application/json", s_apiResp);
+    });
+
+    server.on("/api/vault/restore", HTTP_POST, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      String body = server.arg("plain");
+      int code = handleRestore(*s_appContext, body.c_str(), s_apiResp, sizeof(s_apiResp));
+      server.send(code, "application/json", s_apiResp);
+    });
+
+    server.on("/api/device/display", HTTP_POST, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      String body = server.arg("plain");
+      int code = handleDeviceDisplay(*s_appContext, body.c_str(), s_apiResp, sizeof(s_apiResp));
+      server.send(code, "application/json", s_apiResp);
+    });
+
+    server.on("/api/device/lock", HTTP_POST, [this]() {
+      if (!s_appContext) { server.send(500, "application/json", "{\"error\":\"No context\"}"); return; }
+      String body = server.arg("plain");
+      int code = handleDeviceLock(*s_appContext, body.c_str(), s_apiResp, sizeof(s_apiResp));
+      server.send(code, "application/json", s_apiResp);
+    });
+
+    server.onNotFound([]() {
+      String uri = server.uri();
+      if (uri != "/" && !uri.startsWith("/api/")) {
+        server.sendHeader("Location", String("http://") + WiFi.softAPIP().toString() + "/", true);
+        server.send(302, "text/plain", "");
+        return;
+      }
+      server.sendHeader("Content-Encoding", "gzip");
+      server.send_P(200, "text/html", reinterpret_cast<PGM_P>(kIndexHtmlGz), sizeof(kIndexHtmlGz));
+    });
+  }
+
   server.begin();
 #endif
 
@@ -610,6 +299,13 @@ void WebPortalService::stop(AppContext& ctx) {
   state_ = WebPortalState::Idle;
   CryptoService::secureZero(password_, sizeof(password_));
   CryptoService::secureZero(webPin_, sizeof(webPin_));
+
+  // Automatically restore BLE Keyboard if it was suspended for Web Portal
+  if (bleSuspended_) {
+    bleSuspended_ = false;
+    ctx.bleHid.setEnabled(true, ctx);
+    Serial.println("[WebPortal] Restored BLE Keyboard after Web Portal closed");
+  }
 }
 
 void WebPortalService::tick(uint32_t nowMs, AppContext& ctx) {
@@ -625,9 +321,201 @@ void WebPortalService::tick(uint32_t nowMs, AppContext& ctx) {
 }
 
 int WebPortalService::handleStatus(AppContext& ctx, char* outResponse, size_t maxLen) {
-  (void)ctx;
-  snprintf(outResponse, maxLen, "{\"ok\":true,\"device\":\"NibruOS\",\"remaining\":%u}",
-           static_cast<unsigned int>(remainingSeconds(startedMs_ + 1000)));
+  const bool unlocked = ctx.security.hasActiveKey();
+  const uint32_t epoch = ctx.time.getEpoch();
+  const uint8_t keyCount = ctx.totp.isLoaded() ? ctx.totp.accountCount() : 0;
+  const uint8_t vaultCount = ctx.vault.isLoaded() ? ctx.vault.count() : 0;
+  snprintf(outResponse, maxLen,
+           "{\"ok\":true,\"device\":\"NibruOS\",\"version\":\"%s\",\"remaining\":%u,\"unlocked\":%s,\"epoch\":%lu,\"keysCount\":%u,\"vaultCount\":%u}",
+           Config::kVersion,
+           static_cast<unsigned int>(remainingSeconds(millis())),
+           unlocked ? "true" : "false",
+           static_cast<unsigned long>(epoch),
+           keyCount, vaultCount);
+  return 200;
+}
+
+int WebPortalService::handleTotpList(AppContext& ctx, char* outResponse, size_t maxLen) {
+  if (!ctx.security.hasActiveKey()) {
+    snprintf(outResponse, maxLen, "{\"ok\":false,\"error\":\"Device locked\",\"keys\":[]}");
+    return 403;
+  }
+  if (!ctx.totp.isLoaded()) {
+    ctx.totp.loadVault(ctx.security.getActiveVaultKey());
+  }
+  const uint8_t count = ctx.totp.accountCount();
+  const uint32_t epoch = ctx.time.getEpoch();
+  size_t offset = snprintf(outResponse, maxLen, "{\"ok\":true,\"epoch\":%lu,\"keys\":[", static_cast<unsigned long>(epoch));
+  for (uint8_t i = 0; i < count; ++i) {
+    const TotpAccount* acc = ctx.totp.getAccount(i);
+    if (!acc) continue;
+    char code[10] = "------";
+    uint8_t remaining = 0;
+    ctx.totp.getAccountCode(i, epoch, code, sizeof(code), remaining);
+    const bool isHotp = (static_cast<OtpType>(acc->type) == OtpType::Hotp);
+    const char* algoStr = (acc->algo == static_cast<uint8_t>(OtpAlgo::Sha256)) ? "sha256" :
+                          ((acc->algo == static_cast<uint8_t>(OtpAlgo::Sha512)) ? "sha512" : "sha1");
+    char item[256];
+    snprintf(item, sizeof(item),
+             "%s{\"index\":%u,\"name\":\"%s\",\"user\":\"%s\",\"code\":\"%s\",\"timer\":%u,\"period\":%u,\"type\":\"%s\",\"algo\":\"%s\",\"digits\":%u,\"counter\":%lu}",
+             (i > 0 ? "," : ""),
+             i, acc->name, acc->user, code,
+             isHotp ? 0 : remaining,
+             acc->period,
+             isHotp ? "hotp" : "totp",
+             algoStr,
+             acc->digits,
+             static_cast<unsigned long>(acc->counter));
+    CryptoService::secureZero(code, sizeof(code));
+    const size_t itemLen = strlen(item);
+    if (offset + itemLen + 4 < maxLen) {
+      memcpy(outResponse + offset, item, itemLen);
+      offset += itemLen;
+      outResponse[offset] = '\0';
+    }
+  }
+  if (offset + 3 < maxLen) {
+    outResponse[offset++] = ']';
+    outResponse[offset++] = '}';
+    outResponse[offset] = '\0';
+  }
+  return 200;
+}
+
+int WebPortalService::handleAddTotp(AppContext& ctx, const char* body, char* outResponse, size_t maxLen) {
+  char pin[16]{}, name[24]{}, user[32]{}, secret[65]{}, typeStr[16]{}, algoStr[16]{};
+  extractJsonString(body, "pin", pin, sizeof(pin));
+  extractJsonString(body, "name", name, sizeof(name));
+  extractJsonString(body, "user", user, sizeof(user));
+  extractJsonString(body, "secret", secret, sizeof(secret));
+  extractJsonString(body, "type", typeStr, sizeof(typeStr));
+  extractJsonString(body, "algo", algoStr, sizeof(algoStr));
+  int digits = extractJsonInt(body, "digits", 6);
+  int period = extractJsonInt(body, "period", 30);
+  int counter = extractJsonInt(body, "counter", 0);
+
+  if (strcmp(pin, webPin_) != 0) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Invalid Web PIN\"}");
+    return 401;
+  }
+
+  if (!ctx.security.hasActiveKey()) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Device locked. Unlock on device first.\"}");
+    return 403;
+  }
+
+  if (!name[0] || !secret[0]) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Service name and Secret key are required\"}");
+    return 400;
+  }
+
+  if (!ctx.totp.isLoaded()) {
+    if (!ctx.totp.loadVault(ctx.security.getActiveVaultKey())) {
+      snprintf(outResponse, maxLen, "{\"error\":\"Failed to load 2FA storage\"}");
+      return 500;
+    }
+  }
+
+  OtpType type = (strcmp(typeStr, "hotp") == 0) ? OtpType::Hotp : OtpType::Totp;
+  OtpAlgo algo = OtpAlgo::Sha1;
+  if (strcmp(algoStr, "sha256") == 0) algo = OtpAlgo::Sha256;
+  else if (strcmp(algoStr, "sha512") == 0) algo = OtpAlgo::Sha512;
+
+  if (!ctx.totp.addAccount(ctx.security.getActiveVaultKey(), name, user[0] ? user : "Account", secret,
+                           static_cast<uint8_t>(digits), static_cast<uint8_t>(period),
+                           type, algo, static_cast<uint32_t>(counter))) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Failed to save 2FA account (invalid Base32 or storage full)\"}");
+    return 400;
+  }
+
+  snprintf(outResponse, maxLen, "{\"success\":true,\"count\":%u}", static_cast<unsigned int>(ctx.totp.accountCount()));
+  return 200;
+}
+
+int WebPortalService::handleRemoveTotp(AppContext& ctx, const char* body, char* outResponse, size_t maxLen) {
+  char pin[16]{};
+  extractJsonString(body, "pin", pin, sizeof(pin));
+  if (strcmp(pin, webPin_) != 0) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Invalid Web PIN\"}");
+    return 401;
+  }
+  if (!ctx.security.hasActiveKey()) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Device locked\"}");
+    return 403;
+  }
+  int index = extractJsonInt(body, "index", -1);
+  if (index < 0 || index >= ctx.totp.accountCount()) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Invalid index\"}");
+    return 400;
+  }
+  if (!ctx.totp.removeAccount(ctx.security.getActiveVaultKey(), static_cast<uint8_t>(index))) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Failed to remove account\"}");
+    return 500;
+  }
+  snprintf(outResponse, maxLen, "{\"success\":true,\"count\":%u}", static_cast<unsigned int>(ctx.totp.accountCount()));
+  return 200;
+}
+
+int WebPortalService::handleNextHotp(AppContext& ctx, const char* body, char* outResponse, size_t maxLen) {
+  char pin[16]{};
+  extractJsonString(body, "pin", pin, sizeof(pin));
+  if (strcmp(pin, webPin_) != 0) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Invalid Web PIN\"}");
+    return 401;
+  }
+  if (!ctx.security.hasActiveKey()) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Device locked\"}");
+    return 403;
+  }
+  int index = extractJsonInt(body, "index", -1);
+  if (index < 0 || index >= ctx.totp.accountCount()) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Invalid index\"}");
+    return 400;
+  }
+  if (!ctx.totp.incrementHotp(ctx.security.getActiveVaultKey(), static_cast<uint8_t>(index))) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Failed to advance counter\"}");
+    return 500;
+  }
+  const TotpAccount* acc = ctx.totp.getAccount(static_cast<uint8_t>(index));
+  char code[10]{};
+  uint8_t rem = 0;
+  ctx.totp.getAccountCode(static_cast<uint8_t>(index), 0, code, sizeof(code), rem);
+  snprintf(outResponse, maxLen, "{\"success\":true,\"code\":\"%s\",\"counter\":%lu}",
+           code, static_cast<unsigned long>(acc ? acc->counter : 0));
+  CryptoService::secureZero(code, sizeof(code));
+  return 200;
+}
+
+int WebPortalService::handleVaultList(AppContext& ctx, char* outResponse, size_t maxLen) {
+  if (!ctx.security.hasActiveKey()) {
+    snprintf(outResponse, maxLen, "{\"ok\":false,\"error\":\"Device locked\",\"passwords\":[]}");
+    return 403;
+  }
+  if (!ctx.vault.isLoaded()) {
+    ctx.vault.loadVault(ctx.security.getActiveVaultKey());
+  }
+  const uint8_t count = ctx.vault.count();
+  size_t offset = snprintf(outResponse, maxLen, "{\"ok\":true,\"passwords\":[");
+  for (uint8_t i = 0; i < count; ++i) {
+    const VaultEntry* entry = ctx.vault.getEntry(i);
+    if (!entry) continue;
+    char item[256];
+    snprintf(item, sizeof(item),
+             "%s{\"index\":%u,\"title\":\"%s\",\"username\":\"%s\",\"password\":\"%s\",\"notes\":\"%s\"}",
+             (i > 0 ? "," : ""),
+             i, entry->title, entry->username, entry->password, entry->notes);
+    const size_t itemLen = strlen(item);
+    if (offset + itemLen + 4 < maxLen) {
+      memcpy(outResponse + offset, item, itemLen);
+      offset += itemLen;
+      outResponse[offset] = '\0';
+    }
+  }
+  if (offset + 3 < maxLen) {
+    outResponse[offset++] = ']';
+    outResponse[offset++] = '}';
+    outResponse[offset] = '\0';
+  }
   return 200;
 }
 
@@ -670,41 +558,27 @@ int WebPortalService::handleAddVault(AppContext& ctx, const char* body, char* ou
   return 200;
 }
 
-int WebPortalService::handleAddTotp(AppContext& ctx, const char* body, char* outResponse, size_t maxLen) {
-  char pin[16]{}, name[24]{}, user[32]{}, secret[53]{};
+int WebPortalService::handleRemoveVault(AppContext& ctx, const char* body, char* outResponse, size_t maxLen) {
+  char pin[16]{};
   extractJsonString(body, "pin", pin, sizeof(pin));
-  extractJsonString(body, "name", name, sizeof(name));
-  extractJsonString(body, "user", user, sizeof(user));
-  extractJsonString(body, "secret", secret, sizeof(secret));
-
   if (strcmp(pin, webPin_) != 0) {
     snprintf(outResponse, maxLen, "{\"error\":\"Invalid Web PIN\"}");
     return 401;
   }
-
   if (!ctx.security.hasActiveKey()) {
-    snprintf(outResponse, maxLen, "{\"error\":\"Device locked. Unlock on device first.\"}");
+    snprintf(outResponse, maxLen, "{\"error\":\"Device locked\"}");
     return 403;
   }
-
-  if (!name[0] || !secret[0]) {
-    snprintf(outResponse, maxLen, "{\"error\":\"Service name and Secret key are required\"}");
+  int index = extractJsonInt(body, "index", -1);
+  if (index < 0 || index >= ctx.vault.count()) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Invalid index\"}");
     return 400;
   }
-
-  if (!ctx.totp.isLoaded()) {
-    if (!ctx.totp.loadVault(ctx.security.getActiveVaultKey())) {
-      snprintf(outResponse, maxLen, "{\"error\":\"Failed to load 2FA storage\"}");
-      return 500;
-    }
+  if (!ctx.vault.removeEntry(ctx.security.getActiveVaultKey(), static_cast<uint8_t>(index))) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Failed to remove password\"}");
+    return 500;
   }
-
-  if (!ctx.totp.addAccount(ctx.security.getActiveVaultKey(), name, user[0] ? user : "Account", secret)) {
-    snprintf(outResponse, maxLen, "{\"error\":\"Failed to save 2FA account (invalid Base32 or storage full)\"}");
-    return 400;
-  }
-
-  snprintf(outResponse, maxLen, "{\"success\":true,\"count\":%u}", static_cast<unsigned int>(ctx.totp.accountCount()));
+  snprintf(outResponse, maxLen, "{\"success\":true,\"count\":%u}", static_cast<unsigned int>(ctx.vault.count()));
   return 200;
 }
 
@@ -798,6 +672,44 @@ int WebPortalService::handleRestore(AppContext& ctx, const char* body, char* out
   return 200;
 }
 
+int WebPortalService::handleDeviceDisplay(AppContext& ctx, const char* body, char* outResponse, size_t maxLen) {
+  char pin[16]{};
+  extractJsonString(body, "pin", pin, sizeof(pin));
+  if (strcmp(pin, webPin_) != 0) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Invalid Web PIN\"}");
+    return 401;
+  }
+  int brightness = extractJsonInt(body, "brightness", -1);
+  int timeout = extractJsonInt(body, "timeout", -1);
+  int theme = extractJsonInt(body, "theme", -1);
+
+  if (brightness >= 0 && brightness <= 100) {
+    ctx.settings.setBrightness(static_cast<uint8_t>(brightness));
+  }
+  if (timeout >= 0) {
+    ctx.settings.setScreenTimeoutSec(static_cast<uint16_t>(timeout));
+  }
+  if (theme >= 0 && theme <= 3) {
+    ctx.settings.setTheme(static_cast<uint8_t>(theme));
+  }
+  snprintf(outResponse, maxLen, "{\"success\":true}");
+  return 200;
+}
+
+int WebPortalService::handleDeviceLock(AppContext& ctx, const char* body, char* outResponse, size_t maxLen) {
+  char pin[16]{};
+  extractJsonString(body, "pin", pin, sizeof(pin));
+  if (strcmp(pin, webPin_) != 0) {
+    snprintf(outResponse, maxLen, "{\"error\":\"Invalid Web PIN\"}");
+    return 401;
+  }
+  ctx.security.lock();
+  ctx.totp.lock();
+  ctx.vault.lock();
+  snprintf(outResponse, maxLen, "{\"success\":true,\"locked\":true}");
+  return 200;
+}
+
 int WebPortalService::simulateRequest(AppContext& ctx, const char* method, const char* path, const char* body, char* outResponse, size_t maxLen) {
   if (state_ != WebPortalState::Active) {
     snprintf(outResponse, maxLen, "{\"error\":\"Portal not active\"}");
@@ -805,14 +717,28 @@ int WebPortalService::simulateRequest(AppContext& ctx, const char* method, const
   }
   if (strcmp(path, "/api/status") == 0) {
     return handleStatus(ctx, outResponse, maxLen);
-  } else if (strcmp(path, "/api/vault/add") == 0 && strcmp(method, "POST") == 0) {
-    return handleAddVault(ctx, body, outResponse, maxLen);
+  } else if (strcmp(path, "/api/totp/list") == 0 && strcmp(method, "GET") == 0) {
+    return handleTotpList(ctx, outResponse, maxLen);
   } else if (strcmp(path, "/api/totp/add") == 0 && strcmp(method, "POST") == 0) {
     return handleAddTotp(ctx, body, outResponse, maxLen);
+  } else if (strcmp(path, "/api/totp/remove") == 0 && strcmp(method, "POST") == 0) {
+    return handleRemoveTotp(ctx, body, outResponse, maxLen);
+  } else if (strcmp(path, "/api/totp/next_hotp") == 0 && strcmp(method, "POST") == 0) {
+    return handleNextHotp(ctx, body, outResponse, maxLen);
+  } else if (strcmp(path, "/api/vault/list") == 0 && strcmp(method, "GET") == 0) {
+    return handleVaultList(ctx, outResponse, maxLen);
+  } else if (strcmp(path, "/api/vault/add") == 0 && strcmp(method, "POST") == 0) {
+    return handleAddVault(ctx, body, outResponse, maxLen);
+  } else if (strcmp(path, "/api/vault/remove") == 0 && strcmp(method, "POST") == 0) {
+    return handleRemoveVault(ctx, body, outResponse, maxLen);
   } else if (strcmp(path, "/api/vault/backup") == 0 && strcmp(method, "POST") == 0) {
     return handleBackup(ctx, body, outResponse, maxLen);
   } else if (strcmp(path, "/api/vault/restore") == 0 && strcmp(method, "POST") == 0) {
     return handleRestore(ctx, body, outResponse, maxLen);
+  } else if (strcmp(path, "/api/device/display") == 0 && strcmp(method, "POST") == 0) {
+    return handleDeviceDisplay(ctx, body, outResponse, maxLen);
+  } else if (strcmp(path, "/api/device/lock") == 0 && strcmp(method, "POST") == 0) {
+    return handleDeviceLock(ctx, body, outResponse, maxLen);
   } else if (strcmp(path, "/") == 0) {
     snprintf(outResponse, maxLen, "HTML_PORTAL");
     return 200;

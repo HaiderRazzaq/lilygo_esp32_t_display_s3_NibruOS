@@ -61,7 +61,9 @@ private:
   uint32_t lastActivityMs_ = 0;
   uint32_t screensaverStartedMs_ = 0;
   uint16_t themeAccent_ = Colors::Cyan;
+#if NIBRU_BACKLIGHT_LEDC
   bool pwmReady_ = false;
+#endif
 
   void applyBacklight(uint8_t percent);
 };

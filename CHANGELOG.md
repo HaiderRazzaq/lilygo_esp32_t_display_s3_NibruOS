@@ -1,5 +1,111 @@
 # Changelog
 
+## [v0.24.0] - 2026-11-07
+
+### Added
+
+- **Unified Release v0.24.0**: Merged Web Portal features (v0.23.0 - v0.23.9: HOTP RFC 4226, SHA-256/512 multi-algorithm OTP, USB HID keystroke injection, Gzip PROGMEM streaming, and official Nibru brand identity) with External Antenna rework and Wi-Fi Scanner enhancements (v0.22.0 - v0.22.4: passive beacon scanning, active/passive mode toggle, station radio disconnect, and 100% flicker-free differential UI).
+
+## [v0.23.9] - 2026-11-06
+
+### Added
+
+- **Official Nibru Visual Identity & Branding for Web Portal**: Re-engineered `src/services/web_portal/index.html` and regenerated `src/services/WebPortalHtml.h` utilizing the exact styling, color palette, logo, typography, and content from `tools/account_setup`:
+  1. **Visual Branding & Palette**: Integrated brand-navy (`#0F1954`), brand-aqua (`#38FFE1`), brand-offwhite (`#F1FFFD`), dark background (`#080F2C`), card panels (`#101B42`), and subtle cyan neon borders (`rgba(56, 255, 225, 0.18)`).
+  2. **Official Vector Logo**: Embedded the authentic Nibru geometric vector SVG mark with linear gradient (`#1FB6C9` to `#38FFE1`) into topbar and auth modal.
+  3. **Arabic RTL Typography & Layout**: Configured responsive RTL layout with Fustat and Segoe UI fonts, Arabic labels, and directionality.
+  4. **Side Column Quick Guide**: Added a step-by-step connection badge guide (Connect to AP -> Open 192.168.4.1 -> Enter PIN -> Manage Vault & TOTP) with an animated shield icon.
+  5. **Footer & Credentials**: Added official contact details (Phone `07838844400` / `tel:+9647838844400`), Nibru and Haider Razaq LinkedIn badges, and "Developed by Haider Razaq".
+  6. **Automated Compression Pipeline**: Maintained the Gzip compression workflow via `tools/compress_portal_html.py`, compressing 54.6 KB raw HTML down to 12.3 KB (22%) stored in Flash PROGMEM.
+
+## [v0.23.8] - 2026-11-06
+
+### Fixed
+
+- **Web Portal Client Connection Crash/Panic (`ESP_RST_PANIC`) Elimination**: Resolved a critical panic occurring immediately when a smartphone or browser connects to the Web Portal SoftAP:
+  1. **Gzip Compressed PROGMEM Payload**: Converted the 33,786-byte raw HTML dashboard into an 8,036-byte Gzip-compressed byte array (`kIndexHtmlGz`) in `src/services/WebPortalHtml.h`. Served with `Content-Encoding: gzip` via `server.send_P(200, "text/html", kIndexHtmlGz, sizeof(kIndexHtmlGz))`. This completely eliminates the previous 33.7 KB heap `String` allocation and prevents TCP socket buffer congestion and lwIP pbuf exhaustion.
+  2. **Captive Portal Probe Redirection**: Implemented dedicated 302 redirection for Android (`/generate_204`, `/gen_204`), Apple iOS (`/hotspot-detect.html`, `/canonical.html`), and Windows (`/ncsi.txt`, `/connecttest.txt`). Previously, every background OS connectivity probe hit `onNotFound`, triggering simultaneous 33 KB HTML dumps that overwhelmed internal SRAM. Probes now receive instant, lightweight 50-byte 302 redirects to `http://192.168.4.1/`.
+  3. **Stack Buffer Elimination in API Routes**: Replaced per-lambda stack allocations (`char resp[3072]`) with a shared static response buffer (`s_apiResp[3072]`).
+  4. **Doubled FreeRTOS Loop Task Stack**: Increased Arduino-ESP32 `loopTask` stack size from 8,192 bytes (8KB) to 16,384 bytes (16KB) by overriding `getArduinoLoopTaskStackSize()` in `src/main.cpp`.
+  5. **One-Time WebServer Route Registration**: Protected route registration in `WebPortalService::start()` with `s_routesRegistered` flag to prevent memory leaks and handler duplication across sessions.
+  6. **Software ROM Download Mode Trigger**: Added serial command `'~'` in `src/main.cpp` to programmatically enter the ESP32-S3 ROM bootloader download mode via `RTC_CNTL_FORCE_DOWNLOAD_BOOT`.
+
+## [v0.23.7] - 2026-11-06
+
+### Changed
+
+- **System Info Boot Cause Clarification**: Updated telemetry label in `SettingsApp::renderMemory()` from `Reset: %.36s` to `Boot cause: %.32s`. Clarifies that this value displays the historical hardware RTC reset reason from the initial boot sequence (`esp_reset_reason()`), rather than indicating an active system error or current panic condition.
+- **Diagnostics & User Guidance**: Clarified that historical `Software Crash/Panic` statuses from earlier sessions persist in the ESP32-S3 RTC slow-memory register across RTS soft-resets until cleared by a normal user reboot (**Settings -> Device -> REBOOT**, resetting to `Software Restart`) or a cold power cycle (unplugging and reattaching USB, resetting to `Power-on`).
+
+## [v0.23.6] - 2026-11-06
+
+### Fixed
+
+- **Web Portal Continuous Background Broadcast During Screensaver & Sleep**: Decoupled Web Portal lifecycle from display power and security lock states in `src/main.cpp`. Previously, entering screensaver or display sleep erroneously invoked `webPortal.stop()`, terminating the active Wi-Fi SoftAP and web server abruptly. Web Portal now maintains its independent 3-minute session lifecycle, continuing full-speed background SoftAP broadcasting and HTTP request handling while the screen enters Clock Screensaver or sleep.
+- **Screensaver Portal Status Indicator**: Updated `ClockApp::renderScreensaver()` to detect active Web Portal sessions in real-time, displaying a vibrant green header pill `PORTAL BROADCASTING` and live countdown badge `[ PORTAL AP ACTIVE (X s) * TAP ]` directly on the clock screensaver.
+- **Seamless Wake from Screensaver**: When tapping the screen while Web Portal is broadcasting, waking up restores the Web Portal view immediately without forcing a PIN lock or stopping the SoftAP.
+
+### Fixed
+
+- **Flicker-Free Differential Rendering for Clock Screensaver & ClockApp**: Fixed full-screen display flashing/flickering every second when the digital clock updates. In both `ClockApp::renderScreensaver()` and `ClockApp::render()`, eliminated redundant `fillRoundRect()` full card/screen background wipes on every 1-second tick. The cyber frame, header pills, badges, date strings, and progress bar tracks are now drawn once on entry/reset, while per-second ticks update only the digital time glyphs and incremental seconds bar in-place. Added `ClockApp::resetScreensaver()` to trigger full setup on initial screensaver activation.
+
+### Fixed
+
+- **Web Portal Display Keep-Alive & Sleep Prevention**: Added `DisplayManager::notifyActivity()` to `WebPortalService::tick()` and `SettingsApp::onTick()`. Prevents the screen from entering sleep/screensaver or locking while the user is actively working on the 3-minute Web Portal session, ensuring the AP SSID, password, web PIN, and live countdown remain visible and the SoftAP web server is not abruptly terminated by the display inactivity timer.
+
+## [v0.23.3] - 2026-11-06
+
+### Fixed
+
+- **CryptoService SAR Entropy & Panic Elimination**: Removed legacy `bootloader_random_enable()` and `bootloader_random_disable()` calls from `CryptoService::fillRandom()`. On ESP32-S3, re-initializing the bootloader SAR ADC during runtime while Bluetooth/Wi-Fi or FreeRTOS is active creates hardware clock register collisions and triggers `ESP_RST_PANIC` ("Software Crash/Panic"). Replaced with direct, thread-safe ESP-IDF runtime `esp_fill_random()` hardware RNG.
+- **Diagnostics Clarification for Reset Reason**: Documented how `MemoryProfiler::resetReasonString()` displays the last recorded hardware RTC reset reason on the System Info screen, explaining why previous crash reasons persist until a software reboot (`ESP_RST_SW`) or cold power cycle (`ESP_RST_POWERON`).
+
+## [v0.23.2] - 2026-11-06
+
+### Fixed
+
+- **Web Portal SoftAP Coexistence with BLE**: Resolved radio resource lock contention preventing Web Portal from starting when BLE Keyboard was enabled. In `WebPortalService::start()`, active BLE Keyboard leases are now gracefully suspended during the ephemeral 3-minute SoftAP administration session to ensure dedicated 2.4GHz RF bandwidth and full internal SRAM headroom.
+- **Automatic BLE Restoration**: When exiting the Web Portal (via Back gesture, UI exit, or session timeout), `WebPortalService::stop()` automatically restores the prior BLE Keyboard state and re-enables advertising without requiring manual intervention in Bluetooth settings.
+- **SoftAP Verification & Error Guard**: Added return status verification for `WiFi.softAP()` in `WebPortalService.cpp` and safe rollback logic in `SettingsApp::onActivate()`, ensuring the view transitions cleanly without silent resets.
+- **Host Test Suite**: Added automated unit test coverage in `tests/host/test_web_portal.cpp` verifying BLE suspension during active Web Portal sessions and seamless automatic restoration upon portal closure.
+
+## [v0.23.1] - 2026-11-06
+
+### Fixed
+
+- **USB HID Primary Keystroke Transport**: Fixed USB HID transport readiness probe in `UsbHidService.cpp` to use TinyUSB `tud_mounted() && !tud_suspended()` instead of an uninitialized instance, ensuring USB connection is reliably recognized as soon as the cable is connected to a PC.
+- **2FA Single-Touch & Hold USB Send**: Removed accidental BLE mode toggle in `TotpApp`; simplified input handling so that both short Tap, LongPress (Hold), and physical BOOT button immediately inject the active 2FA code over USB HID to the PC.
+- **Capsule Button UI**: Updated action button to clearly display `[USB] TAP/HOLD TO SEND` in vibrant cyan with immediate live feedback (`TYPING USB TO PC...` and `Code sent to PC (USB)!`).
+
+## [v0.23.0] - 2026-11-06
+
+### Added
+
+- **HOTP (RFC 4226) Engine & Counter-Based 2FA**: Counter-based one-time password generation operating fully offline without NTP/RTC clock requirements.
+- **SHA-256 and SHA-512 Multi-Algorithm TOTP/HOTP**: Added `CryptoService::hmacSha512` primitive and upgraded `TotpService::computeOtp` to support SHA-1 (20B), SHA-256 (32B), and SHA-512 (64B) HMACs with standard RFC 4226 dynamic truncation.
+- **Authenticator Web Control Panel**: Integrated single-page web dashboard (`WebPortalService`) matching SecureGen architecture with tabs: `Keys`, `Passwords`, `Display`, `PIN`, `Settings`, and `Instructions`.
+- **Live Visual Countdown & Progress Bar**: Table display for 2FA keys with live remaining-time countdown and animated pink progress bar (`#f43f5e`), code display, and instant key removal.
+- **Client-Side Password Generator**: Integrated into the Passwords tab with configurable length (8–32) and character sets (A–Z, a–z, 0–9, symbols), with instant "Use in Form" insertion.
+- **HOTP USB HID Keystroke Injection**: Advancing HOTP counter automatically sends code over USB HID and immediately commits incremented counter into AES-256-GCM encrypted NVS storage.
+
+### Changed
+
+- Upgraded `TotpAccount` struct schema to v2 (124 bytes) supporting extended 64-byte secrets for SHA-512, account type (`Totp` / `Hotp`), algorithm enum, and counter, maintaining automatic decryption and in-memory upgrade for v1 blobs.
+- Display UI in `TotpApp` now displays `[HOTP]` and algorithm badges (`256`/`512`), counter state (`HOTP #<counter>`), and supports direct tap on card or physical BOOT button to generate/send next code without requiring time sync.
+- Synchronized firmware runtime version across configuration headers, main, and engineering records to `v0.23.0`.
+
+## [v0.22.0] - 2026-11-06
+
+### Added
+
+- Automated desktop simulator test suite covering `SettingsApp` UI subviews, navigation, brightness/timeout cycling, theme switching, memory monitor pagination, Wi-Fi diagnostics telemetry inspection, modal confirmation cancellation, and lifecycle exit (`testSettingsAppNavigation`).
+- Backlight PWM compilation warning cleanup in `DisplayManager.h` when `NIBRU_BACKLIGHT_LEDC` is disabled.
+
+### Changed
+
+- Consolidated Essential Settings v0.1 and permanent engineering resource policy documentation and baselines across all project records.
+- Synchronized firmware runtime version across configuration headers, main, and engineering records to `v0.22.0`.
+
 ## [v0.22.4] - 2026-11-07
 
 ### Added
@@ -615,4 +721,3 @@ The original [package changelog](docs/CHANGELOG.md) is preserved, including its
 present in the first available commit `d6cf0294f548b64884076e8732e2bf425ee8e773`.
 Their development order and release dates cannot be reconstructed from Git.
 No release tags exist at this baseline; runtime still displays v0.1.
-

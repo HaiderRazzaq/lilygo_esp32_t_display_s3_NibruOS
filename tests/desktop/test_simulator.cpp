@@ -484,6 +484,72 @@ void testSettingsPersistence(AppContext& ctx) {
   std::printf("  -> Settings Persistence Tests PASS\n");
 }
 
+void testSettingsAppNavigation(AppContext& ctx, SettingsApp& settingsApp) {
+  std::printf("[Test] Running SettingsApp Navigation, Subviews & Lifecycle Tests...\n");
+
+  settingsApp.onEnter(ctx);
+  settingsApp.render(ctx);
+
+  // 1. Display subview (first menu item)
+  settingsApp.onActivate(ctx);
+  settingsApp.render(ctx);
+  settingsApp.onPrimaryAction(ctx);
+  settingsApp.onActivate(ctx);
+  settingsApp.render(ctx);
+  assert(settingsApp.onBack(ctx));
+  settingsApp.render(ctx);
+
+  // 2. Theme subview (second menu item)
+  settingsApp.onPrimaryAction(ctx); // focus Theme
+  settingsApp.onActivate(ctx);
+  settingsApp.render(ctx);
+  settingsApp.onPrimaryAction(ctx); // focus Green
+  settingsApp.onActivate(ctx);
+  assert(ctx.settings.theme() == 1);
+  assert(ctx.settings.themeColor() == 0x07E0);
+  assert(settingsApp.onBack(ctx));
+  settingsApp.render(ctx);
+
+  // 3. Memory & System Info subview (third menu item)
+  settingsApp.onPrimaryAction(ctx); // focus Memory
+  settingsApp.onActivate(ctx);
+  settingsApp.render(ctx); // page 0
+  settingsApp.onPrimaryAction(ctx); // switch to page 1
+  settingsApp.render(ctx); // page 1
+  settingsApp.onTick(ctx, 2000);
+  assert(settingsApp.onBack(ctx));
+  settingsApp.render(ctx);
+
+  // 4. Wi-Fi Diagnostics subview (fourth menu item)
+  settingsApp.onPrimaryAction(ctx); // focus WiFiDiag
+  settingsApp.onActivate(ctx);
+  settingsApp.render(ctx);
+  assert(ctx.resources.wifiOwner() == ResourceOwner::None);
+  settingsApp.onTick(ctx, 3000);
+  assert(settingsApp.onBack(ctx));
+  settingsApp.render(ctx);
+
+  // 5. Device Controls subview (fifth menu item)
+  settingsApp.onPrimaryAction(ctx); // focus Device
+  settingsApp.onActivate(ctx);
+  settingsApp.render(ctx);
+  settingsApp.onActivate(ctx); // modal confirmation
+  settingsApp.render(ctx);
+  assert(settingsApp.onBack(ctx)); // cancel confirmation
+  settingsApp.render(ctx);
+  assert(settingsApp.onBack(ctx)); // back to menu
+  settingsApp.render(ctx);
+
+  // Return to launcher (onBack from Menu returns false)
+  assert(!settingsApp.onBack(ctx));
+  settingsApp.onExit(ctx);
+
+  // Restore default theme
+  ctx.settings.setTheme(0);
+
+  std::printf("  -> SettingsApp Navigation Tests PASS\n");
+}
+
 void testRepeatedLifecycleCycles(AppManager& launcher) {
   std::printf("[Test] Running 25 Repeated Lifecycle Entry/Exit Cycles...\n");
 
@@ -1094,6 +1160,7 @@ int main() {
   assert(!wifi.beaconActive());
 
   testSettingsPersistence(context);
+  testSettingsAppNavigation(context, settingsApp);
   testModularArchitecture(context);
   testSleepLockWakeFlow(context, wifiApp, launcher);
   testEncryptedVaultStorage(context);

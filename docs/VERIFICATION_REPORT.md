@@ -74,7 +74,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Repository checks and all 14 mutation tests pass.",
   "actual": "Checker reported 3 missing-record/evidence errors; suite ran 14 tests with 2 failures: missing verification records and a formatting-dependent mutation fixture.",
   "result": "FAIL",
-  "evidence": ["docs/evidence/2026-11-01-documentation.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-01-documentation.txt"
+  ],
   "evidence_kind": "Observed command output summarized without the enormous assertion dump",
   "environment": "Windows, Python 3.12",
   "limitations": "Intermediate implementation check; follow-up results are appended separately. No firmware/hardware assertions."
@@ -179,7 +181,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "CI configuration added but hosted runner not executed. Does not prove physical behavior, evidence authenticity or append-only history. Current firmware host suite remains BLOCKED (VER-0002)."
 }
 ```
-
 
 ```json
 {
@@ -545,8 +546,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-**Correction to VER-0020 (2026-11-01):** The profile image byte count in the actual field was transcribed as 843440; the generated artifact and captured build show **843424 bytes**, leaving **5710176 bytes** in app0. Linked program843061 B is unchanged. The resource report uses the actual artifact value; this corrects transcription only and adds no new physical evidence.
-
 ```json
 {
   "record_type": "test",
@@ -645,6 +644,7 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "evidence_kind": "Captured PlatformIO output and generated artifact reports"
 }
 ```
+
 ```json
 {
   "record_type": "test",
@@ -692,7 +692,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Compilation only; does not upload to physical hardware."
 }
 ```
-
 
 ```json
 {
@@ -742,7 +741,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -766,8 +764,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Build only, no runtime observation."
 }
 ```
-
-
 
 ```json
 {
@@ -793,8 +789,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
-
 ```json
 {
   "record_type": "test",
@@ -819,8 +813,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
-
 ```json
 {
   "record_type": "test",
@@ -844,8 +836,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Tool orchestration collision, not a demonstrated firmware failure."
 }
 ```
-
-
 
 ```json
 {
@@ -872,8 +862,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
-
 ```json
 {
   "record_type": "test",
@@ -897,8 +885,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "SDL2 2.30.10/CNG host only. Existing unused-constant and pragma warnings remain; no physical leak/UI/RF claim."
 }
 ```
-
-
 
 ```json
 {
@@ -925,8 +911,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
-
 ```json
 {
   "record_type": "test",
@@ -950,8 +934,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Static RAM remainder cannot establish >=150 KiB free internal heap, PSRAM, stack, latency or power."
 }
 ```
-
-
 
 ```json
 {
@@ -977,8 +959,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
-
 ```json
 {
   "record_type": "test",
@@ -1002,7 +982,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Setup errors are distinct from intentional behavioral RED."
 }
 ```
-
 
 ```json
 {
@@ -1030,7 +1009,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1056,7 +1034,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1080,7 +1057,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Intentional RED, incomplete runner setup and fixture setup are distinct from final verified behavior; no physical attempt."
 }
 ```
-
 
 ```json
 {
@@ -1107,7 +1083,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1131,7 +1106,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "HOST/SIMULATOR only; no physical peripherals/real network delivery."
 }
 ```
-
 
 ```json
 {
@@ -1159,7 +1133,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1183,7 +1156,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Builds are not physical runtime, resource or HID validation."
 }
 ```
-
 
 ```json
 {
@@ -1210,7 +1182,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1234,7 +1205,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Source review is not a security certification; reviewer performed no target/device checks."
 }
 ```
-
 
 ```json
 {
@@ -1261,7 +1231,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1287,7 +1256,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1312,7 +1280,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1336,7 +1303,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Structural and link consistency checks only; does not validate physical electrical properties"
 }
 ```
-
 
 ```json
 {
@@ -1386,7 +1352,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1410,7 +1375,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Host execution does not measure physical ESP32-S3 RF reception, AW9364 backlight pulses, or hardware touch response"
 }
 ```
-
 
 ```json
 {
@@ -2900,7 +2864,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -3573,7 +3536,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -3597,7 +3559,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Simulates an early return from Arduino init. Does not model the real busy-loop timing."
 }
 ```
-
 
 ```json
 {
@@ -3623,7 +3584,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -3647,7 +3607,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Host stubs."
 }
 ```
-
 
 ```json
 {
@@ -3673,7 +3632,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -3697,7 +3655,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Software simulation. CMake emitted its existing FetchContent developer warning."
 }
 ```
-
 
 ```json
 {
@@ -3723,7 +3680,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -3747,7 +3703,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Runtime metrics NOT MEASURED."
 }
 ```
-
 
 ```json
 {
@@ -4804,7 +4759,7 @@ are new observations, not revisions of its original outcomes. Current coverage:
   ],
   "evidence_kind": "Captured output",
   "environment": "Windows",
-  "limitations": "Physical RF and resource scenarios A\u2013E not run."
+  "limitations": "Physical RF and resource scenarios A–E not run."
 }
 ```
 
@@ -4829,7 +4784,7 @@ are new observations, not revisions of its original outcomes. Current coverage:
   ],
   "evidence_kind": "Captured output",
   "environment": "Windows",
-  "limitations": "Physical RF and resource scenarios A\u2013E not run."
+  "limitations": "Physical RF and resource scenarios A–E not run."
 }
 ```
 
@@ -4854,7 +4809,7 @@ are new observations, not revisions of its original outcomes. Current coverage:
   ],
   "evidence_kind": "Captured output",
   "environment": "Windows",
-  "limitations": "Physical RF and resource scenarios A\u2013E not run."
+  "limitations": "Physical RF and resource scenarios A–E not run."
 }
 ```
 
@@ -4879,10 +4834,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   ],
   "evidence_kind": "Captured output",
   "environment": "Windows",
-  "limitations": "Physical RF and resource scenarios A\u2013E not run."
+  "limitations": "Physical RF and resource scenarios A–E not run."
 }
 ```
-
 
 ```json
 {
@@ -4958,7 +4912,6 @@ are new observations, not revisions of its original outcomes. Current coverage:
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -5031,6 +4984,7 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Static cross-reference and schema validation only."
 }
 ```
+
 ```json
 {
   "record_type": "test",
@@ -5194,7 +5148,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "The new feature test fails before implementation.",
   "actual": "Compilation failed because BleAdvertisingService.h did not exist.",
   "result": "FAIL",
-  "evidence": ["docs/evidence/2026-11-05-v0170-host-red.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0170-host-red.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / MSVC",
   "limitations": "Expected RED test."
@@ -5216,7 +5172,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Build with the pinned framework.",
   "actual": "C++11 rejected aggregate initialization with default member initializers. Explicit constructors corrected the event and optional context initialization.",
   "result": "FAIL",
-  "evidence": ["docs/evidence/2026-11-05-v0170-build.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0170-build.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / PlatformIO",
   "limitations": "Superseded by VER-0214."
@@ -5238,7 +5196,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Host tests pass.",
   "actual": "Passed GAP sequencing, 31-byte payloads, LabBLE10 naming, stable rotation without reinit, exclusive ownership, operation timeout/rejection, startup and teardown failures, automatic cleanup retry and twenty app entry/exit cycles.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0170-host-verified.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0170-host-verified.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / MSVC",
   "limitations": "Injected transport events do not measure RF or physical heap."
@@ -5260,7 +5220,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Build the physical target with existing dependencies.",
   "actual": "Build passed. Existing TFT library warnings remain.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0170-build-verified.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0170-build-verified.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / PlatformIO / Arduino-ESP32 2.0.14",
   "limitations": "Compilation does not establish receiver discovery or performance."
@@ -5282,7 +5244,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "The image fits the generated app0 partition.",
   "actual": "1,588,688 B image fits 6,553,600 B app0 with 4,964,912 B remaining. Existing baseline growth warning retained.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0170-resources.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0170-resources.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / Python",
   "limitations": "Runtime metrics are NOT MEASURED."
@@ -5304,7 +5268,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Resume after the owner requests reactivation.",
   "actual": "Simulator code, registration and execution were not changed or run during the BLE Lab task.",
   "result": "SKIPPED",
-  "evidence": ["docs/BLE_LAB.md"],
+  "evidence": [
+    "docs/BLE_LAB.md"
+  ],
   "evidence_kind": "Owner instruction in this conversation",
   "environment": "Desktop work paused",
   "limitations": "The new BLE Lab app is registered only on the physical target."
@@ -5326,7 +5292,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Documentation checks pass.",
   "actual": "Documentation consistency check passed.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0170-docs.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0170-docs.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / Python",
   "limitations": "Checks consistency only."
@@ -5348,7 +5316,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "The new tests fail before implementation.",
   "actual": "Compilation failed because BleAdvertisingPayload.h did not exist.",
   "result": "FAIL",
-  "evidence": ["docs/evidence/2026-11-05-v0180-host-red.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0180-host-red.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / MSVC",
   "limitations": "Expected RED regression."
@@ -5370,7 +5340,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Payload and lifecycle tests pass.",
   "actual": "Passed golden protocol markers, all ten model indices per profile, fifty mixed identities, dynamic Apple fields, variable payload lengths, connectability selection, Windows/All UI selection and existing timeout/cleanup/twenty-cycle regressions.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0180-host-final.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0180-host-final.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / MSVC",
   "limitations": "Golden bytes do not establish notification compatibility."
@@ -5392,7 +5364,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Build the pinned physical target.",
   "actual": "Build passed with existing library warnings.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0180-build.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0180-build.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / PlatformIO",
   "limitations": "Physical receiver and runtime resources remain unverified."
@@ -5414,7 +5388,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "The image fits app0.",
   "actual": "1,589,984 B image fits app0 with 4,963,616 B remaining. Existing baseline growth warning retained.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0180-resources.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0180-resources.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / Python",
   "limitations": "No runtime resource inference."
@@ -5436,7 +5412,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Resume only on explicit owner instruction.",
   "actual": "Simulator registration, code and execution remain paused.",
   "result": "SKIPPED",
-  "evidence": ["docs/BLE_LAB.md"],
+  "evidence": [
+    "docs/BLE_LAB.md"
+  ],
   "evidence_kind": "Owner instruction in this conversation",
   "environment": "Desktop paused",
   "limitations": "New profiles are validated through host tests and the physical target build."
@@ -5458,7 +5436,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Documentation checks pass.",
   "actual": "Documentation checks passed.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0180-docs.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0180-docs.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / Python",
   "limitations": "Checks consistency only."
@@ -5480,7 +5460,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "New tests fail before the feature exists.",
   "actual": "Compilation failed on the missing Random profile and target-picker API.",
   "result": "FAIL",
-  "evidence": ["docs/evidence/2026-11-05-v0190-host-red.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0190-host-red.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / MSVC",
   "limitations": "Expected RED test."
@@ -5502,7 +5484,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Host tests pass.",
   "actual": "Passed Windows/All/Random selection, opening-contact suppression, Back, BOOT next/activate, random payload bounds and fresh addresses, plus existing operation failure and twenty-cycle tests.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0190-host.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0190-host.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / MSVC",
   "limitations": "Physical touch and Random receiver behavior remain pending."
@@ -5524,7 +5508,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Build with pinned dependencies.",
   "actual": "Build passed and the image contains the v0.19.0 boot marker.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0190-build.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0190-build.txt"
+  ],
   "evidence_kind": "Captured output and image marker inspection",
   "environment": "Windows / PlatformIO",
   "limitations": "Compilation does not establish physical behavior."
@@ -5546,7 +5532,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "The actual image fits app0.",
   "actual": "1,590,992 B image fits with 4,962,608 B remaining. Existing accepted-baseline growth warning retained.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0190-resources.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0190-resources.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / Python",
   "limitations": "Runtime acceptance is separate."
@@ -5568,7 +5556,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Resume on explicit owner request.",
   "actual": "Simulator code, registration and execution remain paused.",
   "result": "SKIPPED",
-  "evidence": ["docs/BLE_LAB.md"],
+  "evidence": [
+    "docs/BLE_LAB.md"
+  ],
   "evidence_kind": "Owner instruction in this conversation",
   "environment": "Desktop paused",
   "limitations": "Host tests and ESP32 build cover the current change."
@@ -5590,7 +5580,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Documentation checks pass.",
   "actual": "Documentation checks passed.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0190-docs.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0190-docs.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / Python",
   "limitations": "Consistency only."
@@ -5612,7 +5604,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Existing payload tests continue to pass; Apple Action, Not Your Device, Beacon, page-two selection and cleanup assertions pass.",
   "actual": "All host suites passed, including 'Bruce pairing, Apple action, Not Your Device and beacon payload formats' and 'BLE Lab GAP sequence, payload, timeouts, cleanup and 20 host cycles'.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0200-host.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0200-host.txt"
+  ],
   "evidence_kind": "Captured MSVC host-test output",
   "environment": "Windows host; UNIT_TEST stubs",
   "limitations": "Fake GAP transport; does not prove physical RF behavior, heap or latency."
@@ -5634,7 +5628,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Target compiles, links and fits the generated app0 partition.",
   "actual": "SUCCESS. firmware.bin 1,592,096 B of 6,553,600 B app0, 4,961,504 B remaining, sha256 6dcaeb1827f6abd6bcef5c3489aeafe9a477cfb1c76ad40818f69ee2603a94fb. Static RAM 86,264 B (26.3%). The provisional >5% image-growth warning is retained.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0200-build.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0200-build.txt"
+  ],
   "evidence_kind": "Captured PlatformIO output and resource report",
   "environment": "PlatformIO 6.2.0; espressif32@6.5.0; Arduino-ESP32 2.0.14",
   "limitations": "Build only; no upload, runtime heap, latency or power measurement."
@@ -5656,7 +5652,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Documentation checks pass with synchronized v0.20.0 records.",
   "actual": "Documentation checks passed.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0200-docs.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0200-docs.txt"
+  ],
   "evidence_kind": "Captured output",
   "environment": "Windows / Python",
   "limitations": "Consistency only."
@@ -5678,7 +5676,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Simulator mirrors the new BLE targets.",
   "actual": "Not executed; BLE Lab is not registered in the desktop simulator and simulator work remains paused by the owner.",
   "result": "SKIPPED",
-  "evidence": ["docs/BLE_LAB.md"],
+  "evidence": [
+    "docs/BLE_LAB.md"
+  ],
   "evidence_kind": "Owner decision recorded in project documentation",
   "environment": "Windows desktop target",
   "limitations": "Simulator coverage is absent by decision, not by test failure."
@@ -5700,7 +5700,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Build finishes with code 0 and fits in app0 partition.",
   "actual": "Flash 1,593,409 B (24.3%), RAM 86,312 B (26.3%), code 0.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0210-build.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0210-build.txt"
+  ],
   "evidence_kind": "Captured compiler output",
   "environment": "Windows / PlatformIO espressif32@6.5.0",
   "limitations": "Does not prove physical display or radio execution."
@@ -5722,7 +5724,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "All 26 desktop units pass including Security Lab Hub tests.",
   "actual": "ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0210-desktop.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0210-desktop.txt"
+  ],
   "evidence_kind": "Automated unit test execution",
   "environment": "Windows / MSVC x64 Native",
   "limitations": "Host simulation only."
@@ -5744,7 +5748,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Build succeeds.",
   "actual": "PASS. Firmware built successfully.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0211-build.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0211-build.txt"
+  ],
   "evidence_kind": "Build log capture",
   "environment": "Windows / PlatformIO",
   "limitations": "Compile only."
@@ -5766,7 +5772,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Tests pass.",
   "actual": "PASS. Desktop tests passed.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0211-desktop.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0211-desktop.txt"
+  ],
   "evidence_kind": "Test runner output",
   "environment": "Windows / MSVC",
   "limitations": "Host only."
@@ -5788,7 +5796,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Doc checks pass.",
   "actual": "PASS. Documentation checks passed.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0212-docs.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0212-docs.txt"
+  ],
   "evidence_kind": "Tool output",
   "environment": "Windows / Python 3",
   "limitations": "Documentation check only."
@@ -5810,7 +5820,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Build succeeds.",
   "actual": "PASS. Firmware built successfully.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0220-build.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0220-build.txt"
+  ],
   "evidence_kind": "Build log capture",
   "environment": "Windows / PlatformIO",
   "limitations": "Compile only."
@@ -5832,7 +5844,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Tests pass.",
   "actual": "PASS. Simulator tests passed.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-05-v0220-desktop.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-05-v0220-desktop.txt"
+  ],
   "evidence_kind": "Test runner output",
   "environment": "Windows / MSVC",
   "limitations": "Host only."
@@ -5854,7 +5868,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Build succeeds.",
   "actual": "PASS. Firmware built successfully.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0221-build.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0221-build.txt"
+  ],
   "evidence_kind": "Build log capture",
   "environment": "Windows / PlatformIO",
   "limitations": "Compile only."
@@ -5876,7 +5892,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Tests pass.",
   "actual": "PASS. Desktop tests passed.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0221-desktop.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0221-desktop.txt"
+  ],
   "evidence_kind": "Test runner output",
   "environment": "Windows / MSVC",
   "limitations": "Host only."
@@ -5898,7 +5916,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Docs check passes.",
   "actual": "PASS. 0 errors found.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0221-docs.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0221-docs.txt"
+  ],
   "evidence_kind": "Tool output",
   "environment": "Windows / Python 3",
   "limitations": "Documentation check only."
@@ -5920,7 +5940,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Build succeeds.",
   "actual": "PASS. Firmware built successfully.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0222-build.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0222-build.txt"
+  ],
   "evidence_kind": "Build log capture",
   "environment": "Windows / PlatformIO",
   "limitations": "Compile only."
@@ -5942,7 +5964,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Tests pass.",
   "actual": "PASS. Desktop tests passed.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0222-desktop.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0222-desktop.txt"
+  ],
   "evidence_kind": "Test runner output",
   "environment": "Windows / MSVC",
   "limitations": "Host only."
@@ -5964,7 +5988,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Docs check passes.",
   "actual": "PASS. 0 errors found.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0222-docs.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0222-docs.txt"
+  ],
   "evidence_kind": "Tool output",
   "environment": "Windows / Python 3",
   "limitations": "Documentation check only."
@@ -5986,7 +6012,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Build succeeds.",
   "actual": "PASS. Firmware built successfully.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0223-build.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0223-build.txt"
+  ],
   "evidence_kind": "Build log capture",
   "environment": "Windows / PlatformIO",
   "limitations": "Compile only."
@@ -6008,7 +6036,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Tests pass.",
   "actual": "PASS. Desktop tests passed.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0223-desktop.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0223-desktop.txt"
+  ],
   "evidence_kind": "Test runner output",
   "environment": "Windows / MSVC",
   "limitations": "Host only."
@@ -6030,7 +6060,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Docs check passes.",
   "actual": "PASS. 0 errors found.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0223-docs.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0223-docs.txt"
+  ],
   "evidence_kind": "Tool output",
   "environment": "Windows / Python 3",
   "limitations": "Documentation check only."
@@ -6052,7 +6084,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Build succeeds.",
   "actual": "PASS. Firmware built successfully in 54.67s.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0224-build.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0240-build.txt"
+  ],
   "evidence_kind": "Build log capture",
   "environment": "Windows / PlatformIO",
   "limitations": "Compile only."
@@ -6074,7 +6108,9 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Tests pass.",
   "actual": "PASS. Desktop tests passed.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0224-desktop.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0240-desktop.txt"
+  ],
   "evidence_kind": "Test runner output",
   "environment": "Windows / MSVC",
   "limitations": "Host only."
@@ -6096,9 +6132,443 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "expected": "Docs check passes.",
   "actual": "PASS. 0 errors found.",
   "result": "PASS",
-  "evidence": ["docs/evidence/2026-11-07-v0224-docs.txt"],
+  "evidence": [
+    "docs/evidence/2026-11-07-v0240-docs.txt"
+  ],
   "evidence_kind": "Tool output",
   "environment": "Windows / Python 3",
+  "limitations": "Documentation check only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0253",
+  "date": "2026-11-06",
+  "firmware_version": "v0.22.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "ESP32-S3 compilation with Settings v0.1 consolidation, version bump to v0.22.0, and PWM compilation warning cleanup",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (target toolchain)",
+  "wiring": "Default parallel ST7789 + CST816S pin definitions",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build finishes with code 0 and fits in app0 partition.",
+  "actual": "Flash 1,593,385 B (24.3%), RAM 86,312 B (26.3%), code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0220-build.txt"
+  ],
+  "evidence_kind": "Captured compiler output",
+  "environment": "Windows / PlatformIO espressif32@6.5.0",
+  "limitations": "Does not prove physical display or radio execution."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0254",
+  "date": "2026-11-06",
+  "firmware_version": "v0.22.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "SettingsApp navigation, subviews (Display, Theme, Memory, WiFiDiag, Device), modal confirmation, and lifecycle exit",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools/run_desktop_tests.bat",
+  "expected": "All desktop test cases pass including SettingsApp navigation tests.",
+  "actual": "ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0220-desktop.txt"
+  ],
+  "evidence_kind": "Automated unit test execution",
+  "environment": "Windows / MSVC x64 Native",
+  "limitations": "Host simulation only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0255",
+  "date": "2026-11-06",
+  "firmware_version": "v0.22.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Repository consistency and documentation validation",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "All documentation checks pass with 0 errors.",
+  "actual": "Documentation checks: PASS",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0220-docs.txt"
+  ],
+  "evidence_kind": "Automated documentation validation tool",
+  "environment": "Windows / Python 3.12",
+  "limitations": "Validates schema and references only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0256",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of CryptoService SHA-512, TotpService RFC 4226 HOTP, and multi-algo dynamic truncation",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; mbedTLS SHA-512 and HOTP compile cleanly.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,595,641 B (24.3%), RAM: 87,128 B (26.6%).",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0230-pio-build-crypto.txt"
+  ],
+  "evidence_kind": "PlatformIO build log",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Does not prove physical display or radio execution."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0257",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of WebPortalService Authenticator Control Panel single-page application and REST API endpoints",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Full firmware compiles and links within partition capacity with zero errors.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,608,208 B Flash (24.5% of 6.25 MB partition, 4,945,392 B free capacity) and 87,128 B RAM (26.6%).",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0230-pio-build-webportal.txt"
+  ],
+  "evidence_kind": "PlatformIO build log",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Desktop simulator paused per explicit user directive; hardware RF validation pending."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0258",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of UsbHidService transport readiness fix and TotpApp primary USB send gestures",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; TinyUSB native transport compiles cleanly.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,607,361 B (24.5%), RAM: 87,128 B (26.6%).",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0231-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build log",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Does not prove physical display or radio execution."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0259",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of WebPortalService BLE coexistence suspension, automatic restoration, and SoftAP verification",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; WebPortalService and SettingsApp compile cleanly with full resource tracking.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,607,753 B (24.5%), RAM: 87,144 B (26.6%). Binary image 1,608,112 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0232-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0090."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0260",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.3",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of CryptoService bootloader SAR entropy cleanup and runtime RNG safety",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; CryptoService compiles with standard esp_fill_random().",
+  "actual": "Compilation succeeded with code 0. Flash: 1,606,877 B (24.5%), RAM: 87,144 B (26.6%). Binary image 1,607,248 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0233-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0091."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0261",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.4",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of Web Portal display keep-alive and sleep lock prevention in v0.23.4",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; WebPortalService and SettingsApp compile with display keep-alive notifications.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,606,893 B (24.5%), RAM: 87,144 B (26.6%). Binary image 1,607,264 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0234-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0092."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0262",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.5",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of flicker-free differential rendering for Clock Screensaver and ClockApp in v0.23.5",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; ClockApp compiles with differential rendering cache and reset logic.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,607,749 B (24.5%), RAM: 87,144 B (26.6%). Binary image 1,608,112 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0235-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0093."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0263",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.6",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of continuous background Web Portal broadcast during screensaver in v0.23.6",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; WebPortalService and ClockApp compile with background SoftAP persistence and screensaver portal indicators.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,607,977 B (24.5%), RAM: 87,160 B (26.6%). Binary image 1,608,336 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0236-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0094."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0264",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.7",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of clarified System Info Boot Cause telemetry label in v0.23.7",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; SettingsApp compiles with Boot Cause label.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,607,977 B (24.5%), RAM: 87,160 B (26.6%). Binary image 1,608,336 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0237-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0095."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0265",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.8",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of Gzip Web Portal streaming and crash elimination in v0.23.8",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; WebPortalService compiles with Gzip streaming and 16KB loop stack.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,583,669 B (24.2%), RAM: 90,240 B (27.5%). Binary image 1,584,032 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0238-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0096."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0266",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.9",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Compilation of official Nibru visual identity and branding in Web Portal for v0.23.9",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds without errors; WebPortalService compiles with updated Gzip PROGMEM payload.",
+  "actual": "Compilation succeeded with code 0. Flash: 1,587,941 B (24.2%), RAM: 90,240 B (27.5%). Binary image 1,588,304 B with verified SHA-256.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0239-pio-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build log and resource artifact check",
+  "environment": "PlatformIO 6.1.18 / espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Build verification only; physical flash upload tracked in HWT-0097."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0267",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.9",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Documentation check for v0.23.9",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "PASS with zero errors",
+  "actual": "PASS with zero errors; exit code 0",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0239-docs-check.txt"
+  ],
+  "evidence_kind": "Execution log file",
+  "environment": "PlatformIO 6.1.18 / Python 3.12",
+  "limitations": "Scope limited to documentation schema"
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0268",
+  "date": "2026-11-07",
+  "firmware_version": "v0.24.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "v0.24.0 desktop simulator test suite execution across all 19 suites",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "All desktop unit and integration tests pass with 0 failures.",
+  "actual": "PASS. ALL DESKTOP SIMULATOR TESTS PASSED SUCCESSFULLY.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-07-v0240-desktop.txt"
+  ],
+  "evidence_kind": "Test runner execution log",
+  "environment": "Windows / MSVC x64 Native",
+  "limitations": "Host simulator only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0269",
+  "date": "2026-11-07",
+  "firmware_version": "v0.24.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "v0.24.0 ESP32-S3 firmware build unifying Web Portal v0.23 and Wi-Fi Scanner v0.22",
+  "hardware": "ESP32-S3 (lilygo-t-display-s3)",
+  "wiring": "Standard LILYGO T-Display-S3 ST7789 parallel / CST816S",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build finishes with code 0 and fits comfortably in app0 partition.",
+  "actual": "PASS. Build succeeded with code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-07-v0240-build.txt"
+  ],
+  "evidence_kind": "PlatformIO build output",
+  "environment": "Windows / PlatformIO espressif32@6.5.0 / Arduino-ESP32 2.0.14",
+  "limitations": "Compile only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0270",
+  "date": "2026-11-07",
+  "firmware_version": "v0.24.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Repository consistency and documentation validation for unified v0.24.0 release",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "All documentation checks pass with 0 errors.",
+  "actual": "PASS. Documentation checks passed with 0 errors.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-07-v0240-docs.txt"
+  ],
+  "evidence_kind": "Tool output",
+  "environment": "Windows / Python 3.12",
   "limitations": "Documentation check only."
 }
 ```

@@ -9,8 +9,7 @@
 #include "tusb.h"
 namespace {
 USBHIDKeyboard keyboard;
-USBHID hid;
-bool nativeReady() { return hid.ready(); }
+bool nativeReady() { return tud_mounted() && !tud_suspended(); }
 bool nativeConnected() { return tud_mounted() && !tud_suspended(); }
 bool nativeSend(uint8_t usage, uint8_t modifiers) {
   KeyReport report{};

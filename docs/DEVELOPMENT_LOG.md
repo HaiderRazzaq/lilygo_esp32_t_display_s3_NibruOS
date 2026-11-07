@@ -236,7 +236,6 @@ Corrections must be appended with the original ID reference.
 }
 ```
 
-
 ```json
 {
   "record_type": "development",
@@ -732,6 +731,7 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Owner checks repaired touch/display; no commit or push."
 }
 ```
+
 ```json
 {
   "record_type": "development",
@@ -780,7 +780,6 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Use desktop simulator for rapid interactive app development; verify final changes on physical LILYGO board."
 }
 ```
-
 
 ```json
 {
@@ -865,7 +864,6 @@ Corrections must be appended with the original ID reference.
 }
 ```
 
-
 ```json
 {
   "record_type": "development",
@@ -905,7 +903,6 @@ Corrections must be appended with the original ID reference.
 }
 ```
 
-
 ```json
 {
   "record_type": "development",
@@ -934,7 +931,6 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Owner checks Home/touch/Settings, provisions own PIN and tests public TOTP fixture; perform HWT-0015 and profiling A-E."
 }
 ```
-
 
 ```json
 {
@@ -977,7 +973,6 @@ Corrections must be appended with the original ID reference.
 }
 ```
 
-
 ```json
 {
   "record_type": "development",
@@ -1007,7 +1002,6 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Use launcher tools/open_account_setup.bat and public disposable fixture; complete HWT-0018 with resource scenarios A-E."
 }
 ```
-
 
 ```json
 {
@@ -1163,7 +1157,6 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Verify with user on physical device with companion web tool."
 }
 ```
-
 
 ```json
 {
@@ -1404,7 +1397,6 @@ Corrections must be appended with the original ID reference.
   "follow_up": "User to verify on physical device: send TIME:<epoch> or test TOTP display with sync source indicator."
 }
 ```
-
 
 ```json
 {
@@ -1707,7 +1699,6 @@ Corrections must be appended with the original ID reference.
 }
 ```
 
-
 ```json
 {
   "record_type": "development",
@@ -2006,7 +1997,6 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Flash v0.10.5 firmware to device, verify boot into COM6, and verify BLE keyboard pairing and typing."
 }
 ```
-
 
 ```json
 {
@@ -2381,7 +2371,6 @@ Corrections must be appended with the original ID reference.
 }
 ```
 
-
 ```json
 {
   "record_type": "development",
@@ -2411,6 +2400,7 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Observe real deauth detection in laboratory RF environment with physical packet generation."
 }
 ```
+
 ```json
 {
   "record_type": "development",
@@ -2443,7 +2433,7 @@ Corrections must be appended with the original ID reference.
   "verification": "VER-0205 through VER-0210; HWT-0074 owner report; HWT-0075 NOT RUN",
   "risks": "Scan counts are a snapshot of discoverable APs. Post-scan aggregation scales with driver result count. Physical latency, heap, stacks, PSRAM and power were not measured.",
   "commit": "WORKING_TREE",
-  "follow_up": "Run HWT-0075 after an authorized upload. Retain existing resource baseline and measure A\u2013E before accepting runtime performance."
+  "follow_up": "Run HWT-0075 after an authorized upload. Retain existing resource baseline and measure A–E before accepting runtime performance."
 }
 ```
 
@@ -2452,7 +2442,10 @@ Corrections must be appended with the original ID reference.
   "record_type": "development",
   "id": "DEV-0067",
   "date": "2026-11-05",
-  "related": ["FEAT-0027", "FEAT-0022"],
+  "related": [
+    "FEAT-0027",
+    "FEAT-0022"
+  ],
   "action": "Add BLE Lab in v0.17.0",
   "files": [
     "src/services/BleAdvertisingService.h",
@@ -2482,7 +2475,10 @@ Corrections must be appended with the original ID reference.
   "record_type": "development",
   "id": "DEV-0068",
   "date": "2026-11-05",
-  "related": ["FEAT-0027", "HWT-0078"],
+  "related": [
+    "FEAT-0027",
+    "HWT-0078"
+  ],
   "action": "Add Bruce pairing advertisement profiles in v0.18.0",
   "files": [
     "src/services/BleAdvertisingPayload.h",
@@ -2510,7 +2506,11 @@ Corrections must be appended with the original ID reference.
   "record_type": "development",
   "id": "DEV-0069",
   "date": "2026-11-05",
-  "related": ["FEAT-0027", "HWT-0080", "HWT-0081"],
+  "related": [
+    "FEAT-0027",
+    "HWT-0080",
+    "HWT-0081"
+  ],
   "action": "Add target-family picker and Random in v0.19.0",
   "files": [
     "src/apps/BleLabApp.h",
@@ -2536,7 +2536,12 @@ Corrections must be appended with the original ID reference.
   "record_type": "development",
   "id": "DEV-0070",
   "date": "2026-11-05",
-  "related": ["FEAT-0027", "VER-0230", "VER-0231", "VER-0232"],
+  "related": [
+    "FEAT-0027",
+    "VER-0230",
+    "VER-0231",
+    "VER-0232"
+  ],
   "action": "Add Bruce-derived BLE advertising modes in v0.20.0",
   "files": [
     "src/apps/BleLabApp.h",
@@ -2562,7 +2567,11 @@ Corrections must be appended with the original ID reference.
   "record_type": "development",
   "id": "DEV-0071",
   "date": "2026-11-05",
-  "related": ["FEAT-0027", "HWT-0085", "HWT-0086"],
+  "related": [
+    "FEAT-0027",
+    "HWT-0085",
+    "HWT-0086"
+  ],
   "action": "Record post-upload runtime boot blocker after v0.20.0 installation",
   "files": [
     "docs/evidence/2026-11-05-v0200-runtime-probe.txt",
@@ -2585,7 +2594,12 @@ Corrections must be appended with the original ID reference.
   "record_type": "development",
   "id": "DEV-0072",
   "date": "2026-11-05",
-  "related": ["FEAT-0028", "VER-0233", "VER-0234", "VER-0235"],
+  "related": [
+    "FEAT-0028",
+    "VER-0233",
+    "VER-0234",
+    "VER-0235"
+  ],
   "action": "Add Security Lab hub consolidating wireless audit and defense tools in v0.21.0",
   "files": [
     "src/apps/SecurityLabApp.h",
@@ -2612,7 +2626,11 @@ Corrections must be appended with the original ID reference.
   "record_type": "development",
   "id": "DEV-0073",
   "date": "2026-11-05",
-  "related": ["FEAT-0023", "VER-0236", "VER-0237"],
+  "related": [
+    "FEAT-0023",
+    "VER-0236",
+    "VER-0237"
+  ],
   "action": "Add Beacon Lab long-press auto-disconnect and force-start in v0.21.1",
   "files": [
     "src/apps/BeaconLabApp.h",
@@ -2630,12 +2648,16 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Upload v0.21.1 to device and test LongPress on START with an active Wi-Fi connection."
 }
 ```
+
 ```json
 {
   "record_type": "development",
   "id": "DEV-0074",
   "date": "2026-11-05",
-  "related": ["FEAT-0024", "VER-0238"],
+  "related": [
+    "FEAT-0024",
+    "VER-0238"
+  ],
   "action": "Add external IPEX/U.FL antenna hardware guide and safety protocol in v0.21.2",
   "files": [
     "docs/HARDWARE_PINOUT.md",
@@ -2656,12 +2678,17 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Perform physical soldering and multimeter continuity check before attaching external 2.4 GHz antenna."
 }
 ```
+
 ```json
 {
   "record_type": "development",
   "id": "DEV-0075",
   "date": "2026-11-05",
-  "related": ["FEAT-0004", "VER-0239", "VER-0240"],
+  "related": [
+    "FEAT-0004",
+    "VER-0239",
+    "VER-0240"
+  ],
   "action": "Implement fast Wi-Fi scanning, live auto-scan, and zero-flicker differential UI in v0.22.0",
   "files": [
     "include/NibruConfig.h",
@@ -2691,7 +2718,13 @@ Corrections must be appended with the original ID reference.
   "record_type": "development",
   "id": "DEV-0076",
   "date": "2026-11-07",
-  "related": ["FEAT-0004", "BUG-0010", "VER-0241", "VER-0242", "VER-0243"],
+  "related": [
+    "FEAT-0004",
+    "BUG-0010",
+    "VER-0241",
+    "VER-0242",
+    "VER-0243"
+  ],
   "action": "Fix Wi-Fi scan dwell time, station warmup, and differential screen clearing in v0.22.1",
   "files": [
     "include/NibruConfig.h",
@@ -2720,7 +2753,13 @@ Corrections must be appended with the original ID reference.
   "record_type": "development",
   "id": "DEV-0077",
   "date": "2026-11-07",
-  "related": ["FEAT-0004", "BUG-0010", "VER-0244", "VER-0245", "VER-0246"],
+  "related": [
+    "FEAT-0004",
+    "BUG-0010",
+    "VER-0244",
+    "VER-0245",
+    "VER-0246"
+  ],
   "action": "Disconnect active station on scan to free radio on ESP32, eliminate 100ms animation tick loop, tight bounding box control bar updates with zero flicker in v0.22.2",
   "files": [
     "include/NibruConfig.h",
@@ -2746,7 +2785,14 @@ Corrections must be appended with the original ID reference.
   "record_type": "development",
   "id": "DEV-0078",
   "date": "2026-11-07",
-  "related": ["FEAT-0004", "BUG-0010", "VER-0250", "VER-0251", "VER-0252", "HWT-0092"],
+  "related": [
+    "FEAT-0004",
+    "BUG-0010",
+    "VER-0250",
+    "VER-0251",
+    "VER-0252",
+    "HWT-0092"
+  ],
   "action": "Add passive beacon scan mode, in-page active/passive toggle, and state-guarded zero-flicker redraw in v0.22.4",
   "files": [
     "include/NibruConfig.h",
@@ -2765,5 +2811,406 @@ Corrections must be appended with the original ID reference.
   "risks": "Passive scan requires dwelling long enough to catch 102.4ms beacons; 300ms dwell safely guarantees 2 full beacon periods per channel.",
   "commit": "WORKING_TREE",
   "follow_up": "Perform physical testing on hardware and check RP-SMA pin alignment."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0079",
+  "date": "2026-11-06",
+  "related": [
+    "FEAT-0010",
+    "FEAT-0008",
+    "VER-0253",
+    "VER-0254",
+    "VER-0255"
+  ],
+  "action": "Consolidate Essential Settings v0.1 and permanent engineering resource policy in v0.22.0",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/hardware/DisplayManager.h",
+    "tests/desktop/test_simulator.cpp",
+    "docs/CURRENT_STATE.md",
+    "docs/RESOURCE_BUDGET.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Consolidate and verify Essential Settings v0.1 functionality (Display, Theme, Memory/System Info, Wi-Fi Diagnostics, Device Controls) and permanent project-wide Memory Profiling & Resource Budget policy. Added comprehensive desktop navigation tests for all Settings subviews, cleaned up unused PWM field in DisplayManager.h when LEDC is disabled, and incremented runtime version to v0.22.0.",
+  "reason": "Satisfy project requirement for Essential Settings v0.1 verification and permanent resource budgeting policy enforcement across all future changes.",
+  "expected": "All settings subviews navigable, responsive, non-blocking, zero resource leaks on exit, firmware image within app0 capacity, and desktop/host tests passing.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,593,385 B Flash (24.3%, 4,959,856 B headroom) and 86,312 B RAM (26.3%). Desktop simulator tests passed with all 19 test suites including SettingsApp navigation.",
+  "verification": "VER-0253 build PASS, VER-0254 desktop PASS, VER-0255 documentation PASS; physical hardware acceptance pending",
+  "risks": "Physical dimming and power consumption on AW9364 pulse controller require physical device verification.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Flash v0.22.0 to physical LILYGO T-Display-S3 Touch Glass and capture profiling scenarios A-E."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0080",
+  "date": "2026-11-06",
+  "related": [
+    "FEAT-0029",
+    "FEAT-0008",
+    "FEAT-0010",
+    "FEAT-0013",
+    "VER-0256",
+    "VER-0257"
+  ],
+  "action": "Implement SecureGen feature parity: HOTP RFC 4226, SHA-256/512 OTP, and Authenticator Control Panel in v0.23.0",
+  "files": [
+    "src/services/CryptoService.h",
+    "src/services/CryptoService.cpp",
+    "src/services/TotpService.h",
+    "src/services/TotpService.cpp",
+    "src/apps/TotpApp.h",
+    "src/apps/TotpApp.cpp",
+    "src/services/WebPortalService.h",
+    "src/services/WebPortalService.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Implemented full feature parity with makepkg/SecureGen: upgraded TotpService with RFC 4226 HOTP counter-based engine and SHA-1/256/512 algorithms using mbedTLS HMAC primitives; upgraded TotpAccount schema to v2 (124 bytes) with backward compatibility for v1 blobs; updated TotpApp on 320x170 display with HOTP badge, counter status, offline USB HID keystroke injection without NTP requirement; built single-page Authenticator Control Panel web dashboard matching user's screenshot with tabs (Keys, Passwords, Display, PIN, Settings, Instructions), dynamic pink progress bar, live countdown, and client-side password generator; paused desktop simulator as instructed; bumped firmware version sequentially to v0.23.0.",
+  "reason": "User request for SecureGen feature parity (HOTP, multi-algorithm TOTP, Web Authenticator Control Panel) while halting simulator tasks and targeting physical ESP32-S3.",
+  "expected": "HOTP and SHA-256/512 OTP generation working offline, Web Portal matching screenshot, PlatformIO compilation success, zero memory leaks, firmware within app0 partition.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,608,208 B Flash (24.5% of 6.25 MB partition, 4,945,392 B free capacity) and 87,128 B RAM (26.6%). Documentation checks pass.",
+  "verification": "VER-0256 (Crypto/Totp build PASS), VER-0257 (Full WebPortal build PASS); desktop simulator paused per user order",
+  "risks": "HOTP counter desynchronization if server-side window exceeds lookahead; mitigated by on-device counter visibility and USB send.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Flash v0.23.0 to physical LILYGO T-Display-S3 Touch Glass, verify HOTP counter advancement on screen, and test Authenticator Control Panel in browser over SoftAP."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0081",
+  "date": "2026-11-06",
+  "related": [
+    "FEAT-0029",
+    "FEAT-0008",
+    "VER-0258",
+    "HWT-0095"
+  ],
+  "action": "Fix USB HID primary transport readiness and simplify 2FA touch send gestures in v0.23.1",
+  "files": [
+    "src/services/UsbHidService.cpp",
+    "src/apps/TotpApp.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Fixed UsbHidService native transport probe to use tud_mounted() && !tud_suspended() directly, ensuring reliable readiness detection when plugged into a PC. Updated TotpApp to make USB HID the permanent primary transport: eliminated confusing accidental BLE mode toggles, enabled direct USB code injection on both single Tap and LongPress (Hold) of the capsule button, code area, or physical BOOT button. Updated capsule button label to '[USB] TAP/HOLD TO SEND'. Incremented firmware version sequentially to v0.23.1.",
+  "reason": "User feedback inquiring why hold was restricted to Bluetooth; resolved by establishing USB HID as the primary keystroke transport on all gestures.",
+  "expected": "USB HID recognized immediately on PC connection; touching or holding capsule button or pressing BOOT button immediately types code into active PC field.",
+  "actual": "PlatformIO build succeeded at 1,607,728 B Flash (24.5%) and 87,128 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.8 seconds with verified SHA-256 hash. Documentation checks pass.",
+  "verification": "VER-0258 (build PASS), HWT-0095 (upload PASS)",
+  "risks": "None; BLE remains available via dedicated configuration without obstructing the primary USB workflow.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Test on physical PC: verify that tapping or holding the USB capsule on the device types the OTP code into an active text field on the PC."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0082",
+  "date": "2026-11-06",
+  "related": [
+    "FEAT-0029",
+    "FEAT-0022",
+    "VER-0259",
+    "HWT-0096"
+  ],
+  "action": "Resolve Web Portal SoftAP radio contention with BLE Keyboard in v0.23.2",
+  "files": [
+    "src/services/WebPortalService.h",
+    "src/services/WebPortalService.cpp",
+    "src/apps/SettingsApp.cpp",
+    "tests/host/test_web_portal.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Resolved 2.4GHz radio resource lock contention preventing Web Portal from launching when BLE Keyboard was active. When user activates Web Portal in Settings, WebPortalService::start() now detects active BLE Keyboard leases, gracefully suspends BLE during the ephemeral 3-minute SoftAP administration session, acquires the Wi-Fi resource, starts SoftAP with verified status, and serves the control panel with dedicated RF bandwidth and heap headroom. On portal closure (via Back, exit, or timeout), WebPortalService::stop() automatically restores BLE Keyboard and resumes advertising seamlessly. Added automated host unit tests and bumped firmware version sequentially to v0.23.2.",
+  "reason": "User reported that selecting Web Portal in Settings failed to open on second click whenever BLE was enabled, but worked after manually disabling BLE.",
+  "expected": "Web Portal AP opens reliably on second click regardless of BLE state; BLE Keyboard resumes automatically upon exiting Web Portal.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,608,112 B Flash (24.5%) and 87,144 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.7 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0259 (build PASS), HWT-0096 (upload PASS)",
+  "risks": "None; BLE is paused only during active administrative SoftAP sessions and restored cleanly on exit.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Verify on hardware: open Settings, enable Bluetooth, navigate to Web Portal (AP Mode), tap second click to open, verify AP broadcast and web dashboard, tap Back, and verify Bluetooth re-engages."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0083",
+  "date": "2026-11-06",
+  "related": [
+    "FEAT-0006",
+    "FEAT-0022",
+    "VER-0260",
+    "HWT-0097"
+  ],
+  "action": "Eliminate bootloader SAR entropy calls in CryptoService and clarify reset diagnostics in v0.23.3",
+  "files": [
+    "src/services/CryptoService.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Removed bootloader_random_enable() and bootloader_random_disable() from CryptoService::fillRandom(). On ESP32-S3, manipulating SAR ADC clocks at runtime while BLE or FreeRTOS is active causes hardware collisions and triggers ESP_RST_PANIC ('Software Crash/Panic'). Replaced with standard ESP-IDF runtime esp_fill_random(). Clarified in documentation that MemoryProfiler::resetReasonString() displays the hardware RTC register of the previous boot, and that historical crash reasons persist until a software restart (ESP_RST_SW) or power cycle (ESP_RST_POWERON). Bumped firmware version sequentially to v0.23.3.",
+  "reason": "User inquiry regarding 'Reset: Software Crash/Panic' shown in System Info.",
+  "expected": "Safe runtime entropy generation without bootloader register manipulation; clean reset diagnostic reporting.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,607,248 B Flash (24.5%) and 87,144 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.7 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0260 (build PASS), HWT-0097 (upload PASS)",
+  "risks": "None; esp_fill_random is the recommended ESP-IDF runtime RNG.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Confirm on hardware: reboot via Settings -> Device -> Reboot or power-cycle to observe the updated reset reason (Software Restart or Power-on)."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0084",
+  "date": "2026-11-06",
+  "related": [
+    "FEAT-0022",
+    "FEAT-0019",
+    "VER-0261",
+    "HWT-0098"
+  ],
+  "action": "Implement Web Portal display keep-alive and prevent premature sleep/lock session drop in v0.23.4",
+  "files": [
+    "src/services/WebPortalService.cpp",
+    "src/apps/SettingsApp.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Fixed an issue where the device's 30-second screen inactivity timeout triggered display.sleep(), which in turn invoked security.lock() and stopped webPortal.stop(context), terminating active user web portal connections unexpectedly. Integrated continuous display keep-alive notifications (ctx.display.notifyActivity(nowMs)) inside WebPortalService::tick() and SettingsApp::onTick() while the WebPortal subview or service is active. This keeps the LCD backlight illuminated, the connection credentials (SSID/Password/PIN) visible to the user, and prevents security auto-lock from killing the web server before the 3-minute session expires or the user explicitly exits. Bumped firmware version sequentially to v0.23.4.",
+  "reason": "User reported that the device enters sleep or lock mode automatically, which immediately exits and stops the Web Portal service.",
+  "expected": "Web Portal keeps the screen awake and unlocked throughout the administrative session without premature termination.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,607,264 B Flash (24.5%) and 87,144 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.8 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0261 (build PASS), HWT-0098 (upload PASS)",
+  "risks": "None; display activity timer is kept active only while the Web Portal is explicitly running and reverts to normal sleep timeout once stopped.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Verify on hardware: open Web Portal (AP Mode), connect phone/PC without touching the ESP32 screen, and confirm the connection remains active and the screen stays on for the full 3 minutes."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0085",
+  "date": "2026-11-06",
+  "related": [
+    "FEAT-0024",
+    "FEAT-0010",
+    "VER-0262",
+    "HWT-0099"
+  ],
+  "action": "Eliminate full-screen redraw flicker in Clock Screensaver and ClockApp via differential rendering in v0.23.5",
+  "files": [
+    "src/apps/ClockApp.h",
+    "src/apps/ClockApp.cpp",
+    "src/main.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Resolved an issue where the LCD screen noticeably flashed/flickered black every second in screensaver mode and in ClockApp. The previous implementation executed a full 304x158 fillRoundRect() background wipe on every 1-second tick before redrawing borders, pills, badges, and text. Replaced with true differential rendering: the static frame, cyber borders, header pills, badges, date strings, and seconds track are rendered once upon screensaver activation or app entry. Subsequent per-second ticks overwrite only the fixed-pitch digital time characters in-place using TFT_eSPI setTextColor(accent, bg) and update the incremental 4-pixel seconds bar without clearing the surrounding UI. Added ClockApp::resetScreensaver() triggered in main.cpp on screensaver transition to initialize the layout cleanly. Bumped firmware version sequentially to v0.23.5.",
+  "reason": "User reported that in screen saver mode, the LCD was flashing every second while updating the clock.",
+  "expected": "Completely flicker-free, rock-solid 1-second clock updates in both Screensaver mode and ClockApp.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,607,749 B Flash (24.5%) and 87,144 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.7 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0262 (build PASS), HWT-0099 (upload PASS)",
+  "risks": "None; differential rendering reduces bus traffic and CPU load on every 1-second tick.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Verify on physical device: allow the screensaver to activate and observe that the digital time updates cleanly every second with zero black flashing or flicker."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0086",
+  "date": "2026-11-06",
+  "related": [
+    "FEAT-0022",
+    "FEAT-0024",
+    "VER-0263",
+    "HWT-0100"
+  ],
+  "action": "Enable continuous background Web Portal broadcast during screensaver and decouple from display power in v0.23.6",
+  "files": [
+    "src/main.cpp",
+    "src/services/WebPortalService.cpp",
+    "src/apps/SettingsApp.cpp",
+    "src/apps/ClockApp.h",
+    "src/apps/ClockApp.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Decoupled WebPortalService lifecycle from display power and security lock states in src/main.cpp. Previously, display.isSleeping() or security.isLocked() erroneously invoked webPortal.stop(context), terminating active user Wi-Fi SoftAP connections whenever the device entered screensaver, sleep, or auto-lock. Removed webPortal.stop() from the display sleep block so that the Web Portal operates strictly according to its dedicated 3-minute session timer (remainingSeconds). Removed artificial notifyActivity() locks to allow the screen to transition naturally into Clock Screensaver after 30 seconds of inactivity to protect the display. Extended ClockApp::renderScreensaver() with live detection of active Web Portal sessions, rendering a vibrant green PORTAL BROADCASTING header and live countdown badge directly on the clock screensaver. Updated screensaver wake handling to return directly to the Web Portal view without abrupt session termination. Bumped firmware version sequentially to v0.23.6.",
+  "reason": "User reported that when entering screensaver mode, the web portal broadcast stopped.",
+  "expected": "Web Portal continues broadcasting SoftAP and serving web requests without interruption even when Clock Screensaver is active.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,607,977 B Flash (24.5%) and 87,160 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.8 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0263 (build PASS), HWT-0100 (upload PASS)",
+  "risks": "None; Web Portal retains its 3-minute session timeout safety boundary and automatic BLE restoration upon stop.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Verify on hardware: start Web Portal, connect phone, let device sit idle for 30s until Clock Screensaver activates, observe green PORTAL BROADCASTING indicator on screensaver, and verify web dashboard continues responding smoothly on phone."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0087",
+  "date": "2026-11-06",
+  "related": [
+    "FEAT-0024",
+    "VER-0264",
+    "HWT-0101"
+  ],
+  "action": "Clarify System Info Boot Cause telemetry label and document RTC reset reason persistence in v0.23.7",
+  "files": [
+    "src/apps/SettingsApp.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Updated the telemetry metric label in SettingsApp::renderMemory() from 'Reset: %.36s' to 'Boot cause: %.32s'. The previous label led users viewing System Info to believe the device was currently experiencing an active software crash or panic error. Clarified that esp_reset_reason() reads the hardware RTC register (RTC_CNTL_RESET_CAUSE_REG), which records the cause of the initial boot sequence rather than an active crash. In ESP32-S3, soft flashing via RTS does not clear RTC slow memory, causing historical panic reasons from earlier development to persist until the user initiates a software restart (Settings -> Device -> REBOOT, setting reason to Software Restart) or a cold power cycle (unplugging USB, setting reason to Power-on). Bumped firmware version sequentially to v0.23.7.",
+  "reason": "User inquired about 'software crash panic' after observing the label on the System Info screen.",
+  "expected": "Clear UI wording indicating 'Boot cause' so users understand it is an initial boot telemetry record, not an active error.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,607,977 B Flash (24.5%) and 87,160 B RAM (26.6%). Firmware uploaded cleanly to COM3 in 13.9 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0264 (build PASS), HWT-0101 (upload PASS)",
+  "risks": "None; cosmetic string adjustment with zero impact on system logic or memory footprint.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Advise user that tapping REBOOT in Settings -> Device will clear the old crash record and update Boot Cause to 'Software Restart'."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0088",
+  "date": "2026-11-06",
+  "related": [
+    "FEAT-0022",
+    "VER-0265",
+    "HWT-0102"
+  ],
+  "action": "Eliminate Web Portal client connection crash/panic via Gzip PROGMEM streaming, captive portal 302 redirects, and 16KB loop stack in v0.23.8",
+  "files": [
+    "src/services/WebPortalService.cpp",
+    "src/services/WebPortalHtml.h",
+    "tools/compress_portal_html.py",
+    "tools/patch_webportal.py",
+    "src/main.cpp",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Resolved a critical ESP_RST_PANIC crash occurring specifically when a smartphone or browser connected to the Web Portal SoftAP. Diagnosed two compounding failure modes: 1) The 33.7 KB HTML dashboard was passed to server.send() which forced a 33.7 KB heap String allocation, and onNotFound dumped this huge payload onto every simultaneous captive portal probe (/generate_204, /hotspot-detect.html, etc.), exhausting internal heap and lwIP socket buffers. 2) Route handler lambdas allocated char resp[3072] on the stack, which combined with loadVault() (3.5 KB) blew through the default 8KB loopTask stack. Fixed by: 1) Compressing HTML dashboard into an 8,036-byte Gzip PROGMEM byte array in WebPortalHtml.h and streaming it via server.send_P(..., Content-Encoding: gzip), eliminating heap allocations. 2) Adding lightweight 50-byte 302 redirects for all OS captive portal probes. 3) Moving response buffers to a shared static buffer (s_apiResp). 4) Increasing loopTask stack from 8KB to 16KB via getArduinoLoopTaskStackSize(). 5) Guarding route registration against duplicate handler leaks with s_routesRegistered. Bumped firmware version sequentially to v0.23.8.",
+  "reason": "User reported that the 'Reset: Software Crash/Panic' occurs specifically after activating the Web Portal and connecting to it, but does not occur when no client connects.",
+  "expected": "Web Portal handles client connections, captive portal detection, and web dashboard browsing rock-solid without crashing or panicking.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,583,669 B Flash (24.2%) and 90,240 B RAM (27.5%). Firmware uploaded cleanly to COM3 in 13.6 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0265 (build PASS), HWT-0102 (upload PASS)",
+  "risks": "None; Gzip compression is universally supported across modern smartphone and desktop browsers.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Verify on hardware: start Web Portal, connect smartphone to SoftAP, verify captive portal opens without reboot, and manage keys/vault successfully."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0089",
+  "date": "2026-11-06",
+  "related": [
+    "FEAT-0022",
+    "VER-0266",
+    "HWT-0103"
+  ],
+  "action": "Adopt official Nibru visual identity, SVG logo, Arabic typography, and branding in Web Portal for v0.23.9",
+  "files": [
+    "src/services/web_portal/index.html",
+    "src/services/WebPortalHtml.h",
+    "tools/compress_portal_html.py",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Completely redesigned the Web Portal interface (src/services/web_portal/index.html) based on the official Nibru visual identity and assets in tools/account_setup. Adopted brand navy (#0F1954), brand aqua (#38FFE1), offwhite (#F1FFFD), deep background (#080F2C), and panel styling (#101B42). Embedded the authentic geometric vector SVG logo with teal-to-aqua gradient. Added RTL Arabic layout with Fustat/Segoe UI fonts, side column quick-start guide with step badges, session live countdown, and footer with contact phone 07838844400, LinkedIn badges, and Haider Razaq credentials. Preserved full TOTP key management, password vault, encrypted backup/restore, and device settings. Compressed via tools/compress_portal_html.py into a 12,308-byte Gzip PROGMEM byte array in WebPortalHtml.h. Bumped firmware version sequentially to v0.23.9.",
+  "reason": "User requested applying the visual identity, style, and branding information from tools/account_setup to the Web Portal.",
+  "expected": "Web Portal serves an authentic, polished Nibru-branded RTL Arabic dashboard with official colors, SVG logo, and developer credentials, operating reliably within memory budget.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,587,941 B Flash (24.2%) and 90,240 B RAM (27.5%). Firmware uploaded cleanly to COM3 in 13.5 seconds with verified data hash. Documentation checks pass.",
+  "verification": "VER-0266 (build PASS), HWT-0103 (upload PASS)",
+  "risks": "None; HTML is compressed into Flash PROGMEM (12.3 KB Gzip) and streamed directly without heap String overhead.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Connect smartphone or browser to NibruOS-Portal AP, browse to 192.168.4.1, and verify the new Nibru visual branding, SVG logo, RTL Arabic layout, and credentials."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0090",
+  "date": "2026-11-07",
+  "related": [
+    "FEAT-0028",
+    "FEAT-0029",
+    "VER-0268",
+    "VER-0269",
+    "VER-0270",
+    "HWT-0093"
+  ],
+  "action": "Unify Web Portal v0.23 and external antenna Wi-Fi scanner v0.22 into v0.24.0 release",
+  "files": [
+    "CHANGELOG.md",
+    "docs/CURRENT_STATE.md",
+    "docs/DEVELOPMENT_LOG.md",
+    "docs/HARDWARE_TEST_LOG.md",
+    "docs/VERIFICATION_REPORT.md",
+    "docs/FEATURE_REGISTRY.md",
+    "docs/TEST_MATRIX.md",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp"
+  ],
+  "description": "Resolved git branch divergence by unifying remote Web Portal v0.23.x changes (HOTP RFC 4226, SHA-256/512 multi-algorithm TOTP, USB HID injection, Gzip PROGMEM compression, official Nibru branding) with local external antenna Wi-Fi scanner v0.22.x changes (passive beacon scanning, active/passive mode toggle, station radio disconnect, and zero-flicker UI). User physically validated external IPEX antenna Wi-Fi reception (HWT-0093). Incremented runtime version sequentially to v0.24.0.",
+  "reason": "Integrate concurrent remote Web Portal and local Wi-Fi antenna features into a single cohesive release.",
+  "expected": "Zero merge conflicts, all desktop tests pass, firmware builds with code 0, and documentation consistency checks pass.",
+  "actual": "Merged cleanly; all 19 desktop test suites pass; PlatformIO ESP32-S3 build succeeds; check_docs passes with 0 errors.",
+  "verification": "VER-0268 desktop PASS, VER-0269 build PASS, VER-0270 docs PASS, HWT-0093 hardware PASS",
+  "risks": "None; features operate in independent subsystems with clean resource leasing via ResourceManager.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Flash v0.24.0 to hardware and test Web Portal SoftAP alongside passive Wi-Fi scanning."
 }
 ```

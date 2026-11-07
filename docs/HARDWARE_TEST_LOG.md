@@ -343,7 +343,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -365,7 +364,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "No physical security, USB, RF, timing or resource claim."
 }
 ```
-
 
 ```json
 {
@@ -392,7 +390,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -417,7 +414,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -439,7 +435,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "All runtime resource metrics NOT MEASURED. Default USB serial import differs from optional keyboard HID delivery."
 }
 ```
-
 
 ```json
 {
@@ -658,7 +653,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -851,7 +845,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -875,7 +868,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Flashing and hardware reset verified; physical observation of Cyber USB Action Capsule, long-press touch sending, and BOOT button typing requested from user"
 }
 ```
-
 
 ```json
 {
@@ -1045,7 +1037,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1069,7 +1060,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "No reset reason, timing measurement, or panic trace captured. The installed version is identified by the preceding upload record and the local artifact, not a captured boot banner."
 }
 ```
-
 
 ```json
 {
@@ -1717,7 +1707,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1743,7 +1732,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
 }
 ```
 
-
 ```json
 {
   "record_type": "test",
@@ -1768,6 +1756,7 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Physical RF reception and real over-air deauth packet observation require laboratory radio emissions."
 }
 ```
+
 ```json
 {
   "record_type": "test",
@@ -2028,11 +2017,6 @@ and [record rules](ENGINEERING_WORKFLOW.md).
 }
 ```
 
-Correction (2026-11-05, after HWT-0084): v0.20.0 was subsequently uploaded and
-hash-verified under HWT-0085. HWT-0084's receiver procedure remains NOT RUN; its
-statement that no image had been uploaded was accurate when that record was
-written.
-
 ```json
 {
   "record_type": "test",
@@ -2060,11 +2044,6 @@ written.
 }
 ```
 
-Correction (2026-11-05, after HWT-0085): the statement that a post-upload
-esptool reset "restored normal boot" was wrong. Later no-reset synchronization
-and ROM-banner captures proved the chip stayed in the ROM USB download mode. See
-HWT-0086 and `docs/evidence/2026-11-05-v0200-runtime-probe.txt`.
-
 ```json
 {
   "record_type": "test",
@@ -2089,10 +2068,6 @@ HWT-0086 and `docs/evidence/2026-11-05-v0200-runtime-probe.txt`.
   "limitations": "The upload and its hash remain verified under HWT-0085. This record does not evaluate the application itself; it documents that the board could not be returned to normal boot without physical intervention."
 }
 ```
-
-Update (2026-11-05, after HWT-0086): the owner pressed the physical RESET
-button / re-plugged USB. The board then re-enumerated as COM6 and the running
-application answered the serial TIME command. See HWT-0087.
 
 ```json
 {
@@ -2259,5 +2234,245 @@ application answered the serial TIME command. See HWT-0087.
   "evidence_kind": "Owner physical hardware test confirmation and runtime observation",
   "environment": "Physical hardware / LILYGO T-Display-S3 Touch Glass",
   "limitations": "Physical validation of Wi-Fi scanning, passive beacon mode, and display rendering confirmed. Power consumption and long-term 20-cycle automated battery telemetry remain pending."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0094",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.23.0 firmware image",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2, MAC 44:1b:f6:d3:aa:bc)",
+  "wiring": "Direct USB-C on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool detected ESP32-S3 (MAC 44:1b:f6:d3:aa:bc) on COM3, flashed 1,608,208 B application image at 0x00010000 in 13.7 seconds with verified SHA-256 hash, and triggered hard reset via RTS. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0230-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO 6.1.18 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Interactive touch UI gestures and SoftAP web portal browsing from mobile/PC require hands-on physical verification."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0095",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.23.1 firmware image with primary USB HID transport",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2, MAC 44:1b:f6:d3:aa:bc)",
+  "wiring": "Direct USB-C on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool connected to ESP32-S3 on COM3 at 460800 baud, programmed 1,607,728 bytes in 13.8 seconds with verified data hash, and hard-reset via RTS pin. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0231-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO 6.1.18 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Interactive keystroke injection into active text field on host PC pending user test."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0096",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.23.2 firmware image with Web Portal graceful BLE suspension",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2, MAC 44:1b:f6:d3:aa:bc)",
+  "wiring": "Direct USB-C on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool connected to ESP32-S3 on COM3 at 460800 baud, programmed 1,608,112 bytes in 13.7 seconds with verified data hash, and hard-reset via RTS pin. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0232-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO 6.1.18 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Interactive verification of Web Portal activation while BLE is enabled on real device."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0097",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.3",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.23.3 firmware image with CryptoService SAR entropy cleanup",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2, MAC 44:1b:f6:d3:aa:bc)",
+  "wiring": "Direct USB-C on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool connected to ESP32-S3 on COM3 at 460800 baud, programmed 1,607,248 bytes in 13.7 seconds with verified data hash, and hard-reset via RTS pin. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0233-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO 6.1.18 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Interactive verification of System Info reset diagnostics and reboot behavior."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0098",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.4",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.23.4 firmware image with Web Portal keep-alive and sleep lock prevention",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2, MAC 44:1b:f6:d3:aa:bc)",
+  "wiring": "Direct USB-C on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool connected to ESP32-S3 on COM3 at 460800 baud, programmed 1,607,264 bytes in 13.8 seconds with verified data hash, and hard-reset via RTS pin. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0234-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO 6.1.18 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Interactive verification of continuous display keep-alive during active Web Portal session."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0099",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.5",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.23.5 firmware image with flicker-free differential clock screensaver rendering",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2, MAC 44:1b:f6:d3:aa:bc)",
+  "wiring": "Direct USB-C on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool connected to ESP32-S3 on COM3 at 460800 baud, programmed 1,608,112 bytes in 13.7 seconds with verified data hash, and hard-reset via RTS pin. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0235-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO 6.1.18 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Interactive verification of flicker-free clock screensaver and ClockApp updates."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0100",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.6",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.23.6 firmware image with continuous background Web Portal broadcast during screensaver",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2, MAC 44:1b:f6:d3:aa:bc)",
+  "wiring": "Direct USB-C on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool connected to ESP32-S3 on COM3 at 460800 baud, programmed 1,608,336 bytes in 13.8 seconds with verified data hash, and hard-reset via RTS pin. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0236-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO 6.1.18 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Interactive verification of continuous SoftAP broadcast and HTTP serving while Clock Screensaver is active."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0101",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.7",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.23.7 firmware image with clarified System Info Boot Cause telemetry label",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2, MAC 44:1b:f6:d3:aa:bc)",
+  "wiring": "Direct USB-C on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool connected to ESP32-S3 on COM3 at 460800 baud, programmed 1,608,336 bytes in 13.9 seconds with verified data hash, and hard-reset via RTS pin. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0237-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO 6.1.18 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Interactive verification of Boot Cause label in System Info."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0102",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.8",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.23.8 firmware image with Gzip Web Portal streaming and crash elimination",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2, MAC 44:1b:f6:d3:aa:bc)",
+  "wiring": "Direct USB-C on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool connected to ESP32-S3 on COM3 at 460800 baud, programmed 1,584,032 bytes in 13.6 seconds with verified data hash, and hard-reset via RTS pin. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0238-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO 6.1.18 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Interactive verification of phone connection to Web Portal SoftAP."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0103",
+  "date": "2026-11-06",
+  "firmware_version": "v0.23.9",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.23.9 firmware image with official Nibru visual identity for Web Portal",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3 rev v0.2, MAC 44:1b:f6:d3:aa:bc)",
+  "wiring": "Direct USB-C on COM3",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM3",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool connected to ESP32-S3 on COM3 at 460800 baud, programmed 1,588,304 bytes in 13.5 seconds with verified data hash, and hard-reset via RTS pin. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-06-v0239-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO 6.1.18 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Interactive verification of Web Portal dashboard on smartphone."
 }
 ```

@@ -1,0 +1,28 @@
+PlatformIO Build Output - v0.23.6
+Date: 2026-11-06
+Environment: lilygo-t-display-s3
+
+RAM:   [===       ]  26.6% (used 87160 bytes from 327680 bytes)
+Flash: [==        ]  24.5% (used 1607977 bytes from 6553600 bytes)
+
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+
+check_image:
+{
+  "binary_bytes": 1608336,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 4945264,
+  "sha256": "22458e09a9307e16b349ee1dd890e5545018bc0b0352a1708dde66cea77659ea",
+  "growth_percent": 91.071869832158,
+  "warnings": [
+    "Image growth exceeds provisional 5% review trigger"
+  ],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+Took 17.86 seconds
+

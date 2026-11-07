@@ -1,0 +1,15 @@
+Building in release mode
+RAM:   [===       ]  27.5% (used 90256 bytes from 327680 bytes)
+Flash: [==        ]  24.3% (used 1589549 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+check_image([".pio\build\lilygo-t-display-s3\firmware.bin"], [".pio\build\lilygo-t-display-s3\firmware.elf"])
+{
+  "binary_bytes": 1589920,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 4963680,
+  "sha256": "cfbe968dae4a7b35a3492b1ea4d99aab41028caef433e62507eac520aad02f72"
+}
+Resource artifact check PASS
+======================== [SUCCESS] Took 103.92 seconds ========================

@@ -1,170 +1,90 @@
 # Current state
 
-
-
-Snapshot: 2026-11-05, Asia/Baghdad. Implementation and physical acceptance are
-
+Snapshot: 2026-11-07, Asia/Baghdad. Implementation and physical acceptance are
 separate; [history](DEVELOPMENT_LOG.md) is append-only.
 
-
-
 ```json
-
 {
-
   "record_type": "state",
-
   "date": "2026-11-07",
-
-  "runtime_version": "v0.22.4",
-
+  "runtime_version": "v0.24.0",
   "source_patch_label": "v0.1.1-source-patch (legacy documentation label)",
-
   "branch_at_baseline": "main",
-
   "baseline_commit": "8239bb6",
-
-  "working_tree": "Passive beacon scanning mode, active-to-passive toggle, zero-flicker differential state redraw, and RP-SMA hardware pin check",
-
+  "working_tree": "Merge origin/main: unify Web Portal v0.23 and external antenna Wi-Fi scanner v0.22 into v0.24.0",
   "implemented_features": [
-
     "FEAT-0024",
-
     "FEAT-0001",
-
     "FEAT-0002",
-
     "FEAT-0003",
-
     "FEAT-0004",
-
     "FEAT-0005",
-
     "FEAT-0006",
-
     "FEAT-0008",
-
     "FEAT-0009",
-
     "FEAT-0010",
-
     "FEAT-0011",
-
     "FEAT-0012",
-
     "FEAT-0013",
-
     "FEAT-0014",
-
     "FEAT-0015",
-
     "FEAT-0016",
-
     "FEAT-0017",
-
     "FEAT-0018",
-
     "FEAT-0019",
-
     "FEAT-0020",
-
     "FEAT-0021",
-
     "FEAT-0022",
-
     "FEAT-0023",
-
     "FEAT-0025",
-
     "FEAT-0026",
-
     "FEAT-0027",
-
-    "FEAT-0028"
-
+    "FEAT-0028",
+    "FEAT-0029"
   ],
-
   "planned_features": [
-
     "FEAT-0007"
-
   ],
-
   "active_issues": [
-
     "BUG-0001",
-
     "BUG-0002",
-
     "BUG-0003",
-
     "BUG-0004",
-
     "BUG-0005",
-
     "BUG-0007",
-
     "BUG-0008",
-
     "BUG-0009",
-
     "BUG-0010",
-
     "BUG-0011",
-
     "BUG-0015",
-
     "BUG-0016",
-
     "BUG-0018"
-
   ],
-
-  "latest_build": "VER-0250",
-
+  "latest_build": "VER-0269",
   "latest_upload": "HWT-0093",
-
-  "documentation_verification": "VER-0252",
-
-  "current_host_attempt": "VER-0251",
-
+  "documentation_verification": "VER-0270",
+  "current_host_attempt": "VER-0268",
   "source_constants": {
-
     "kTouchSda": 18,
-
     "kTouchScl": 17,
-
     "kTouchReset": 21,
-
     "kTouchInterrupt": 16,
-
     "kButtonBoot": 0,
-
     "kButtonUser": 14,
-
     "kDisplayPower": 15,
-
     "kDisplayBacklight": 38,
-
     "kScreenWidth": 320,
-
     "kScreenHeight": 170,
-
     "kRotation": 1,
-
     "kTouchDebounceMs": 180,
-
     "kWiFiWarmupMs": 650,
-
     "kScanTimeoutMs": 11000,
-
     "kScanMsPerChannel": 300,
-
     "kScanMaxAttempts": 2,
-
     "kConnectTimeoutMs": 20000
-
   }
+}
+```
 
 }
 
