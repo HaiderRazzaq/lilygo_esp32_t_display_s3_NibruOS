@@ -5728,3 +5728,377 @@ are new observations, not revisions of its original outcomes. Current coverage:
   "limitations": "Host simulation only."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0236",
+  "date": "2026-11-05",
+  "firmware_version": "v0.21.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Beacon Lab force-disconnect build",
+  "hardware": "ESP32-S3",
+  "wiring": "Default",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds.",
+  "actual": "PASS. Firmware built successfully.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0211-build.txt"],
+  "evidence_kind": "Build log capture",
+  "environment": "Windows / PlatformIO",
+  "limitations": "Compile only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0237",
+  "date": "2026-11-05",
+  "firmware_version": "v0.21.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Beacon Lab force-disconnect simulation",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "Tests pass.",
+  "actual": "PASS. Desktop tests passed.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0211-desktop.txt"],
+  "evidence_kind": "Test runner output",
+  "environment": "Windows / MSVC",
+  "limitations": "Host only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0238",
+  "date": "2026-11-05",
+  "firmware_version": "v0.21.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "Antenna hardware switch documentation check",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Doc checks pass.",
+  "actual": "PASS. Documentation checks passed.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0212-docs.txt"],
+  "evidence_kind": "Tool output",
+  "environment": "Windows / Python 3",
+  "limitations": "Documentation check only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0239",
+  "date": "2026-11-05",
+  "firmware_version": "v0.22.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "Fast Wi-Fi scan and differential UI build",
+  "hardware": "ESP32-S3",
+  "wiring": "Default",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds.",
+  "actual": "PASS. Firmware built successfully.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0220-build.txt"],
+  "evidence_kind": "Build log capture",
+  "environment": "Windows / PlatformIO",
+  "limitations": "Compile only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0240",
+  "date": "2026-11-05",
+  "firmware_version": "v0.22.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "Fast scan and zero-flicker differential UI simulation",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "Tests pass.",
+  "actual": "PASS. Simulator tests passed.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-05-v0220-desktop.txt"],
+  "evidence_kind": "Test runner output",
+  "environment": "Windows / MSVC",
+  "limitations": "Host only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0241",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "v0.22.1 scan dwell time and differential redraw build",
+  "hardware": "ESP32-S3",
+  "wiring": "Default",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds.",
+  "actual": "PASS. Firmware built successfully.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0221-build.txt"],
+  "evidence_kind": "Build log capture",
+  "environment": "Windows / PlatformIO",
+  "limitations": "Compile only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0242",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "v0.22.1 desktop tests",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "Tests pass.",
+  "actual": "PASS. Desktop tests passed.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0221-desktop.txt"],
+  "evidence_kind": "Test runner output",
+  "environment": "Windows / MSVC",
+  "limitations": "Host only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0243",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "v0.22.1 doc check",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Docs check passes.",
+  "actual": "PASS. 0 errors found.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0221-docs.txt"],
+  "evidence_kind": "Tool output",
+  "environment": "Windows / Python 3",
+  "limitations": "Documentation check only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0244",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "v0.22.2 build",
+  "hardware": "ESP32-S3",
+  "wiring": "Default",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds.",
+  "actual": "PASS. Firmware built successfully.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0222-build.txt"],
+  "evidence_kind": "Build log capture",
+  "environment": "Windows / PlatformIO",
+  "limitations": "Compile only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0245",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "v0.22.2 desktop tests",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "Tests pass.",
+  "actual": "PASS. Desktop tests passed.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0222-desktop.txt"],
+  "evidence_kind": "Test runner output",
+  "environment": "Windows / MSVC",
+  "limitations": "Host only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0246",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "v0.22.2 doc check",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Docs check passes.",
+  "actual": "PASS. 0 errors found.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0222-docs.txt"],
+  "evidence_kind": "Tool output",
+  "environment": "Windows / Python 3",
+  "limitations": "Documentation check only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0247",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.3",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "v0.22.3 300ms dwell build",
+  "hardware": "ESP32-S3",
+  "wiring": "Default",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds.",
+  "actual": "PASS. Firmware built successfully.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0223-build.txt"],
+  "evidence_kind": "Build log capture",
+  "environment": "Windows / PlatformIO",
+  "limitations": "Compile only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0248",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.3",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "v0.22.3 desktop tests",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "Tests pass.",
+  "actual": "PASS. Desktop tests passed.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0223-desktop.txt"],
+  "evidence_kind": "Test runner output",
+  "environment": "Windows / MSVC",
+  "limitations": "Host only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0249",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.3",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "v0.22.3 doc check",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Docs check passes.",
+  "actual": "PASS. 0 errors found.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0223-docs.txt"],
+  "evidence_kind": "Tool output",
+  "environment": "Windows / Python 3",
+  "limitations": "Documentation check only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0250",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.4",
+  "commit": "WORKING_TREE",
+  "verification_type": "BUILD",
+  "scope": "v0.22.4 passive scan build",
+  "hardware": "ESP32-S3",
+  "wiring": "Default",
+  "procedure": "pio run -e lilygo-t-display-s3",
+  "expected": "Build succeeds.",
+  "actual": "PASS. Firmware built successfully in 54.67s.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0224-build.txt"],
+  "evidence_kind": "Build log capture",
+  "environment": "Windows / PlatformIO",
+  "limitations": "Compile only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0251",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.4",
+  "commit": "WORKING_TREE",
+  "verification_type": "HOST",
+  "scope": "v0.22.4 desktop tests",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "tools\\run_desktop_tests.bat",
+  "expected": "Tests pass.",
+  "actual": "PASS. Desktop tests passed.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0224-desktop.txt"],
+  "evidence_kind": "Test runner output",
+  "environment": "Windows / MSVC",
+  "limitations": "Host only."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "VER-0252",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.4",
+  "commit": "WORKING_TREE",
+  "verification_type": "DOCUMENTATION",
+  "scope": "v0.22.4 doc check",
+  "hardware": "None",
+  "wiring": "None",
+  "procedure": "python tools/check_docs.py",
+  "expected": "Docs check passes.",
+  "actual": "PASS. 0 errors found.",
+  "result": "PASS",
+  "evidence": ["docs/evidence/2026-11-07-v0224-docs.txt"],
+  "evidence_kind": "Tool output",
+  "environment": "Windows / Python 3",
+  "limitations": "Documentation check only."
+}
+```

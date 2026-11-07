@@ -7,8 +7,8 @@
  */
 namespace Config {
 
-constexpr const char* kVersion = "v0.21.0";
-constexpr const char* kSystemTitle = "NibruOS v0.21.0";
+constexpr const char* kVersion = "v0.22.4";
+constexpr const char* kSystemTitle = "NibruOS v0.22.4";
 
 // Display geometry (landscape mode)
 constexpr int ScreenWidth = 320;
@@ -23,6 +23,8 @@ constexpr uint32_t WiFiWarmupMs = 650;
 constexpr uint32_t ScanTimeoutMs = 11000;
 constexpr uint32_t ScanMsPerChannel = 300;
 constexpr uint8_t ScanMaxAttempts = 2;
+constexpr uint32_t FastScanMsPerChannel = 180;
+constexpr uint32_t FastWiFiWarmupMs = 500;
 constexpr uint32_t ConnectTimeoutMs = 20000;
 
 } // namespace Config

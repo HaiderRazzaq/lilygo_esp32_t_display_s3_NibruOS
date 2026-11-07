@@ -11,8 +11,8 @@
  */
 namespace Board {
 // Firmware runtime versioning
-constexpr const char* kVersion = "v0.21.0";
-constexpr const char* kSystemTitle = "NibruOS v0.21.0";
+constexpr const char* kVersion = "v0.22.4";
+constexpr const char* kSystemTitle = "NibruOS v0.22.4";
 
 // Hardware pin mapping (statically verified against PinDefinitions.h)
 constexpr int kTouchSda = 18;
@@ -37,6 +37,8 @@ constexpr uint32_t kWiFiWarmupMs = 650;
 constexpr uint32_t kScanTimeoutMs = 11000;
 constexpr uint32_t kScanMsPerChannel = 300;
 constexpr uint8_t kScanMaxAttempts = 2;
+constexpr uint32_t kFastScanMsPerChannel = 180;
+constexpr uint32_t kFastWiFiWarmupMs = 500;
 constexpr uint32_t kConnectTimeoutMs = 20000;
 
 // Compile-time static assertions ensuring single source of truth alignment
@@ -59,6 +61,8 @@ static_assert(kWiFiWarmupMs == Config::WiFiWarmupMs, "WiFiWarmupMs mismatch");
 static_assert(kScanTimeoutMs == Config::ScanTimeoutMs, "ScanTimeoutMs mismatch");
 static_assert(kScanMsPerChannel == Config::ScanMsPerChannel, "ScanMsPerChannel mismatch");
 static_assert(kScanMaxAttempts == Config::ScanMaxAttempts, "ScanMaxAttempts mismatch");
+static_assert(kFastScanMsPerChannel == Config::FastScanMsPerChannel, "FastScanMsPerChannel mismatch");
+static_assert(kFastWiFiWarmupMs == Config::FastWiFiWarmupMs, "FastWiFiWarmupMs mismatch");
 static_assert(kConnectTimeoutMs == Config::ConnectTimeoutMs, "ConnectTimeoutMs mismatch");
 
 } // namespace Board

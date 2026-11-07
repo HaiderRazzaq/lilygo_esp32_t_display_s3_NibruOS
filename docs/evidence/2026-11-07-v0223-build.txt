@@ -1,0 +1,28 @@
+Processing lilygo-t-display-s3 (platform: espressif32@6.5.0; board: lilygo-t-display-s3; framework: arduino)
+--------------------------------------------------------------------------------
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/lilygo-t-display-s3.html
+PLATFORM: Espressif 32 (6.5.0) > LilyGo T-Display-S3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+Building in release mode
+Retrieving maximum program size .pio\build\lilygo-t-display-s3\firmware.elf
+Checking size .pio\build\lilygo-t-display-s3\firmware.elf
+RAM:   [===       ]  26.3% (used 86328 bytes from 327680 bytes)
+Flash: [==        ]  24.3% (used 1594745 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+check_image([".pio\\build\\lilygo-t-display-s3\\firmware.bin"], [".pio\\build\\lilygo-t-display-s3\\firmware.elf"])
+{
+  "binary_bytes": 1595104,
+  "application_partition_bytes": 6553600,
+  "remaining_bytes": 4958496,
+  "sha256": "50fc83803b5668279ff5eed44021b22e9affe53c030f346aab576308624ab154",
+  "growth_percent": 89.49989545515027,
+  "warnings": [
+    "Image growth exceeds provisional 5% review trigger"
+  ],
+  "runtime_metrics": "NOT MEASURED"
+}
+Resource artifact check PASS (runtime acceptance pending)
+========================= [SUCCESS] Took 49.46 seconds =========================

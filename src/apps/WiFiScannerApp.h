@@ -29,8 +29,12 @@ public:
   bool onBack(AppContext& ctx) override;
   void onDisplayRestored(AppContext&) override {
     fullRedraw_ = true;
+    listHeaderDrawn_ = false;
     invalidate();
   }
+
+  bool isLiveMode() const { return autoScanMode_; }
+  void setLiveMode(bool enable) { autoScanMode_ = enable; }
 
 private:
   bool acquired_ = false;
@@ -39,6 +43,13 @@ private:
   uint32_t viewChangeMs_ = 0;
   uint32_t lastKeyMs_ = 0;
   bool fullRedraw_ = true;
+  bool listHeaderDrawn_ = false;
+  bool autoScanMode_ = false;
+  bool passiveScanMode_ = false;
+  uint8_t animPhase_ = 0;
+  uint32_t lastAutoScanStartMs_ = 0;
+  uint8_t lastRenderedCount_ = 255;
+  ScanState lastRenderedScanState_ = ScanState::Idle;
 
   ScanState lastScanState_ = ScanState::Idle;
   ConnectState lastConnState_ = ConnectState::Disconnected;
@@ -63,6 +74,7 @@ private:
   void renderConnecting(AppContext& ctx);
   void renderConnected(AppContext& ctx);
 
+  void renderSignalBars(AppContext& ctx, int x, int y, int16_t rssi, uint16_t sigColor);
   void renderPasswordBox(AppContext& ctx);
   void startConnection(AppContext& ctx);
 };

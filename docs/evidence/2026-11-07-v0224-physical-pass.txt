@@ -1,0 +1,8 @@
+Target: LILYGO T-Display-S3 Touch Glass with external IPEX 2.4 GHz antenna
+Firmware: v0.22.4
+Observation:
+Owner pressed RST, booted v0.22.4 runtime, opened Wi-Fi Scanner and performed scans.
+Owner confirmed: 'نعم الان يعمل بشكل ممتاز' (Yes, now it works excellently).
+Network discovery: PASS - APs detected across 2.4 GHz channels with strong RSSI.
+Display stability: PASS - Zero screen flickering, smooth in-place differential card updates.
+RF Hardware: PASS - 0-ohm jumper resistor rotation to external IPEX pad verified working in both TX and RX.

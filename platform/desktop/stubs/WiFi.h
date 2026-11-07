@@ -52,7 +52,10 @@ struct MockWiFi {
     return true;
   }
 
+  int currentMode = 0;
+  int getMode() const { return currentMode; }
   bool mode(int m) {
+    currentMode = m;
     return MockWiFiService::instance().onMode(m);
   }
 

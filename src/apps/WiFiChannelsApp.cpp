@@ -31,7 +31,7 @@ void WiFiChannelsApp::onTick(AppContext& ctx, uint32_t nowMs) {
 
 void WiFiChannelsApp::onPrimaryAction(AppContext& ctx) {
   if (!acquired_) return;
-  ctx.wifi.startScan(millis());
+  ctx.wifi.startScan(millis(), true);
   invalidate();
 }
 

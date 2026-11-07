@@ -11,6 +11,8 @@ public:
   void onTick(AppContext& ctx, uint32_t nowMs) override;
   void onTouch(AppContext& ctx, const TouchEvent& touch) override;
   void onPrimaryAction(AppContext& ctx) override;
+  void onActivate(AppContext& ctx) override;
+  void forceStart(AppContext& ctx);
   void render(AppContext& ctx) override;
   uint8_t openCount() const { return openCount_; }
   uint8_t securedCount() const { return securedCount_; }

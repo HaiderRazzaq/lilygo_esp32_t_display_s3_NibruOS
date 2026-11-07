@@ -1,5 +1,64 @@
 # Changelog
 
+## [v0.22.4] - 2026-11-07
+
+### Added
+
+- Passive 802.11 beacon scanning support in `WiFiService`: captures periodic AP beacon broadcasts on 2.4 GHz channels 1-13 without transmitting probe requests, bypassing router probe-filtering.
+- In-page `[ACTIVE / PASSIVE]` mode toggle in `WiFiScannerApp` control bar, allowing instant switching between active probe request scanning and passive beacon listening.
+- Zero-flicker state-guarded differential redraw: empty-state backgrounds are only redrawn when scan state changes, completely eliminating black flashing during empty or scanning states.
+
+## [v0.22.3] - 2026-11-07
+
+### Added
+
+- Restored standard 300ms channel dwell for maximum active scan detection coverage.
+- On-screen diagnostic antenna verification text in `WiFiScannerApp` when 0 networks are detected.
+
+## [v0.22.2] - 2026-11-07
+
+### Fixed
+
+- Free ESP32 Wi-Fi radio on scan: `prepareStation()` now explicitly disconnects any active or connecting station association prior to channel sweeping, solving the issue where scanning while connected to an AP returned 0 networks due to single-radio channel locking.
+- 100% Flicker Elimination: completely removed the 100ms animation tick loop in `WiFiScannerApp` that was repeatedly calling `invalidate()` and clearing `fillRect` 10 times per second; control bar elements now use tight bounding boxes rather than full-width bar clears, and the screen remains rock-solid still with zero black flashing during scanning.
+
+## [v0.22.1] - 2026-11-07
+
+### Fixed
+
+- Wi-Fi scan dwell time and station warmup: increased `ScanMsPerChannel` to 250ms and `FastScanMsPerChannel` to 180ms with 650ms/500ms warmup so 802.11 active probe scans reliably detect APs within standard beacon intervals (fixing 0 networks found on physical hardware).
+- Screen clearing and ghost data removal: `WiFiScannerApp` now clears the control bar at y=34..65 and wipes the card list zone at y=66..150 whenever slot count is 0 or refreshed, completely eliminating stale cards and ghost text while preserving top/bottom bars with zero flicker.
+- Initial scan on entry in `WiFiScannerApp` now initiates a standard reliable scan before allowing fast scan refreshes.
+
+## [v0.22.0] - 2026-11-05
+
+### Added
+
+- High-speed fast Wi-Fi scan engine (`kFastScanMsPerChannel = 80ms`, `kFastWiFiWarmupMs = 50ms`), reducing scan cycle time from 4.5s down to ~1.1s.
+- Zero-flicker differential in-place rendering engine in `WiFiScannerApp`: structural header and footer are drawn once on entry; network cards and controls are updated in place with solid backgrounds, eliminating 100% of screen blanking and flicker during scanning, touch, and scrolling.
+- Real-time continuous live monitoring mode (`[LIVE: ON/OFF]` toggle button) that continuously refreshes APs and RSSI values.
+- 4-bar graphical signal strength meters on every network card (color-coded Green/Cyan/Amber/Red based on RSSI threshold).
+- Manual fast scan refresh button (`[FAST SCAN]`) and physical BOOT button (GPIO 0) trigger.
+- Automated desktop simulator tests for fast scanning, live mode toggle, and flicker-free differential UI lifecycle.
+
+## [v0.21.2] - 2026-11-05
+
+### Added
+
+- Hardware guide and official manufacturer diagram in docs/HARDWARE_PINOUT.md for enabling the external 2.4 GHz IPEX / U.FL antenna.
+- Documented 0-ohm SMD jumper resistor rework (rotating from default onboard antenna to yellow external IPEX position).
+- Multimeter continuity and short-circuit verification procedures prior to RF powering.
+- Critical Power Amplifier (PA) burnout protection guidelines prohibiting transmission without an antenna attached.
+
+## [v0.21.1] - 2026-11-05
+
+### Added
+
+- Beacon Lab long-press force-start (`forceStart`): holding the START button or BOOT button automatically disconnects any active Wi-Fi connection, cancels scans, and starts broadcasting without leaving the page.
+- Direct in-page `[DISCONNECT WI-FI]` badge in Beacon Lab allowing one-tap station disconnection when Wi-Fi is connected.
+- START button contextual label updates to `START (HOLD: AUTO-DISC)` when Wi-Fi is connected.
+- Automated tests in desktop simulator verifying auto-disconnect, force-start, and in-page disconnect badge taps.
+
 ## [v0.21.0] - 2026-11-05
 
 ### Added

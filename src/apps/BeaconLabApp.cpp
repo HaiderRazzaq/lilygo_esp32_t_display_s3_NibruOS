@@ -32,9 +32,48 @@ void BeaconLabApp::onTick(AppContext& ctx, uint32_t nowMs) {
   }
 }
 
+void BeaconLabApp::forceStart(AppContext& ctx) {
+  if (ctx.resources.ownsWiFi(ResourceOwner::BeaconLab)) {
+    onExit(ctx);
+    return;
+  }
+  if (ctx.wifi.isConnected() || ctx.wifi.connectState() == ConnectState::Connecting) {
+    ctx.wifi.disconnect();
+  }
+  ctx.wifi.stopScan();
+
+  if (ctx.resources.wifiOwner() != ResourceOwner::None &&
+      !ctx.resources.ownsWiFi(ResourceOwner::BeaconLab)) {
+    ctx.resources.releaseWiFi(ctx.resources.wifiOwner());
+  }
+
+  if (!ctx.resources.acquireWiFi(ResourceOwner::BeaconLab)) {
+    status_ = "Radio busy";
+  } else if (!ctx.wifi.startBeaconLab(openCount_, securedCount_, durationSeconds_, millis())) {
+    ctx.resources.releaseWiFi(ResourceOwner::BeaconLab);
+    status_ = "Wi-Fi busy or unavailable";
+  } else {
+    status_ = "Broadcasting (Wi-Fi disconnected)";
+  }
+  invalidate();
+}
+
+void BeaconLabApp::onActivate(AppContext& ctx) {
+  if (ctx.wifi.isConnected()) {
+    forceStart(ctx);
+  } else {
+    onPrimaryAction(ctx);
+  }
+}
+
 void BeaconLabApp::onPrimaryAction(AppContext& ctx) {
   if (ctx.resources.ownsWiFi(ResourceOwner::BeaconLab)) {
     onExit(ctx);
+    return;
+  }
+  if (ctx.wifi.isConnected()) {
+    status_ = "Wi-Fi busy (Hold START to force)";
+    invalidate();
     return;
   }
   if (!ctx.resources.acquireWiFi(ResourceOwner::BeaconLab)) {
@@ -49,6 +88,24 @@ void BeaconLabApp::onPrimaryAction(AppContext& ctx) {
 }
 
 void BeaconLabApp::onTouch(AppContext& ctx, const TouchEvent& touch) {
+  // 1. Long Press on START button: auto-disconnect Wi-Fi and force start
+  if (touch.gesture == TouchGesture::LongPress &&
+      touch.x >= 13 && touch.x < 307 && touch.y >= 129 && touch.y < 159) {
+    forceStart(ctx);
+    return;
+  }
+
+  // 2. Click on [DISCONNECT WI-FI] badge on status line
+  if (touch.gesture == TouchGesture::Tap && ctx.wifi.isConnected() &&
+      !ctx.wifi.beaconActive() && touch.y >= 156 && touch.y <= 170 &&
+      touch.x >= 13 && touch.x <= 130) {
+    ctx.wifi.disconnect();
+    status_ = "Wi-Fi disconnected";
+    invalidate();
+    return;
+  }
+
+  // 3. Regular Tap handling
   if (touch.gesture != TouchGesture::Tap) return;
   if (touch.x < 13 || touch.x >= 307) return;
   if (touch.y >= 129 && touch.y < 159) {
@@ -92,8 +149,21 @@ void BeaconLabApp::render(AppContext& ctx) {
   row(94, "Seconds", durationSeconds_);
   const auto color = running ? Colors::Red : Colors::Cyan;
   gfx.fillRoundRect(13, 129, 294, 27, 6, color);
-  screen.label(136, 138, running ? "STOP" : "START", Colors::Bg, 1, color);
-  screen.label(13, 160, status_, Colors::Muted, 1, Colors::Bg);
+  if (running) {
+    screen.label(136, 138, "STOP", Colors::Bg, 1, color);
+  } else if (ctx.wifi.isConnected()) {
+    screen.label(70, 138, "START (HOLD: AUTO-DISC)", Colors::Bg, 1, color);
+  } else {
+    screen.label(136, 138, "START", Colors::Bg, 1, color);
+  }
+
+  if (ctx.wifi.isConnected() && !running) {
+    gfx.fillRoundRect(13, 157, 108, 12, 2, Colors::Panel);
+    gfx.drawRoundRect(13, 157, 108, 12, 2, Colors::Amber);
+    screen.label(16, 159, "DISCONNECT WI-FI", Colors::Amber, 1, Colors::Panel);
+  } else {
+    screen.label(13, 160, status_, Colors::Muted, 1, Colors::Bg);
+  }
   char accepted[24];
   snprintf(accepted, sizeof(accepted), "TX accepted: %u",
            static_cast<unsigned>(ctx.wifi.beaconAcceptedNames()));

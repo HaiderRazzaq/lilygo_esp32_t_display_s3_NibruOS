@@ -2606,3 +2606,164 @@ Corrections must be appended with the original ID reference.
   "follow_up": "Upload v0.21.0 to hardware and verify touch navigation and sub-tool entry on the physical display."
 }
 ```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0073",
+  "date": "2026-11-05",
+  "related": ["FEAT-0023", "VER-0236", "VER-0237"],
+  "action": "Add Beacon Lab long-press auto-disconnect and force-start in v0.21.1",
+  "files": [
+    "src/apps/BeaconLabApp.h",
+    "src/apps/BeaconLabApp.cpp",
+    "tests/desktop/test_simulator.cpp",
+    "tests/host/test_main.cpp"
+  ],
+  "description": "When Wi-Fi is connected, Beacon Lab informs the user and allows a long-press on START (or BOOT hold) to automatically disconnect Wi-Fi and start broadcasting immediately. An in-page [DISCONNECT WI-FI] badge is also provided for one-tap manual disconnection.",
+  "reason": "The owner requested being able to disconnect Wi-Fi or auto-disconnect on START long-press from inside Beacon Lab without navigating back to WiFiApp.",
+  "expected": "Zero-friction transition into beacon testing from any connected state; clean station disconnection and radio lease acquisition.",
+  "actual": "Desktop simulator tests and host unit tests passed. PlatformIO ESP32-S3 build succeeded at 1,593,913 B Flash (+504 B) and 86,312 B static RAM with code 0.",
+  "verification": "VER-0236 build PASS, VER-0237 desktop PASS",
+  "risks": "Force-disconnecting station mode drops any active network connection; clearly indicated on UI with confirmation badge.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Upload v0.21.1 to device and test LongPress on START with an active Wi-Fi connection."
+}
+```
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0074",
+  "date": "2026-11-05",
+  "related": ["FEAT-0024", "VER-0238"],
+  "action": "Add external IPEX/U.FL antenna hardware guide and safety protocol in v0.21.2",
+  "files": [
+    "docs/HARDWARE_PINOUT.md",
+    "docs/assets/T-Display-S3-antenna-switch.png",
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "docs/CURRENT_STATE.md",
+    "CHANGELOG.md"
+  ],
+  "description": "Document the complete physical modification procedure to switch the LILYGO T-Display-S3 from the onboard ceramic antenna to an external IPEX/U.FL antenna. Detail 0-ohm jumper resistor rotation, multimeter continuity checks, and PA protection warnings.",
+  "reason": "The owner inquired about connecting an external antenna for enhanced Wi-Fi and Bluetooth range in security audit tools.",
+  "expected": "Clear hardware guidance preventing RF power amplifier burnout and ensuring proper impedance and connection.",
+  "actual": "Documented in HARDWARE_PINOUT.md with official schematic asset; version synchronized across codebase.",
+  "verification": "VER-0238 doc checks PASS",
+  "risks": "Soldering 0402 SMD resistor carries risk of bridging GND or lifting pads; running RF transmitter without antenna destroys ESP32-S3 PA.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Perform physical soldering and multimeter continuity check before attaching external 2.4 GHz antenna."
+}
+```
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0075",
+  "date": "2026-11-05",
+  "related": ["FEAT-0004", "VER-0239", "VER-0240"],
+  "action": "Implement fast Wi-Fi scanning, live auto-scan, and zero-flicker differential UI in v0.22.0",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/services/WiFiService.h",
+    "src/services/WiFiService.cpp",
+    "src/apps/WiFiScannerApp.h",
+    "src/apps/WiFiScannerApp.cpp",
+    "src/apps/WiFiChannelsApp.cpp",
+    "platform/desktop/stubs/WiFi.h",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Add fast 80ms/channel scan engine, in-place differential rendering eliminating screen clear flicker, [LIVE: ON/OFF] continuous monitoring, 4-bar graphical RSSI meters, and manual FAST SCAN button / BOOT action.",
+  "reason": "The owner requested adding fast, high-framerate Wi-Fi network scanning with manual refresh, guaranteeing zero screen flickering on every scan, touch, or second.",
+  "expected": "Rapid ~1.1s scans, zero black blinks during browse/scan/touch, live visual RSSI updates for antenna tuning.",
+  "actual": "PlatformIO ESP32-S3 build succeeded at 1,594,529 B Flash (24.3%) and 86,328 B RAM (26.3%); all desktop simulator tests passed.",
+  "verification": "VER-0239 build PASS, VER-0240 desktop PASS",
+  "risks": "Continuous live scanning draws radio RX power while active; live mode defaults to OFF and can be toggled via touch.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Upload v0.22.0 to physical device and verify live RSSI signal meter responsiveness with the external antenna."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0076",
+  "date": "2026-11-07",
+  "related": ["FEAT-0004", "BUG-0010", "VER-0241", "VER-0242", "VER-0243"],
+  "action": "Fix Wi-Fi scan dwell time, station warmup, and differential screen clearing in v0.22.1",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/services/WiFiService.h",
+    "src/services/WiFiService.cpp",
+    "src/apps/WiFiScannerApp.h",
+    "src/apps/WiFiScannerApp.cpp",
+    "platform/desktop/stubs/WiFi.h",
+    "tests/desktop/test_simulator.cpp"
+  ],
+  "description": "Increase ScanMsPerChannel to 250ms and FastScanMsPerChannel to 180ms with 650ms/500ms warmup to reliably capture 802.11 active probe responses within beacon intervals. In WiFiScannerApp, clear control bar at y=34..65 and wipe card list zone at y=66..150 when count==0 or slot is unused, eliminating stale ghost data and cards while preserving structural header and footer with zero flicker.",
+  "reason": "Physical hardware testing of v0.22.0 revealed 'in fast scan its no network found' due to 80ms dwell being shorter than 102.4ms beacon interval and station PLL warmup, and 'screen was has old data in screen its not update all' due to incomplete row clearing on empty/refresh state.",
+  "expected": "Reliable AP discovery on hardware, clean updates of all rows and status text without residual cards, zero screen flickering.",
+  "actual": "PlatformIO ESP32-S3 build VER-0241 PASS at 1,594,992 B Flash (24.3%) and 86,328 B RAM (26.3%); desktop simulator tests VER-0242 PASS; documentation check VER-0243 PASS.",
+  "verification": "VER-0241 build PASS, VER-0242 desktop PASS, VER-0243 docs PASS",
+  "risks": "Dwell time increase from 80ms to 180ms adds ~1.3s to fast scan cycle time, but guarantees RFC-compliant probe response reception.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Upload v0.22.1 to physical device via COM5 and perform on-device validation of network discovery and row refreshing."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0077",
+  "date": "2026-11-07",
+  "related": ["FEAT-0004", "BUG-0010", "VER-0244", "VER-0245", "VER-0246"],
+  "action": "Disconnect active station on scan to free radio on ESP32, eliminate 100ms animation tick loop, tight bounding box control bar updates with zero flicker in v0.22.2",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/services/WiFiService.cpp",
+    "src/apps/WiFiScannerApp.h",
+    "src/apps/WiFiScannerApp.cpp"
+  ],
+  "description": "In prepareStation, explicitly disconnect active/connecting station association to release the ESP32 radio from connected AP channel locking, enabling full 2.4GHz multi-channel active probe scanning when user searches while connected. In WiFiScannerApp, completely remove 100ms animation invalidate loop that caused 10 Hz full-screen blanking, update buttons with tight bounding boxes instead of full-bar clearing, and eliminate repeated card list clears.",
+  "reason": "User reported 'i already connected to network but if using search i cant find any wifi' (ESP32 single-radio lock prevented scanning while connected) and 'its screen flicker' (100ms animation loop was erasing Y 34..150 black 10 times a second).",
+  "expected": "Wi-Fi scan successfully discovers all surrounding APs even when previously connected; screen remains rock-solid still with zero flicker or black blanking during scanning.",
+  "actual": "PlatformIO ESP32-S3 build VER-0244 PASS at 1,595,072 B Flash (24.3%) and 86,328 B RAM (26.3%); desktop simulator tests VER-0245 PASS; documentation check VER-0246 PASS.",
+  "verification": "VER-0244 build PASS, VER-0245 desktop PASS, VER-0246 docs PASS",
+  "risks": "Disconnecting active station temporarily drops network association while scanning; user can tap any discovered or saved network to reconnect immediately.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Upload v0.22.2 to physical ESP32-S3 and verify that scanning works while previously connected with zero screen flickering."
+}
+```
+
+```json
+{
+  "record_type": "development",
+  "id": "DEV-0078",
+  "date": "2026-11-07",
+  "related": ["FEAT-0004", "BUG-0010", "VER-0250", "VER-0251", "VER-0252", "HWT-0092"],
+  "action": "Add passive beacon scan mode, in-page active/passive toggle, and state-guarded zero-flicker redraw in v0.22.4",
+  "files": [
+    "include/NibruConfig.h",
+    "include/BoardConfig.h",
+    "src/main.cpp",
+    "src/services/WiFiService.h",
+    "src/services/WiFiService.cpp",
+    "src/apps/WiFiScannerApp.h",
+    "src/apps/WiFiScannerApp.cpp"
+  ],
+  "description": "Add full passive 802.11 beacon scanning support in WiFiService without transmitting active probe requests. Add [PASSIVE / ACTIVE] mode toggle in WiFiScannerApp control bar. Guard card list redraws against empty-state clearing when state is unchanged, eliminating all remaining screen flicker.",
+  "reason": "Owner confirmed that transmission (TX) is working strongly and multimeter resistance is 300 ohms (ESD diodes, no GND short). Some routers ignore active probe requests, requiring passive beacon listening. User requested adding passive scan.",
+  "expected": "Flawless discovery of APs through raw periodic 802.11 beacons; rock-solid display with zero flicker.",
+  "actual": "PlatformIO ESP32-S3 build VER-0250 PASS at 1,595,296 B Flash and 86,328 B RAM; desktop simulator tests VER-0251 PASS; uploaded to device as HWT-0092; documentation check VER-0252 PASS.",
+  "verification": "VER-0250 build PASS, VER-0251 desktop PASS, VER-0252 docs PASS, HWT-0092 upload PASS",
+  "risks": "Passive scan requires dwelling long enough to catch 102.4ms beacons; 300ms dwell safely guarantees 2 full beacon periods per channel.",
+  "commit": "WORKING_TREE",
+  "follow_up": "Perform physical testing on hardware and check RP-SMA pin alignment."
+}
+```

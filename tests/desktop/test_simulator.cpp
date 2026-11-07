@@ -272,6 +272,40 @@ void testWiFiSimulation(AppContext& ctx) {
   wifi.stopScan();
   res.releaseWiFi(ResourceOwner::WiFiScanner);
 
+  // 4. Fast Scan Verification
+  MockWiFiService::instance().setSimulationMode(WiFiSimMode::Normal);
+  assert(res.acquireWiFi(ResourceOwner::WiFiScanner));
+  setCustomMillis(50000);
+  assert(wifi.startScan(50000, true));
+  assert(wifi.isFastScan() == true);
+  assert(wifi.state() == ScanState::Preparing);
+  setCustomMillis(50700);
+  wifi.tick(50700);
+  assert(wifi.state() == ScanState::Scanning);
+  setCustomMillis(52000);
+  wifi.tick(52000);
+  assert(wifi.state() == ScanState::Complete);
+  assert(wifi.count() == 5);
+  wifi.stopScan();
+  res.releaseWiFi(ResourceOwner::WiFiScanner);
+
+  // 5. WiFiScannerApp Live Mode and Flicker-Free UI Verification
+  WiFiScannerApp scanner;
+  assert(!scanner.isLiveMode());
+  scanner.setLiveMode(true);
+  assert(scanner.isLiveMode());
+  scanner.onEnter(ctx);
+  assert(!ctx.wifi.isFastScan());
+  ctx.wifi.stopScan();
+  scanner.setLiveMode(true);
+  scanner.onPrimaryAction(ctx);
+  assert(ctx.wifi.isFastScan());
+  scanner.render(ctx);
+  scanner.onPrimaryAction(ctx);
+  scanner.onExit(ctx);
+  assert(!scanner.isLiveMode());
+  assert(ctx.resources.wifiOwner() == ResourceOwner::None);
+
   // Reset clock and mode
   clearCustomMillis();
   MockWiFiService::instance().setSimulationMode(WiFiSimMode::Normal);
@@ -1032,6 +1066,32 @@ int main() {
   beaconLab.onExit(context);
   assert(!wifi.beaconActive());
   assert(resources.wifiOwner() == ResourceOwner::None);
+
+  // Test BeaconLab auto-disconnect and force-start while Wi-Fi is connected
+  wifi.connect("CoffeeShop_Guest", "", millis());
+  delay(1600);
+  wifi.tick(millis());
+  assert(wifi.isConnected());
+  beaconLab.onPrimaryAction(context);
+  assert(!wifi.beaconActive()); // Primary tap warns that Wi-Fi is connected
+  // Long press on START button auto-disconnects Wi-Fi and starts BeaconLab
+  beaconLab.onTouch(context, {150, 140, 0, 0, TouchGesture::LongPress});
+  assert(!wifi.isConnected());
+  assert(wifi.beaconActive());
+  beaconLab.onExit(context);
+  assert(!wifi.beaconActive());
+
+  // Test in-page [DISCONNECT WI-FI] tap
+  wifi.connect("CoffeeShop_Guest", "", millis());
+  delay(1600);
+  wifi.tick(millis());
+  assert(wifi.isConnected());
+  beaconLab.onTouch(context, {50, 160, 0, 0, TouchGesture::Tap}); // tap [DISCONNECT WI-FI] badge
+  assert(!wifi.isConnected());
+  beaconLab.onPrimaryAction(context); // Now normal start succeeds!
+  assert(wifi.beaconActive());
+  beaconLab.onExit(context);
+  assert(!wifi.beaconActive());
 
   testSettingsPersistence(context);
   testModularArchitecture(context);

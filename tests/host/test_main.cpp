@@ -976,6 +976,10 @@ int main() {
     assert(hub.activeTool() == &def);
     hub.onExit(context);
     assert(hub.activeTool() == nullptr);
+
+    bcn.onEnter(context);
+    bcn.forceStart(context);
+    bcn.onExit(context);
   }
 
   puts("PASS: host navigation/resource/async scan/timeout/connect/crypto/settings/defense smoke tests");

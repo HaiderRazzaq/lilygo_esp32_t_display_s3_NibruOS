@@ -182,6 +182,9 @@ bool WiFiService::setBleCoexistence(bool required) {
 
 bool WiFiService::prepareStation(uint32_t nowMs) {
   WiFi.persistent(false);
+  autoConnectActive_ = false;
+  autoConnectIdx_ = -1;
+  const bool alreadySta = staActive_ || ((WiFi.getMode() & WIFI_STA) != 0);
   if (!WiFi.mode(WIFI_STA)) {
     state_ = ScanState::Failed;
     error_ = "STA init failed";
@@ -189,19 +192,34 @@ bool WiFiService::prepareStation(uint32_t nowMs) {
     return false;
   }
   WiFi.setSleep(bleCoexistence_);
-  if (connectState_ != ConnectState::Connected && connectState_ != ConnectState::Connecting) {
+
+  // On ESP32, full 2.4GHz channel scanning requires station association not to be locked
+  // to an active AP connection. Disconnect any active/connecting station to free the radio.
+  if (connectState_ == ConnectState::Connected || connectState_ == ConnectState::Connecting) {
+    Serial.printf("[WiFi] Disconnecting active station from '%s' to free radio for channel scan\n",
+                  connectedSsid_[0] ? connectedSsid_ : targetSsid_);
+    WiFi.disconnect(false, false);
+    connectState_ = ConnectState::Disconnected;
+    connectedSsid_[0] = '\0';
+    connectErrorBuf_[0] = '\0';
+  } else {
     WiFi.disconnect(false, false);
   }
+
   WiFi.scanDelete();
   stageStartedAt_ = nowMs;
   state_ = ScanState::Preparing;
-  Serial.printf("[WiFi] attempt %u/%u: STA preparing (%u ms warmup)\n",
-                attempt_, Board::kScanMaxAttempts, Board::kWiFiWarmupMs);
+  staActive_ = true;
+  warmupDurationMs_ = (isFastScan_ && alreadySta) ? Board::kFastWiFiWarmupMs : Board::kWiFiWarmupMs;
+  Serial.printf("[WiFi] attempt %u/%u: STA preparing (%u ms warmup, fast=%d)\n",
+                attempt_, Board::kScanMaxAttempts, warmupDurationMs_, isFastScan_ ? 1 : 0);
   return true;
 }
 
-bool WiFiService::startScan(uint32_t nowMs) {
+bool WiFiService::startScan(uint32_t nowMs, bool fast, bool passive) {
   if (state_ == ScanState::Preparing || state_ == ScanState::Scanning) return false;
+  isFastScan_ = fast;
+  isPassiveScan_ = passive;
   count_ = 0;
   scanResultCount_ = 0;
   for (auto& channel : channels_) channel = {};
@@ -211,9 +229,12 @@ bool WiFiService::startScan(uint32_t nowMs) {
 }
 
 void WiFiService::startHardwareScan(uint32_t nowMs) {
-  const int result = WiFi.scanNetworks(true, false, false, Board::kScanMsPerChannel);
-  Serial.printf("[WiFi] scanNetworks(async)=%d, freeHeap=%lu\n",
-                result, static_cast<unsigned long>(ESP.getFreeHeap()));
+  const uint32_t dwell = isFastScan_ ? Board::kFastScanMsPerChannel : Board::kScanMsPerChannel;
+  const bool usePassive = isPassiveScan_ || (attempt_ > 1);
+  const int result = WiFi.scanNetworks(true, true, usePassive, dwell);
+  Serial.printf("[WiFi] scanNetworks(async, passive=%d, dwell=%lu)=%d, freeHeap=%lu\n",
+                usePassive ? 1 : 0, static_cast<unsigned long>(dwell), result,
+                static_cast<unsigned long>(ESP.getFreeHeap()));
   if (result == WIFI_SCAN_FAILED) {
     onFailure(nowMs, "Scan start rejected");
     return;
@@ -254,6 +275,7 @@ void WiFiService::onFailure(uint32_t nowMs, const char* why) {
   state_ = ScanState::Failed;
   if (connectState_ == ConnectState::Disconnected) {
     WiFi.mode(WIFI_OFF);
+    staActive_ = false;
   }
 }
 
@@ -422,7 +444,7 @@ void WiFiService::tick(uint32_t nowMs) {
   // 1. Scan state machine
   if (state_ == ScanState::Preparing) {
     if (nowMs < stageStartedAt_) return;
-    if (nowMs - stageStartedAt_ >= Board::kWiFiWarmupMs) startHardwareScan(nowMs);
+    if (nowMs - stageStartedAt_ >= warmupDurationMs_) startHardwareScan(nowMs);
     return;
   }
   if (state_ == ScanState::Scanning) {
@@ -703,6 +725,7 @@ void WiFiService::stopBeaconLab() {
   beaconCount_ = 0;
 #if defined(ARDUINO_ARCH_ESP32) && !defined(UNIT_TEST)
   if (beaconOwnsStation_) WiFi.mode(WIFI_OFF);
+    staActive_ = false;
 #endif
   beaconOwnsStation_ = false;
 }
@@ -711,6 +734,7 @@ void WiFiService::shutdown() {
   disconnect();
   stopScan();
   WiFi.mode(WIFI_OFF);
+    staActive_ = false;
   count_ = 0;
   scanResultCount_ = 0;
   for (auto& channel : channels_) channel = {};

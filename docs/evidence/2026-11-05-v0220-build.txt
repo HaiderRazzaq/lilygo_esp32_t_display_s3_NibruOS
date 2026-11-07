@@ -1,0 +1,6 @@
+PlatformIO ESP32-S3 build output for v0.22.0:
+RAM: 86328 bytes (26.3%)
+Flash: 1594529 bytes (24.3%)
+Binary bytes: 1594896
+SHA-256: cd2075a29a8a14e4d04cb4465e627128b8343d3e50a477efffce2c9bfb3b2c44
+Status: SUCCESS in 72.68s

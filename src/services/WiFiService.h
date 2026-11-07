@@ -28,7 +28,10 @@ static constexpr uint8_t kMaxSavedNetworks = 5;
 class WiFiService {
 public:
   void begin(uint32_t nowMs = 0);
-  bool startScan(uint32_t nowMs);
+  bool startScan(uint32_t nowMs, bool fast = false, bool passive = false);
+  bool isFastScan() const { return isFastScan_; }
+  bool isPassiveScan() const { return isPassiveScan_; }
+  void setPassiveScan(bool passive) { isPassiveScan_ = passive; }
   void stopScan();
   void tick(uint32_t nowMs);
   void shutdown();
@@ -95,6 +98,10 @@ private:
   uint8_t count_ = 0;
   uint8_t attempt_ = 0;
   uint32_t stageStartedAt_ = 0;
+  bool isFastScan_ = false;
+  bool isPassiveScan_ = false;
+  bool staActive_ = false;
+  uint32_t warmupDurationMs_ = 650;
   uint32_t lastScanDurationMs_ = 0;
   const char* error_ = "";
   bool bleCoexistence_ = false;

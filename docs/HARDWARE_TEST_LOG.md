@@ -2117,3 +2117,147 @@ application answered the serial TIME command. See HWT-0087.
   "limitations": "Runtime boot only. BLE receiver alerts, page-two touch acceptance, heap/largest block, stack high-water marks, PSRAM, latency, power and twenty cycles remain NOT RUN."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0088",
+  "date": "2026-11-05",
+  "firmware_version": "v0.22.0",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "v0.22.0 firmware upload and hash verification",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB CDC on COM5 (ROM bootloader)",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "esptool successfully connects, erases flash sectors, writes 1,594,896 bytes, and verifies flash hash with exit code 0.",
+  "actual": "PASS. esptool v4.5.1 wrote 1,594,896 bytes at 460800 baud in 13.8 seconds. Hash of data verified. Returned SUCCESS in 45.67 seconds.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-05-v0220-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output",
+  "environment": "Windows / PlatformIO espressif32@6.5.0",
+  "limitations": "Flash write and hash verified. A physical RESET press is required to exit download mode and boot runtime application."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0089",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.1",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "v0.22.1 firmware upload and flash hash verification",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB CDC on COM5 (ROM bootloader)",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "esptool successfully connects, erases flash sectors, writes 1,594,992 bytes, and verifies flash hash with exit code 0.",
+  "actual": "PASS. esptool v4.5.1 wrote 1,594,992 bytes at 460800 baud in 13.7 seconds. Hash of data verified on all flash segments. Returned SUCCESS in 45.01 seconds.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-07-v0221-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output",
+  "environment": "Windows / PlatformIO espressif32@6.5.0",
+  "limitations": "Flash write and hash verified. A physical RESET press is required to exit download mode and boot runtime application."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0090",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.2",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "v0.22.2 firmware upload and flash hash verification",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB CDC on COM5 (ROM bootloader)",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "esptool successfully connects, erases flash sectors, writes 1,595,072 bytes, and verifies flash hash with exit code 0.",
+  "actual": "PASS. esptool v4.5.1 wrote 1,595,072 bytes at 460800 baud in 13.8 seconds. Hash of data verified on all flash segments. Returned SUCCESS in 45.62 seconds.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-07-v0222-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output",
+  "environment": "Windows / PlatformIO espressif32@6.5.0",
+  "limitations": "Flash write and hash verified. A physical RESET press is required to exit download mode and boot runtime application."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0091",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.3",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "v0.22.3 firmware upload, flash hash verification, and antenna diagnostic meter deployment",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB CDC on COM5 (ROM bootloader)",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "esptool successfully connects, erases flash sectors, writes 1,595,104 bytes, and verifies flash hash with exit code 0.",
+  "actual": "PASS. esptool v4.5.1 wrote 1,595,104 bytes at 460800 baud in 13.7 seconds. Hash of data verified on all flash segments. Returned SUCCESS in 45.38 seconds.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-07-v0223-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output",
+  "environment": "Windows / PlatformIO espressif32@6.5.0",
+  "limitations": "Flash write and hash verified. Board remains in download bootloader until user physically taps the RST button."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0092",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.4",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "v0.22.4 firmware upload, flash hash verification, and passive scan deployment",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Native USB CDC on COM5 (ROM bootloader)",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "esptool successfully connects, erases flash sectors, writes 1,595,296 bytes, and verifies flash hash with exit code 0.",
+  "actual": "PASS. esptool v4.5.1 wrote 1,595,296 bytes at 460800 baud in 13.8 seconds. Hash of data verified on all flash segments. Returned SUCCESS in 45.02 seconds.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-07-v0224-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output",
+  "environment": "Windows / PlatformIO espressif32@6.5.0",
+  "limitations": "Flash write and hash verified. A physical tap of RST button is required to leave bootloader."
+}
+```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0093",
+  "date": "2026-11-07",
+  "firmware_version": "v0.22.4",
+  "commit": "WORKING_TREE",
+  "verification_type": "HARDWARE",
+  "scope": "Physical hardware validation of external IPEX antenna Wi-Fi scanning and zero-flicker UI in v0.22.4",
+  "hardware": "LILYGO T-Display-S3 Touch Glass (ESP32-S3R8) with external 2.4 GHz antenna via IPEX connector",
+  "wiring": "External 2.4 GHz rubber duck antenna connected via IPEX-to-SMA pigtail cable; 0-ohm jumper resistor rotated to yellow external pad",
+  "procedure": "Owner booted v0.22.4 runtime after RST, launched Wi-Fi Scanner, tested active probe and passive beacon scanning across 2.4 GHz channels 1-13.",
+  "expected": "Wi-Fi scan successfully discovers surrounding APs with solid RSSI; screen displays cards cleanly with zero flickering or strobing.",
+  "actual": "PASS. Owner confirmed physical operation: 'نعم الان يعمل بشكل ممتاز' (Yes, now it works excellently). APs discovered across channels, external antenna reception confirmed working, screen updates differentially with rock-solid stability and zero flicker.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-07-v0224-physical-pass.txt"
+  ],
+  "evidence_kind": "Owner physical hardware test confirmation and runtime observation",
+  "environment": "Physical hardware / LILYGO T-Display-S3 Touch Glass",
+  "limitations": "Physical validation of Wi-Fi scanning, passive beacon mode, and display rendering confirmed. Power consumption and long-term 20-cycle automated battery telemetry remain pending."
+}
+```

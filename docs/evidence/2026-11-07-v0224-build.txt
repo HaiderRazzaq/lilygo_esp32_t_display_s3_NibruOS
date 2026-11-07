@@ -1,0 +1,5 @@
+RAM:   [===       ]  26.3% (used 86328 bytes from 327680 bytes)
+Flash: [==        ]  24.3% (used 1594937 bytes from 6553600 bytes)
+Building .pio\build\lilygo-t-display-s3\firmware.bin
+SUCCESS in 54.67s
+Zero compiler errors.
