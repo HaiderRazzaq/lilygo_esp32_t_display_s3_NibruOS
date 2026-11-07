@@ -61,7 +61,7 @@ separate; [history](DEVELOPMENT_LOG.md) is append-only.
     "BUG-0018"
   ],
   "latest_build": "VER-0269",
-  "latest_upload": "HWT-0093",
+  "latest_upload": "HWT-0104",
   "documentation_verification": "VER-0270",
   "current_host_attempt": "VER-0268",
   "source_constants": {

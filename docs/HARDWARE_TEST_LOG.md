@@ -2476,3 +2476,27 @@ and [record rules](ENGINEERING_WORKFLOW.md).
   "limitations": "Physical flash upload verified. Interactive verification of Web Portal dashboard on smartphone."
 }
 ```
+
+```json
+{
+  "record_type": "test",
+  "id": "HWT-0104",
+  "date": "2026-11-07",
+  "firmware_version": "v0.24.0",
+  "commit": "070e02c",
+  "verification_type": "HARDWARE",
+  "scope": "Flash programming and installation of v0.24.0 unified firmware image",
+  "hardware": "LILYGO T-Display-S3 Touch Glass",
+  "wiring": "Direct USB-C on COM5",
+  "procedure": "pio run -e lilygo-t-display-s3 -t upload --upload-port COM5",
+  "expected": "esptool successfully flashes bootloader, partitions, and application image, reporting verified hashes and hard reset.",
+  "actual": "PASS. esptool connected on COM5 at 460800 baud, programmed 1,589,920 bytes in 13.8 seconds with verified data hash, and hard-reset via RTS pin. Exit code 0.",
+  "result": "PASS",
+  "evidence": [
+    "docs/evidence/2026-11-07-v0240-upload.txt"
+  ],
+  "evidence_kind": "Captured esptool output and flash verification report",
+  "environment": "Windows / PlatformIO espressif32@6.5.0 / esptool 4.5.1",
+  "limitations": "Physical flash upload verified. Active Wi-Fi scanning and Web Portal interactive test ready for user verification."
+}
+```
